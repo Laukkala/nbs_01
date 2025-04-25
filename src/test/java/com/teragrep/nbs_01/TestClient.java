@@ -11,7 +11,7 @@ import java.net.URI;
 public final class TestClient implements Session.Listener {
         public static void main(String[] args){
             try{
-                URI serverURI = URI.create("ws://localhost:8080/notebook/list");
+                URI serverURI = URI.create("ws://localhost:8080/notebook/ping");
                 WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
                 webSocketClient.start();
                 TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);

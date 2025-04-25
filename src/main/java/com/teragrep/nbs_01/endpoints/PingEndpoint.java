@@ -1,12 +1,12 @@
 package com.teragrep.nbs_01.endpoints;
 
-public class HelloEndpoint implements EndPoint{
+public class PingEndpoint implements EndPoint{
 
-    public HelloEndpoint(){
+    public PingEndpoint(){
 
     }
 
     public String createResponse(String request) {
-        return "Hello!";
+        return "pong";
     }
 }

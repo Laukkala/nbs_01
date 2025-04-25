@@ -18,7 +18,7 @@ public class NotebookServerTest extends AbstractNotebookServerTest
     // Assert that a simple HTTP request to an existing endpoint results in return code 200 OK
     public void httpConnectTest(){
         Assertions.assertDoesNotThrow(()->{
-            URL serverURL = new URL("http://"+serverAddress()+"/notebook/hello");
+            URL serverURL = new URL("http://"+serverAddress()+"/notebook/ping");
             HttpURLConnection connection = (HttpURLConnection) serverURL.openConnection();
             int status = connection.getResponseCode();
             connection.disconnect();
@@ -29,7 +29,7 @@ public class NotebookServerTest extends AbstractNotebookServerTest
     // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
     public void webSocketConnectTest(){
         Assertions.assertDoesNotThrow(()->{
-            URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/list");
+            URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/ping");
             WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
             webSocketClient.start();
             TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);

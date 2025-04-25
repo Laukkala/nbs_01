@@ -33,10 +33,11 @@ public class NotebookServer extends Thread
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
             PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
-            // Endpoint that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
+            // Endpoints that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
             pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPConnection(new ListEndPoint(root())));
+            pathMappingsHandler.addMapping(PathSpec.from("/ping"),new UpgradeableHTTPConnection(new PingEndpoint()));
             // Endpoint that doesn't support upgrading to WebSocket communication. Takes only HTTP requests.
-            pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPConnection(new HelloEndpoint()));
+            pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPConnection(new PingEndpoint()));
             contextHandler.setHandler(pathMappingsHandler);
             ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
             server.start();
