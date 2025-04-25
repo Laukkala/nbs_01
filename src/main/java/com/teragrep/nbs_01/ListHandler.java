@@ -49,8 +49,8 @@ public class ListHandler extends Handler.Abstract {
         else
         {
             // Handle a normal HTTP request.
-            response.setStatus(HttpStatus.OK_200);
-            response.write(true, Charset.defaultCharset().encode(new HTTPListEndPoint(root).list()),callback);
+            HTTPListEndPoint endPoint = new HTTPListEndPoint(root);
+            endPoint.onRequest(request,response);
             callback.succeeded();
             return true;
         }

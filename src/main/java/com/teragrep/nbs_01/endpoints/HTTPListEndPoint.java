@@ -10,14 +10,13 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 // This endpoint lists all the saved notebooks the user has access to.
-public class HTTPListEndPoint {
+public class HTTPListEndPoint extends HTTPEndPoint {
     private final Directory root;
     public HTTPListEndPoint(Directory root){
         this.root = root;
     }
 
-    public String list(){
-        String ret = "";
+    public String createResponse(String request){
         // Find all notebooks from Directory structure
         StringBuilder sb = new StringBuilder();
         List<ZeppelinFile> files = root.listAllChildren();
@@ -27,7 +26,6 @@ public class HTTPListEndPoint {
                 sb.append("\n");
             }
         }
-        ret = sb.toString();
-        return ret;
+        return sb.toString();
     }
 }
