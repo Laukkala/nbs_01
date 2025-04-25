@@ -18,7 +18,6 @@ public class FindEndPoint implements EndPoint {
 
     @Override
     public String createResponse(String request) {
-        //System.out.println("Responding to request "+request);
         // Find a notebooks from Directory structure based on given ID
         try{
             Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
