@@ -7,6 +7,7 @@ import org.eclipse.jetty.util.IO;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 // This endpoint lists all the saved notebooks the user has access to.
 public class FindEndPoint implements EndPoint {
@@ -22,7 +23,8 @@ public class FindEndPoint implements EndPoint {
         //System.out.println("Responding to request "+request);
         // Find a notebooks from Directory structure based on given ID
         try{
-            ZeppelinFile file = root.findFile(request);
+            Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
+            ZeppelinFile file = updatedDirectory.findFile(request);
             if (!file.isDirectory()){
                 return file.readFile();
             }

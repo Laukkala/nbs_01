@@ -13,7 +13,7 @@ public class AbstractNotebookServerTest {
         if(server.getState() == Thread.State.NEW){
             try {
                 server.start();
-                Thread.sleep(500);
+                Thread.sleep(1000);
             }
             catch (InterruptedException interruptedException){
                 throw new RuntimeException(interruptedException);
