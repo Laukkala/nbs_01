@@ -27,7 +27,7 @@ public class NotebookServerTest
             URI serverURI = URI.create("ws://"+serverAddress+"/notebook/list");
             WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
             webSocketClient.start();
-            WebSocketConnection client = new WebSocketConnection(webSocketClient,serverURI);
+            TestWebSocketConnection client = new TestWebSocketConnection(webSocketClient,serverURI);
             client.sendText("hello");
         });
     }
