@@ -7,18 +7,21 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public final class TestWebSocketClientEndpoint implements Session.Listener {
 
     private final WebSocketClient webSocketClient;
     private final Session webSocketSession;
     private final URI serverURI;
+    private final ArrayList<String> receivedMessages;
 
     public TestWebSocketClientEndpoint(WebSocketClient webSocketClient, URI serverURI){
         try{
             this.webSocketClient = webSocketClient;
             this.serverURI = serverURI;
             this.webSocketSession = this.webSocketClient.connect(this,this.serverURI).get();
+            this.receivedMessages = new ArrayList<>();
         }catch (Exception exception){
             throw new RuntimeException("Failed to create client!");
         }
@@ -40,6 +43,7 @@ public final class TestWebSocketClientEndpoint implements Session.Listener {
 
     @Override
     public void onWebSocketText(String message){
+        receivedMessages.add(message);
         System.out.println("Received message "+message+" from server at "+ webSocketSession.getRemoteSocketAddress().toString());
         webSocketSession.demand();
     }
@@ -53,5 +57,9 @@ public final class TestWebSocketClientEndpoint implements Session.Listener {
         webSocketSession.sendText(message,Callback.from(webSocketSession::demand, failure -> {
             webSocketSession.close(StatusCode.SERVER_ERROR, "Failure while sending message: "+ message, Callback.NOOP);
         }));
+    }
+
+    public ArrayList<String> receivedMessages(){
+        return receivedMessages;
     }
 }

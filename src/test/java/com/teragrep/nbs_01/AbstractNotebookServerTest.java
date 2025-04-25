@@ -8,9 +8,19 @@ public class AbstractNotebookServerTest {
     private final String serverAddress = "localhost:"+serverPort;
     private final Path notebookDirectory = Paths.get("target/notebooks");
     private final Configuration testConfiguration = new Configuration(notebookDirectory,serverPort);
-    private final NotebookServer server = new NotebookServer(testConfiguration);;
+    private final NotebookServer server = new NotebookServer(testConfiguration);
     public void startServer(){
-        server.start();
+        if(server.getState() == Thread.State.NEW){
+            server.start();
+        }
+    }
+
+    public void stopServer() throws InterruptedException {
+        server.join();
+    }
+
+    public Path notebookDirectory(){
+        return notebookDirectory;
     }
     public String serverAddress(){
         return serverAddress;

@@ -21,7 +21,7 @@ public class HTTPConnection extends Handler.Abstract {
 
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        System.out.println("Received an HTTP request!");
+        //System.out.println("Received an HTTP request!");
         response.setStatus(HttpStatus.OK_200);
         response.write(true, Charset.defaultCharset().encode(endPoint.createResponse(Content.Source.asString(request))), Callback.NOOP);
         callback.succeeded();

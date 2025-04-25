@@ -17,12 +17,12 @@ public class WebSocketConnection implements Session.Listener {
     @Override
     public void onWebSocketOpen(Session session){
         this.session = session;
-        System.out.println("New WebSocket session created! "+session.getRemoteSocketAddress().toString());
+        //System.out.println("New WebSocket session created! "+session.getRemoteSocketAddress().toString());
         session.demand();
     }
     @Override
     public void onWebSocketClose(int statusCode, String reason){
-        System.out.println("Client disconnected from WebSocket: "+ session.getRemoteSocketAddress().toString() +", Reason: "+reason);
+        //System.out.println("Client disconnected from WebSocket: "+ session.getRemoteSocketAddress().toString() +", Reason: "+reason);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class WebSocketConnection implements Session.Listener {
     @Override
     public void onWebSocketText(String message){
         session.sendText(endPoint.createResponse(message), Callback.from(()->{
-            System.out.println("Sent response to " + session.getRemoteSocketAddress());
+            //System.out.println("Sent response to " + session.getRemoteSocketAddress());
             session.demand();
         },failure -> {
             session.close(StatusCode.SERVER_ERROR, "failure", Callback.NOOP);
@@ -42,7 +42,7 @@ public class WebSocketConnection implements Session.Listener {
     }
     @Override
     public void onWebSocketError(Throwable cause){
-        System.out.println("Server error: "+cause.toString());
+        System.err.println("Server error: "+cause.toString());
         session.close(StatusCode.SERVER_ERROR,"Websocket Error occurred",Callback.NOOP);
     }
 
