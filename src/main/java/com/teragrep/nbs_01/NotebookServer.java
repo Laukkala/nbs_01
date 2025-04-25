@@ -34,11 +34,11 @@ public class NotebookServer extends Thread
             Server server = new Server(configuration.serverPort());
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
-            ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
             PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
-            pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPHandler(new WebSocketConnection(new ListEndPoint(root())),new HTTPConnection(new ListEndPoint(root()))));
+            pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPHandler(new ListEndPoint(root())));
             pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPHandler(new HTTPConnection(new HelloEndpoint())));
             contextHandler.setHandler(pathMappingsHandler);
+            ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
             server.start();
 
             System.out.println("Server started!");
