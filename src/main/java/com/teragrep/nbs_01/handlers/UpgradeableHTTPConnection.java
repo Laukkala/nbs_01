@@ -8,10 +8,10 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
-public class UpgradeableHTTPHandler extends Handler.Abstract {
+public class UpgradeableHTTPConnection extends Handler.Abstract {
     EndPoint endPoint;
 
-    public UpgradeableHTTPHandler(EndPoint endPoint){
+    public UpgradeableHTTPConnection(EndPoint endPoint){
         this.endPoint = endPoint;
     }
 
@@ -34,17 +34,16 @@ public class UpgradeableHTTPHandler extends Handler.Abstract {
                         return true;
                     }
                 }
-                catch (Exception x)
+                catch (Exception exception)
                 {
-                    System.err.println(x);
-                    Response.writeError(request, response, callback, HttpStatus.UPGRADE_REQUIRED_426, "failed to upgrade", x);
+                    Response.writeError(request, response, callback, HttpStatus.UPGRADE_REQUIRED_426, "failed to upgrade", exception);
                     return true;
                 }
             }
             else
             {
                 // Handle a normal HTTP request.
-                new HTTPConnection(endPoint).onRequest(request,response);
+                new HTTPConnection(endPoint).handle(request,response,callback);
                 callback.succeeded();
                 return true;
             }

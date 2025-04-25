@@ -2,9 +2,7 @@ package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
 import com.teragrep.nbs_01.handlers.HTTPConnection;
-import com.teragrep.nbs_01.handlers.WebSocketConnection;
-import com.teragrep.nbs_01.handlers.HTTPHandler;
-import com.teragrep.nbs_01.handlers.UpgradeableHTTPHandler;
+import com.teragrep.nbs_01.handlers.UpgradeableHTTPConnection;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.UnloadedNotebook;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
@@ -36,9 +34,9 @@ public class NotebookServer extends Thread
             server.setHandler(contextHandler);
             PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
             // Endpoint that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
-            pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPHandler(new ListEndPoint(root())));
+            pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPConnection(new ListEndPoint(root())));
             // Endpoint that doesn't support upgrading to WebSocket communication. Takes only HTTP requests.
-            pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPHandler(new HTTPConnection(new HelloEndpoint())));
+            pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPConnection(new HelloEndpoint()));
             contextHandler.setHandler(pathMappingsHandler);
             ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
             server.start();
