@@ -6,15 +6,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class NotebookServerTest
 {
-    private final String serverPort = "8080";
+    private final int serverPort = 8080;
     private final String serverAddress = "localhost:"+serverPort;
+    private final Path notebookDirectory = Paths.get("target/notebook");
+    private final Configuration testConfiguration = new Configuration(notebookDirectory,serverPort);
 
     public NotebookServerTest(){
-        NotebookServer server = new NotebookServer(Paths.get("target"));
+        NotebookServer server = new NotebookServer(testConfiguration);
         server.start();
     }
 

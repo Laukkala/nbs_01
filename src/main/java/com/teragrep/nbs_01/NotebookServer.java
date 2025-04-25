@@ -15,16 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NotebookServer extends Thread
 {
-    private final Path notebookPath;
-    public NotebookServer(Path notebookPath){
-        this.notebookPath = notebookPath;
+    private final Configuration configuration;
+    public NotebookServer(Configuration configuration){
+        this.configuration = configuration;
     }
 
     public void run(){
         // Start jetty server
         try{
             // Jetty setup
-            Server server = new Server(Integer.parseInt("8080"));
+            Server server = new Server(configuration.serverPort());
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
             ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
@@ -112,7 +112,7 @@ public class NotebookServer extends Thread
     }
 
     public Directory root() throws IOException {
-        return initializeNotebooks(notebookPath, new ConcurrentHashMap<>());
+        return initializeNotebooks(configuration.notebookDirectory(), new ConcurrentHashMap<>());
     }
 }
 
