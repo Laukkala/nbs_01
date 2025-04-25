@@ -32,7 +32,7 @@ public class NotebookServerTest extends AbstractNotebookServerTest
             URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/list");
             WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
             webSocketClient.start();
-            TestWebSocketConnection client = new TestWebSocketConnection(webSocketClient,serverURI);
+            TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
             Assertions.assertEquals(1,webSocketClient.getOpenSessions().size());
             webSocketClient.close();
             Assertions.assertEquals(0,webSocketClient.getOpenSessions().size());

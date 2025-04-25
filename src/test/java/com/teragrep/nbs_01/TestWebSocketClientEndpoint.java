@@ -8,13 +8,13 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import java.net.URI;
 import java.nio.ByteBuffer;
 
-public final class TestWebSocketConnection implements Session.Listener {
+public final class TestWebSocketClientEndpoint implements Session.Listener {
 
     private final WebSocketClient webSocketClient;
     private final Session webSocketSession;
     private final URI serverURI;
 
-    public TestWebSocketConnection(WebSocketClient webSocketClient, URI serverURI){
+    public TestWebSocketClientEndpoint(WebSocketClient webSocketClient, URI serverURI){
         try{
             this.webSocketClient = webSocketClient;
             this.serverURI = serverURI;
