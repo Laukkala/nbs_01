@@ -4,19 +4,11 @@ import com.teragrep.nbs_01.endpoints.*;
 import com.teragrep.nbs_01.handlers.HTTPConnection;
 import com.teragrep.nbs_01.handlers.UpgradeableHTTPConnection;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.UnloadedNotebook;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import org.eclipse.jetty.http.pathmap.PathSpec;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
-
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class NotebookServer extends Thread
 {

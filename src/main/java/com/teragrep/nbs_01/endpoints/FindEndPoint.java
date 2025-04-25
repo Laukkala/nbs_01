@@ -2,11 +2,9 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
-import org.eclipse.jetty.util.IO;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 // This endpoint lists all the saved notebooks the user has access to.

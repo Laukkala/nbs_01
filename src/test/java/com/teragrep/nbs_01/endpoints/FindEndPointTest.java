@@ -14,11 +14,11 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FindEndPointTest extends AbstractNotebookServerTest
 {
@@ -41,7 +41,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
-            byte[] bytes = URLEncoder.encode("2A94M5J1Z","UTF-8").getBytes();
+            byte[] bytes = URLEncoder.encode("2A94M5J1Z", StandardCharsets.UTF_8).getBytes();
             int length = bytes.length;
 
             connection.setFixedLengthStreamingMode(length);
@@ -97,7 +97,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
-            byte[] bytes = URLEncoder.encode("nonexistentID","UTF-8").getBytes();
+            byte[] bytes = URLEncoder.encode("nonexistentID",StandardCharsets.UTF_8).getBytes();
             int length = bytes.length;
 
             connection.setFixedLengthStreamingMode(length);

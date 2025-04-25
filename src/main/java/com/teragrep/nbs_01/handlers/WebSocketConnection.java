@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 
 public class WebSocketConnection implements Session.Listener {
     private Session session;
-    private EndPoint endPoint;
+    private final EndPoint endPoint;
 
     public WebSocketConnection(EndPoint endPoint){
         this.endPoint = endPoint;
@@ -44,9 +44,5 @@ public class WebSocketConnection implements Session.Listener {
     public void onWebSocketError(Throwable cause){
         System.err.println("Server error: "+cause.toString());
         session.close(StatusCode.SERVER_ERROR,"Websocket Error occurred",Callback.NOOP);
-    }
-
-    public Session session(){
-        return session;
     }
 }
