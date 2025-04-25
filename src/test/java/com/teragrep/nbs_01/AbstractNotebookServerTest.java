@@ -11,7 +11,13 @@ public class AbstractNotebookServerTest {
     private final NotebookServer server = new NotebookServer(testConfiguration);
     public void startServer(){
         if(server.getState() == Thread.State.NEW){
-            server.start();
+            try {
+                server.start();
+                Thread.sleep(500);
+            }
+            catch (InterruptedException interruptedException){
+                throw new RuntimeException(interruptedException);
+            }
         }
     }
 

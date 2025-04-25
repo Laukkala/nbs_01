@@ -1,5 +1,6 @@
 package com.teragrep.nbs_01.handlers;
 
+import com.teragrep.nbs_01.Configuration;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.io.Content;
@@ -9,6 +10,7 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,7 +25,7 @@ public class HTTPConnection extends Handler.Abstract {
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         //System.out.println("Received an HTTP request!");
         response.setStatus(HttpStatus.OK_200);
-        response.write(true, Charset.defaultCharset().encode(endPoint.createResponse(Content.Source.asString(request))), Callback.NOOP);
+        response.write(true, ByteBuffer.wrap(endPoint.createResponse(Content.Source.asString(request)).getBytes()), Callback.NOOP);
         callback.succeeded();
         return true;
     }

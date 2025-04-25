@@ -36,6 +36,7 @@ public class NotebookServer extends Thread
             // Endpoints that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
             pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPConnection(new ListEndPoint(root())));
             pathMappingsHandler.addMapping(PathSpec.from("/ping"),new UpgradeableHTTPConnection(new PingEndpoint()));
+            pathMappingsHandler.addMapping(PathSpec.from("/find"),new UpgradeableHTTPConnection(new FindEndPoint(root())));
             // Endpoint that doesn't support upgrading to WebSocket communication. Takes only HTTP requests.
             pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPConnection(new PingEndpoint()));
             contextHandler.setHandler(pathMappingsHandler);
