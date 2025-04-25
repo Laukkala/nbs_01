@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.nio.file.Paths;
 
 public class NotebookServerTest
 {
@@ -13,7 +14,7 @@ public class NotebookServerTest
     private final String serverAddress = "localhost:"+serverPort;
 
     public NotebookServerTest(){
-        NotebookServer server = new NotebookServer();
+        NotebookServer server = new NotebookServer(Paths.get("target"));
         server.start();
     }
 

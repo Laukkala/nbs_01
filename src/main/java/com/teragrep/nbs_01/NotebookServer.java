@@ -1,19 +1,13 @@
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.endpoints.ListEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.UnloadedNotebook;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
-import org.apache.http.HttpHeaders;
-import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.util.Callback;
-import org.eclipse.jetty.websocket.server.WebSocketUpgradeHandler;
+import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
@@ -31,32 +25,10 @@ public class NotebookServer extends Thread
         try{
             // Jetty setup
             Server server = new Server(Integer.parseInt("8080"));
-            //Connector connector = new ServerConnector(server);
-            //server.addConnector(connector);
-            ContextHandler contextHandler = new ContextHandler("/ws");
+            ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
-            WebSocketUpgradeHandler webSocketHandler = WebSocketUpgradeHandler.from(server, contextHandler, container -> {
-                // Map every endpoint
-                container.addMapping("/list", (rq, rs, cb) -> new ListEndPoint(this));
-                //container.addMapping("/load", (rq, rs, cb) -> new LoadEndPoint()); //This is only needed if we need lazy loading. Otherwise we can load notebooks when list is called
-                //container.addMapping("/save", (rq, rs, cb) -> new SaveEndPoint());
-                //container.addMapping("/revisions", (rq, rs, cb) -> new RevisionsEndPoint());
-            });
-            contextHandler.setHandler(webSocketHandler);
-            //contextHandler.setHandler(new Handler.Abstract() {
-            //    @Override
-            //    public boolean handle(Request request, Response response, Callback callback) throws Exception {
-            //        System.out.println("Got http");
-            //        System.out.println(request);
-            //        if(request.getHeaders().contains("Upgrade")){
-            //            System.out.println("Its a websocket upgrade");
-            //        }
-            //        System.out.println(response);
-            //        response.write(true, Charset.defaultCharset().encode("hello thank you"),callback);
-            //        callback.succeeded();
-            //        return true;
-            //    }
-            //});
+            ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
+            contextHandler.setHandler(new ListHandler(root()));
             server.start();
 
             System.out.println("Server started!");

@@ -11,7 +11,7 @@ import java.net.URI;
     public final class Client implements Session.Listener {
         public static void main(String[] args){
             try{
-                URI serverURI = URI.create("ws://localhost:8080/ws/list");
+                URI serverURI = URI.create("ws://localhost:8080/notebook/list");
                 WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
                 webSocketClient.start();
                 WebSocketConnection client = new WebSocketConnection(webSocketClient,serverURI);
