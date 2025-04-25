@@ -1,13 +1,19 @@
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.handlers;
 
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 
 import java.nio.ByteBuffer;
 
-public abstract class WebSocketEndPoint implements Session.Listener, EndPoint {
+public class WebSocketConnection implements Session.Listener {
     private Session session;
+    private EndPoint endPoint;
+
+    public WebSocketConnection(EndPoint endPoint){
+        this.endPoint = endPoint;
+    }
     @Override
     public void onWebSocketOpen(Session session){
         this.session = session;
@@ -27,7 +33,7 @@ public abstract class WebSocketEndPoint implements Session.Listener, EndPoint {
 
     @Override
     public void onWebSocketText(String message){
-        session.sendText(createResponse(message), Callback.from(()->{
+        session.sendText(endPoint.createResponse(message), Callback.from(()->{
             System.out.println("Sent response to " + session.getRemoteSocketAddress());
             session.demand();
         },failure -> {
