@@ -1,13 +1,21 @@
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.endpoints.HTTPListEndPoint;
+import com.teragrep.nbs_01.endpoints.WebSocketListEndPoint;
+import com.teragrep.nbs_01.handlers.HTTPHandler;
+import com.teragrep.nbs_01.handlers.UpgradeableHTTPHandler;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.UnloadedNotebook;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
+import org.eclipse.jetty.http.pathmap.PathMappings;
+import org.eclipse.jetty.http.pathmap.PathSpec;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
@@ -28,7 +36,10 @@ public class NotebookServer extends Thread
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
             ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
-            contextHandler.setHandler(new ListHandler(root()));
+            PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
+            pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPHandler(new WebSocketListEndPoint(root()),new HTTPListEndPoint(root())));
+            pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPHandler(new HTTPListEndPoint(root())));
+            contextHandler.setHandler(pathMappingsHandler);
             server.start();
 
             System.out.println("Server started!");

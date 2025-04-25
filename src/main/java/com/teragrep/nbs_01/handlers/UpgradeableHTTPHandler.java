@@ -1,8 +1,7 @@
-package com.teragrep.nbs_01;
+package com.teragrep.nbs_01.handlers;
 
-import com.teragrep.nbs_01.endpoints.HTTPListEndPoint;
-import com.teragrep.nbs_01.endpoints.WebSocketListEndPoint;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
+import com.teragrep.nbs_01.endpoints.WebSocketEndPoint;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -10,27 +9,25 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
-import java.nio.charset.Charset;
+public class UpgradeableHTTPHandler extends Handler.Abstract {
+    WebSocketEndPoint webSocketEndPoint;
+    HTTPEndPoint httpEndPoint;
 
-public class ListHandler extends Handler.Abstract {
-
-    Directory root;
-
-    public ListHandler(Directory root) {
-        this.root = root;
+    public UpgradeableHTTPHandler(WebSocketEndPoint webSocketEndPoint, HTTPEndPoint httpEndPoint) {
+        this.webSocketEndPoint = webSocketEndPoint;
+        this.httpEndPoint = httpEndPoint;
     }
 
 
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        String pathInContext = Request.getPathInContext(request);
-        if (pathInContext.startsWith("/list") && request.getHeaders().contains("Upgrade", "websocket") && request.getHeaders().contains("Connection", "Upgrade"))
+        if (request.getHeaders().contains("Upgrade", "websocket") && request.getHeaders().contains("Connection", "Upgrade"))
         {
             try
             {
                 ServerWebSocketContainer container = ServerWebSocketContainer.get(request.getContext());
                 // This is a WebSocket upgrade request, perform a direct upgrade.
-                boolean upgraded = container.upgrade((rq, rs, cb) -> new WebSocketListEndPoint(root), request, response, callback);
+                boolean upgraded = container.upgrade((rq, rs, cb) -> webSocketEndPoint, request, response, callback);
                 if (upgraded){
                     return true;
                 }
@@ -49,7 +46,7 @@ public class ListHandler extends Handler.Abstract {
         else
         {
             // Handle a normal HTTP request.
-            HTTPListEndPoint endPoint = new HTTPListEndPoint(root);
+            HTTPEndPoint endPoint = httpEndPoint;
             endPoint.onRequest(request,response);
             callback.succeeded();
             return true;
