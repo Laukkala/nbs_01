@@ -14,7 +14,7 @@ public final class TestWebSocketConnection implements Session.Listener {
     private final Session webSocketSession;
     private final URI serverURI;
 
-    TestWebSocketConnection(WebSocketClient webSocketClient, URI serverURI){
+    public TestWebSocketConnection(WebSocketClient webSocketClient, URI serverURI){
         try{
             this.webSocketClient = webSocketClient;
             this.serverURI = serverURI;
