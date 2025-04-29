@@ -12,7 +12,7 @@ import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 // Otherwise the HTTP request will be handled normally by a HTTPConnection object.
 // Creates either an HTTPConnection object or a WebSocketConnection object with the configured EndPoint.
 public class UpgradeableHTTPConnection extends Handler.Abstract {
-    EndPoint endPoint;
+    private final EndPoint endPoint;
 
     public UpgradeableHTTPConnection(EndPoint endPoint){
         this.endPoint = endPoint;

@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 // A Jetty Handler for HTTP connections to some Endpoint.
 // Extracts the contents of the request and delegates it to it's EndPoint instance for processing, and then returns the response received from the EndPoint.
 public class HTTPConnection extends Handler.Abstract {
-    private EndPoint endPoint;
+    private final EndPoint endPoint;
 
     public HTTPConnection(EndPoint endPoint){
         this.endPoint = endPoint;
