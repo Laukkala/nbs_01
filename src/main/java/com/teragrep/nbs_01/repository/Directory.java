@@ -51,6 +51,22 @@ public final class Directory extends ZeppelinFile {
             throw new FileNotFoundException("Notebook or directory with path "+path.toString()+" not found!");
         }
     }
+    public boolean contains(String id){
+        try{
+            findFile(id);
+            return true;
+        }catch (FileNotFoundException fileNotFoundException){
+            return false;
+        }
+    }
+    public boolean contains(Path path){
+        try{
+            findFile(path);
+            return true;
+        }catch (FileNotFoundException fileNotFoundException){
+            return false;
+        }
+    }
 
     public void move(Path destination) throws IOException{
         if(destination.toAbsolutePath().startsWith(path().toAbsolutePath())){

@@ -5,13 +5,31 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.HashMap;
 
 public final class TestClient implements Session.Listener {
-        public static void main(String[] args){
+
+    private static String[] selections = {"ping","find","new","list"};
+        public static void main(String[] args) throws IOException {
             try{
-                URI serverURI = URI.create("ws://localhost:8080/notebook/find");
+                System.out.print("Which endpoint to connect to?\n" +
+                        "1) "+selections[0]+"\n" +
+                        "2) "+selections[1]+"\n" +
+                        "3) "+selections[2]+"\n" +
+                        "4) "+selections[3]+"\n" +
+                        "Selection: ");
+                BufferedReader br1 = new BufferedReader(new InputStreamReader(System.in));
+                int selection = Integer.parseInt(br1.readLine());
+                if(0 > selection || selection > selections.length){
+                    System.out.println("Invalid selection!");
+                    System.exit(1);
+                }
+
+                URI serverURI = URI.create("ws://localhost:8080/notebook/"+selections[selection-1]);
+                //URI serverURI = URI.create("ws://localhost:8080/notebook/"+endpoint);
                 WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
                 webSocketClient.start();
                 TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
@@ -21,6 +39,7 @@ public final class TestClient implements Session.Listener {
                 while ((message = br.readLine()) != null){
                     client.sendText(message);
                 }
+                br1.close();
                 br.close();
             }catch (Exception exception){
                 System.err.println(exception);
