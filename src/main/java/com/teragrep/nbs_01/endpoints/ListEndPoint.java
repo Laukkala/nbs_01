@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-// This endpoint lists all the saved notebooks the user has access to.
+// Lists all the ID's of saved notebooks
 public class ListEndPoint implements EndPoint {
 
     private final Directory root;

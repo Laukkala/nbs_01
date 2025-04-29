@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
+// A thread that registers all endpoints users can connect to and starts the Jetty server.
 public class NotebookServer extends Thread
 {
     private final Configuration configuration;

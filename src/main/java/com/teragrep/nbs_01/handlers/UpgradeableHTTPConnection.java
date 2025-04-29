@@ -7,7 +7,10 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
-
+// A Jetty Handler for HTTP connections that can be upgraded to a WebSocket connection to some Endpoint.
+// If the HTTP connection is an upgrade request, the connection is upgraded to a WebSocket connection and adds a WebSocketConnection object as a listener for incoming WebSocket events
+// Otherwise the HTTP request will be handled normally by a HTTPConnection object.
+// Creates either an HTTPConnection object or a WebSocketConnection object with the configured EndPoint.
 public class UpgradeableHTTPConnection extends Handler.Abstract {
     EndPoint endPoint;
 

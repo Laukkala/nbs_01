@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-// This endpoint lists all the saved notebooks the user has access to.
+// Returns the JSON content of a Notebook if a matching ID is provided.
 public class FindEndPoint implements EndPoint {
 
     private final Directory root;

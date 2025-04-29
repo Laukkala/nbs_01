@@ -9,7 +9,8 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 
 import java.nio.ByteBuffer;
-
+// A Jetty Handler for HTTP connections to some Endpoint.
+// Extracts the contents of the request and delegates it to it's EndPoint instance for processing, and then returns the response received from the EndPoint.
 public class HTTPConnection extends Handler.Abstract {
     private EndPoint endPoint;
 
@@ -19,7 +20,6 @@ public class HTTPConnection extends Handler.Abstract {
 
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        //System.out.println("Received an HTTP request!");
         response.setStatus(HttpStatus.OK_200);
         response.write(true, ByteBuffer.wrap(endPoint.createResponse(Content.Source.asString(request)).getBytes()), Callback.NOOP);
         callback.succeeded();
