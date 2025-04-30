@@ -66,7 +66,10 @@ public class ListEndPointTest extends AbstractNotebookServerTest
             TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
             Assertions.assertEquals(1,webSocketClient.getOpenSessions().size());
             client.sendText("hello");
-            Thread.sleep(500);
+            long startTime = System.currentTimeMillis();
+            while (client.receivedMessages().size() == 0 && (System.currentTimeMillis()-startTime) < webSocketTimeoutMs){
+                // Wait until a message is received or a timeout is reached.
+            }
             // Read the WebSocket response and assert that we got the proper list of notebook IDs.
             ArrayList<String> receivedMessages = client.receivedMessages();
             Assertions.assertEquals(1,receivedMessages.size());
