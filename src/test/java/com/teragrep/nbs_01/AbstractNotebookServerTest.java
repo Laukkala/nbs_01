@@ -9,6 +9,7 @@ public class AbstractNotebookServerTest {
     private final Path notebookDirectory = Paths.get("target/notebooks");
     private final Configuration testConfiguration = new Configuration(notebookDirectory,serverPort);
     private final NotebookServer server = new NotebookServer(testConfiguration);
+    public final int webSocketTimeoutMs = 1000;
     public void startServer(){
         if(server.getState() == Thread.State.NEW){
             try {
