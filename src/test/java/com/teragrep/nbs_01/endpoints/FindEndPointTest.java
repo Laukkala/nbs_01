@@ -4,8 +4,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.TestWebSocketClientEndpoint;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -19,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FindEndPointTest extends AbstractNotebookServerTest
 {
     private final Path testFilePath = Paths.get("src/test/resources/my_folder/my_second_folder/my_note1_2A94M5J1Z.zpln");
@@ -28,6 +27,14 @@ public class FindEndPointTest extends AbstractNotebookServerTest
         Assertions.assertDoesNotThrow(()->{
              expectedFileContent = Files.readString(testFilePath);
         });
+    }
+    @BeforeEach
+    private void setUp(){
+        copyFileRecursively(notebookResources().toFile(),notebookDirectory().toFile());
+    }
+    @AfterAll
+    private void tearDown(){
+        deleteFileRecursively(notebookDirectory().toFile());
     }
     @Test
     // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs

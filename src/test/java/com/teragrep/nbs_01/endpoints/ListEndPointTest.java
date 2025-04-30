@@ -4,10 +4,10 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.TestWebSocketClientEndpoint;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -18,17 +18,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ListEndPointTest extends AbstractNotebookServerTest
 {
     private List<String> savedFileNames;
-    public ListEndPointTest(){
-        Assertions.assertDoesNotThrow(()->{
-            savedFileNames = Files.list(notebookDirectory())
+    public List<String> readFilesOnDisk(){
+        try{
+            return Files.list(notebookDirectory())
                     .filter(file -> !Files.isDirectory(file))
                     .map(Path::toString)
                     .collect(Collectors.toList());
-        });
+        }catch (IOException ioException){
+            throw new RuntimeException("Failed to initialize test!",ioException);
+        }
+    }
+    @BeforeAll
+    private void setUp(){
+        copyFileRecursively(notebookResources().toFile(),notebookDirectory().toFile());
+        savedFileNames = readFilesOnDisk();
+    }
+    @AfterAll
+    private void tearDown(){
+        deleteFileRecursively(notebookDirectory().toFile());
     }
     @Test
     // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs

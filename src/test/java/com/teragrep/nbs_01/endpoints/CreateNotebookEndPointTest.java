@@ -23,9 +23,8 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest
     private Path testFileName = Paths.get("testFileName.zpln");
     public CreateNotebookEndPointTest(){
     }
-
-    @BeforeEach
-    @AfterAll
+    @AfterEach
+    // Delete the notebook that was created by this test so that multiple tests can be run in succession.
     public void deleteTestNotebook(){
         Assertions.assertDoesNotThrow(()->{
             Path testFilePath = Paths.get(notebookDirectory().toString(), testFileName.toString());
@@ -34,6 +33,14 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest
                 Files.delete(testFilePath);
             }
         });
+    }
+    @BeforeAll
+    private void setUp(){
+        copyFileRecursively(notebookResources().toFile(),notebookDirectory().toFile());
+    }
+    @AfterAll
+    private void tearDown(){
+        deleteFileRecursively(notebookDirectory().toFile());
     }
     @Test
     // Assert that a simple HTTP request to /notebook/new endpoint results in a new file being saved on disk.
