@@ -14,18 +14,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new notebook. Should be provided with a title and a file path in a comma-separated string
 public class CreateNotebookEndpoint implements EndPoint{
-    private Directory root;
+    private final Directory root;
     public CreateNotebookEndpoint(Directory root){
         this.root = root;
     }
 
     public String createResponse(String request) {
         try{
-            root = root.initializeDirectory(root.path(),new ConcurrentHashMap<>(root.children()));
+            Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
             String[] args = request.split(",");
             String title = args[0];
-            Path path = Paths.get(root.path().toString(),args[1]);
-            if(root.contains(path)){
+            Path path = Paths.get(updatedDirectory.path().toString(),args[1]);
+            if(updatedDirectory.contains(path)){
                 return "Notebook already exists!";
             }
             Paragraph paragraph = new Paragraph(UUID.randomUUID().toString(),"",new Script(""));

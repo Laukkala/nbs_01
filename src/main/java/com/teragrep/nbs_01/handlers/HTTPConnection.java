@@ -21,7 +21,8 @@ public class HTTPConnection extends Handler.Abstract {
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         response.setStatus(HttpStatus.OK_200);
-        response.write(true, ByteBuffer.wrap(endPoint.createResponse(Content.Source.asString(request)).getBytes()), Callback.NOOP);
+        String body = new String(Content.Source.asString(request));
+        response.write(true, ByteBuffer.wrap(endPoint.createResponse(body).getBytes()), Callback.NOOP);
         callback.succeeded();
         return true;
     }
