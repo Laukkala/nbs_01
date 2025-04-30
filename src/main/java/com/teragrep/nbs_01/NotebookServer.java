@@ -28,7 +28,7 @@ public class NotebookServer extends Thread
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
             PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
-            Directory root = new Directory("root",configuration.notebookDirectory()).initializeDirectory(configuration.notebookDirectory(),new ConcurrentHashMap<>());
+            Directory root = new Directory("root",configuration.notebookDirectory());
             // Endpoints that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
             pathMappingsHandler.addMapping(PathSpec.from("/list"),new UpgradeableHTTPConnection(new ListEndPoint(root)));
             pathMappingsHandler.addMapping(PathSpec.from("/ping"),new UpgradeableHTTPConnection(new PingEndpoint()));
