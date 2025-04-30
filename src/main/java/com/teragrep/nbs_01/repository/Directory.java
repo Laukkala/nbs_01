@@ -7,14 +7,17 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class Directory extends ZeppelinFile {
+public final class Directory implements ZeppelinFile {
     private final Map<String, ZeppelinFile> children;
+    private final String id;
+    private final Path path;
 
     public Directory(String id, Path path){
         this(id,path,new HashMap<>());
     }
     public Directory(String id, Path path, Map<String, ZeppelinFile> children){
-        super(id,path);
+        this.id = id;
+        this.path = path;
         this.children = Collections.unmodifiableMap(children);
     }
 
@@ -50,6 +53,12 @@ public final class Directory extends ZeppelinFile {
             }
             throw new FileNotFoundException("Notebook or directory with path "+path.toString()+" not found!");
         }
+    }
+    public String id() {
+        return id;
+    }
+    public Path path() {
+        return path;
     }
     public boolean contains(String id){
         try{

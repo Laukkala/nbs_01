@@ -6,31 +6,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ZeppelinFile implements Stubable {
-    private final String id;
-    private final Path path;
-    public ZeppelinFile(String id, Path path){
-        this.id = id;
-        this.path = path;
-    }
+public interface ZeppelinFile extends Stubable {
+
     public abstract void delete() throws IOException;
     public abstract ZeppelinFile findFile(String id) throws FileNotFoundException;
     public abstract ZeppelinFile findFile(Path path) throws FileNotFoundException;
-    public String id(){
-        return id;
-    };
-    public Path path(){
-        return path;
-    }
-    public abstract void save() throws IOException;
-    public abstract boolean isDirectory();
-    /**
-     * Copies a ZeppelinFile in memory, assigning it a new ID
-     * @param path
-     * @param id
-     * @return
-     * @throws IOException
-     */
+    public String id();
+    public Path path();
+    public void save() throws IOException;
+    public  boolean isDirectory();
     public abstract ZeppelinFile copy(Path path, String id) throws IOException;
     public abstract Map<String,ZeppelinFile> children();
     public abstract void printTree();

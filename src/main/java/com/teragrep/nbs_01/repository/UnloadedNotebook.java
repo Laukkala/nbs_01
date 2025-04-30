@@ -21,13 +21,16 @@ import java.util.stream.Collectors;
  * Represents an unloaded notebook.
  * Can only report its name and ID. Other operatoins require you to load the notebook from the Path.
  */
-public final class UnloadedNotebook extends ZeppelinFile {
+public final class UnloadedNotebook implements ZeppelinFile {
+  private final String id;
+  private final Path path;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UnloadedNotebook.class);
   private final Map<String,Paragraph> paragraphs;
 
   public UnloadedNotebook(String id, Path path) {
-    super(id,path);
+    this.id = id;
+    this.path = path;
     this.paragraphs = new HashMap<>();
   }
 
@@ -57,7 +60,12 @@ public final class UnloadedNotebook extends ZeppelinFile {
   }
 
   public String id() {
-    return super.id();
+    return id;
+  }
+
+  @Override
+  public Path path() {
+    return path;
   }
 
   public String title() {

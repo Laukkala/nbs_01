@@ -18,14 +18,16 @@ import java.util.stream.Collectors;
 /**
  * Represents a single Notebook within Zeppelin
  */
-public final class Notebook extends ZeppelinFile implements Stubable {
+public final class Notebook implements ZeppelinFile {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Notebook.class);
   private final LinkedHashMap<String,Paragraph> paragraphs;
   private final String title;
-
+  private final String id;
+  private final Path path;
   public Notebook(String title, String id, Path path, LinkedHashMap<String,Paragraph> paragraphs) {
-    super(id,path);
+    this.id = id;
+    this.path = path;
     this.title = title;
     this.paragraphs = paragraphs;
   }
@@ -56,6 +58,13 @@ public final class Notebook extends ZeppelinFile implements Stubable {
     else {
       throw new FileNotFoundException("Searched path "+path+" does not match with"+path());
     }
+  }
+  public String id() {
+    return id;
+  }
+
+  public Path path() {
+    return path;
   }
 
   public String title() {
