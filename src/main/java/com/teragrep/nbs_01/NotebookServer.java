@@ -34,6 +34,7 @@ public class NotebookServer extends Thread
             pathMappingsHandler.addMapping(PathSpec.from("/ping"),new UpgradeableHTTPConnection(new PingEndpoint()));
             pathMappingsHandler.addMapping(PathSpec.from("/find"),new UpgradeableHTTPConnection(new FindEndPoint(root)));
             pathMappingsHandler.addMapping(PathSpec.from("/new"),new UpgradeableHTTPConnection(new CreateNotebookEndpoint(root)));
+            pathMappingsHandler.addMapping(PathSpec.from("/delete"),new UpgradeableHTTPConnection(new DeleteNotebookEndpoint(root)));
             // Endpoint that doesn't support upgrading to WebSocket communication. Takes only HTTP requests.
             pathMappingsHandler.addMapping(PathSpec.from("/hello"),new HTTPConnection(new PingEndpoint()));
             contextHandler.setHandler(pathMappingsHandler);

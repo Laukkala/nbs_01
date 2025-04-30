@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public final class TestClient implements Session.Listener {
 
-    private static String[] selections = {"ping","find","new","list"};
+    private static String[] selections = {"ping","find","new","list","delete"};
         public static void main(String[] args) throws IOException {
             try{
                 System.out.print("Which endpoint to connect to?\n" +
@@ -20,6 +20,7 @@ public final class TestClient implements Session.Listener {
                         "2) "+selections[1]+"\n" +
                         "3) "+selections[2]+"\n" +
                         "4) "+selections[3]+"\n" +
+                        "5) "+selections[4]+"\n" +
                         "Selection: ");
                 BufferedReader br1 = new BufferedReader(new InputStreamReader(System.in));
                 int selection = Integer.parseInt(br1.readLine());
@@ -29,7 +30,6 @@ public final class TestClient implements Session.Listener {
                 }
 
                 URI serverURI = URI.create("ws://localhost:8080/notebook/"+selections[selection-1]);
-                //URI serverURI = URI.create("ws://localhost:8080/notebook/"+endpoint);
                 WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
                 webSocketClient.start();
                 TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
