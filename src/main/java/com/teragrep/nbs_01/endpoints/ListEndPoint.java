@@ -17,7 +17,7 @@ public class ListEndPoint implements EndPoint {
     }
 
     @Override
-    public String createResponse(String request) {
+    public String createResponseBody(String request) {
         //System.out.println("Responding to request "+request);
         // Find all notebooks from Directory structure
         StringBuilder sb = new StringBuilder();

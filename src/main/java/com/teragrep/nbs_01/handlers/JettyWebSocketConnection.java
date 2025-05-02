@@ -8,11 +8,11 @@ import org.eclipse.jetty.websocket.api.StatusCode;
 import java.nio.ByteBuffer;
 // A Jetty listener for a WebSocket connection to some Endpoint.
 // Creates a session between Client and Server once the connection has been opened, through which communication is routed
-public class WebSocketConnection implements Session.Listener {
+public class JettyWebSocketConnection implements Session.Listener {
     private Session session;
     private final EndPoint endPoint;
 
-    public WebSocketConnection(EndPoint endPoint){
+    public JettyWebSocketConnection(EndPoint endPoint){
         this.endPoint = endPoint;
     }
     // Jetty creates a Session when onWebSocketOpen is called, so we have to assign the Session here instead of in the constructor.
@@ -33,7 +33,7 @@ public class WebSocketConnection implements Session.Listener {
 
     @Override
     public void onWebSocketText(String message){
-        session.sendText(endPoint.createResponse(message), Callback.from(()->{
+        session.sendText(endPoint.createResponseBody(message), Callback.from(()->{
             session.demand();
         },failure -> {
             session.close(StatusCode.SERVER_ERROR, "failure", Callback.NOOP);

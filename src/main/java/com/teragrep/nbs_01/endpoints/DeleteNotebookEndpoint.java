@@ -16,7 +16,7 @@ public class DeleteNotebookEndpoint implements EndPoint{
         this.root = root;
     }
 
-    public String createResponse(String request) {
+    public String createResponseBody(String request) {
         try{
             Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
             ZeppelinFile file = updatedDirectory.findFile(request);

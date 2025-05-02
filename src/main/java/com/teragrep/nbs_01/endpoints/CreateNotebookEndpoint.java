@@ -19,7 +19,7 @@ public class CreateNotebookEndpoint implements EndPoint{
         this.root = root;
     }
 
-    public String createResponse(String request) {
+    public String createResponseBody(String request) {
         try{
             Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
             String[] args = request.split(",");

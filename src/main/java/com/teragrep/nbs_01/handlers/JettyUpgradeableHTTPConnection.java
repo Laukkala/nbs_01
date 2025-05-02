@@ -11,10 +11,10 @@ import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 // If the HTTP connection is an upgrade request, the connection is upgraded to a WebSocket connection and adds a WebSocketConnection object as a listener for incoming WebSocket events
 // Otherwise the HTTP request will be handled normally by a HTTPConnection object.
 // Creates either an HTTPConnection object or a WebSocketConnection object with the configured EndPoint.
-public class UpgradeableHTTPConnection extends Handler.Abstract {
+public class JettyUpgradeableHTTPConnection extends Handler.Abstract {
     private final EndPoint endPoint;
 
-    public UpgradeableHTTPConnection(EndPoint endPoint){
+    public JettyUpgradeableHTTPConnection(EndPoint endPoint){
         this.endPoint = endPoint;
     }
 
@@ -28,7 +28,7 @@ public class UpgradeableHTTPConnection extends Handler.Abstract {
                 try
                 {
                     ServerWebSocketContainer container = ServerWebSocketContainer.get(request.getContext());
-                    boolean upgraded = container.upgrade((rq, rs, cb) -> new WebSocketConnection(endPoint), request, response, callback);
+                    boolean upgraded = container.upgrade((rq, rs, cb) -> new JettyWebSocketConnection(endPoint), request, response, callback);
                     if (upgraded){
                         return true;
                     }
@@ -47,7 +47,7 @@ public class UpgradeableHTTPConnection extends Handler.Abstract {
             else
             {
                 // Handle a normal HTTP request.
-                new HTTPConnection(endPoint).handle(request,response,callback);
+                new JettyHTTPConnection(endPoint).handle(request,response,callback);
                 callback.succeeded();
                 return true;
             }

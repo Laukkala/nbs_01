@@ -7,7 +7,7 @@ public class PingEndpoint implements EndPoint{
 
     }
 
-    public String createResponse(String request) {
+    public String createResponseBody(String request) {
         return "pong";
     }
 }
