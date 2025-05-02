@@ -10,6 +10,8 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 // A thread that registers all endpoints users can connect to and starts the Jetty server.
 public class NotebookServer extends Thread
 {
@@ -26,7 +28,7 @@ public class NotebookServer extends Thread
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
             PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
-            Directory root = new Directory("root",configuration.notebookDirectory());
+            Directory root = new Directory("root",configuration.notebookDirectory()).initializeDirectory(configuration.notebookDirectory(),new ConcurrentHashMap<>());
             // Endpoints that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
             pathMappingsHandler.addMapping(PathSpec.from("/list"),new JettyUpgradeableHTTPConnection(new ListEndPoint(root)));
             pathMappingsHandler.addMapping(PathSpec.from("/ping"),new JettyUpgradeableHTTPConnection(new PingEndpoint()));

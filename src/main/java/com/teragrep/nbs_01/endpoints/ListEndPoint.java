@@ -3,6 +3,7 @@ package com.teragrep.nbs_01.endpoints;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,11 +19,19 @@ public class ListEndPoint implements EndPoint {
 
     @Override
     public String createResponseBody(String request) {
-        //System.out.println("Responding to request "+request);
         // Find all notebooks from Directory structure
         StringBuilder sb = new StringBuilder();
+        ZeppelinFile foundFile;
+        Directory directoryToSearch;
         try{
-            Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
+            foundFile = root.findFile(request);
+            directoryToSearch = (Directory) foundFile;
+        }
+        catch (FileNotFoundException fileNotFoundException){
+            directoryToSearch = root;
+        }
+        try{
+            Directory updatedDirectory = directoryToSearch.initializeDirectory(directoryToSearch.path(),new ConcurrentHashMap<>());
             List<ZeppelinFile> files = updatedDirectory.listAllChildren();
             for (ZeppelinFile file : files) {
                 if (!file.isDirectory()) {
