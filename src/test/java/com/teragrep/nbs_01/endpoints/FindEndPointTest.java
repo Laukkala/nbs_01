@@ -21,7 +21,7 @@ import java.util.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FindEndPointTest extends AbstractNotebookServerTest
 {
-    private final Path testFilePath = Paths.get("src/test/resources/my_folder/my_second_folder/my_note1_2A94M5J1Z.zpln");
+    private final Path testFilePath = Paths.get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
     private String expectedFileContent;
     public FindEndPointTest(){
         Assertions.assertDoesNotThrow(()->{
