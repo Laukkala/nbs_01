@@ -21,6 +21,7 @@ public class UpgradeableHTTPConnection extends Handler.Abstract {
 
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
+        try{
             if (request.getHeaders().contains("Upgrade", "websocket") && request.getHeaders().contains("Connection", "Upgrade"))
             {
                 // Handle a WebSocket connection
@@ -50,5 +51,9 @@ public class UpgradeableHTTPConnection extends Handler.Abstract {
                 callback.succeeded();
                 return true;
             }
+        }catch (Exception exception){
+            callback.failed(exception);
+            return false;
+        }
     }
 }
