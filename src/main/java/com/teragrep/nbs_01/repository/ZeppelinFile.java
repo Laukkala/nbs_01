@@ -8,19 +8,19 @@ import java.util.Map;
 
 public interface ZeppelinFile extends Stubable {
 
-    public abstract void delete() throws IOException;
-    public abstract ZeppelinFile findFile(String id) throws FileNotFoundException;
-    public abstract ZeppelinFile findFile(Path path) throws FileNotFoundException;
-    public String id();
-    public Path path();
-    public void save() throws IOException;
-    public  boolean isDirectory();
-    public abstract ZeppelinFile copy(Path path, String id) throws IOException;
-    public abstract Map<String,ZeppelinFile> children();
-    public abstract void printTree();
-    public abstract String readFile() throws IOException;
-    public abstract ZeppelinFile load() throws IOException;
-    public abstract void move(Path path) throws IOException;
-    public abstract void rename(String name) throws IOException;
-    public abstract List<ZeppelinFile> listAllChildren();
+    void delete() throws IOException;
+    ZeppelinFile findFile(String id) throws FileNotFoundException;
+    ZeppelinFile findFile(Path path) throws FileNotFoundException;
+    String id();
+    Path path();
+    void save() throws IOException;
+    boolean isDirectory();
+    ZeppelinFile copy(Path path, String id) throws IOException;
+    Map<String,ZeppelinFile> children();
+    void printTree();
+    String readFile() throws IOException;
+    ZeppelinFile load() throws IOException;
+    void move(Path path) throws IOException;
+    void rename(String name) throws IOException;
+    List<ZeppelinFile> listAllChildren();
 }
