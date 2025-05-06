@@ -1,5 +1,6 @@
 package com.teragrep.nbs_01.repository;
 
+import jakarta.json.JsonObject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,4 +24,5 @@ public interface ZeppelinFile extends Stubable {
     void move(Path path) throws IOException;
     void rename(String name) throws IOException;
     List<ZeppelinFile> listAllChildren();
+    JsonObject json();
 }

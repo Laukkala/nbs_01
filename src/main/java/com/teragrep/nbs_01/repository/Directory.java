@@ -1,5 +1,7 @@
 package com.teragrep.nbs_01.repository;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
@@ -134,6 +136,13 @@ public final class Directory implements ZeppelinFile {
             allChildren.addAll(child.listAllChildren());
         }
         return allChildren;
+    }
+    public JsonObject json() {
+        return Json.createObjectBuilder()
+                .add("id",id)
+                .add("name",path.getFileName().toString())
+                .add("chidlren",children.keySet().toString())
+                .build();
     }
 
 
