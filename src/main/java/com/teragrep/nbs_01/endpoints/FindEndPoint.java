@@ -23,7 +23,7 @@ public class FindEndPoint implements EndPoint {
             Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
             ZeppelinFile file = updatedDirectory.findFile(request);
             if (!file.isDirectory()){
-                return file.readFile();
+                return file.load().json().toString();
             }
             else {
                 return "Notebook not found";

@@ -1,10 +1,10 @@
 package com.teragrep.nbs_01.repository;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 
 public final class NullScript{
 
@@ -26,8 +26,11 @@ public final class NullScript{
     }
 
 
-    public Script load(JsonObject json){
-        String text = json.getString("text");
+    public Script load(JsonValue json){
+        if(json.equals(JsonValue.EMPTY_JSON_OBJECT)){
+            return new Script("");
+        }
+        String text = json.toString();
         return new Script(text);
     }
 }
