@@ -19,7 +19,6 @@ public interface ZeppelinFile extends Stubable {
     ZeppelinFile copy(Path path, String id) throws IOException;
     Map<String,ZeppelinFile> children();
     void printTree();
-    String readFile() throws IOException;
     ZeppelinFile load() throws IOException;
     void move(Path path) throws IOException;
     void rename(String name) throws IOException;

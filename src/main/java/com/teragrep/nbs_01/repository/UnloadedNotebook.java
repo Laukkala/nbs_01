@@ -97,8 +97,7 @@ public final class UnloadedNotebook implements ZeppelinFile {
     throw new UnsupportedOperationException("Cannot print tree on a UnloadedNotebook!");
   }
 
-  @Override
-  public String readFile() throws IOException {
+  private String readFile() throws IOException {
     List<String> lines = Files.readAllLines(path(), Charset.defaultCharset());
     String concatenatedLines = lines.stream()
             .map(n -> String.valueOf(n))

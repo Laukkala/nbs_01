@@ -172,10 +172,6 @@ public final class Directory implements ZeppelinFile {
         return this;
     }
 
-    public String readFile() throws IOException{
-        throw new IOException("Cannot read a file that is a directory!");
-    }
-
     public boolean isStub(){
         return false;
     }
