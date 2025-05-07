@@ -55,7 +55,6 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest
             connection.setDoOutput(true);
 
             byte[] bytes = ("TestTitle,"+ testFileName).getBytes();
-            System.out.println(new String(bytes,StandardCharsets.UTF_8));
             int length = bytes.length;
 
             connection.setFixedLengthStreamingMode(length);

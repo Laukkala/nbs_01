@@ -45,7 +45,6 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
             connection.setDoOutput(true);
 
             byte[] bytes = (testFileId+","+testParagraphId+","+"testEditMessage").getBytes();
-            System.out.println(new String(bytes,StandardCharsets.UTF_8));
             int length = bytes.length;
 
             connection.setFixedLengthStreamingMode(length);
