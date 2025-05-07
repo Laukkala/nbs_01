@@ -1,11 +1,23 @@
 package com.teragrep.nbs_01;
 
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AbstractNotebookServerTest {
     private final int serverPort = 8080;
@@ -67,5 +79,58 @@ public class AbstractNotebookServerTest {
             }
             fileToDelete.delete();
         });
+    }
+
+    public Map<Integer, List<String>> makeHttpPOSTRequest(String urlString, String requestBody){
+        HashMap<Integer,List<String>> response = new HashMap<>();
+        Assertions.assertDoesNotThrow(()->{
+            URL url = new URL(urlString);
+            ArrayList<String> messages = new ArrayList<>();
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            byte[] bytes = (requestBody).getBytes();
+            int length = bytes.length;
+
+            connection.setFixedLengthStreamingMode(length);
+            connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+            connection.connect();
+            OutputStream output = connection.getOutputStream();
+            output.write(bytes);
+            int status = connection.getResponseCode();
+            // Read the response received, and assert that we have a list of notebook IDs matching files saved in the notebook directory.
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                messages.add(line);
+            }
+            connection.disconnect();
+            response.put(status,messages);
+        });
+        return response;
+    }
+
+    public Map<Integer,List<String>> makeWebSocketRequest(String url, String requestBody){
+        HashMap<Integer,List<String>> response = new HashMap<>();
+            Assertions.assertDoesNotThrow(()->{
+                // Start server and wait for it to initialize.
+                URI serverURI = URI.create(url);
+                WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
+                webSocketClient.start();
+                TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
+                client.sendText(requestBody);
+                long startTime = System.currentTimeMillis();
+                while (client.receivedMessages().size() == 0 && (System.currentTimeMillis()-startTime) < webSocketTimeoutMs){
+                    // Wait until a message is received or a timeout is reached.
+                }
+                // Read the WebSocket response and assert that we got the proper list of notebook IDs.
+                ArrayList<String> receivedMessages = client.receivedMessages();
+                response.put(200,receivedMessages);
+                webSocketClient.close();
+            });
+        return response;
     }
 }
