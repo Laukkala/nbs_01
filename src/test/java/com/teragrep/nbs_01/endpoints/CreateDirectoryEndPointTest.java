@@ -17,6 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest
@@ -38,34 +40,9 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest
         Assertions.assertDoesNotThrow(()->{
             // Start server and wait for it to initialize.
             startServer();
-
-            URL serverURL = new URL("http://"+serverAddress()+"/notebook/newDirectory");
-            HttpURLConnection connection = (HttpURLConnection) serverURL.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-
-            byte[] bytes = ("2A94M5J1D,created_directory").getBytes();
-            System.out.println(new String(bytes,StandardCharsets.UTF_8));
-            int length = bytes.length;
-
-            connection.setFixedLengthStreamingMode(length);
-            connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
-            connection.connect();
-            OutputStream output = connection.getOutputStream();
-            output.write(bytes);
-
-            int status = connection.getResponseCode();
-            // Read the response received, and assert that we get the proper response indicating success.
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            Assertions.assertEquals(200,status);
-            Assertions.assertTrue(sb.toString().contains("Created directory "));
-            connection.disconnect();
-            String newDirectoryId = sb.toString().split("Created directory ")[1];
+            Map<Integer, List<String>> response = makeHttpPOSTRequest("http://"+serverAddress()+"/notebook/newDirectory","2A94M5J1D,created_directory");
+            Assertions.assertTrue(response.get(200).get(0).toString().contains("Created directory "));
+            String newDirectoryId = response.get(200).get(0).toString().split("Created directory ")[1];
             stopServer();
             Assertions.assertTrue(Files.exists(Paths.get(testParentDirectory.toString(),"created_directory_"+newDirectoryId)));
         });
@@ -75,21 +52,9 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest
     public void webSocketCreateDirectoryTest(){
         Assertions.assertDoesNotThrow(()->{
             startServer();
-            URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/newDirectory");
-            WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
-            webSocketClient.start();
-            TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
-            Assertions.assertEquals(1,webSocketClient.getOpenSessions().size());
-            client.sendText("2A94M5J1D,created_directory");
-            // Read the WebSocket response and assert that we got the proper response indicating success.
-            long startTime = System.currentTimeMillis();
-            while (client.receivedMessages().size() == 0 && (System.currentTimeMillis()-startTime) < webSocketTimeoutMs){
-                // Wait until a message is received or a timeout is reached.
-            }
-            ArrayList<String> receivedMessages = client.receivedMessages();
-            Assertions.assertEquals(1,receivedMessages.size());
-            Assertions.assertTrue(receivedMessages.get(0).contains("Created directory"));
-            String newDirectoryId = receivedMessages.get(0).split("Created directory ")[1];
+            Map<Integer, List<String>> response = makeHttpPOSTRequest("http://"+serverAddress()+"/notebook/newDirectory","2A94M5J1D,created_directory");
+            Assertions.assertTrue(response.get(200).get(0).contains("Created directory"));
+            String newDirectoryId = response.get(200).get(0).split("Created directory ")[1];
             stopServer();
             Assertions.assertTrue(Files.exists(Paths.get(testParentDirectory.toString(),"created_directory_"+newDirectoryId)));
         });
