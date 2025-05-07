@@ -33,8 +33,8 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest
         deleteFileRecursively(notebookDirectory().toFile());
     }
     @Test
-    // Assert that a simple HTTP request to /notebook/new endpoint results in a new file being saved on disk.
-    public void httpCreateNotebookTest(){
+    // Assert that a simple HTTP request to /notebook/newDirectory endpoint results in a new directory being saved on disk.
+    public void httpCreateDirectoryTest(){
         Assertions.assertDoesNotThrow(()->{
             // Start server and wait for it to initialize.
             startServer();
@@ -55,39 +55,43 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest
             output.write(bytes);
 
             int status = connection.getResponseCode();
-            // Read the response received, and assert that we have a list of notebook IDs matching files saved in the notebook directory.
+            // Read the response received, and assert that we get the proper response indicating success.
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
             StringBuilder sb = new StringBuilder();
             while ((line = reader.readLine()) != null) {
-                sb.append(line+"\n");
+                sb.append(line);
             }
             Assertions.assertEquals(200,status);
             Assertions.assertTrue(sb.toString().contains("Created directory "));
             connection.disconnect();
+            String newDirectoryId = sb.toString().split("Created directory ")[1];
             stopServer();
+            Assertions.assertTrue(Files.exists(Paths.get(testParentDirectory.toString(),"created_directory_"+newDirectoryId)));
         });
     }
     @Test
     // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
-    public void webSocketCreateNotebookTest(){
+    public void webSocketCreateDirectoryTest(){
         Assertions.assertDoesNotThrow(()->{
             startServer();
-            URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/new");
+            URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/newDirectory");
             WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
             webSocketClient.start();
             TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient,serverURI);
             Assertions.assertEquals(1,webSocketClient.getOpenSessions().size());
-            client.sendText("2A04M5J1D,created_directory");
-            // Read the WebSocket response and assert that we got the proper list of notebook IDs.
+            client.sendText("2A94M5J1D,created_directory");
+            // Read the WebSocket response and assert that we got the proper response indicating success.
             long startTime = System.currentTimeMillis();
             while (client.receivedMessages().size() == 0 && (System.currentTimeMillis()-startTime) < webSocketTimeoutMs){
                 // Wait until a message is received or a timeout is reached.
             }
             ArrayList<String> receivedMessages = client.receivedMessages();
             Assertions.assertEquals(1,receivedMessages.size());
-            Assertions.assertTrue(receivedMessages.get(0).contains("Created notebook"));
+            Assertions.assertTrue(receivedMessages.get(0).contains("Created directory"));
+            String newDirectoryId = receivedMessages.get(0).split("Created directory ")[1];
             stopServer();
+            Assertions.assertTrue(Files.exists(Paths.get(testParentDirectory.toString(),"created_directory_"+newDirectoryId)));
         });
     }
 }
