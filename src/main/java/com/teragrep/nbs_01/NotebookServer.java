@@ -34,6 +34,7 @@ public class NotebookServer extends Thread
             pathMappingsHandler.addMapping(PathSpec.from("/ping"),new JettyUpgradeableHTTPConnection(new PingEndpoint()));
             pathMappingsHandler.addMapping(PathSpec.from("/find"),new JettyUpgradeableHTTPConnection(new FindEndPoint(root)));
             pathMappingsHandler.addMapping(PathSpec.from("/new"),new JettyUpgradeableHTTPConnection(new CreateNotebookEndpoint(root)));
+            pathMappingsHandler.addMapping(PathSpec.from("/newDirectory"),new JettyUpgradeableHTTPConnection(new CreateDirectoryEndpoint(root)));
             pathMappingsHandler.addMapping(PathSpec.from("/delete"),new JettyUpgradeableHTTPConnection(new DeleteNotebookEndpoint(root)));
             pathMappingsHandler.addMapping(PathSpec.from("/update"),new JettyUpgradeableHTTPConnection(new UpdateParagraphEndpoint(root)));
             // Endpoint that doesn't support upgrading to WebSocket communication. Takes only HTTP requests.
