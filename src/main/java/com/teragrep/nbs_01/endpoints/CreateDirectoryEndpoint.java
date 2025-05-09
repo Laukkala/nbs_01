@@ -1,6 +1,10 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.StringResponse;
+import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,10 +20,10 @@ public class CreateDirectoryEndpoint implements EndPoint{
         this.root = root;
     }
 
-    public String createResponseBody(String request) {
+    public Response createResponse(Request request) {
         try{
             Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
-            String[] args = request.split(",");
+            String[] args = request.body().split(",");
             String parentId = args[0];
             String name = args[1];
 
@@ -28,14 +32,13 @@ public class CreateDirectoryEndpoint implements EndPoint{
             Path path = Paths.get(parent.path().toString(),name+"_"+id);
             Directory newDirectory = new Directory(id,path);
             newDirectory.save();
-            return "Created directory "+newDirectory.id();
+            return new StringResponse(HttpStatus.OK_200,"Created directory "+newDirectory.id());
         }
         catch (FileNotFoundException fileNotFoundException){
-            return "Directory doesn't exist!";
+            return new StringResponse(HttpStatus.BAD_REQUEST_400,"Directory doesn't exist!");
         }
         catch (IOException ioException){
-            return "Failed to create directory, reason:\n"+ioException;
+            return new StringResponse(HttpStatus.INTERNAL_SERVER_ERROR_500,"Failed to create directory, reason:\n"+ioException);
         }
-
     }
 }

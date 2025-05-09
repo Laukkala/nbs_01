@@ -1,6 +1,11 @@
 package com.teragrep.nbs_01.handlers;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.requests.SimpleRequest;
+import jakarta.json.Json;
+import jakarta.json.JsonReader;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParser;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
@@ -9,6 +14,7 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 
 import java.nio.ByteBuffer;
+
 // A Jetty Handler for HTTP connections to some Endpoint.
 // Extracts the contents of the request and delegates it to it's EndPoint instance for processing, and then returns the response received from the EndPoint.
 public class JettyHTTPConnection extends Handler.Abstract {
@@ -19,12 +25,12 @@ public class JettyHTTPConnection extends Handler.Abstract {
     }
 
     @Override
-    public boolean handle(Request request, Response response, Callback callback) throws Exception {
+    public boolean handle(Request jettyRequest, Response jettyResponse, Callback callback) throws Exception {
         try{
-            String requestBody = new String(Content.Source.asString(request));
-            String responseBody = endPoint.createResponseBody(requestBody);
-            response.setStatus(HttpStatus.OK_200);
-            response.write(true, ByteBuffer.wrap(responseBody.getBytes()), Callback.NOOP);
+            com.teragrep.nbs_01.requests.Request request = new SimpleRequest(Content.Source.asString(jettyRequest));
+            com.teragrep.nbs_01.responses.Response response = endPoint.createResponse(request);
+            jettyResponse.setStatus(HttpStatus.OK_200);
+            jettyResponse.write(true, ByteBuffer.wrap(response.parse().getBytes()), Callback.NOOP);
             callback.succeeded();
             return true;
         }catch (Exception exception){

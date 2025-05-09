@@ -2,6 +2,10 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.StringResponse;
+import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,14 +21,13 @@ public class ListEndPoint implements EndPoint {
         this.root = root;
     }
 
-    @Override
-    public String createResponseBody(String request) {
+    public Response createResponse(Request request) {
         // Find all notebooks from Directory structure
         StringBuilder sb = new StringBuilder();
         ZeppelinFile foundFile;
         Directory directoryToSearch;
         try{
-            foundFile = root.findFile(request);
+            foundFile = root.findFile(request.body());
             directoryToSearch = (Directory) foundFile;
         }
         catch (FileNotFoundException fileNotFoundException){
@@ -39,9 +42,9 @@ public class ListEndPoint implements EndPoint {
                     sb.append("\n");
                 }
             }
-            return sb.toString();
+            return new StringResponse(HttpStatus.OK_200,sb.toString());
         }catch (IOException ioException){
-            return "Failed to list notebooks";
+            return new StringResponse(HttpStatus.INTERNAL_SERVER_ERROR_500,"Failed to list notebooks");
         }
     }
 }

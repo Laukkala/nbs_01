@@ -1,6 +1,9 @@
 package com.teragrep.nbs_01.handlers;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.requests.SimpleRequest;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
@@ -33,7 +36,9 @@ public class JettyWebSocketConnection implements Session.Listener {
 
     @Override
     public void onWebSocketText(String message){
-        session.sendText(endPoint.createResponseBody(message), Callback.from(()->{
+        Request request = new SimpleRequest(message);
+        Response response = endPoint.createResponse(request);
+        session.sendText(response.parse(), Callback.from(()->{
             session.demand();
         },failure -> {
             session.close(StatusCode.SERVER_ERROR, "failure", Callback.NOOP);

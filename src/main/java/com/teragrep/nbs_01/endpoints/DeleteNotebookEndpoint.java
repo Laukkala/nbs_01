@@ -1,6 +1,10 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.*;
+import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.StringResponse;
+import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,14 +20,14 @@ public class DeleteNotebookEndpoint implements EndPoint{
         this.root = root;
     }
 
-    public String createResponseBody(String request) {
+    public Response createResponse(Request request) {
         try{
             Directory updatedDirectory = root.initializeDirectory(root.path(),new ConcurrentHashMap<>());
-            ZeppelinFile file = updatedDirectory.findFile(request);
+            ZeppelinFile file = updatedDirectory.findFile(request.body());
             file.delete();
-            return "Notebook deleted";
+            return new StringResponse(HttpStatus.OK_200,"Notebook deleted");
         } catch (IOException ioException){
-            return "Failed to delete notebook, reason:\n"+ioException;
+            return new StringResponse(HttpStatus.INTERNAL_SERVER_ERROR_500,"Failed to delete notebook, reason:\n"+ioException);
         }
     }
 }

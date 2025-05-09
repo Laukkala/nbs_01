@@ -1,6 +1,10 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.*;
+import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.StringResponse;
+import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -13,10 +17,10 @@ public class UpdateParagraphEndpoint implements EndPoint{
         this.root = root;
     }
 
-    public String createResponseBody(String request) {
+    public Response createResponse(Request request) {
         try{
             root.initializeDirectory(root.path(),new ConcurrentHashMap<>(root.children()));
-            String[] args = request.split(",");
+            String[] args = request.body().split(",");
             String notebookId = args[0];
             String paragraphId = args[1];
             String updatedParagraph = args[2];
@@ -28,9 +32,9 @@ public class UpdateParagraphEndpoint implements EndPoint{
             paragraphs.put(paragraphId,new Paragraph(paragraphId,paragraph.title(),editedScript));
             Notebook newNotebook = new Notebook(notebook.title(),notebook.id(),notebook.path(),paragraphs);
             newNotebook.save();
-            return "Notebook edited successfully";
+            return new StringResponse(HttpStatus.OK_200,"Notebook edited successfully");
         } catch (IOException ioException){
-            return "Failed to edit notebook, reason:\n"+ioException;
+            return new StringResponse(HttpStatus.INTERNAL_SERVER_ERROR_500,"Failed to edit notebook, reason:\n"+ioException);
         }
     }
 }
