@@ -27,7 +27,7 @@ public class CreateDirectoryEndpoint implements EndPoint{
             String parentId = args[0];
             String name = args[1];
 
-            Directory parent = (Directory) root.findFile(parentId);
+            Directory parent = (Directory) updatedDirectory.findFile(parentId);
             String id = UUID.randomUUID().toString();
             Path path = Paths.get(parent.path().toString(),name+"_"+id);
             Directory newDirectory = new Directory(id,path);
