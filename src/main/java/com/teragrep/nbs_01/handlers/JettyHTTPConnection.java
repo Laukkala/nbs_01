@@ -29,7 +29,7 @@ public class JettyHTTPConnection extends Handler.Abstract {
         try{
             com.teragrep.nbs_01.requests.Request request = new SimpleRequest(Content.Source.asString(jettyRequest));
             com.teragrep.nbs_01.responses.Response response = endPoint.createResponse(request);
-            jettyResponse.setStatus(HttpStatus.OK_200);
+            jettyResponse.setStatus(response.status());
             jettyResponse.write(true, ByteBuffer.wrap(response.parse().getBytes()), Callback.NOOP);
             callback.succeeded();
             return true;

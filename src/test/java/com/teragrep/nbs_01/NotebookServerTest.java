@@ -2,33 +2,43 @@ package com.teragrep.nbs_01;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NotebookServerTest extends AbstractNotebookServerTest
 {
     public NotebookServerTest(){
-        startServer();
+    }
+
+    @BeforeAll
+    private void setUp(){
+        copyFileRecursively(notebookResources().toFile(),notebookDirectory().toFile());
+    }
+    @AfterAll
+    private void tearDown(){
+        deleteFileRecursively(notebookDirectory().toFile());
     }
     @Test
     // Assert that a simple HTTP request to an existing endpoint results in return code 200 OK
     public void httpConnectTest(){
         Assertions.assertDoesNotThrow(()->{
-            URL serverURL = new URL("http://"+serverAddress()+"/notebook/ping");
-            HttpURLConnection connection = (HttpURLConnection) serverURL.openConnection();
-            int status = connection.getResponseCode();
-            connection.disconnect();
-            Assertions.assertEquals(200,status);
+            startServer();
+            Map<Integer, List<String>> response = makeHttpGETRequest("http://"+serverAddress()+"/notebook/ping");
+            Assertions.assertEquals("pong",response.get(200).get(0).toString());
+            stopServer();
         });
     }
     @Test
     // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
     public void webSocketConnectTest(){
         Assertions.assertDoesNotThrow(()->{
+            startServer();
             URI serverURI = URI.create("ws://"+serverAddress()+"/notebook/ping");
             WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
             webSocketClient.start();
@@ -36,6 +46,7 @@ public class NotebookServerTest extends AbstractNotebookServerTest
             Assertions.assertEquals(1,webSocketClient.getOpenSessions().size());
             webSocketClient.close();
             Assertions.assertEquals(0,webSocketClient.getOpenSessions().size());
+            stopServer();
         });
     }
 }

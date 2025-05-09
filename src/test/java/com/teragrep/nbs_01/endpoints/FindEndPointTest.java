@@ -49,7 +49,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest("http://"+serverAddress()+"/notebook/find","nonExistentId");
-            Assertions.assertEquals("Notebook not found!",response.get(200).get(0).toString());
+            Assertions.assertEquals("Notebook not found!",response.get(400).get(0).toString());
             stopServer();
         });
     }

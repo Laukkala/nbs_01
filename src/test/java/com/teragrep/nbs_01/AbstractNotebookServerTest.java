@@ -4,10 +4,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -81,9 +78,8 @@ public class AbstractNotebookServerTest {
         });
     }
 
-    public Map<Integer, List<String>> makeHttpPOSTRequest(String urlString, String requestBody){
+    public Map<Integer, List<String>> makeHttpPOSTRequest(String urlString, String requestBody) throws IOException {
         HashMap<Integer,List<String>> response = new HashMap<>();
-        Assertions.assertDoesNotThrow(()->{
             URL url = new URL(urlString);
             ArrayList<String> messages = new ArrayList<>();
 
@@ -100,8 +96,15 @@ public class AbstractNotebookServerTest {
             OutputStream output = connection.getOutputStream();
             output.write(bytes);
             int status = connection.getResponseCode();
-            // Read the response received, and assert that we have a list of notebook IDs matching files saved in the notebook directory.
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStreamReader connectionInputStreamReader;
+            if(status == 200){
+                connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+            }
+            else {
+                connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+            }
+            // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
+            BufferedReader reader = new BufferedReader(connectionInputStreamReader);
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -109,13 +112,39 @@ public class AbstractNotebookServerTest {
             }
             connection.disconnect();
             response.put(status,messages);
-        });
         return response;
     }
 
-    public Map<Integer,List<String>> makeWebSocketRequest(String url, String requestBody){
+    public Map<Integer, List<String>> makeHttpGETRequest(String urlString) throws IOException{
         HashMap<Integer,List<String>> response = new HashMap<>();
-            Assertions.assertDoesNotThrow(()->{
+        URL url = new URL(urlString);
+        ArrayList<String> messages = new ArrayList<>();
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        int status = connection.getResponseCode();
+        InputStreamReader connectionInputStreamReader;
+        if(status == 200){
+            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+        }
+        else {
+            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+        }
+        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
+        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            messages.add(line);
+        }
+        connection.disconnect();
+        response.put(status,messages);
+        return response;
+    }
+    public Map<Integer,List<String>> makeWebSocketRequest(String url, String requestBody) throws Exception {
+        HashMap<Integer,List<String>> response = new HashMap<>();
                 // Start server and wait for it to initialize.
                 URI serverURI = URI.create(url);
                 WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
@@ -130,7 +159,6 @@ public class AbstractNotebookServerTest {
                 ArrayList<String> receivedMessages = client.receivedMessages();
                 response.put(200,receivedMessages);
                 webSocketClient.close();
-            });
         return response;
     }
 }
