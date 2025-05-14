@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.StringResponse;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -71,17 +71,17 @@ public class FindEndPoint implements EndPoint {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             ZeppelinFile file = updatedDirectory.findFile(request.body());
             if (!file.isDirectory()) {
-                return new StringResponse(HttpStatus.OK_200, file.load().json().toString());
+                return new SimpleResponse(HttpStatus.OK_200, file.load().json().toString());
             }
             else {
-                return new StringResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
+                return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new StringResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
         }
         catch (IOException ioException) {
-            return new StringResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
+            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
         }
     }
 }

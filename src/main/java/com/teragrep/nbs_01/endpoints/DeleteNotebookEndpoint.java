@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.StringResponse;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -69,10 +69,10 @@ public class DeleteNotebookEndpoint implements EndPoint {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             ZeppelinFile file = updatedDirectory.findFile(request.body());
             file.delete();
-            return new StringResponse(HttpStatus.OK_200, "Notebook deleted");
+            return new SimpleResponse(HttpStatus.OK_200, "Notebook deleted");
         }
         catch (IOException ioException) {
-            return new StringResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to delete notebook, reason:\n" + ioException
             );

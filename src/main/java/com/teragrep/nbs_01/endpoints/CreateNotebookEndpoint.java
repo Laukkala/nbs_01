@@ -51,7 +51,7 @@ import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.StringResponse;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -78,17 +78,17 @@ public class CreateNotebookEndpoint implements EndPoint {
             String title = args[0];
             Path path = Paths.get(updatedDirectory.path().toString(), args[1]);
             if (updatedDirectory.contains(path)) {
-                return new StringResponse(HttpStatus.BAD_REQUEST_400, "Notebook already exists!");
+                return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Notebook already exists!");
             }
             Paragraph paragraph = new Paragraph(UUID.randomUUID().toString(), "", new Script(""));
             Map<String, Paragraph> paragraphs = new LinkedHashMap();
             paragraphs.put(paragraph.id(), paragraph);
             Notebook newNotebook = new Notebook(title, UUID.randomUUID().toString(), path, paragraphs);
             newNotebook.save();
-            return new StringResponse(HttpStatus.OK_200, "Created notebook " + newNotebook.id());
+            return new SimpleResponse(HttpStatus.OK_200, "Created notebook " + newNotebook.id());
         }
         catch (IOException ioException) {
-            return new StringResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create notebook, reason:\n" + ioException
             );

@@ -51,7 +51,7 @@ import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.StringResponse;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -83,10 +83,10 @@ public class UpdateParagraphEndpoint implements EndPoint {
             paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), editedScript));
             Notebook newNotebook = new Notebook(notebook.title(), notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new StringResponse(HttpStatus.OK_200, "Notebook edited successfully");
+            return new SimpleResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
         catch (IOException ioException) {
-            return new StringResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to edit notebook, reason:\n" + ioException
             );

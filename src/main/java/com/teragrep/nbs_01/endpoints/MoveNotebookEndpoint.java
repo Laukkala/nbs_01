@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.StringResponse;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -76,13 +76,13 @@ public class MoveNotebookEndpoint implements EndPoint {
             Directory parent = (Directory) updatedDirectory.findFile(directoryId);
 
             notebook.move(parent);
-            return new StringResponse(HttpStatus.OK_200, "Moved notebook " + notebook.id());
+            return new SimpleResponse(HttpStatus.OK_200, "Moved notebook " + notebook.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new StringResponse(HttpStatus.BAD_REQUEST_400, "Failed to find a file");
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Failed to find a file");
         }
         catch (IOException ioException) {
-            return new StringResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create directory, reason:\n" + ioException
             );
