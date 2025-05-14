@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,7 +81,7 @@ public class CreateNotebookEndpoint implements EndPoint {
                 return new StringResponse(HttpStatus.BAD_REQUEST_400, "Notebook already exists!");
             }
             Paragraph paragraph = new Paragraph(UUID.randomUUID().toString(), "", new Script(""));
-            LinkedHashMap paragraphs = new LinkedHashMap();
+            Map<String, Paragraph> paragraphs = new LinkedHashMap();
             paragraphs.put(paragraph.id(), paragraph);
             Notebook newNotebook = new Notebook(title, UUID.randomUUID().toString(), path, paragraphs);
             newNotebook.save();

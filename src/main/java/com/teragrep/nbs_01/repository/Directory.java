@@ -71,38 +71,40 @@ public final class Directory implements ZeppelinFile {
     }
 
     // Find a matching ZeppelinFile by ID
-    public ZeppelinFile findFile(String id) throws FileNotFoundException {
-        if (id().equals(id)) {
+    public ZeppelinFile findFile(String searchedId) throws FileNotFoundException {
+        if (id().equals(searchedId)) {
             return this;
         }
         else {
             for (ZeppelinFile child : children.values()) {
                 try {
-                    return (child.findFile(id));
+                    return (child.findFile(searchedId));
                 }
                 catch (FileNotFoundException exception) {
                     continue;
                 }
             }
-            throw new FileNotFoundException("Notebook or directory " + id + " not found!");
+            throw new FileNotFoundException("Notebook or directory " + searchedId + " not found!");
         }
     }
 
     // Find a matching ZeppelinFile by Path
-    public ZeppelinFile findFile(Path path) throws FileNotFoundException {
-        if (path().equals(path)) {
+    public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
+        if (path().equals(searchedPath)) {
             return this;
         }
         else {
             for (ZeppelinFile child : children.values()) {
                 try {
-                    return (child.findFile(path));
+                    return (child.findFile(searchedPath));
                 }
                 catch (FileNotFoundException exception) {
                     continue;
                 }
             }
-            throw new FileNotFoundException("Notebook or directory with path " + path.toString() + " not found!");
+            throw new FileNotFoundException(
+                    "Notebook or directory with path " + searchedPath.toString() + " not found!"
+            );
         }
     }
 
@@ -114,9 +116,9 @@ public final class Directory implements ZeppelinFile {
         return path;
     }
 
-    public boolean contains(String id) {
+    public boolean contains(String searchedId) {
         try {
-            findFile(id);
+            findFile(searchedId);
             return true;
         }
         catch (FileNotFoundException fileNotFoundException) {
@@ -124,9 +126,9 @@ public final class Directory implements ZeppelinFile {
         }
     }
 
-    public boolean contains(Path path) {
+    public boolean contains(Path searchedPath) {
         try {
-            findFile(path);
+            findFile(searchedPath);
             return true;
         }
         catch (FileNotFoundException fileNotFoundException) {
@@ -138,7 +140,7 @@ public final class Directory implements ZeppelinFile {
         if (destination.toAbsolutePath().startsWith(path().toAbsolutePath())) {
             throw new IOException("Cannot move a directory into one of its own children!");
         }
-        HashMap<String, ZeppelinFile> movedChildren = new HashMap<>();
+        Map<String, ZeppelinFile> movedChildren = new HashMap<>();
         for (ZeppelinFile child : children.values()) {
             if (child.isStub()) {
                 child = child.load();
@@ -164,21 +166,21 @@ public final class Directory implements ZeppelinFile {
         Files.delete(path());
     }
 
-    public Directory copy(Path path, String id) throws IOException {
-        HashMap<String, ZeppelinFile> copyChildren = new HashMap<>();
+    public Directory copy(Path destinationPath, String copyId) throws IOException {
+        Map<String, ZeppelinFile> copyChildren = new HashMap<>();
         for (ZeppelinFile child : children.values()) {
             if (child.isStub()) {
                 child = child.load();
             }
-            String copyId = UUID.randomUUID().toString();
-            String childFileName = child.path().getFileName().toString();
-            StringBuilder sb = new StringBuilder(childFileName);
+            String childCopyId = UUID.randomUUID().toString();
+            String childCopyFileName = child.path().getFileName().toString();
+            StringBuilder sb = new StringBuilder(childCopyFileName);
             sb
-                    .replace(childFileName.lastIndexOf("_") + 1, (childFileName.endsWith(".zpln") ? childFileName.lastIndexOf(".zpln") : childFileName.length()), copyId);
-            Path copyChildPath = Paths.get(path.toString(), sb.toString());
-            copyChildren.put(copyId, child.copy(copyChildPath, copyId));
+                    .replace(childCopyFileName.lastIndexOf("_") + 1, (childCopyFileName.endsWith(".zpln") ? childCopyFileName.lastIndexOf(".zpln") : childCopyFileName.length()), childCopyId);
+            Path copyChildPath = Paths.get(destinationPath.toString(), sb.toString());
+            copyChildren.put(childCopyId, child.copy(copyChildPath, childCopyId));
         }
-        Directory copiedDirectory = new Directory(id, path, copyChildren);
+        Directory copiedDirectory = new Directory(copyId, destinationPath, copyChildren);
         copiedDirectory.save();
         return copiedDirectory;
     }
@@ -238,21 +240,21 @@ public final class Directory implements ZeppelinFile {
         return false;
     }
 
-    public Directory initializeDirectory(Path path, ConcurrentHashMap<String, ZeppelinFile> existingFiles)
+    public Directory initializeDirectory(Path pathToVisit, ConcurrentHashMap<String, ZeppelinFile> existingFiles)
             throws IOException {
         // Create a copy of existingFiles so that we don't make any direct edits to it.
-        HashMap<String, ZeppelinFile> children = new HashMap<>();
-        children.putAll(existingFiles);
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        Map<String, ZeppelinFile> existingChildren = new HashMap<>();
+        existingChildren.putAll(existingFiles);
+        Files.walkFileTree(pathToVisit, new SimpleFileVisitor<Path>() {
 
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                 // walkFileTree visits the root directory it's called on.
                 // This method operates on the given directory's children so we skip the processing of the root directory here.
-                if (dir.equals(path)) {
+                if (dir.equals(pathToVisit)) {
                     return FileVisitResult.CONTINUE;
                 }
                 // Ignore .git directory. This could be moved somewhere else.
-                if (dir.startsWith(path + "/.git")) {
+                if (dir.startsWith(pathToVisit + "/.git")) {
                     return FileVisitResult.SKIP_SUBTREE;
                 }
                 // Read an ID from the file name
@@ -261,14 +263,14 @@ public final class Directory implements ZeppelinFile {
                     // Here we create any child Directories by calling this function recursively.
                     // First we will check if we already have the files of the child Directory in existingFiles, and pass them to the recursive call so that we don't do any unnecessary operations in later recursions.
                     ConcurrentHashMap<String, ZeppelinFile> subtreeChildren = new ConcurrentHashMap<>();
-                    if (children.containsKey(directoryId)) {
-                        subtreeChildren.putAll(children.get(directoryId).children());
+                    if (existingChildren.containsKey(directoryId)) {
+                        subtreeChildren.putAll(existingChildren.get(directoryId).children());
                     }
                     Directory subtree = initializeDirectory(dir, subtreeChildren);
-                    children.put(subtree.id(), subtree);
+                    existingChildren.put(subtree.id(), subtree);
                 }
-                catch (Exception e) {
-                    throw new RuntimeException(e);
+                catch (IOException exception) {
+                    throw new RuntimeException(exception);
                 }
                 return FileVisitResult.SKIP_SUBTREE;
             }
@@ -276,8 +278,8 @@ public final class Directory implements ZeppelinFile {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 String notebookId = extractIDFromFileName(file);
-                if (!children.containsKey(notebookId)) {
-                    children.put(notebookId, new UnloadedNotebook(notebookId, file));
+                if (!existingChildren.containsKey(notebookId)) {
+                    existingChildren.put(notebookId, new UnloadedNotebook(notebookId, file));
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -292,7 +294,7 @@ public final class Directory implements ZeppelinFile {
                 return super.postVisitDirectory(dir, exc);
             }
         });
-        Directory root = new Directory(extractIDFromFileName(path), path, children);
+        Directory root = new Directory(extractIDFromFileName(pathToVisit), pathToVisit, existingChildren);
         return root;
     }
 

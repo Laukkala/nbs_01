@@ -55,6 +55,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 // A thread that registers all endpoints users can connect to and starts the Jetty server.
@@ -100,7 +101,12 @@ public class NotebookServer extends Thread {
             server.start();
             System.out.println("Server started!");
         }
+        catch (IOException exception) {
+            System.err.println("An error occurred while configuring server:");
+            System.err.println(exception);
+        }
         catch (Exception exception) {
+            System.err.println("An error occurred while starting server:");
             System.err.println(exception);
         }
     }

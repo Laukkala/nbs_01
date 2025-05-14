@@ -85,22 +85,22 @@ public final class UnloadedNotebook implements ZeppelinFile {
     }
 
     @Override
-    public ZeppelinFile findFile(String id) throws FileNotFoundException {
-        if (id.equals(id())) {
+    public ZeppelinFile findFile(String searchedId) throws FileNotFoundException {
+        if (searchedId.equals(id())) {
             return this;
         }
         else {
-            throw new FileNotFoundException("Searched id " + id + " does not match with" + id());
+            throw new FileNotFoundException("Searched id " + searchedId + " does not match with" + id());
         }
     }
 
     @Override
-    public ZeppelinFile findFile(Path path) throws FileNotFoundException {
-        if (path().equals(path)) {
+    public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
+        if (path().equals(searchedPath)) {
             return this;
         }
         else {
-            throw new FileNotFoundException("Searched path " + path + " does not match with" + path());
+            throw new FileNotFoundException("Searched path " + searchedPath + " does not match with" + path());
         }
     }
 
@@ -130,7 +130,7 @@ public final class UnloadedNotebook implements ZeppelinFile {
     }
 
     @Override
-    public UnloadedNotebook copy(Path path, String id) throws IOException {
+    public UnloadedNotebook copy(Path destinationPath, String copyId) throws IOException {
         throw new UnsupportedOperationException("Cannot copy UnloadedNotebook!");
     }
 
@@ -159,20 +159,20 @@ public final class UnloadedNotebook implements ZeppelinFile {
         jsonReader.close();
         stringReader.close();
 
-        String name = object.getString("name");
-        String id = object.getString("id");
+        String savedName = object.getString("name");
+        String savedId = object.getString("id");
         JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
-        LinkedHashMap<String, Paragraph> paragraphs = new LinkedHashMap<>();
+        Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
         for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
             NullParagraph nullParagraph = new NullParagraph();
             Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
-            paragraphs.put(paragraph.id(), paragraph);
+            savedParagraphs.put(paragraph.id(), paragraph);
         }
-        return new Notebook(name, id, path(), paragraphs);
+        return new Notebook(savedName, savedId, path(), savedParagraphs);
     }
 
     @Override
-    public void move(Path path) throws IOException {
+    public void move(Path destinationPath) throws IOException {
         throw new UnsupportedOperationException("Cannot move an Unloaded Notebook!");
     }
 

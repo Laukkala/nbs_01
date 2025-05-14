@@ -54,33 +54,33 @@ import java.util.Map;
 
 public interface ZeppelinFile extends Stubable {
 
-    void delete() throws IOException;
+    public abstract void delete() throws IOException;
 
-    ZeppelinFile findFile(String id) throws FileNotFoundException;
+    public abstract ZeppelinFile findFile(String id) throws FileNotFoundException;
 
-    ZeppelinFile findFile(Path path) throws FileNotFoundException;
+    public abstract ZeppelinFile findFile(Path path) throws FileNotFoundException;
 
-    String id();
+    public abstract String id();
 
-    Path path();
+    public abstract Path path();
 
-    void save() throws IOException;
+    public abstract void save() throws IOException;
 
-    boolean isDirectory();
+    public abstract boolean isDirectory();
 
-    ZeppelinFile copy(Path path, String id) throws IOException;
+    public abstract ZeppelinFile copy(Path path, String id) throws IOException;
 
-    Map<String, ZeppelinFile> children();
+    public abstract Map<String, ZeppelinFile> children();
 
-    void printTree();
+    public abstract void printTree();
 
-    ZeppelinFile load() throws IOException;
+    public abstract ZeppelinFile load() throws IOException;
 
-    void move(Path path) throws IOException;
+    public abstract void move(Path path) throws IOException;
 
-    void rename(String name) throws IOException;
+    public abstract void rename(String name) throws IOException;
 
-    List<ZeppelinFile> listAllChildren();
+    public abstract List<ZeppelinFile> listAllChildren();
 
-    JsonObject json();
+    public abstract JsonObject json();
 }

@@ -53,6 +53,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 // A Jetty Handler for HTTP connections to some Endpoint.
@@ -66,7 +67,7 @@ public class JettyHTTPConnection extends Handler.Abstract {
     }
 
     @Override
-    public boolean handle(Request jettyRequest, Response jettyResponse, Callback callback) throws Exception {
+    public boolean handle(Request jettyRequest, Response jettyResponse, Callback callback) {
         try {
             com.teragrep.nbs_01.requests.Request request = new SimpleRequest(Content.Source.asString(jettyRequest));
             com.teragrep.nbs_01.responses.Response response = endPoint.createResponse(request);
@@ -75,7 +76,7 @@ public class JettyHTTPConnection extends Handler.Abstract {
             callback.succeeded();
             return true;
         }
-        catch (Exception exception) {
+        catch (IOException exception) {
             callback.failed(exception);
             return false;
         }

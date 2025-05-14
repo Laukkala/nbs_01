@@ -66,12 +66,12 @@ import java.util.stream.Collectors;
 public final class Notebook implements ZeppelinFile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Notebook.class);
-    private final LinkedHashMap<String, Paragraph> paragraphs;
+    private final Map<String, Paragraph> paragraphs;
     private final String title;
     private final String id;
     private final Path path;
 
-    public Notebook(String title, String id, Path path, LinkedHashMap<String, Paragraph> paragraphs) {
+    public Notebook(String title, String id, Path path, Map<String, Paragraph> paragraphs) {
         this.id = id;
         this.path = path;
         this.title = title;
@@ -86,23 +86,23 @@ public final class Notebook implements ZeppelinFile {
 
     // Checks if searched ID matches with this Notebooks ID.
     @Override
-    public ZeppelinFile findFile(String id) throws FileNotFoundException {
-        if (id().equals(id)) {
+    public ZeppelinFile findFile(String searchedId) throws FileNotFoundException {
+        if (id().equals(searchedId)) {
             return this;
         }
         else {
-            throw new FileNotFoundException("Searched id " + id + " does not match with" + id());
+            throw new FileNotFoundException("Searched id " + searchedId + " does not match with" + id());
         }
     }
 
     // Checks if searched path matches with this Notebooks path.
     @Override
-    public ZeppelinFile findFile(Path path) throws FileNotFoundException {
-        if (path().equals(path)) {
+    public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
+        if (path().equals(searchedPath)) {
             return this;
         }
         else {
-            throw new FileNotFoundException("Searched path " + path + " does not match with" + path());
+            throw new FileNotFoundException("Searched path " + searchedPath + " does not match with" + path());
         }
     }
 
@@ -118,7 +118,7 @@ public final class Notebook implements ZeppelinFile {
         return title;
     }
 
-    public LinkedHashMap<String, Paragraph> paragraphs() {
+    public Map<String, Paragraph> paragraphs() {
         return paragraphs;
     }
 
@@ -139,8 +139,8 @@ public final class Notebook implements ZeppelinFile {
         return builder.build();
     }
 
-    public Notebook copy(Path path, String id) throws IOException {
-        return copy(title, path, id);
+    public Notebook copy(Path destinationPath, String copyId) throws IOException {
+        return copy(title, destinationPath, copyId);
     }
 
     @Override
@@ -163,16 +163,16 @@ public final class Notebook implements ZeppelinFile {
         jsonReader.close();
         stringReader.close();
 
-        String name = object.getString("name");
-        String id = object.getString("id");
+        String savedName = object.getString("name");
+        String savedId = object.getString("id");
         JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
-        LinkedHashMap<String, Paragraph> paragraphs = new LinkedHashMap<>();
+        Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
         for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
             NullParagraph nullParagraph = new NullParagraph();
             Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
-            paragraphs.put(paragraph.id(), paragraph);
+            savedParagraphs.put(paragraph.id(), paragraph);
         }
-        return new Notebook(name, id, path(), paragraphs);
+        return new Notebook(savedName, savedId, path(), savedParagraphs);
     }
 
     @Override
@@ -180,15 +180,15 @@ public final class Notebook implements ZeppelinFile {
         return new ArrayList<>();
     }
 
-    public Notebook copy(String title, Path path, String id) throws IOException {
-        LinkedHashMap<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
+    public Notebook copy(String copyTitle, Path destinationPath, String copyId) throws IOException {
+        Map<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
         for (Paragraph paragraph : paragraphs.values()) {
             String copyParagraphId = UUID.randomUUID().toString();
             Script copyScript = new Script(paragraph.script().text());
             Paragraph copyParagraph = new Paragraph(copyParagraphId, paragraph.title(), copyScript);
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
         }
-        Notebook copyNotebook = new Notebook(title, id, path, copyParagraphs);
+        Notebook copyNotebook = new Notebook(copyTitle, copyId, destinationPath, copyParagraphs);
         copyNotebook.save();
         return copyNotebook;
     }
@@ -214,8 +214,8 @@ public final class Notebook implements ZeppelinFile {
         move(Paths.get(path().getParent().toString(), fileName));
     }
 
-    public void move(Path path) throws IOException {
-        Notebook movedNotebook = copy(path, id());
+    public void move(Path destinationPath) throws IOException {
+        Notebook movedNotebook = copy(destinationPath, id());
         movedNotebook.save();
         delete();
     }

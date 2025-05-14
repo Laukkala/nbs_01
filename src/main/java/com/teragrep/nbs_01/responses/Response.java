@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.responses;
 
 public interface Response {
 
-    int status();
+    public abstract int status();
 
-    String parse();
+    public abstract String parse();
 }

@@ -68,9 +68,9 @@ public class JettyWebSocketConnection implements Session.Listener {
 
     // Jetty creates a Session when onWebSocketOpen is called, so we have to assign the Session here instead of in the constructor.
     @Override
-    public void onWebSocketOpen(Session session) {
-        this.session = session;
-        session.demand();
+    public void onWebSocketOpen(Session openedSession) {
+        this.session = openedSession;
+        openedSession.demand();
     }
 
     @Override

@@ -52,5 +52,5 @@ import com.teragrep.nbs_01.responses.Response;
 public interface EndPoint {
 
     // createResponse is where the functionality of the endpoint should be defined. The response should be created and returned.
-    Response createResponse(Request request);
+    public abstract Response createResponse(Request request);
 }

@@ -66,45 +66,29 @@ public class JettyUpgradeableHTTPConnection extends Handler.Abstract {
     }
 
     @Override
-    public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        try {
-            if (
-                request.getHeaders().contains("Upgrade", "websocket")
-                        && request.getHeaders().contains("Connection", "Upgrade")
-            ) {
-                // Handle a WebSocket connection
-                try {
-                    ServerWebSocketContainer container = ServerWebSocketContainer.get(request.getContext());
-                    boolean upgraded = container
-                            .upgrade((rq, rs, cb) -> new JettyWebSocketConnection(endPoint), request, response, callback);
-                    if (upgraded) {
-                        return true;
-                    }
-                    else {
-                        // This was supposed to be a WebSocket upgrade request, but something went wrong.
-                        Response.writeError(request, response, callback, HttpStatus.UPGRADE_REQUIRED_426);
-                        return true;
-                    }
-                }
-                catch (Exception exception) {
-                    Response
-                            .writeError(
-                                    request, response, callback, HttpStatus.UPGRADE_REQUIRED_426, "failed to upgrade",
-                                    exception
-                            );
-                    return true;
-                }
+    public boolean handle(Request request, Response response, Callback callback) {
+        if (
+            request.getHeaders().contains("Upgrade", "websocket")
+                    && request.getHeaders().contains("Connection", "Upgrade")
+        ) {
+            // Handle a WebSocket connection
+            ServerWebSocketContainer container = ServerWebSocketContainer.get(request.getContext());
+            boolean upgraded = container
+                    .upgrade((rq, rs, cb) -> new JettyWebSocketConnection(endPoint), request, response, callback);
+            if (upgraded) {
+                return true;
             }
             else {
-                // Handle a normal HTTP request.
-                new JettyHTTPConnection(endPoint).handle(request, response, callback);
-                callback.succeeded();
+                // This was supposed to be a WebSocket upgrade request, but something went wrong.
+                Response.writeError(request, response, callback, HttpStatus.UPGRADE_REQUIRED_426);
                 return true;
             }
         }
-        catch (Exception exception) {
-            callback.failed(exception);
-            return false;
+        else {
+            // Handle a normal HTTP request.
+            new JettyHTTPConnection(endPoint).handle(request, response, callback);
+            callback.succeeded();
+            return true;
         }
     }
 }
