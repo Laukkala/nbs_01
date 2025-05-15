@@ -52,6 +52,8 @@ import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.SimpleResponse;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -71,10 +73,10 @@ public class UpdateParagraphEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             root.initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
-            String[] args = request.body().split(",");
-            String notebookId = args[0];
-            String paragraphId = args[1];
-            String updatedParagraph = args[2];
+            JsonObject parameters = request.parameters();
+            String notebookId = parameters.getString("notebookId");
+            String paragraphId = parameters.getString("paragraphId");
+            String updatedParagraph = parameters.getString("paragraphText");
             Notebook notebook = (Notebook) root.findFile(notebookId).load();
             Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
             Paragraph paragraph = paragraphs.get(paragraphId);
@@ -90,6 +92,9 @@ public class UpdateParagraphEndpoint implements EndPoint {
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to edit notebook, reason:\n" + ioException
             );
+        }
+        catch (JsonException jsonException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

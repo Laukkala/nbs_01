@@ -45,13 +45,12 @@
  */
 package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.repository.Script;
+import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.SimpleResponse;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -74,16 +73,18 @@ public class CreateNotebookEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            String[] args = request.body().split(",");
-            String title = args[0];
-            Path path = Paths.get(updatedDirectory.path().toString(), args[1]);
-            if (updatedDirectory.contains(path)) {
-                return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Notebook already exists!");
+            JsonObject parameters = request.parameters();
+            String name = parameters.getString("name");
+            String parentId = parameters.getString("parentId");
+            ZeppelinFile parentDirectory = updatedDirectory.findFile(parentId);
+            if (!parentDirectory.isDirectory()) {
+                return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Given parentId is not a Directory!");
             }
+            Path path = Paths.get(parentDirectory.path().toString(), name);
             Paragraph paragraph = new Paragraph(UUID.randomUUID().toString(), "", new Script(""));
             Map<String, Paragraph> paragraphs = new LinkedHashMap();
             paragraphs.put(paragraph.id(), paragraph);
-            Notebook newNotebook = new Notebook(title, UUID.randomUUID().toString(), path, paragraphs);
+            Notebook newNotebook = new Notebook("", UUID.randomUUID().toString(), path, paragraphs);
             newNotebook.save();
             return new SimpleResponse(HttpStatus.OK_200, "Created notebook " + newNotebook.id());
         }
@@ -92,6 +93,9 @@ public class CreateNotebookEndpoint implements EndPoint {
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create notebook, reason:\n" + ioException
             );
+        }
+        catch (JsonException jsonException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

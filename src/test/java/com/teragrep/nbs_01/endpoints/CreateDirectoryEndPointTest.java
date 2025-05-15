@@ -79,7 +79,8 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/newDirectory", "2A94M5J1D,created_directory"
+                    "http://" + serverAddress() + "/notebook/newDirectory",
+                    "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"created_directory\"}"
             );
             Assertions.assertTrue(response.get(200).get(0).toString().contains("Created directory "));
             String newDirectoryId = response.get(200).get(0).toString().split("Created directory ")[1];
@@ -97,7 +98,8 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/newDirectory", "2A94M5J1D,created_directory"
+                    "http://" + serverAddress() + "/notebook/newDirectory",
+                    "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"created_directory\"}"
             );
             Assertions.assertTrue(response.get(200).get(0).contains("Created directory"));
             String newDirectoryId = response.get(200).get(0).split("Created directory ")[1];

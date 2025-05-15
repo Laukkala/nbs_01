@@ -45,12 +45,13 @@
  */
 package com.teragrep.nbs_01.requests;
 
-import java.util.Map;
+import jakarta.json.JsonObject;
+import jakarta.json.stream.JsonParsingException;
 
 // Request object contains parameters that the user wants to send to NBS_01
 public interface Request {
 
     public abstract String body();
 
-    public abstract Map<String, String> parameters();
+    public abstract JsonObject parameters() throws JsonParsingException;
 }

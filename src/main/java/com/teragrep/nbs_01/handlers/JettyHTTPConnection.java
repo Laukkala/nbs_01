@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.handlers;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.requests.SimpleRequest;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -69,7 +69,7 @@ public class JettyHTTPConnection extends Handler.Abstract {
     @Override
     public boolean handle(Request jettyRequest, Response jettyResponse, Callback callback) {
         try {
-            com.teragrep.nbs_01.requests.Request request = new SimpleRequest(Content.Source.asString(jettyRequest));
+            com.teragrep.nbs_01.requests.Request request = new JsonRequest(Content.Source.asString(jettyRequest));
             com.teragrep.nbs_01.responses.Response response = endPoint.createResponse(request);
             jettyResponse.setStatus(response.status());
             jettyResponse.write(true, ByteBuffer.wrap(response.parse().getBytes()), Callback.NOOP);

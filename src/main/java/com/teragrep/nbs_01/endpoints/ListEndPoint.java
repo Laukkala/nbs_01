@@ -50,6 +50,8 @@ import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.SimpleResponse;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -71,13 +73,25 @@ public class ListEndPoint implements EndPoint {
         StringBuilder sb = new StringBuilder();
         ZeppelinFile foundFile;
         Directory directoryToSearch;
-        try {
-            foundFile = root.findFile(request.body());
-            directoryToSearch = (Directory) foundFile;
+        JsonObject parameters = request.parameters();
+        if (parameters.containsKey("directoryId")) {
+            try {
+                foundFile = root.findFile(parameters.getString("directoryId"));
+                if (foundFile.isDirectory()) {
+                    directoryToSearch = (Directory) foundFile;
+                }
+                else {
+                    return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
+                }
+            }
+            catch (FileNotFoundException fileNotFoundException) {
+                return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
+            }
         }
-        catch (FileNotFoundException fileNotFoundException) {
+        else {
             directoryToSearch = root;
         }
+
         try {
             Directory updatedDirectory = directoryToSearch
                     .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
@@ -92,6 +106,9 @@ public class ListEndPoint implements EndPoint {
         }
         catch (IOException ioException) {
             return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
+        }
+        catch (JsonException jsonException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

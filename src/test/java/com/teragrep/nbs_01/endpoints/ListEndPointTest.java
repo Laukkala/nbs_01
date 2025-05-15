@@ -92,7 +92,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/list", ""
+                    "http://" + serverAddress() + "/notebook/list", "{}"
             );
             for (String filename : savedFileNames) {
                 Assertions.assertTrue(response.get(200).stream().anyMatch(filename::contains));
@@ -107,7 +107,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/list", "2A94M5J1D"
+                    "http://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
             );
             ArrayList<String> savedIdsInFolder = new ArrayList<>();
             savedFileNames.add("2A94M5J1Z");
@@ -125,7 +125,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Map<Integer, List<String>> response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/list", ""
+                    "ws://" + serverAddress() + "/notebook/list", "{}"
             );
             List<String> ids = Arrays.stream(response.get(200).get(0).split("\n")).toList();
             ids.stream().anyMatch(savedFileNames::contains);
@@ -139,7 +139,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Map<Integer, List<String>> response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/list", "2A94M5J1D"
+                    "ws://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
             );
             ArrayList<String> savedIdsInFolder = new ArrayList<>();
             savedFileNames.add("2A94M5J1Z");

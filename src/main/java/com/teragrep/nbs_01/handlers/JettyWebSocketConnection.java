@@ -46,8 +46,8 @@
 package com.teragrep.nbs_01.handlers;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.requests.SimpleRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
@@ -85,7 +85,7 @@ public class JettyWebSocketConnection implements Session.Listener {
 
     @Override
     public void onWebSocketText(String message) {
-        Request request = new SimpleRequest(message);
+        Request request = new JsonRequest(message);
         Response response = endPoint.createResponse(request);
         session.sendText(response.parse(), Callback.from(() -> {
             session.demand();

@@ -49,6 +49,8 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.SimpleResponse;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -70,9 +72,9 @@ public class CreateDirectoryEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            String[] args = request.body().split(",");
-            String parentId = args[0];
-            String name = args[1];
+            JsonObject parameters = request.parameters();
+            String parentId = parameters.getString("parentId");
+            String name = parameters.getString("directoryName");
 
             Directory parent = (Directory) updatedDirectory.findFile(parentId);
             String id = UUID.randomUUID().toString();
@@ -89,6 +91,9 @@ public class CreateDirectoryEndpoint implements EndPoint {
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create directory, reason:\n" + ioException
             );
+        }
+        catch (JsonException jsonException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

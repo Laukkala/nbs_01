@@ -76,7 +76,8 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/move", notebookId + "," + directoryId
+                    "http://" + serverAddress() + "/notebook/move",
+                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + directoryId + "\"}"
             );
             Assertions.assertEquals("Moved notebook " + notebookId, response.get(200).get(0).toString());
             stopServer();
@@ -102,7 +103,8 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/move", notebookId + "," + directoryId
+                    "ws://" + serverAddress() + "/notebook/move",
+                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + directoryId + "\"}"
             );
             Assertions.assertEquals("Moved notebook " + notebookId, response.get(200).get(0));
             stopServer();

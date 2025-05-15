@@ -79,7 +79,7 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/delete", "2A94M5J3Z"
+                    "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"2A94M5J3Z\"}"
             );
             Assertions.assertEquals("Notebook deleted", response.get(200).get(0).toString());
             stopServer();
@@ -99,7 +99,7 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/delete", "2A94M5J3Z"
+                    "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"2A94M5J3Z\"}"
             );
             Assertions.assertEquals("Notebook deleted", response.get(200).get(0));
             // Assert that a file was deleted.

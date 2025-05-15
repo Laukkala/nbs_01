@@ -91,7 +91,8 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/new", "TestTitle," + testFileName
+                    "http://" + serverAddress() + "/notebook/new",
+                    "{\"name\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
             );
             Assertions.assertTrue(response.get(200).get(0).toString().contains("Created notebook "));
             stopServer();
@@ -104,7 +105,8 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/new", "TestTitle," + testFileName
+                    "http://" + serverAddress() + "/notebook/new",
+                    "{\"name\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
             );
             Assertions.assertTrue(response.get(200).get(0).contains("Created notebook"));
             stopServer();

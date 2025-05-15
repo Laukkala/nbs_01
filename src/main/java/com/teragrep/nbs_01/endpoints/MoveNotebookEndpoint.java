@@ -50,6 +50,8 @@ import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.SimpleResponse;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -68,9 +70,9 @@ public class MoveNotebookEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            String[] args = request.body().split(",");
-            String notebookId = args[0];
-            String directoryId = args[1];
+            JsonObject parameters = request.parameters();
+            String notebookId = parameters.getString("notebookId");
+            String directoryId = parameters.getString("parentId");
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(notebookId).load();
             Directory parent = (Directory) updatedDirectory.findFile(directoryId);
@@ -86,6 +88,9 @@ public class MoveNotebookEndpoint implements EndPoint {
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create directory, reason:\n" + ioException
             );
+        }
+        catch (JsonException jsonException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

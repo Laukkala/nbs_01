@@ -84,7 +84,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/update",
-                    testFileId + "," + testParagraphId + "," + "testEditMessage"
+                    "{\"notebookId\":\"" + testFileId + "\",\"paragraphId\":\"" + testParagraphId
+                            + "\",\"paragraphText\":\"" + "testEditMessage\"}"
             );
             Assertions.assertTrue(response.get(200).get(0).toString().contains("Notebook edited successfully"));
             stopServer();
@@ -102,7 +103,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
             startServer();
             Map<Integer, List<String>> response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/update",
-                    testFileId + "," + testParagraphId + "," + "testEditMessage"
+                    "{\"notebookId\":\"" + testFileId + "\",\"paragraphId\":\"" + testParagraphId
+                            + "\",\"paragraphText\":\"" + "testEditMessage\"}"
             );
             Assertions.assertEquals("Notebook edited successfully", response.get(200).get(0));
             stopServer();

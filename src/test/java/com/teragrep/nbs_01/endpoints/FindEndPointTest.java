@@ -78,7 +78,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/find", testFileId
+                    "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"" + testFileId + "\"}"
             );
             Assertions.assertEquals(expectedFileContent, response.get(200).get(0).toString());
             stopServer();
@@ -92,7 +92,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/find", testFileId
+                    "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"" + testFileId + "\"}"
             );
             Assertions.assertEquals(expectedFileContent, response.get(200).get(0));
             stopServer();
@@ -105,7 +105,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/find", "nonExistentId"
+                    "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"nonExistentId\"}"
             );
             Assertions.assertEquals("Notebook not found!", response.get(400).get(0).toString());
             stopServer();

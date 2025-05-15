@@ -50,6 +50,8 @@ import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.SimpleResponse;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -68,8 +70,10 @@ public class FindEndPoint implements EndPoint {
     public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
+            JsonObject parameters = request.parameters();
+            String id = parameters.getString("notebookId");
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            ZeppelinFile file = updatedDirectory.findFile(request.body());
+            ZeppelinFile file = updatedDirectory.findFile(id);
             if (!file.isDirectory()) {
                 return new SimpleResponse(HttpStatus.OK_200, file.load().json().toString());
             }
@@ -82,6 +86,9 @@ public class FindEndPoint implements EndPoint {
         }
         catch (IOException ioException) {
             return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
+        }
+        catch (JsonException jsonException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }
