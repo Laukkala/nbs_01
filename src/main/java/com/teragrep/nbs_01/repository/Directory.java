@@ -138,6 +138,9 @@ public final class Directory implements ZeppelinFile {
 
     public void move(Path destination) throws IOException {
         if (destination.toAbsolutePath().startsWith(path().toAbsolutePath())) {
+            if(destination.toAbsolutePath().equals(path().toAbsolutePath())){
+                throw new IOException("Directory is already located in the given destination!");
+            }
             throw new IOException("Cannot move a directory into one of its own children!");
         }
         Map<String, ZeppelinFile> movedChildren = new HashMap<>();
@@ -155,8 +158,8 @@ public final class Directory implements ZeppelinFile {
         delete();
     }
 
-    public void move(Directory destinationDirectory, String name) throws IOException {
-        move(Paths.get(destinationDirectory.path().toString(), name));
+    public void move(Directory destinationDirectory) throws IOException {
+        move(Paths.get(destinationDirectory.path().toString(),path().getFileName().toString()));
     }
 
     public void delete() throws IOException {

@@ -163,7 +163,7 @@ class DirectoryTest {
 
     // Moving a directory should result in the directory being moved to the correct path along with its children.
     @Test
-    void testMove() {
+    void testMoveToPath() {
         Assertions.assertDoesNotThrow(() -> {
             Directory root = new Directory("root", notebookDirectory)
                     .initializeDirectory(notebookDirectory, new ConcurrentHashMap<>());
@@ -182,6 +182,30 @@ class DirectoryTest {
             Assertions
                     .assertEquals(
                             Paths.get(root.path().toString(), "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln"), subFile.path()
+                    );
+        });
+    }
+    @Test
+    void testMoveToDirectory() {
+        Assertions.assertDoesNotThrow(() -> {
+            Directory root = new Directory("root", notebookDirectory)
+                    .initializeDirectory(notebookDirectory, new ConcurrentHashMap<>());
+            Directory directory = (Directory) root.findFile("2A94M5J2D");
+            Directory parentDirectory = root;
+            directory.move(parentDirectory);
+
+            // Re-initialize directory as we have made modifications.
+            root = new Directory("root", notebookDirectory)
+                    .initializeDirectory(notebookDirectory, new ConcurrentHashMap<>());
+            directory = (Directory) root.findFile("2A94M5J2D");
+            Assertions
+                    .assertEquals(Paths.get(parentDirectory.path().toString(), "my_second_folder_2A94M5J2D").toString(), directory.path().toString());
+
+            // Assert that the children of the moved directory were moved as well.
+            ZeppelinFile subFile = directory.findFile("2A94M5J1Z");
+            Assertions
+                    .assertEquals(
+                            Paths.get(parentDirectory.path().toString(), "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln"), subFile.path()
                     );
         });
     }
