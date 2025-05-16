@@ -46,13 +46,12 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -78,10 +77,10 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             startServer();
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"2A94M5J3Z\"}"
             );
-            Assertions.assertEquals("Notebook deleted", response.get(200).get(0).toString());
+            Assertions.assertEquals("Notebook deleted", response.body().getString("message").toString().strip());
             stopServer();
             // Assert that a file was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
@@ -98,10 +97,10 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             startServer();
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"2A94M5J3Z\"}"
             );
-            Assertions.assertEquals("Notebook deleted", response.get(200).get(0));
+            Assertions.assertEquals("Notebook deleted", response.body().getString("message").strip());
             // Assert that a file was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the correct file was deleted.

@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -81,19 +81,19 @@ public class CreateDirectoryEndpoint implements EndPoint {
             Path path = Paths.get(parent.path().toString(), name + "_" + id);
             Directory newDirectory = new Directory(id, path);
             newDirectory.save();
-            return new SimpleResponse(HttpStatus.OK_200, "Created directory " + newDirectory.id());
+            return new JsonResponse(HttpStatus.OK_200, "Created directory " + newDirectory.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory doesn't exist!");
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory doesn't exist!");
         }
         catch (IOException ioException) {
-            return new SimpleResponse(
+            return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create directory, reason:\n" + ioException
             );
         }
         catch (JsonException jsonException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

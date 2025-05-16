@@ -87,7 +87,7 @@ public class JettyWebSocketConnection implements Session.Listener {
     public void onWebSocketText(String message) {
         Request request = new JsonRequest(message);
         Response response = endPoint.createResponse(request);
-        session.sendText(response.parse(), Callback.from(() -> {
+        session.sendText(response.body().getString("message"), Callback.from(() -> {
             session.demand();
         }, failure -> {
             session.close(StatusCode.SERVER_ERROR, "failure", Callback.NOOP);

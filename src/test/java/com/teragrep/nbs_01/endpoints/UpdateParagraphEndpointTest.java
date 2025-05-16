@@ -47,13 +47,12 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
@@ -82,12 +81,13 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
 
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/update",
                     "{\"notebookId\":\"" + testFileId + "\",\"paragraphId\":\"" + testParagraphId
                             + "\",\"paragraphText\":\"" + "testEditMessage\"}"
             );
-            Assertions.assertTrue(response.get(200).get(0).toString().contains("Notebook edited successfully"));
+            Assertions
+                    .assertTrue(response.body().getString("message").strip().contains("Notebook edited successfully"));
             stopServer();
             // Assert that the message we wanted to edit can be found in the file.
             Assertions
@@ -101,12 +101,12 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeWebSocketRequest(
+            Response response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/update",
                     "{\"notebookId\":\"" + testFileId + "\",\"paragraphId\":\"" + testParagraphId
                             + "\",\"paragraphText\":\"" + "testEditMessage\"}"
             );
-            Assertions.assertEquals("Notebook edited successfully", response.get(200).get(0));
+            Assertions.assertEquals("Notebook edited successfully", response.body().getString("message").strip());
             stopServer();
             // Assert that the message we wanted to edit can be found in the file.
             Assertions

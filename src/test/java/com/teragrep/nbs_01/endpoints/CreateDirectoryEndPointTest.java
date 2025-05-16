@@ -46,13 +46,12 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
@@ -78,12 +77,12 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/newDirectory",
                     "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"created_directory\"}"
             );
-            Assertions.assertTrue(response.get(200).get(0).toString().contains("Created directory "));
-            String newDirectoryId = response.get(200).get(0).toString().split("Created directory ")[1];
+            Assertions.assertTrue(response.body().getString("message").contains("Created directory "));
+            String newDirectoryId = response.body().getString("message").strip().split("Created directory ")[1];
             stopServer();
             Assertions
                     .assertTrue(
@@ -97,12 +96,12 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
     public void webSocketCreateDirectoryTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/newDirectory",
                     "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"created_directory\"}"
             );
-            Assertions.assertTrue(response.get(200).get(0).contains("Created directory"));
-            String newDirectoryId = response.get(200).get(0).split("Created directory ")[1];
+            Assertions.assertTrue(response.body().getString("message").contains("Created directory"));
+            String newDirectoryId = response.body().getString("message").strip().split("Created directory ")[1];
             stopServer();
             Assertions
                     .assertTrue(

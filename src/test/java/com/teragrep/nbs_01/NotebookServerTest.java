@@ -45,13 +45,13 @@
  */
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.*;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NotebookServerTest extends AbstractNotebookServerTest {
@@ -74,8 +74,9 @@ public class NotebookServerTest extends AbstractNotebookServerTest {
     public void httpConnectTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeHttpGETRequest("http://" + serverAddress() + "/notebook/ping");
-            Assertions.assertEquals("pong", response.get(200).get(0).toString());
+            Response response = makeHttpGETRequest("http://" + serverAddress() + "/notebook/ping");
+            Assertions.assertEquals(HttpStatus.OK_200, response.status());
+            Assertions.assertEquals("pong", response.body().getString("message"));
             stopServer();
         });
     }

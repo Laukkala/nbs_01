@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -54,20 +55,27 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ListEndPointTest extends AbstractNotebookServerTest {
 
-    private List<String> savedFileNames;
+    private List<String> savedFileIds;
 
     public List<String> readFilesOnDisk() {
         try {
             return Files
                     .list(notebookDirectory())
                     .filter(file -> !Files.isDirectory(file))
+                    .map(Path::getFileName)
                     .map(Path::toString)
+                    .map(filename -> {
+                        if (filename.contains("_")) {
+                            return filename.substring(filename.lastIndexOf("_") + 1, filename.lastIndexOf(".zpln"));
+                        }
+                        else
+                            return filename;
+                    })
                     .collect(Collectors.toList());
         }
         catch (IOException ioException) {
@@ -78,7 +86,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     @BeforeAll
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-        savedFileNames = readFilesOnDisk();
+        savedFileIds = readFilesOnDisk();
     }
 
     @AfterAll
@@ -91,11 +99,9 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     public void httpListAllTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/list", "{}"
-            );
-            for (String filename : savedFileNames) {
-                Assertions.assertTrue(response.get(200).stream().anyMatch(filename::contains));
+            Response response = makeHttpPOSTRequest("http://" + serverAddress() + "/notebook/list", "{}");
+            for (String filename : savedFileIds) {
+                Assertions.assertTrue(response.body().getString("message").contains(filename));
             }
             stopServer();
         });
@@ -106,14 +112,14 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     public void httpListWithinFolderTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
             );
             ArrayList<String> savedIdsInFolder = new ArrayList<>();
-            savedFileNames.add("2A94M5J1Z");
-            savedFileNames.add("2A94M5J2Z");
+            savedFileIds.add("2A94M5J1Z");
+            savedFileIds.add("2A94M5J2Z");
             for (String filename : savedIdsInFolder) {
-                Assertions.assertTrue(response.get(200).stream().anyMatch(filename::equals));
+                Assertions.assertTrue(response.body().getString("message").contains(filename));
             }
             stopServer();
         });
@@ -124,11 +130,9 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     public void webSocketListAllTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/list", "{}"
-            );
-            List<String> ids = Arrays.stream(response.get(200).get(0).split("\n")).toList();
-            ids.stream().anyMatch(savedFileNames::contains);
+            Response response = makeWebSocketRequest("ws://" + serverAddress() + "/notebook/list", "{}");
+            List<String> ids = Arrays.stream(response.body().getString("message").split("\n")).toList();
+            ids.stream().anyMatch(savedFileIds::contains);
             stopServer();
         });
     }
@@ -138,14 +142,14 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     public void webSocketListWithinFolderTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeWebSocketRequest(
+            Response response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
             );
             ArrayList<String> savedIdsInFolder = new ArrayList<>();
-            savedFileNames.add("2A94M5J1Z");
-            savedFileNames.add("2A94M5J2Z");
+            savedFileIds.add("2A94M5J1Z");
+            savedFileIds.add("2A94M5J2Z");
 
-            List<String> receivedIds = Arrays.stream(response.get(200).get(0).split("\n")).toList();
+            List<String> receivedIds = Arrays.stream(response.body().getString("message").split("\n")).toList();
             for (String filename : savedIdsInFolder) {
                 Assertions.assertTrue(receivedIds.stream().anyMatch(filename::equals));
             }

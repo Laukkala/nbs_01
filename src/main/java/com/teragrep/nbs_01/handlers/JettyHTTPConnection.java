@@ -72,7 +72,7 @@ public class JettyHTTPConnection extends Handler.Abstract {
             com.teragrep.nbs_01.requests.Request request = new JsonRequest(Content.Source.asString(jettyRequest));
             com.teragrep.nbs_01.responses.Response response = endPoint.createResponse(request);
             jettyResponse.setStatus(response.status());
-            jettyResponse.write(true, ByteBuffer.wrap(response.parse().getBytes()), Callback.NOOP);
+            jettyResponse.write(true, ByteBuffer.wrap(response.body().getString("message").getBytes()), Callback.NOOP);
             callback.succeeded();
             return true;
         }

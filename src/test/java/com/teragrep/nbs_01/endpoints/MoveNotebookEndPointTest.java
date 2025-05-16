@@ -46,12 +46,11 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
@@ -75,11 +74,11 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/move",
                     "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + directoryId + "\"}"
             );
-            Assertions.assertEquals("Moved notebook " + notebookId, response.get(200).get(0).toString());
+            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
             stopServer();
             Assertions
                     .assertTrue(
@@ -102,11 +101,11 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeWebSocketRequest(
+            Response response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/move",
                     "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + directoryId + "\"}"
             );
-            Assertions.assertEquals("Moved notebook " + notebookId, response.get(200).get(0));
+            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
             stopServer();
             Assertions
                     .assertTrue(

@@ -45,6 +45,8 @@
  */
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
@@ -57,9 +59,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class AbstractNotebookServerTest {
 
@@ -129,10 +128,9 @@ public class AbstractNotebookServerTest {
         });
     }
 
-    public Map<Integer, List<String>> makeHttpPOSTRequest(String urlString, String requestBody) throws IOException {
-        HashMap<Integer, List<String>> response = new HashMap<>();
+    public Response makeHttpPOSTRequest(String urlString, String requestBody) throws IOException {
         URL url = new URL(urlString);
-        ArrayList<String> messages = new ArrayList<>();
+        StringBuilder messages = new StringBuilder();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -159,17 +157,15 @@ public class AbstractNotebookServerTest {
 
         String line;
         while ((line = reader.readLine()) != null) {
-            messages.add(line);
+            messages.append(line + "\n");
         }
         connection.disconnect();
-        response.put(status, messages);
-        return response;
+        return new JsonResponse(status, messages.toString());
     }
 
-    public Map<Integer, List<String>> makeHttpGETRequest(String urlString) throws IOException {
-        HashMap<Integer, List<String>> response = new HashMap<>();
+    public Response makeHttpGETRequest(String urlString) throws IOException {
         URL url = new URL(urlString);
-        ArrayList<String> messages = new ArrayList<>();
+        StringBuilder messages = new StringBuilder();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -188,15 +184,13 @@ public class AbstractNotebookServerTest {
 
         String line;
         while ((line = reader.readLine()) != null) {
-            messages.add(line);
+            messages.append(line);
         }
         connection.disconnect();
-        response.put(status, messages);
-        return response;
+        return new JsonResponse(status, messages.toString());
     }
 
-    public Map<Integer, List<String>> makeWebSocketRequest(String url, String requestBody) throws Exception {
-        HashMap<Integer, List<String>> response = new HashMap<>();
+    public Response makeWebSocketRequest(String url, String requestBody) throws Exception {
         // Start server and wait for it to initialize.
         URI serverURI = URI.create(url);
         WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
@@ -209,8 +203,7 @@ public class AbstractNotebookServerTest {
         }
         // Read the WebSocket response and assert that we got the proper list of notebook IDs.
         ArrayList<String> receivedMessages = client.receivedMessages();
-        response.put(200, receivedMessages);
         webSocketClient.close();
-        return response;
+        return new JsonResponse(200, receivedMessages.toString());
     }
 }

@@ -48,8 +48,8 @@ package com.teragrep.nbs_01.endpoints;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -73,16 +73,16 @@ public class DeleteNotebookEndpoint implements EndPoint {
             String notebookId = parameters.getString("notebookId");
             ZeppelinFile file = updatedDirectory.findFile(notebookId);
             file.delete();
-            return new SimpleResponse(HttpStatus.OK_200, "Notebook deleted");
+            return new JsonResponse(HttpStatus.OK_200, "Notebook deleted");
         }
         catch (IOException ioException) {
-            return new SimpleResponse(
+            return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to delete notebook, reason:\n" + ioException
             );
         }
         catch (JsonException jsonException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

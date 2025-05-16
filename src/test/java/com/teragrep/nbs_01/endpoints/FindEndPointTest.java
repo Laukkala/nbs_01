@@ -46,12 +46,11 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FindEndPointTest extends AbstractNotebookServerTest {
@@ -77,10 +76,10 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"" + testFileId + "\"}"
             );
-            Assertions.assertEquals(expectedFileContent, response.get(200).get(0).toString());
+            Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
             stopServer();
         });
     }
@@ -91,10 +90,10 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"" + testFileId + "\"}"
             );
-            Assertions.assertEquals(expectedFileContent, response.get(200).get(0));
+            Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip());
             stopServer();
         });
     }
@@ -104,10 +103,10 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"nonExistentId\"}"
             );
-            Assertions.assertEquals("Notebook not found!", response.get(400).get(0).toString());
+            Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());
             stopServer();
         });
     }

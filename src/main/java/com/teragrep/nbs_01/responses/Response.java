@@ -45,9 +45,11 @@
  */
 package com.teragrep.nbs_01.responses;
 
+import jakarta.json.JsonObject;
+
 public interface Response {
 
     public abstract int status();
 
-    public abstract String parse();
+    public abstract JsonObject body();
 }

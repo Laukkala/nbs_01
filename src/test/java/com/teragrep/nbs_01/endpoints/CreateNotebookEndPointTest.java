@@ -46,13 +46,12 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
@@ -90,11 +89,11 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/new",
                     "{\"name\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
             );
-            Assertions.assertTrue(response.get(200).get(0).toString().contains("Created notebook "));
+            Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
             stopServer();
         });
     }
@@ -104,11 +103,11 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
     public void webSocketCreateNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
-            Map<Integer, List<String>> response = makeHttpPOSTRequest(
+            Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/new",
                     "{\"name\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
             );
-            Assertions.assertTrue(response.get(200).get(0).contains("Created notebook"));
+            Assertions.assertTrue(response.body().getString("message").contains("Created notebook"));
             stopServer();
         });
     }
