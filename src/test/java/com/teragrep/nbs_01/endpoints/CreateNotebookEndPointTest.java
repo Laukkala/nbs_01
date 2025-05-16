@@ -56,59 +56,60 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
 
-    private Path testFileName = Paths.get("testFileName.zpln");
+    private String parentDirectoryID = "notebooks";
+    private String newNotebookName = "testFileName.zpln";
+    private Path newNotebookPath = Paths.get(notebookDirectory().toString(), newNotebookName);
 
     public CreateNotebookEndPointTest() {
     }
 
-    @AfterEach
-    // Delete the notebook that was created by this test so that multiple tests can be run in succession.
-    public void deleteTestNotebook() {
-        Assertions.assertDoesNotThrow(() -> {
-            Path testFilePath = Paths.get(notebookDirectory().toString(), testFileName.toString());
-            // Delete the test Notebook we create here if it already exists
-            if (Files.exists(testFilePath)) {
-                Files.delete(testFilePath);
-            }
-        });
-    }
-
-    @BeforeAll
+    @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
     }
 
-    @AfterAll
+    @AfterEach
     private void tearDown() {
         deleteFileRecursively(notebookDirectory().toFile());
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/new endpoint results in a new file being saved on disk.
+    // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
     public void httpCreateNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
+            // Assert that the file we are creating doesn't already exist.
+            Assertions.assertFalse(Files.exists(newNotebookPath));
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/new",
-                    "{\"notebookName\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
+                    "{\"notebookName\":\"" + newNotebookName + "\",\"parentId\":\"" + parentDirectoryID + "\"}"
             );
-            Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
             stopServer();
+            // Assert that we receive the proper response.
+            Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
+            // Assert that the file was created.
+            Assertions.assertTrue(Files.exists(newNotebookPath));
+
         });
     }
 
     @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
+    // Assert that a WebSocket request to /notebook/new endpoint results in a new file being saved on disk.
     public void webSocketCreateNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
+            // Assert that the file we are creating doesn't already exist.
+            Assertions.assertFalse(Files.exists(newNotebookPath));
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/new",
-                    "{\"notebookName\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
+                    "{\"notebookName\":\"" + newNotebookName + "\",\"parentId\":\"" + parentDirectoryID + "\"}"
             );
-            Assertions.assertTrue(response.body().getString("message").contains("Created notebook"));
             stopServer();
+            // Assert that we receive the proper response.
+            Assertions.assertTrue(response.body().getString("message").contains("Created notebook"));
+            // Assert that the file was created.
+            Assertions.assertTrue(Files.exists(newNotebookPath));
         });
     }
 }

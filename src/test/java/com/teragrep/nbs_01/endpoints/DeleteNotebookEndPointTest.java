@@ -57,49 +57,55 @@ import java.util.stream.Collectors;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
 
-    private final Path fileToDelete = Paths.get(notebookDirectory().toString(), "my_note3_2A94M5J3Z.zpln");
+    private final String notebookId = "2A94M5J3Z";
+    private final Path notebookPath = Paths.get(notebookDirectory().toString(), "my_note3_2A94M5J3Z.zpln");
 
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
     }
 
-    @AfterAll
+    @AfterEach
     private void tearDown() {
         deleteFileRecursively(notebookDirectory().toFile());
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/delete endpoint results in a notebook being deleted
+    // Assert that a HTTP request to /notebook/delete endpoint results in a notebook being deleted
     public void httpDeleteTest() {
         Assertions.assertDoesNotThrow(() -> {
-            // Start server and wait for it to initialize.
-            startServer();
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            // Assert that the file to be deleted exists.
+            Assertions.assertTrue(Files.exists(notebookPath));
+            // Start server and wait for it to initialize.
+            startServer();
             Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"2A94M5J3Z\"}"
+                    "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"" + notebookId + "\"}"
             );
             Assertions.assertEquals("Notebook deleted", response.body().getString("message").toString().strip());
             stopServer();
             // Assert that a file was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the correct file was deleted.
-            Assertions.assertFalse(Files.exists(fileToDelete));
+            Assertions.assertFalse(Files.exists(notebookPath));
         });
     }
 
     @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
+    // Assert that a WebSocket request to /notebook/delete endpoint results in a notebook being deleted
     public void webSocketDeleteTest() {
         Assertions.assertDoesNotThrow(() -> {
-            // Start server and wait for it to initialize.
-            startServer();
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"2A94M5J3Z\"}"
+            // Assert that the file to be deleted exists.
+            Assertions.assertTrue(Files.exists(notebookPath));
+            // Start server and wait for it to initialize.
+            startServer();
+            Response response = makeWebSocketRequest(
+                    "ws://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"" + notebookId + "\"}"
             );
+            stopServer();
             Assertions.assertEquals("Notebook deleted", response.body().getString("message").strip());
             // Assert that a file was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());

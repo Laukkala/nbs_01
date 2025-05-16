@@ -75,9 +75,9 @@ public class NotebookServerTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Response response = makeHttpGETRequest("http://" + serverAddress() + "/notebook/ping");
+            stopServer();
             Assertions.assertEquals(HttpStatus.OK_200, response.status());
             Assertions.assertEquals("pong", response.body().getString("message"));
-            stopServer();
         });
     }
 

@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -57,66 +58,68 @@ public class MoveDirectoryEndPointTest extends AbstractNotebookServerTest {
 
     private final String directoryId = "2A94M5J2D";
     private final String parentId = "notebooks";
+    private final Path originalDirectoryPath = Paths
+            .get(notebookDirectory().toString(), "my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D");
+    private final Path originalChildNotebookPath = Paths
+            .get(
+                    notebookDirectory().toString(), "my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D",
+                    "my_note1_2A94M5J1Z.zpln"
+            );
+    private final Path expectedDirectoryPath = Paths.get(notebookDirectory().toString(), "my_second_folder_2A94M5J2D");
+    private final Path expectedChildNotebookPath = Paths
+            .get(notebookDirectory().toString(), "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln");
 
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
     }
 
-    @AfterAll
+    @AfterEach
     private void tearDown() {
         deleteFileRecursively(notebookDirectory().toFile());
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs
+    // Assert that a HTTP request to /notebook/moveDirectory endpoint results in the proper directory and their children being moved.
     public void httpMoveTest() {
         Assertions.assertDoesNotThrow(() -> {
+            // Assert that the directory and its child files are in their proper places.
+            Assertions.assertTrue(Files.exists(originalDirectoryPath));
+            Assertions.assertTrue(Files.exists(originalChildNotebookPath));
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/moveDirectory",
                     "{\"directoryId\":\"" + directoryId + "\",\"parentId\":\"" + parentId + "\"}"
             );
-            Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
             stopServer();
-            Assertions
-                    .assertTrue(
-                            Files
-                                    .exists(
-                                            Paths
-                                                    .get(
-                                                            notebookDirectory().toString(),
-                                                            "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln"
-                                                    )
-                                    )
-                    );
+            // Assert that we got the proper response.
+            Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
+            // Assert that the directory and child have moved to the new place.
+            Assertions.assertTrue(Files.exists(expectedDirectoryPath));
+            Assertions.assertTrue(Files.exists(expectedChildNotebookPath));
         });
     }
 
     @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
+    // Assert that a WebSocket request to /notebook/moveDirectory endpoint results in the proper directory and their children being moved.
     public void webSocketMoveTest() {
         Assertions.assertDoesNotThrow(() -> {
+            // Assert that the directory and its child files are in their proper places.
+            Assertions.assertTrue(Files.exists(originalDirectoryPath));
+            Assertions.assertTrue(Files.exists(originalChildNotebookPath));
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/moveDirectory",
                     "{\"directoryId\":\"" + directoryId + "\",\"parentId\":\"" + parentId + "\"}"
             );
-            Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
             stopServer();
-            Assertions
-                    .assertTrue(
-                            Files
-                                    .exists(
-                                            Paths
-                                                    .get(
-                                                            notebookDirectory().toString(),
-                                                            "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln"
-                                                    )
-                                    )
-                    );
+            // Assert that we got the proper response.
+            Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
+            // Assert that the directory and child have moved to the new place.
+            Assertions.assertTrue(Files.exists(expectedDirectoryPath));
+            Assertions.assertTrue(Files.exists(expectedChildNotebookPath));
         });
     }
 }

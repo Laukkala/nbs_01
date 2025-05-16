@@ -49,108 +49,79 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ListEndPointTest extends AbstractNotebookServerTest {
 
-    private List<String> savedFileIds;
+    private final List<String> allFileIds = Arrays
+            .asList("2A94M5J1Z", "2A94M5J2Z", "2A94M5J3Z", "2A94M5J4Z", "junkfile");
+    private final List<String> allFileIdsWithinDirectory = Arrays.asList("2A94M5J1Z", "2A94M5J2Z");
 
-    public List<String> readFilesOnDisk() {
-        try {
-            return Files
-                    .list(notebookDirectory())
-                    .filter(file -> !Files.isDirectory(file))
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .map(filename -> {
-                        if (filename.contains("_")) {
-                            return filename.substring(filename.lastIndexOf("_") + 1, filename.lastIndexOf(".zpln"));
-                        }
-                        else
-                            return filename;
-                    })
-                    .collect(Collectors.toList());
-        }
-        catch (IOException ioException) {
-            throw new RuntimeException("Failed to initialize test!", ioException);
-        }
-    }
-
-    @BeforeAll
+    @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-        savedFileIds = readFilesOnDisk();
     }
 
-    @AfterAll
+    @AfterEach
     private void tearDown() {
         deleteFileRecursively(notebookDirectory().toFile());
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs
+    // Assert that a HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpListAllTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Response response = makeHttpPOSTRequest("http://" + serverAddress() + "/notebook/list", "{}");
-            for (String filename : savedFileIds) {
+            stopServer();
+            for (String filename : allFileIds) {
                 Assertions.assertTrue(response.body().getString("message").contains(filename));
             }
-            stopServer();
+
         });
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs
+    // Assert that a HTTP request with a defined DirectoryId to /notebook/list endpoint results in a list of notebook IDs contained in that directory
     public void httpListWithinFolderTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
             );
-            ArrayList<String> savedIdsInFolder = new ArrayList<>();
-            savedFileIds.add("2A94M5J1Z");
-            savedFileIds.add("2A94M5J2Z");
-            for (String filename : savedIdsInFolder) {
+            stopServer();
+            for (String filename : allFileIdsWithinDirectory) {
                 Assertions.assertTrue(response.body().getString("message").contains(filename));
             }
-            stopServer();
         });
     }
 
     @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
+    // Assert that a WebSocket request to /notebook/list endpoint results in a list of notebook IDs
     public void webSocketListAllTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Response response = makeWebSocketRequest("ws://" + serverAddress() + "/notebook/list", "{}");
-            List<String> ids = Arrays.stream(response.body().getString("message").split("\n")).toList();
-            ids.stream().anyMatch(savedFileIds::contains);
             stopServer();
+            List<String> ids = Arrays.stream(response.body().getString("message").split("\n")).toList();
+            ids.stream().anyMatch(allFileIds::contains);
+
         });
     }
 
     @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
+    // Assert that a WebSocket request with a defined DirectoryId to /notebook/list endpoint results in a list of notebook IDs contained in that directory
     public void webSocketListWithinFolderTest() {
         Assertions.assertDoesNotThrow(() -> {
             startServer();
             Response response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
             );
-            ArrayList<String> savedIdsInFolder = new ArrayList<>();
-            savedFileIds.add("2A94M5J1Z");
-            savedFileIds.add("2A94M5J2Z");
 
             List<String> receivedIds = Arrays.stream(response.body().getString("message").split("\n")).toList();
-            for (String filename : savedIdsInFolder) {
+            for (String filename : allFileIdsWithinDirectory) {
                 Assertions.assertTrue(receivedIds.stream().anyMatch(filename::equals));
             }
             stopServer();

@@ -56,57 +56,65 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
 
-    private Path testParentDirectory = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
+    private String parentDirectoryID = "2A94M5J1D";
+    private Path parentDirectoryPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
+    private String newDirectoryName = "new_directory";
 
     public CreateDirectoryEndPointTest() {
     }
 
-    @BeforeAll
+    @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
     }
 
-    @AfterAll
+    @AfterEach
     private void tearDown() {
         deleteFileRecursively(notebookDirectory().toFile());
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/newDirectory endpoint results in a new directory being saved on disk.
+    // Assert that a HTTP request to /notebook/newDirectory endpoint results in a new directory being saved on disk.
     public void httpCreateDirectoryTest() {
         Assertions.assertDoesNotThrow(() -> {
+            // Assert that the parent directory has the correct number of children saved on disk.
+            Assertions.assertEquals(2, parentDirectoryPath.toFile().listFiles().length);
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/newDirectory",
-                    "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"created_directory\"}"
+                    "{\"parentId\":\"" + parentDirectoryID + "\",\"directoryName\":\"" + newDirectoryName + "\"}"
             );
             Assertions.assertTrue(response.body().getString("message").contains("Created directory "));
             String newDirectoryId = response.body().getString("message").strip().split("Created directory ")[1];
             stopServer();
-            Assertions
-                    .assertTrue(
-                            Files.exists(Paths.get(testParentDirectory.toString(), "created_directory_" + newDirectoryId))
-                    );
+            // Assert that the directory now contains an additional file.
+            Assertions.assertEquals(3, parentDirectoryPath.toFile().listFiles().length);
+            // Assert that the proper file was created.
+            Path newDirectoryPath = Paths.get(parentDirectoryPath.toString(), newDirectoryName + "_" + newDirectoryId);
+            Assertions.assertTrue(Files.exists(newDirectoryPath));
         });
     }
 
     @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
+    // Assert that a WebSocket request to /notebook/newDirectory endpoint results in a new directory being saved on disk.
     public void webSocketCreateDirectoryTest() {
         Assertions.assertDoesNotThrow(() -> {
+            // Assert that the parent directory has the correct number of children saved on disk.
+            Assertions.assertEquals(2, parentDirectoryPath.toFile().listFiles().length);
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/newDirectory",
-                    "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"created_directory\"}"
+                    "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"" + newDirectoryName + "\"}"
             );
             Assertions.assertTrue(response.body().getString("message").contains("Created directory"));
             String newDirectoryId = response.body().getString("message").strip().split("Created directory ")[1];
             stopServer();
-            Assertions
-                    .assertTrue(
-                            Files.exists(Paths.get(testParentDirectory.toString(), "created_directory_" + newDirectoryId))
-                    );
+            // Assert that the directory now contains an additional file.
+            Assertions.assertEquals(3, parentDirectoryPath.toFile().listFiles().length);
+            // Assert that the proper file was created.
+            Path newDirectoryPath = Paths.get(parentDirectoryPath.toString(), newDirectoryName + "_" + newDirectoryId);
+            Assertions.assertTrue(Files.exists(newDirectoryPath));
         });
     }
 }

@@ -50,20 +50,29 @@ import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
 
     private final String notebookId = "2A94M5J4Z";
-    private final String directoryId = "2A94M5J2D";
+    private final String parentId = "2A94M5J2D";
+
+    private final Path originalNotebookPath = Paths.get(notebookDirectory().toString(), "my_note4_2A94M5J4Z.zpln");
+
+    private final Path expectedNotebookPath = Paths
+            .get(
+                    notebookDirectory().toString(), "my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D",
+                    "my_note4_2A94M5J4Z.zpln"
+            );
 
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
     }
 
-    @AfterAll
+    @AfterEach
     private void tearDown() {
         deleteFileRecursively(notebookDirectory().toFile());
     }
@@ -72,26 +81,18 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
     // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpMoveTest() {
         Assertions.assertDoesNotThrow(() -> {
+            // Assert that the file we are moving exists and is not already in the destination.
+            Assertions.assertTrue(Files.exists(originalNotebookPath));
+            Assertions.assertFalse(Files.exists(expectedNotebookPath));
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/move",
-                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + directoryId + "\"}"
+                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + parentId + "\"}"
             );
-            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
             stopServer();
-            Assertions
-                    .assertTrue(
-                            Files
-                                    .exists(
-                                            Paths
-                                                    .get(
-                                                            notebookDirectory().toString(), "my_folder_2A94M5J1D",
-                                                            "my_second_folder_" + directoryId,
-                                                            "my_note4_" + notebookId + ".zpln"
-                                                    )
-                                    )
-                    );
+            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
+            Assertions.assertTrue(Files.exists(expectedNotebookPath));
         });
     }
 
@@ -99,26 +100,18 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
     // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
     public void webSocketMoveTest() {
         Assertions.assertDoesNotThrow(() -> {
+            // Assert that the file we are moving exists and is not already in the destination.
+            Assertions.assertTrue(Files.exists(originalNotebookPath));
+            Assertions.assertFalse(Files.exists(expectedNotebookPath));
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeWebSocketRequest(
                     "ws://" + serverAddress() + "/notebook/move",
-                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + directoryId + "\"}"
+                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + parentId + "\"}"
             );
-            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
             stopServer();
-            Assertions
-                    .assertTrue(
-                            Files
-                                    .exists(
-                                            Paths
-                                                    .get(
-                                                            notebookDirectory().toString(), "my_folder_2A94M5J1D",
-                                                            "my_second_folder_" + directoryId,
-                                                            "my_note4_" + notebookId + ".zpln"
-                                                    )
-                                    )
-                    );
+            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
+            Assertions.assertTrue(Files.exists(expectedNotebookPath));
         });
     }
 }
