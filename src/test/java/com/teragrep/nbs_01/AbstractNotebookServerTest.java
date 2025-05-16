@@ -58,7 +58,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class AbstractNotebookServerTest {
 
@@ -202,8 +201,8 @@ public class AbstractNotebookServerTest {
             // Wait until a message is received or a timeout is reached.
         }
         // Read the WebSocket response and assert that we got the proper list of notebook IDs.
-        ArrayList<String> receivedMessages = client.receivedMessages();
+        String receivedMessages = String.join("\n", client.receivedMessages());
         webSocketClient.close();
-        return new JsonResponse(200, receivedMessages.toString());
+        return new JsonResponse(200, receivedMessages);
     }
 }
