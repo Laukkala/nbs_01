@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.requests;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParsingException;
 
 import java.io.StringReader;
@@ -65,6 +66,9 @@ public final class JsonRequest implements Request {
     }
 
     public JsonObject parameters() throws JsonParsingException {
+        if ("".equals(body)) {
+            return JsonValue.EMPTY_JSON_OBJECT;
+        }
         JsonReader jsonReader = Json.createReader(new StringReader(body));
         JsonObject parameters = jsonReader.readObject();
         jsonReader.close();
