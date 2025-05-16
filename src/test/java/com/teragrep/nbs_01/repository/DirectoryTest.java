@@ -185,6 +185,7 @@ class DirectoryTest {
                     );
         });
     }
+
     @Test
     void testMoveToDirectory() {
         Assertions.assertDoesNotThrow(() -> {
@@ -205,7 +206,12 @@ class DirectoryTest {
             ZeppelinFile subFile = directory.findFile("2A94M5J1Z");
             Assertions
                     .assertEquals(
-                            Paths.get(parentDirectory.path().toString(), "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln"), subFile.path()
+                            Paths
+                                    .get(
+                                            parentDirectory.path().toString(), "my_second_folder_2A94M5J2D",
+                                            "my_note1_2A94M5J1Z.zpln"
+                                    ),
+                            subFile.path()
                     );
         });
     }
