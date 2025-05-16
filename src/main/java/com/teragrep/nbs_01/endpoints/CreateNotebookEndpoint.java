@@ -74,7 +74,7 @@ public class CreateNotebookEndpoint implements EndPoint {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            String name = parameters.getString("name");
+            String name = parameters.getString("notebookName");
             String parentId = parameters.getString("parentId");
             ZeppelinFile parentDirectory = updatedDirectory.findFile(parentId);
             if (!parentDirectory.isDirectory()) {

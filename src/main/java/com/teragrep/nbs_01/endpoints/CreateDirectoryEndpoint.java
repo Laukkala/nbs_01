@@ -73,8 +73,8 @@ public class CreateDirectoryEndpoint implements EndPoint {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            String parentId = parameters.getString("parentId");
             String name = parameters.getString("directoryName");
+            String parentId = parameters.getString("parentId");
 
             Directory parent = (Directory) updatedDirectory.findFile(parentId);
             String id = UUID.randomUUID().toString();

@@ -91,7 +91,7 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/new",
-                    "{\"name\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
+                    "{\"notebookName\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
             );
             Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
             stopServer();
@@ -105,7 +105,7 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/new",
-                    "{\"name\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
+                    "{\"notebookName\":\"" + testFileName + "\",\"parentId\":\"notebooks\"}"
             );
             Assertions.assertTrue(response.body().getString("message").contains("Created notebook"));
             stopServer();
