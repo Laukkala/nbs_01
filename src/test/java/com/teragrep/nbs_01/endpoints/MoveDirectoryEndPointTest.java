@@ -69,7 +69,7 @@ public class MoveDirectoryEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a simple HTTP request to /notebook/moveDirectory endpoint results in the proper files being moved
+    // Assert that a simple HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpMoveTest() {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
@@ -80,7 +80,6 @@ public class MoveDirectoryEndPointTest extends AbstractNotebookServerTest {
             );
             Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
             stopServer();
-            // Assert that the file contained in the moved directory exists in the correct path.
             Assertions
                     .assertTrue(
                             Files
@@ -107,7 +106,6 @@ public class MoveDirectoryEndPointTest extends AbstractNotebookServerTest {
             );
             Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
             stopServer();
-            // Assert that the file contained in the moved directory exists in the correct path.
             Assertions
                     .assertTrue(
                             Files
