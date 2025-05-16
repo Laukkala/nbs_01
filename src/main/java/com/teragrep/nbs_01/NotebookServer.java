@@ -91,6 +91,8 @@ public class NotebookServer extends Thread {
             pathMappingsHandler
                     .addMapping(PathSpec.from("/newDirectory"), new JettyUpgradeableHTTPConnection(new CreateDirectoryEndpoint(root)));
             pathMappingsHandler
+                    .addMapping(PathSpec.from("/moveDirectory"), new JettyUpgradeableHTTPConnection(new MoveDirectoryEndpoint(root)));
+            pathMappingsHandler
                     .addMapping(PathSpec.from("/delete"), new JettyUpgradeableHTTPConnection(new DeleteNotebookEndpoint(root)));
             pathMappingsHandler
                     .addMapping(PathSpec.from("/update"), new JettyUpgradeableHTTPConnection(new UpdateParagraphEndpoint(root)));
