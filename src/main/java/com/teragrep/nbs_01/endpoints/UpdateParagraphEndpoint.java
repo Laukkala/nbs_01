@@ -85,12 +85,12 @@ public class UpdateParagraphEndpoint implements EndPoint {
             paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), editedScript));
             Notebook newNotebook = new Notebook(notebook.title(), notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
+            return new JsonResponse(HttpStatus.OK_200, "Paragraph edited successfully");
         }
         catch (IOException ioException) {
             return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to edit notebook, reason:\n" + ioException
+                    "Failed to edit paragraph, reason:\n" + ioException
             );
         }
         catch (JsonException jsonException) {

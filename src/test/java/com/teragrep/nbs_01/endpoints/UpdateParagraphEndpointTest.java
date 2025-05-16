@@ -87,7 +87,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                             + "\",\"paragraphText\":\"" + "testEditMessage\"}"
             );
             Assertions
-                    .assertTrue(response.body().getString("message").strip().contains("Notebook edited successfully"));
+                    .assertTrue(response.body().getString("message").strip().contains("Paragraph edited successfully"));
             stopServer();
             // Assert that the message we wanted to edit can be found in the file.
             Assertions
@@ -106,7 +106,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                     "{\"notebookId\":\"" + testFileId + "\",\"paragraphId\":\"" + testParagraphId
                             + "\",\"paragraphText\":\"" + "testEditMessage\"}"
             );
-            Assertions.assertEquals("Notebook edited successfully", response.body().getString("message").strip());
+            Assertions.assertEquals("Paragraph edited successfully", response.body().getString("message").strip());
             stopServer();
             // Assert that the message we wanted to edit can be found in the file.
             Assertions

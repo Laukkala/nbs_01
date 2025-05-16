@@ -81,12 +81,12 @@ public class MoveNotebookEndpoint implements EndPoint {
             return new JsonResponse(HttpStatus.OK_200, "Moved notebook " + notebook.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Failed to find a file");
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Could not find a file with given id.");
         }
         catch (IOException ioException) {
             return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
+                    "Failed to move notebook, reason:\n" + ioException
             );
         }
         catch (JsonException jsonException) {
