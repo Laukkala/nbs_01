@@ -58,17 +58,11 @@ public class TestServer {
     private static final Path notebookSource = Paths.get("src/test/resources");
     private static final Path notebookDirectory = Paths.get("target/notebooks");
 
-    public static void main(String[] args) {
-        try {
-            setUp();
-            Configuration configuration = new Configuration(Paths.get("target/notebooks"), 8080);
-            NotebookServer server = new NotebookServer(configuration);
-            server.start();
-            server.join();
-        }
-        catch (InterruptedException exception) {
-
-        }
+    public static void main(String[] args) throws Exception {
+        setUp();
+        Configuration configuration = new Configuration(Paths.get("target/notebooks"), 8080);
+        NotebookServer server = new NotebookServer(configuration);
+        server.call();
     }
 
     public static void copyFileRecursively(File fileToCopy, File destination) {

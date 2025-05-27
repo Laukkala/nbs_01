@@ -150,8 +150,7 @@ public final class Notebook implements ZeppelinFile {
 
     @Override
     public void printTree() {
-        System.out.println("File ID: " + id() + ", Path: " + path());
-        LOGGER.debug("File ID: {}, Path: {}", id(), path());
+        LOGGER.debug("File, ID: {}, Path: {}", id(), path());
     }
 
     @Override

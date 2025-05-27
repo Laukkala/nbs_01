@@ -47,6 +47,9 @@ package com.teragrep.nbs_01.repository;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
@@ -56,6 +59,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class Directory implements ZeppelinFile {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
     private final Map<String, ZeppelinFile> children;
     private final String id;
     private final Path path;
@@ -228,7 +232,7 @@ public final class Directory implements ZeppelinFile {
     }
 
     public void printTree() {
-        System.out.println("Dir; Id: " + id() + ", Path: " + path());
+        LOGGER.debug("Dir, ID: {}, Path: {}", id(), path());
         for (Map.Entry<String, ZeppelinFile> child : children.entrySet()) {
             child.getValue().printTree();
         }

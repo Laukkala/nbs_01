@@ -52,6 +52,8 @@ import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 
@@ -59,6 +61,7 @@ import java.nio.ByteBuffer;
 // Creates a session between Client and Server once the connection has been opened, through which communication is routed
 public class JettyWebSocketConnection implements Session.Listener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JettyWebSocketConnection.class);
     private Session session;
     private final EndPoint endPoint;
 
@@ -96,7 +99,7 @@ public class JettyWebSocketConnection implements Session.Listener {
 
     @Override
     public void onWebSocketError(Throwable cause) {
-        System.err.println("Server error: " + cause.toString());
+        LOGGER.error("An  error occurred while handling a WebSocket message", cause);
         session.close(StatusCode.SERVER_ERROR, "Websocket Error occurred", Callback.NOOP);
     }
 }

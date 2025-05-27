@@ -54,24 +54,29 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 // A thread that registers all endpoints users can connect to and starts the Jetty server.
-public class NotebookServer extends Thread {
+public class NotebookServer implements Callable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotebookServer.class);
     private final Configuration configuration;
+    private final Server server;
 
     public NotebookServer(Configuration configuration) {
         this.configuration = configuration;
+        server = new Server(configuration.serverPort());
     }
 
-    public void run() {
+    public Object call() throws Exception {
         // Start jetty server
         try {
             // Jetty setup
-            Server server = new Server(configuration.serverPort());
             ContextHandler contextHandler = new ContextHandler("/notebook");
             server.setHandler(contextHandler);
             PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
@@ -103,15 +108,27 @@ public class NotebookServer extends Thread {
             contextHandler.setHandler(pathMappingsHandler);
             ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
             server.start();
-            System.out.println("Server started!");
+            LOGGER.info("Server started!");
         }
-        catch (IOException exception) {
-            System.err.println("An error occurred while configuring server:");
-            System.err.println(exception);
+        catch (IOException ioException) {
+            LOGGER.error("An error occurred while configuring server", ioException);
+            throw ioException;
         }
         catch (Exception exception) {
-            System.err.println("An error occurred while starting server:");
-            System.err.println(exception);
+            LOGGER.error("An error occurred while starting server", exception);
+            throw exception;
+        }
+        // Callable.call() must return an object on a successful invocation
+        return true;
+    }
+
+    public void stop() throws Exception {
+        try {
+            server.stop();
+        }
+        catch (Exception exception) {
+            LOGGER.error("Failed to stop server", exception);
+            throw exception;
         }
     }
 }

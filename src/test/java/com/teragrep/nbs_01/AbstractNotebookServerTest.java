@@ -69,20 +69,12 @@ public class AbstractNotebookServerTest {
     private final NotebookServer server = new NotebookServer(testConfiguration);
     public final int webSocketTimeoutMs = 1000;
 
-    public void startServer() {
-        if (server.getState() == Thread.State.NEW) {
-            try {
-                server.start();
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException interruptedException) {
-                throw new RuntimeException(interruptedException);
-            }
-        }
+    public void startServer() throws Exception {
+        server.call();
     }
 
-    public void stopServer() throws InterruptedException {
-        server.join();
+    public void stopServer() throws Exception {
+        server.stop();
     }
 
     public Path notebookDirectory() {
