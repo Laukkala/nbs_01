@@ -47,6 +47,8 @@ package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
@@ -55,6 +57,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -127,14 +130,15 @@ public class AbstractNotebookServerTest {
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
-        byte[] bytes = (requestBody).getBytes();
+        byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
         int length = bytes.length;
 
         connection.setFixedLengthStreamingMode(length);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
         OutputStream output = connection.getOutputStream();
         output.write(bytes);
+        output.close();
         int status = connection.getResponseCode();
         InputStreamReader connectionInputStreamReader;
         if (status == 200) {
@@ -150,8 +154,9 @@ public class AbstractNotebookServerTest {
         while ((line = reader.readLine()) != null) {
             messages.append(line + "\n");
         }
+        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
         connection.disconnect();
-        return new JsonResponse(status, messages.toString());
+        return new JsonResponse(status, message);
     }
 
     public Response makeHttpGETRequest(String urlString) throws IOException {
@@ -177,8 +182,9 @@ public class AbstractNotebookServerTest {
         while ((line = reader.readLine()) != null) {
             messages.append(line);
         }
+        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
         connection.disconnect();
-        return new JsonResponse(status, messages.toString());
+        return new JsonResponse(status, message);
     }
 
     public Response makeWebSocketRequest(String url, String requestBody) throws Exception {

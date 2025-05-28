@@ -43,42 +43,15 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.handlers;
+package com.teragrep.nbs_01.exceptions;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import org.eclipse.jetty.io.Content;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
-import org.eclipse.jetty.util.Callback;
+public final class MalformedRequestException extends Exception {
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-// A Jetty Handler for HTTP connections to some Endpoint.
-// Extracts the contents of the request and delegates it to it's EndPoint instance for processing, and then returns the response received from the EndPoint.
-public class JettyHTTPConnection extends Handler.Abstract {
-
-    private final EndPoint endPoint;
-
-    public JettyHTTPConnection(EndPoint endPoint) {
-        this.endPoint = endPoint;
+    public MalformedRequestException(Throwable cause) {
+        super(cause);
     }
 
-    @Override
-    public boolean handle(Request jettyRequest, Response jettyResponse, Callback callback) {
-        try {
-            com.teragrep.nbs_01.requests.Request request = new JsonRequest(Content.Source.asString(jettyRequest));
-            com.teragrep.nbs_01.responses.Response response = endPoint.createResponse(request);
-            jettyResponse.setStatus(response.status());
-            jettyResponse.write(true, ByteBuffer.wrap(response.body().getString("message").getBytes()), Callback.NOOP);
-            callback.succeeded();
-            return true;
-        }
-        catch (IOException exception) {
-            callback.failed(exception);
-            return false;
-        }
+    public MalformedRequestException(String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
     }
 }

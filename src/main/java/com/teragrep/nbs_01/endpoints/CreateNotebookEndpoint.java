@@ -45,11 +45,11 @@
  */
 package com.teragrep.nbs_01.endpoints;
 
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -94,8 +94,8 @@ public class CreateNotebookEndpoint implements EndPoint {
                     "Failed to create notebook, reason:\n" + ioException
             );
         }
-        catch (JsonException jsonException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
+        catch (MalformedRequestException malformedRequestException) {
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

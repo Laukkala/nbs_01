@@ -87,26 +87,7 @@ public class MoveNotebookEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/move",
-                    "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + parentId + "\"}"
-            );
-            stopServer();
-            Assertions.assertEquals("Moved notebook " + notebookId, response.body().getString("message").strip());
-            Assertions.assertTrue(Files.exists(expectedNotebookPath));
-        });
-    }
-
-    @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
-    public void webSocketMoveTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the file we are moving exists and is not already in the destination.
-            Assertions.assertTrue(Files.exists(originalNotebookPath));
-            Assertions.assertFalse(Files.exists(expectedNotebookPath));
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/move",
+                    "http://" + serverAddress() + "/notebook/moveNotebook",
                     "{\"notebookId\":\"" + notebookId + "\",\"parentId\":\"" + parentId + "\"}"
             );
             stopServer();

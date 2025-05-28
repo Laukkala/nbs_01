@@ -81,7 +81,7 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"" + notebookId + "\"}"
+                    "http://" + serverAddress() + "/notebook/deleteNotebook", "{\"notebookId\":\"" + notebookId + "\"}"
             );
             Assertions.assertEquals("Notebook deleted", response.body().getString("message").toString().strip());
             stopServer();
@@ -89,27 +89,6 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the correct file was deleted.
             Assertions.assertFalse(Files.exists(notebookPath));
-        });
-    }
-
-    @Test
-    // Assert that a WebSocket request to /notebook/delete endpoint results in a notebook being deleted
-    public void webSocketDeleteTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the correct number of files exist
-            Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            // Assert that the file to be deleted exists.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/delete", "{\"notebookId\":\"" + notebookId + "\"}"
-            );
-            stopServer();
-            Assertions.assertEquals("Notebook deleted", response.body().getString("message").strip());
-            // Assert that a file was deleted.
-            Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            // Assert that the correct file was deleted.
         });
     }
 }

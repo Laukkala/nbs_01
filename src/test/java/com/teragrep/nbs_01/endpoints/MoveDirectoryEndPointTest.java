@@ -100,26 +100,4 @@ public class MoveDirectoryEndPointTest extends AbstractNotebookServerTest {
             Assertions.assertTrue(Files.exists(expectedChildNotebookPath));
         });
     }
-
-    @Test
-    // Assert that a WebSocket request to /notebook/moveDirectory endpoint results in the proper directory and their children being moved.
-    public void webSocketMoveTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the directory and its child files are in their proper places.
-            Assertions.assertTrue(Files.exists(originalDirectoryPath));
-            Assertions.assertTrue(Files.exists(originalChildNotebookPath));
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/moveDirectory",
-                    "{\"directoryId\":\"" + directoryId + "\",\"parentId\":\"" + parentId + "\"}"
-            );
-            stopServer();
-            // Assert that we got the proper response.
-            Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
-            // Assert that the directory and child have moved to the new place.
-            Assertions.assertTrue(Files.exists(expectedDirectoryPath));
-            Assertions.assertTrue(Files.exists(expectedChildNotebookPath));
-        });
-    }
 }

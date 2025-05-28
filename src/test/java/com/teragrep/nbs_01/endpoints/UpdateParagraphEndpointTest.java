@@ -86,32 +86,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/update",
-                    "{\"notebookId\":\"" + notebookId + "\",\"paragraphId\":\"" + paragraphId
-                            + "\",\"paragraphText\":\"" + paragraphContent + "\"}"
-            );
-            stopServer();
-            // Assert that we got the proper response.
-            Assertions
-                    .assertTrue(response.body().getString("message").strip().contains("Paragraph edited successfully"));
-            // Assert that the file content has the edited paragraph saved to file in the correct place.
-            Assertions
-                    .assertEquals(expectedFileContent, Files.readLines(notebookPath.toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining()));
-        });
-    }
-
-    @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
-    public void webSocketUpdateTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the file content is the same as in the resource files before edits.
-            Assertions
-                    .assertEquals(originalFileContent, Files.readLines(notebookPath.toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining()));
-
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/update",
+                    "http://" + serverAddress() + "/notebook/updateParagraph",
                     "{\"notebookId\":\"" + notebookId + "\",\"paragraphId\":\"" + paragraphId
                             + "\",\"paragraphText\":\"" + paragraphContent + "\"}"
             );

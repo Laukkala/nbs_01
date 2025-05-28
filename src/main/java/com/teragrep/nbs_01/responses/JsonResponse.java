@@ -52,7 +52,7 @@ import jakarta.json.JsonObject;
 public final class JsonResponse implements Response {
 
     private final int status;
-    private final JsonObject body;
+    private final JsonObject json;
 
     public JsonResponse(int status, String body) {
         this(status, Json.createObjectBuilder().add("message", body).build());
@@ -60,7 +60,7 @@ public final class JsonResponse implements Response {
 
     public JsonResponse(int status, JsonObject body) {
         this.status = status;
-        this.body = body;
+        this.json = body;
     }
 
     public int status() {
@@ -68,6 +68,14 @@ public final class JsonResponse implements Response {
     }
 
     public JsonObject body() {
-        return body;
+        return json;
+    }
+
+    public String contentType() {
+        return "application-json";
+    }
+
+    public JsonObject json() {
+        return json;
     }
 }

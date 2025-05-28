@@ -45,12 +45,12 @@
  */
 package com.teragrep.nbs_01.endpoints;
 
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -73,25 +73,29 @@ public class ListEndPoint implements EndPoint {
         StringBuilder sb = new StringBuilder();
         ZeppelinFile foundFile;
         Directory directoryToSearch;
-        JsonObject parameters = request.parameters();
-        if (parameters.containsKey("directoryId")) {
-            try {
-                foundFile = root.findFile(parameters.getString("directoryId"));
-                if (foundFile.isDirectory()) {
-                    directoryToSearch = (Directory) foundFile;
+        try {
+            JsonObject parameters = request.parameters();
+            if (parameters.containsKey("directoryId")) {
+                try {
+                    foundFile = root.findFile(parameters.getString("directoryId"));
+                    if (foundFile.isDirectory()) {
+                        directoryToSearch = (Directory) foundFile;
+                    }
+                    else {
+                        return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
+                    }
                 }
-                else {
-                    return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
+                catch (FileNotFoundException fileNotFoundException) {
+                    return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
                 }
             }
-            catch (FileNotFoundException fileNotFoundException) {
-                return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
+            else {
+                directoryToSearch = root;
             }
         }
-        else {
-            directoryToSearch = root;
+        catch (MalformedRequestException malformedRequestException) {
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
-
         try {
             Directory updatedDirectory = directoryToSearch
                     .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
@@ -106,9 +110,6 @@ public class ListEndPoint implements EndPoint {
         }
         catch (IOException ioException) {
             return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
-        }
-        catch (JsonException jsonException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed JSON :\n" + jsonException);
         }
     }
 }

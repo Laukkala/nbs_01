@@ -45,13 +45,14 @@
  */
 package com.teragrep.nbs_01.requests;
 
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import jakarta.json.JsonObject;
-import jakarta.json.stream.JsonParsingException;
 
-// Request object contains parameters that the user wants to send to NBS_01
+// Request object contains parameters that the user wants to send to NBS_01.
+// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
 public interface Request {
 
     public abstract String body();
 
-    public abstract JsonObject parameters() throws JsonParsingException;
+    public abstract JsonObject parameters() throws MalformedRequestException;
 }

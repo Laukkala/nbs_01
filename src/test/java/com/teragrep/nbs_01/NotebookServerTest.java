@@ -46,12 +46,8 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.responses.Response;
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.*;
-
-import java.net.URI;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NotebookServerTest extends AbstractNotebookServerTest {
@@ -78,22 +74,6 @@ public class NotebookServerTest extends AbstractNotebookServerTest {
             stopServer();
             Assertions.assertEquals(HttpStatus.OK_200, response.status());
             Assertions.assertEquals("pong", response.body().getString("message"));
-        });
-    }
-
-    @Test
-    // Assert that A WebSocket connection is established, and that it is closed after a call to WebSocketClient.close()
-    public void webSocketConnectTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            startServer();
-            URI serverURI = URI.create("ws://" + serverAddress() + "/notebook/ping");
-            WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
-            webSocketClient.start();
-            TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient, serverURI);
-            Assertions.assertEquals(1, webSocketClient.getOpenSessions().size());
-            webSocketClient.close();
-            Assertions.assertEquals(0, webSocketClient.getOpenSessions().size());
-            stopServer();
         });
     }
 }

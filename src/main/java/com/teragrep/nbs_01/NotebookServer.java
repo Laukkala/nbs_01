@@ -46,14 +46,11 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
-import com.teragrep.nbs_01.handlers.JettyHTTPConnection;
-import com.teragrep.nbs_01.handlers.JettyUpgradeableHTTPConnection;
 import com.teragrep.nbs_01.repository.Directory;
-import org.eclipse.jetty.http.pathmap.PathSpec;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.PathMappingsHandler;
-import org.eclipse.jetty.websocket.server.ServerWebSocketContainer;
+import org.eclipse.jetty.server.ServerConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,42 +68,54 @@ public class NotebookServer implements Callable {
     public NotebookServer(Configuration configuration) {
         this.configuration = configuration;
         server = new Server(configuration.serverPort());
+        Connector connector = new ServerConnector(server);
+        server.addConnector(connector);
     }
 
     public Object call() throws Exception {
         // Start jetty server
         try {
-            // Jetty setup
-            ContextHandler contextHandler = new ContextHandler("/notebook");
-            server.setHandler(contextHandler);
-            PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
+
+            // Initialize filesystem
             Directory root = new Directory("root", configuration.notebookDirectory())
                     .initializeDirectory(configuration.notebookDirectory(), new ConcurrentHashMap<>());
-            // Endpoints that supports upgrading to WebSocket communication. Also responds to standard HTTP requests.
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/list"), new JettyUpgradeableHTTPConnection(new ListEndPoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/ping"), new JettyUpgradeableHTTPConnection(new PingEndpoint()));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/find"), new JettyUpgradeableHTTPConnection(new FindEndPoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/new"), new JettyUpgradeableHTTPConnection(new CreateNotebookEndpoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/move"), new JettyUpgradeableHTTPConnection(new MoveNotebookEndpoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/newDirectory"), new JettyUpgradeableHTTPConnection(new CreateDirectoryEndpoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/moveDirectory"), new JettyUpgradeableHTTPConnection(new MoveDirectoryEndpoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/delete"), new JettyUpgradeableHTTPConnection(new DeleteNotebookEndpoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/deleteDirectory"), new JettyUpgradeableHTTPConnection(new DeleteDirectoryEndpoint(root)));
-            pathMappingsHandler
-                    .addMapping(PathSpec.from("/update"), new JettyUpgradeableHTTPConnection(new UpdateParagraphEndpoint(root)));
-            // Endpoint that doesn't support upgrading to WebSocket communication. Takes only HTTP requests.
-            pathMappingsHandler.addMapping(PathSpec.from("/hello"), new JettyHTTPConnection(new PingEndpoint()));
-            contextHandler.setHandler(pathMappingsHandler);
-            ServerWebSocketContainer container = ServerWebSocketContainer.ensure(server, contextHandler);
+
+            // Jetty setup
+            ServletContextHandler contextHandler = new ServletContextHandler();
+            contextHandler.setContextPath("/notebook");
+            server.setHandler(contextHandler);
+
+            // Servlets mapped to paths
+            HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
+            contextHandler.addServlet(pingServlet, "/ping");
+
+            HttpServlet createDirServlet = new HttpServlet(new CreateDirectoryEndpoint(root));
+            contextHandler.addServlet(createDirServlet, "/newDirectory");
+
+            HttpServlet createNotebookServlet = new HttpServlet(new CreateNotebookEndpoint(root));
+            contextHandler.addServlet(createNotebookServlet, "/newNotebook");
+
+            HttpServlet deleteDirServlet = new HttpServlet(new DeleteDirectoryEndpoint(root));
+            contextHandler.addServlet(deleteDirServlet, "/deleteDirectory");
+
+            HttpServlet deleteNotebookServlet = new HttpServlet(new DeleteNotebookEndpoint(root));
+            contextHandler.addServlet(deleteNotebookServlet, "/deleteNotebook");
+
+            HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
+            contextHandler.addServlet(listServlet, "/list");
+
+            HttpServlet findServlet = new HttpServlet(new FindEndPoint(root));
+            contextHandler.addServlet(findServlet, "/find");
+
+            HttpServlet moveDirServlet = new HttpServlet(new MoveDirectoryEndpoint(root));
+            contextHandler.addServlet(moveDirServlet, "/moveDirectory");
+
+            HttpServlet moveNotebookServlet = new HttpServlet(new MoveNotebookEndpoint(root));
+            contextHandler.addServlet(moveNotebookServlet, "/moveNotebook");
+
+            HttpServlet updateParagraphServlet = new HttpServlet(new UpdateParagraphEndpoint(root));
+            contextHandler.addServlet(updateParagraphServlet, "/updateParagraph");
+
             server.start();
             LOGGER.info("Server started!");
         }

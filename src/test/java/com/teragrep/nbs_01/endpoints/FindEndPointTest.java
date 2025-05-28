@@ -88,41 +88,12 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a WebSocket request to /notebook/find endpoint results in a response with the expected file contents
-    public void webSocketFindTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the file exists.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"" + notebookId + "\"}"
-            );
-            stopServer();
-            Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip());
-        });
-    }
-
-    @Test
     public void httpNotebookNotFoundTest() {
         Assertions.assertDoesNotThrow(() -> {
             // Start server and wait for it to initialize.
             startServer();
             Response response = makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"nonExistentId\"}"
-            );
-            stopServer();
-            Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());
-        });
-    }
-
-    @Test
-    public void webSocketNotebookNotFoundTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/find", "{\"notebookId\":\"nonExistentId\"}"
             );
             stopServer();
             Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());

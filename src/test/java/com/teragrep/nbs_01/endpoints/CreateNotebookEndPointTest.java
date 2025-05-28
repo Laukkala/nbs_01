@@ -82,7 +82,7 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(newNotebookPath));
             Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/new",
+                    "http://" + serverAddress() + "/notebook/newNotebook",
                     "{\"notebookName\":\"" + newNotebookName + "\",\"parentId\":\"" + parentDirectoryID + "\"}"
             );
             stopServer();
@@ -91,25 +91,6 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(newNotebookPath));
 
-        });
-    }
-
-    @Test
-    // Assert that a WebSocket request to /notebook/new endpoint results in a new file being saved on disk.
-    public void webSocketCreateNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            startServer();
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(newNotebookPath));
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/new",
-                    "{\"notebookName\":\"" + newNotebookName + "\",\"parentId\":\"" + parentDirectoryID + "\"}"
-            );
-            stopServer();
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created notebook"));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(newNotebookPath));
         });
     }
 }

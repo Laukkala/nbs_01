@@ -95,26 +95,4 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
             Assertions.assertTrue(Files.exists(newDirectoryPath));
         });
     }
-
-    @Test
-    // Assert that a WebSocket request to /notebook/newDirectory endpoint results in a new directory being saved on disk.
-    public void webSocketCreateDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the parent directory has the correct number of children saved on disk.
-            Assertions.assertEquals(2, parentDirectoryPath.toFile().listFiles().length);
-            startServer();
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/newDirectory",
-                    "{\"parentId\":\"2A94M5J1D\",\"directoryName\":\"" + newDirectoryName + "\"}"
-            );
-            Assertions.assertTrue(response.body().getString("message").contains("Created directory"));
-            String newDirectoryId = response.body().getString("message").strip().split("Created directory ")[1];
-            stopServer();
-            // Assert that the directory now contains an additional file.
-            Assertions.assertEquals(3, parentDirectoryPath.toFile().listFiles().length);
-            // Assert that the proper file was created.
-            Path newDirectoryPath = Paths.get(parentDirectoryPath.toString(), newDirectoryName + "_" + newDirectoryId);
-            Assertions.assertTrue(Files.exists(newDirectoryPath));
-        });
-    }
 }

@@ -91,24 +91,4 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
             Assertions.assertFalse(Files.exists(directoryPath));
         });
     }
-
-    @Test
-    // Assert that a WebSocket request to /notebook/deleteDirectory endpoint results in a notebook being deleted.
-    public void webSocketDeleteTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the correct number of files exist
-            Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/deleteDirectory", "{\"directoryId\":\"" + directoryId + "\"}"
-            );
-            Assertions.assertEquals("Directory deleted", response.body().getString("message").strip());
-            stopServer();
-            // Assert that a directory was deleted.
-            Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            // Assert that the correct file was deleted.
-            Assertions.assertFalse(Files.exists(directoryPath));
-        });
-    }
 }

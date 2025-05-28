@@ -97,34 +97,4 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
             }
         });
     }
-
-    @Test
-    // Assert that a WebSocket request to /notebook/list endpoint results in a list of notebook IDs
-    public void webSocketListAllTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            startServer();
-            Response response = makeWebSocketRequest("ws://" + serverAddress() + "/notebook/list", "{}");
-            stopServer();
-            List<String> ids = Arrays.stream(response.body().getString("message").split("\n")).toList();
-            ids.stream().anyMatch(allFileIds::contains);
-
-        });
-    }
-
-    @Test
-    // Assert that a WebSocket request with a defined DirectoryId to /notebook/list endpoint results in a list of notebook IDs contained in that directory
-    public void webSocketListWithinFolderTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            startServer();
-            Response response = makeWebSocketRequest(
-                    "ws://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
-            );
-
-            List<String> receivedIds = Arrays.stream(response.body().getString("message").split("\n")).toList();
-            for (String filename : allFileIdsWithinDirectory) {
-                Assertions.assertTrue(receivedIds.stream().anyMatch(filename::equals));
-            }
-            stopServer();
-        });
-    }
 }
