@@ -97,18 +97,6 @@ public class NotebookServer implements Callable {
             HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
             contextHandler.addServlet(pingServlet, "/ping");
 
-            HttpServlet createDirServlet = new HttpServlet(new CreateDirectoryEndpoint(root));
-            contextHandler.addServlet(createDirServlet, "/newDirectory");
-
-            HttpServlet createNotebookServlet = new HttpServlet(new CreateNotebookEndpoint(root));
-            contextHandler.addServlet(createNotebookServlet, "/newNotebook");
-
-            HttpServlet deleteDirServlet = new HttpServlet(new DeleteDirectoryEndpoint(root));
-            contextHandler.addServlet(deleteDirServlet, "/deleteDirectory");
-
-            HttpServlet deleteNotebookServlet = new HttpServlet(new DeleteNotebookEndpoint(root));
-            contextHandler.addServlet(deleteNotebookServlet, "/deleteNotebook");
-
             HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
             contextHandler.addServlet(listServlet, "/list");
 
