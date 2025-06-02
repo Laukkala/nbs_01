@@ -86,6 +86,14 @@ public class NotebookServer implements Callable {
             server.setHandler(contextHandler);
 
             // Servlets mapped to paths
+            FilesystemServlet fileSystemServlet = new FilesystemServlet(
+                    new FindEndPoint(root),
+                    new UpdateNotebookEndpoint(root),
+                    new CreateNotebookEndpoint(root),
+                    new DeleteNotebookEndpoint(root)
+            );
+            contextHandler.addServlet(fileSystemServlet, "/filesystem/*");
+
             HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
             contextHandler.addServlet(pingServlet, "/ping");
 

@@ -81,10 +81,10 @@ public class CreateDirectoryEndpoint implements EndPoint {
             Path path = Paths.get(parent.path().toString(), name + "_" + id);
             Directory newDirectory = new Directory(id, path);
             newDirectory.save();
-            return new JsonResponse(HttpStatus.OK_200, "Created directory " + newDirectory.id());
+            return new JsonResponse(HttpStatus.CREATED_201, "Created directory " + newDirectory.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory doesn't exist!");
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
         }
         catch (IOException ioException) {
             return new JsonResponse(

@@ -53,6 +53,7 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,28 +75,46 @@ public class CreateNotebookEndpoint implements EndPoint {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            String name = parameters.getString("notebookName");
-            String parentId = parameters.getString("parentId");
-            ZeppelinFile parentDirectory = updatedDirectory.findFile(parentId);
+            String pathParameter = parameters.getString("path");
+            pathParameter = root.path() + pathParameter;
+            Path path = Paths.get(pathParameter);
+            ZeppelinFile parentDirectory = updatedDirectory.findFile(path.getParent());
             if (!parentDirectory.isDirectory()) {
                 return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Given parentId is not a Directory!");
             }
-            Path path = Paths.get(parentDirectory.path().toString(), name);
-            Paragraph paragraph = new Paragraph(UUID.randomUUID().toString(), "", new Script(""));
-            Map<String, Paragraph> paragraphs = new LinkedHashMap();
-            paragraphs.put(paragraph.id(), paragraph);
-            Notebook newNotebook = new Notebook("", UUID.randomUUID().toString(), path, paragraphs);
-            newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, "Created notebook " + newNotebook.id());
+
+            Notebook newNotebook;
+            if (parameters.containsKey("source")) {
+                newNotebook = (Notebook) updatedDirectory
+                        .findFile(Paths.get(root.path().toString(), parameters.getString("source")))
+                        .load()
+                        .copy(path, UUID.randomUUID().toString());
+            }
+            else {
+                Paragraph paragraph = new Paragraph(UUID.randomUUID().toString(), "", new Script(""));
+                Map<String, Paragraph> paragraphs = new LinkedHashMap();
+                paragraphs.put(paragraph.id(), paragraph);
+                newNotebook = new Notebook(
+                        path.getFileName().toString(),
+                        UUID.randomUUID().toString(),
+                        path,
+                        paragraphs
+                );
+                newNotebook.save();
+            }
+            return new JsonResponse(HttpStatus.CREATED_201, "Created notebook " + newNotebook.id());
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Given parentId does not match any file!");
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
         catch (IOException ioException) {
             return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create notebook, reason:\n" + ioException
             );
-        }
-        catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

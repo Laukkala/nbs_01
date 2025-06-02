@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
@@ -86,13 +88,13 @@ public class MoveDirectoryEndPointTest extends AbstractNotebookServerTest {
             // Assert that the directory and its child files are in their proper places.
             Assertions.assertTrue(Files.exists(originalDirectoryPath));
             Assertions.assertTrue(Files.exists(originalChildNotebookPath));
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/moveDirectory",
-                    "{\"directoryId\":\"" + directoryId + "\",\"parentId\":\"" + parentId + "\"}"
-            );
-            stopServer();
+            MoveDirectoryEndpoint endpoint = new MoveDirectoryEndpoint(new Directory("root", notebookDirectory()));
+            Response response = endpoint
+                    .createResponse(
+                            new JsonRequest(
+                                    "{\"directoryId\":\"" + directoryId + "\",\"parentId\":\"" + parentId + "\"}"
+                            )
+                    );
             // Assert that we got the proper response.
             Assertions.assertEquals("Moved directory " + directoryId, response.body().getString("message").strip());
             // Assert that the directory and child have moved to the new place.

@@ -57,36 +57,52 @@ import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the text of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph in a comma-separated string
-public class UpdateParagraphEndpoint implements EndPoint {
+public class UpdateNotebookEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public UpdateParagraphEndpoint(Directory root) {
+    public UpdateNotebookEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
+            JsonObject parameters = request.parameters();
+            Path path = Paths.get(root.path().toString(), parameters.getString("path"));
+
             Directory updatedDirectory = root
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
-            JsonObject parameters = request.parameters();
-            String notebookId = parameters.getString("notebookId");
-            String paragraphId = parameters.getString("paragraphId");
-            String updatedParagraph = parameters.getString("paragraphText");
-            Notebook notebook = (Notebook) updatedDirectory.findFile(notebookId).load();
-            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
-            Paragraph paragraph = paragraphs.get(paragraphId);
+            String title = "";
+            String paragraphId = "";
+            String updatedParagraph = "";
+            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 
-            Script editedScript = new Script(updatedParagraph);
-            paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), editedScript));
+            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
+            if (parameters.containsKey("title")) {
+                title = parameters.getString("title");
+            }
+            else {
+                title = notebook.title();
+            }
+            if (parameters.containsKey("paragraphId") && parameters.containsKey("paragraphText")) {
+                paragraphId = parameters.getString("paragraphId");
+                updatedParagraph = parameters.getString("paragraphText");
+
+                Paragraph paragraph = paragraphs.get(paragraphId);
+                Script newScript = new Script(updatedParagraph);
+                paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), newScript));
+            }
+
             Notebook newNotebook = new Notebook(notebook.title(), notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, "Paragraph edited successfully");
+            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
         catch (IOException ioException) {
             return new JsonResponse(

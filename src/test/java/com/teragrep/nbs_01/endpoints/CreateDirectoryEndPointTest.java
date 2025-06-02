@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
@@ -79,15 +81,11 @@ public class CreateDirectoryEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Assert that the parent directory has the correct number of children saved on disk.
             Assertions.assertEquals(2, parentDirectoryPath.toFile().listFiles().length);
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/newDirectory",
-                    "{\"parentId\":\"" + parentDirectoryID + "\",\"directoryName\":\"" + newDirectoryName + "\"}"
-            );
+            CreateDirectoryEndpoint endpoint = new CreateDirectoryEndpoint(new Directory("root", notebookDirectory()));
+            String body = "{\"parentId\":\"" + parentDirectoryID + "\",\"directoryName\":\"" + newDirectoryName + "\"}";
+            Response response = endpoint.createResponse(new JsonRequest(body));
             Assertions.assertTrue(response.body().getString("message").contains("Created directory "));
             String newDirectoryId = response.body().getString("message").strip().split("Created directory ")[1];
-            stopServer();
             // Assert that the directory now contains an additional file.
             Assertions.assertEquals(3, parentDirectoryPath.toFile().listFiles().length);
             // Assert that the proper file was created.

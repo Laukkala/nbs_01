@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
@@ -58,7 +60,7 @@ import java.util.stream.Collectors;
 public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
 
     private final String notebookId = "2A94M5J3Z";
-    private final Path notebookPath = Paths.get(notebookDirectory().toString(), "my_note3_2A94M5J3Z.zpln");
+    private final Path notebookPath = Paths.get("my_note3_2A94M5J3Z.zpln");
 
     @BeforeEach
     private void setUp() {
@@ -77,14 +79,12 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the file to be deleted exists.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            // Start server and wait for it to initialize.
-            startServer();
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/deleteNotebook", "{\"notebookId\":\"" + notebookId + "\"}"
-            );
+            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
+
+            DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new Directory("root", notebookDirectory()));
+            String body = "{\"path\":\"/" + notebookPath + "\"}";
+            Response response = endPoint.createResponse(new JsonRequest(body));
             Assertions.assertEquals("Notebook deleted", response.body().getString("message").toString().strip());
-            stopServer();
             // Assert that a file was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the correct file was deleted.

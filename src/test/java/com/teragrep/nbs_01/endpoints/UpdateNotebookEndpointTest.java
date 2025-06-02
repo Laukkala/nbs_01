@@ -58,7 +58,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
+class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
 
     private final String notebookId = "2A94M5J2Z";
     private final Path notebookPath = Paths.get("my_folder_2A94M5J1D", "my_note2_2A94M5J2Z.zpln");
@@ -87,18 +87,16 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                                     .readLines(Paths.get(notebookDirectory().toString(), notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
                     );
 
-            UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory("root", notebookDirectory()));
+            UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new Directory("root", notebookDirectory()));
             Response response = endpoint
                     .createResponse(
                             new JsonRequest(
-                                    "{\"path\":\"" + notebookPath + "\",\"notebookId\":\"" + notebookId
-                                            + "\",\"paragraphId\":\"" + paragraphId + "\",\"paragraphText\":\""
-                                            + paragraphContent + "\"}"
+                                    "{\"path\":\"" + notebookPath + "\",\"title\":\"" + "" + "\",\"paragraphId\":\""
+                                            + paragraphId + "\",\"paragraphText\":\"" + paragraphContent + "\"}"
                             )
                     );
             // Assert that we got the proper response.
-            Assertions
-                    .assertTrue(response.body().getString("message").strip().contains("Paragraph edited successfully"));
+            Assertions.assertEquals(response.body().getString("message").strip(), "Notebook edited successfully");
             // Assert that the file content has the edited paragraph saved to file in the correct place.
             Assertions
                     .assertEquals(

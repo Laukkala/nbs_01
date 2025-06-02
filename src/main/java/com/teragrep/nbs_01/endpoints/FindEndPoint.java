@@ -56,6 +56,8 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Returns the JSON content of a Notebook if a matching ID is provided.
@@ -71,9 +73,11 @@ public class FindEndPoint implements EndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
-            String id = parameters.getString("notebookId");
+            String id = parameters.getString("path");
+            id = root.path() + id;
+            Path path = Paths.get(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            ZeppelinFile file = updatedDirectory.findFile(id);
+            ZeppelinFile file = updatedDirectory.findFile(path);
             if (!file.isDirectory()) {
                 return new JsonResponse(HttpStatus.OK_200, file.load().json().toString());
             }

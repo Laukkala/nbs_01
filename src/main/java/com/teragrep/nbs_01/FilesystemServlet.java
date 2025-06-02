@@ -49,6 +49,9 @@ import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -56,31 +59,50 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-// Generic HTTPServlet that delegates received HTTP requests to an Endpoint, and generates an HTTP response based on output from the Endpoint.
-public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
+// HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks or Directories.
+public final class FilesystemServlet extends jakarta.servlet.http.HttpServlet {
 
-    private final EndPoint endPoint;
+    private final EndPoint getEndPoint;
+    private final EndPoint postEndPoint;
+    private final EndPoint putEndPoint;
+    private final EndPoint deleteEndPoint;
     private final Charset charset;
 
-    public HttpServlet(EndPoint endPoint) {
-        this(endPoint, Charset.defaultCharset());
+    public FilesystemServlet(
+            EndPoint getEndPoint,
+            EndPoint postEndPoint,
+            EndPoint putEndPoint,
+            EndPoint deleteEndPoint
+    ) {
+        this(getEndPoint, postEndPoint, putEndPoint, deleteEndPoint, Charset.defaultCharset());
     }
 
-    public HttpServlet(EndPoint endPoint, Charset charset) {
+    public FilesystemServlet(
+            EndPoint getEndPoint,
+            EndPoint postEndPoint,
+            EndPoint putEndPoint,
+            EndPoint deleteEndPoint,
+            Charset charset
+    ) {
         super();
-        this.endPoint = endPoint;
+        this.getEndPoint = getEndPoint;
+        this.postEndPoint = postEndPoint;
+        this.putEndPoint = putEndPoint;
+        this.deleteEndPoint = deleteEndPoint;
         this.charset = charset;
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // GET requests shouldn't have a body, so we generate a JsonRequest with an Empty JSON Object, and ignore any body that might be present.
-        Request endPointRequest = new JsonRequest("");
+        // Extract the path of the requested file from the URL. getPathInfo() removes the path to the endpoint automatically, leaving only the file path specified after /{ContextPath}/{ServLetPath}/.
+        Request endPointRequest = new JsonRequest("{\"path\":\"" + req.getPathInfo() + "\"}");
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = getEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());
@@ -93,16 +115,21 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Extract the path of the requested file from the URL. getPathInfo() removes the path to the endpoint automatically, leaving only the file path specified after /{ContextPath}/{ServLetPath}/.
+        String path = req.getPathInfo();
         // Read the body of the POST request
         BufferedReader reader = req.getReader();
         String body = reader.lines().collect(Collectors.joining());
         // Close the reader to avoid resource leaks.
         reader.close();
         // Create an endPointRequest based on the body.
-        Request endPointRequest = new JsonRequest(body);
+        JsonObjectBuilder jb = Json.createObjectBuilder(Json.createReader(new StringReader(body)).readObject());
+        jb.add("path", path);
+        JsonObject json = jb.build();
+        Request endPointRequest = new JsonRequest(json.toString());
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = postEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());
@@ -115,17 +142,21 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Extract the path of the requested file from the URL. getPathInfo() removes the path to the endpoint automatically, leaving only the file path specified after /{ContextPath}/{ServLetPath}/.
+        String path = req.getPathInfo();
+        String sourceKey = "";
 
-        // Read the body of the PUT request
-        BufferedReader reader = req.getReader();
-        String body = reader.lines().collect(Collectors.joining());
-        // Close the reader to avoid resource leaks.
-        reader.close();
-        // Create an endPointRequest based on the body.
-        Request endPointRequest = new JsonRequest(body);
+        // Get URL parameters
+        Map<String, String[]> parameters = req.getParameterMap();
+        if (parameters.containsKey("source")) {
+            StringBuilder sb = new StringBuilder();
+            sourceKey = ",\"source\":\"" + parameters.get("source")[0] + "\"";
+        }
+        // Create an endPointRequest based on the body. Body should contain JSON key-value pairs containing information about the resource.
+        Request endPointRequest = new JsonRequest("{\"path\":\"" + path + "\"" + sourceKey + "}");
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = putEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());
@@ -139,16 +170,11 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
 
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        // Read the body of the DELETE request
-        BufferedReader reader = req.getReader();
-        String body = reader.lines().collect(Collectors.joining());
-        // Close the reader to avoid resource leaks.
-        reader.close();
-        // Create an endPointRequest based on the body.
-        Request endPointRequest = new JsonRequest(body);
+        // Extract the path of the requested file from the URL. getPathInfo() removes the path to the endpoint automatically, leaving only the file path specified after /{ContextPath}/{ServLetPath}/.
+        Request endPointRequest = new JsonRequest("{\"path\":\"" + req.getPathInfo() + "\"}");
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = deleteEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());

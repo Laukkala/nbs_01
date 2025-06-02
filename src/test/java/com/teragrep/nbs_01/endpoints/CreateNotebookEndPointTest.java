@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
@@ -77,15 +79,11 @@ public class CreateNotebookEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
     public void httpCreateNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
-            // Start server and wait for it to initialize.
-            startServer();
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(newNotebookPath));
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/newNotebook",
-                    "{\"notebookName\":\"" + newNotebookName + "\",\"parentId\":\"" + parentDirectoryID + "\"}"
-            );
-            stopServer();
+            CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory("root", notebookDirectory()));
+            String body = "{\"path\":\"/" + newNotebookName + "\"}";
+            Response response = endPoint.createResponse(new JsonRequest(body));
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
             // Assert that the file was created.

@@ -55,6 +55,8 @@ import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new notebook. Should be provided with a title and a file path in a comma-separated string
@@ -70,8 +72,8 @@ public class DeleteNotebookEndpoint implements EndPoint {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            String notebookId = parameters.getString("notebookId");
-            ZeppelinFile file = updatedDirectory.findFile(notebookId);
+            Path notebookPath = Paths.get(root.path() + parameters.getString("path"));
+            ZeppelinFile file = updatedDirectory.findFile(notebookPath);
             file.delete();
             return new JsonResponse(HttpStatus.OK_200, "Notebook deleted");
         }

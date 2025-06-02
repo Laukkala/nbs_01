@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
@@ -76,15 +78,12 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Assert that the correct number of files exist
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
-            // Start server and wait for it to initialize.
-            startServer();
             Assertions.assertTrue(Files.exists(directoryPath));
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/deleteDirectory",
-                    "{\"directoryId\":\"" + directoryId + "\"}"
-            );
+
+            DeleteDirectoryEndpoint endPoint = new DeleteDirectoryEndpoint(new Directory("root", notebookDirectory()));
+            String body = "{\"directoryId\":\"" + directoryId + "\"}";
+            Response response = endPoint.createResponse(new JsonRequest(body));
             Assertions.assertEquals("Directory deleted", response.body().getString("message").toString().strip());
-            stopServer();
             // Assert that a directory was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the correct file was deleted.

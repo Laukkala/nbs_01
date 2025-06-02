@@ -49,13 +49,10 @@ import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -187,20 +184,79 @@ public class AbstractNotebookServerTest {
         return new JsonResponse(status, message);
     }
 
-    public Response makeWebSocketRequest(String url, String requestBody) throws Exception {
-        // Start server and wait for it to initialize.
-        URI serverURI = URI.create(url);
-        WebSocketClient webSocketClient = new WebSocketClient(new HttpClient());
-        webSocketClient.start();
-        TestWebSocketClientEndpoint client = new TestWebSocketClientEndpoint(webSocketClient, serverURI);
-        client.sendText(requestBody);
-        long startTime = System.currentTimeMillis();
-        while (client.receivedMessages().size() == 0 && (System.currentTimeMillis() - startTime) < webSocketTimeoutMs) {
-            // Wait until a message is received or a timeout is reached.
+    public Response makeHttpPUTRequest(String urlString, String requestBody) throws IOException {
+        URL url = new URL(urlString);
+        StringBuilder messages = new StringBuilder();
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+
+        byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
+        int length = bytes.length;
+
+        connection.setFixedLengthStreamingMode(length);
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        connection.connect();
+        OutputStream output = connection.getOutputStream();
+        output.write(bytes);
+        output.close();
+        int status = connection.getResponseCode();
+        InputStreamReader connectionInputStreamReader;
+        if (status == 201) {
+            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
         }
-        // Read the WebSocket response and assert that we got the proper list of notebook IDs.
-        String receivedMessages = String.join("\n", client.receivedMessages());
-        webSocketClient.close();
-        return new JsonResponse(200, receivedMessages);
+        else {
+            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+        }
+
+        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
+        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            messages.append(line + "\n");
+        }
+        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+        connection.disconnect();
+        return new JsonResponse(status, message);
+    }
+
+    public Response makeHttpDELETERequest(String urlString, String requestBody) throws IOException {
+        URL url = new URL(urlString);
+        StringBuilder messages = new StringBuilder();
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("DELETE");
+        connection.setDoOutput(true);
+
+        byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
+        int length = bytes.length;
+
+        connection.setFixedLengthStreamingMode(length);
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        connection.connect();
+        OutputStream output = connection.getOutputStream();
+        output.write(bytes);
+        output.close();
+        int status = connection.getResponseCode();
+        InputStreamReader connectionInputStreamReader;
+        if (status == 200) {
+            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+        }
+        else {
+            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+        }
+
+        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
+        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            messages.append(line + "\n");
+        }
+        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+        connection.disconnect();
+        return new JsonResponse(status, message);
     }
 }

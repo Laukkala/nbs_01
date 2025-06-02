@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
@@ -73,13 +75,11 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpListAllTest() {
         Assertions.assertDoesNotThrow(() -> {
-            startServer();
-            Response response = makeHttpPOSTRequest("http://" + serverAddress() + "/notebook/list", "{}");
-            stopServer();
+            ListEndPoint listEndPoint = new ListEndPoint(new Directory("root", notebookDirectory()));
+            Response response = listEndPoint.createResponse(new JsonRequest("{}"));
             for (String filename : allFileIds) {
                 Assertions.assertTrue(response.body().getString("message").contains(filename));
             }
-
         });
     }
 
@@ -87,11 +87,8 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request with a defined DirectoryId to /notebook/list endpoint results in a list of notebook IDs contained in that directory
     public void httpListWithinFolderTest() {
         Assertions.assertDoesNotThrow(() -> {
-            startServer();
-            Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/list", "{\"directoryId\":\"2A94M5J1D\"}"
-            );
-            stopServer();
+            ListEndPoint listEndPoint = new ListEndPoint(new Directory("root", notebookDirectory()));
+            Response response = listEndPoint.createResponse(new JsonRequest("{\"directoryId\":\"2A94M5J1D\"}"));
             for (String filename : allFileIdsWithinDirectory) {
                 Assertions.assertTrue(response.body().getString("message").contains(filename));
             }

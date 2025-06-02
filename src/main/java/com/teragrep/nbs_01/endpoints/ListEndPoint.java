@@ -74,10 +74,11 @@ public class ListEndPoint implements EndPoint {
         ZeppelinFile foundFile;
         Directory directoryToSearch;
         try {
+            directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
             if (parameters.containsKey("directoryId")) {
                 try {
-                    foundFile = root.findFile(parameters.getString("directoryId"));
+                    foundFile = directoryToSearch.findFile(parameters.getString("directoryId"));
                     if (foundFile.isDirectory()) {
                         directoryToSearch = (Directory) foundFile;
                     }
@@ -93,7 +94,7 @@ public class ListEndPoint implements EndPoint {
                 directoryToSearch = root;
             }
         }
-        catch (MalformedRequestException malformedRequestException) {
+        catch (MalformedRequestException | IOException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
         try {
