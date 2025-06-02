@@ -87,17 +87,58 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookPath, "{}"
+                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookPath, "{\"title\":\"newTitle\"}"
             );
             // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
+            Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
         });
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/notebook} endpoint results in a new file being saved on disk.
+    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/directory} endpoint results in a new file being saved on disk.
+    public void httpCreateDirectoryTest() {
+        Assertions.assertDoesNotThrow(() -> {
+
+            String newNotebookName = "testFolderName/";
+            Path newNotebookPath = Paths.get(newNotebookName);
+
+            // Assert that the file we are creating doesn't already exist.
+            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+            Response response = makeHttpPUTRequest(
+                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookName, "{\"title\":\"newTitle\"}"
+            );
+            // Assert that we receive the proper response.
+            Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
+            // Assert that the file was created.
+            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+        });
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/directory} endpoint results in a new file being saved on disk.
+    public void httpCopyDirectoryTest() {
+        Assertions.assertDoesNotThrow(() -> {
+
+            String newNotebookName = "testCopyFolderName/";
+            Path newNotebookPath = Paths.get(newNotebookName);
+
+            // Assert that the file we are creating doesn't already exist.
+            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+            Response response = makeHttpPUTRequest(
+                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookName,
+                    "{\"sourcePath\":\"/my_folder_2A94M5J1D/\",\"title\":\"copyDirectory\"}"
+            );
+            // Assert that we receive the proper response.
+            Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
+            // Assert that the file was created.
+            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+        });
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/notebook} endpoint results in a copied file being saved on disk.
     public void httpCopyNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
 
@@ -109,10 +150,10 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
             Response response = makeHttpPUTRequest(
                     "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookPath
                             + "?source=my_note3_2A94M5J3Z.zpln",
-                    "{}"
+                    "{\"sourcePath\":\"/my_note4_2A94M5J4Z.zpln\",\"title\":\"copyNotebook\"}"
             );
             // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created notebook "));
+            Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
         });

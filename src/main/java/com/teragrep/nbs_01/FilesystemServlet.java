@@ -61,7 +61,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 // HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks or Directories.
@@ -144,16 +143,19 @@ public final class FilesystemServlet extends jakarta.servlet.http.HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Extract the path of the requested file from the URL. getPathInfo() removes the path to the endpoint automatically, leaving only the file path specified after /{ContextPath}/{ServLetPath}/.
         String path = req.getPathInfo();
-        String sourceKey = "";
 
-        // Get URL parameters
-        Map<String, String[]> parameters = req.getParameterMap();
-        if (parameters.containsKey("source")) {
-            StringBuilder sb = new StringBuilder();
-            sourceKey = ",\"source\":\"" + parameters.get("source")[0] + "\"";
-        }
+        // Read the body of the POST request
+        BufferedReader reader = req.getReader();
+        String body = reader.lines().collect(Collectors.joining());
+        // Close the reader to avoid resource leaks.
+        reader.close();
+        // Create an endPointRequest based on the body.
+        JsonObjectBuilder jb = Json.createObjectBuilder(Json.createReader(new StringReader(body)).readObject());
+        jb.add("path", path);
+        JsonObject json = jb.build();
+
         // Create an endPointRequest based on the body. Body should contain JSON key-value pairs containing information about the resource.
-        Request endPointRequest = new JsonRequest("{\"path\":\"" + path + "\"" + sourceKey + "}");
+        Request endPointRequest = new JsonRequest(json.toString());
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
         Response endPointResponse = putEndPoint.createResponse(endPointRequest);

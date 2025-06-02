@@ -47,6 +47,10 @@ package com.teragrep.nbs_01.exceptions;
 
 public final class MalformedRequestException extends Exception {
 
+    public MalformedRequestException(String errorMessage) {
+        super(errorMessage);
+    }
+
     public MalformedRequestException(Throwable cause) {
         super(cause);
     }
