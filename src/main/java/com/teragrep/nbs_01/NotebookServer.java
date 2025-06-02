@@ -90,7 +90,7 @@ public class NotebookServer implements Callable {
                     new FindEndPoint(root),
                     new UpdateNotebookEndpoint(root),
                     new CreateFileEndpoint(root),
-                    new DeleteNotebookEndpoint(root)
+                    new DeleteFileEndpoint(root)
             );
             contextHandler.addServlet(fileSystemServlet, "/filesystem/*");
 
