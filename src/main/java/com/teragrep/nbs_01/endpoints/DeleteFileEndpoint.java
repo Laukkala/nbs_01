@@ -81,7 +81,7 @@ public class DeleteFileEndpoint implements EndPoint {
 
             ZeppelinFile deletedFile = updatedDirectory.findFile(path);
             deletedFile.delete();
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "File deleted");
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");

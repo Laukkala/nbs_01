@@ -86,7 +86,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
             String body = "{\"path\":\"/" + deletedNotebookName + "\"}";
             Response response = endPoint.createResponse(new JsonRequest(body));
             // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("File deleted"));
+            Assertions.assertEquals(204, response.status());
             // Assert that the file was created.
             Assertions.assertFalse(Files.exists(deletedNotebookPath));
         });
@@ -102,7 +102,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
             String body = "{\"path\":\"/" + deletedDirectoryName + "/" + "\"}";
             Response response = endPoint.createResponse(new JsonRequest(body));
             // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("File deleted"));
+            Assertions.assertEquals(204, response.status());
             // Assert that the file was created.
             Assertions.assertFalse(Files.exists(deletedDirectoryPath));
         });

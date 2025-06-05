@@ -92,13 +92,16 @@ public class UpdateNotebookEndpoint implements EndPoint {
                 String paragraphId = parameters.getString("paragraphId");
                 String paragraphText = parameters.getString("paragraphText");
 
-                if(paragraphs.containsKey(paragraphId)){
+                if (paragraphs.containsKey(paragraphId)) {
                     Paragraph paragraph = paragraphs.get(paragraphId);
                     Script newScript = new Script(paragraphText);
                     paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), newScript));
                 }
                 else {
-                    throw new MalformedRequestException("Notebook at path "+notebook.path()+" doesn't contain a paragraph with id "+paragraphId);
+                    throw new MalformedRequestException(
+                            "Notebook at path " + notebook.path() + " doesn't contain a paragraph with id "
+                                    + paragraphId
+                    );
                 }
             }
             Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);

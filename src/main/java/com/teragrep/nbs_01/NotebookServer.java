@@ -87,10 +87,10 @@ public class NotebookServer implements Callable {
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
             FilesystemServlet fileSystemServlet = new FilesystemServlet(
-                    new FindEndPoint(root),
-                    new UpdateNotebookEndpoint(root),
-                    new CreateFileEndpoint(root),
-                    new DeleteFileEndpoint(root)
+                    new FindEndPoint(root), // Endpoint to call on a GET Request
+                    new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
+                    new CreateFileEndpoint(root), // Endpoint to call on a PUT Request
+                    new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             contextHandler.addServlet(fileSystemServlet, "/filesystem/*");
 
@@ -99,15 +99,6 @@ public class NotebookServer implements Callable {
 
             HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
             contextHandler.addServlet(listServlet, "/list");
-
-            HttpServlet findServlet = new HttpServlet(new FindEndPoint(root));
-            contextHandler.addServlet(findServlet, "/find");
-
-            HttpServlet moveDirServlet = new HttpServlet(new MoveDirectoryEndpoint(root));
-            contextHandler.addServlet(moveDirServlet, "/moveDirectory");
-
-            HttpServlet moveNotebookServlet = new HttpServlet(new MoveNotebookEndpoint(root));
-            contextHandler.addServlet(moveNotebookServlet, "/moveNotebook");
 
             server.start();
             LOGGER.info("Server started!");

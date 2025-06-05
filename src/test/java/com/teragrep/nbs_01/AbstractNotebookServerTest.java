@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
@@ -240,22 +241,15 @@ public class AbstractNotebookServerTest {
         output.write(bytes);
         output.close();
         int status = connection.getResponseCode();
-        InputStreamReader connectionInputStreamReader;
         if (status == 204) {
-            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+            // Successful responses to DELETE requests should have no content.
+            JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
+            connection.disconnect();
+            return new JsonResponse(status, message);
         }
         else {
-            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+            // If the response is not as expected, throw an exception
+            throw new IOException("Response to DELETE request is not 204!");
         }
-        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            messages.append(line + "\n");
-        }
-        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-        connection.disconnect();
-        return new JsonResponse(status, message);
     }
 }
