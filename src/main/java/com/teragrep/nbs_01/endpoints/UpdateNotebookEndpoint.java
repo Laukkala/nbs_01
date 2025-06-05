@@ -79,35 +79,36 @@ public class UpdateNotebookEndpoint implements EndPoint {
 
             Directory updatedDirectory = root
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
-            String title = "";
-            String paragraphId = "";
-            String updatedParagraph = "";
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 
+            // Create a copy of the current paragraphs
             Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
-            if (parameters.containsKey("title")) {
-                title = parameters.getString("title");
-            }
-            else {
-                title = notebook.title();
-            }
+
+            // Add a modified title if one is provided, otherwise use the current title.
+            String title = parameters.containsKey("title") ? parameters.getString("title") : notebook.title();
+
+            // If a paragraph ID is provided, find the wanted paragraph and update it's Script object
             if (parameters.containsKey("paragraphId") && parameters.containsKey("paragraphText")) {
-                paragraphId = parameters.getString("paragraphId");
-                updatedParagraph = parameters.getString("paragraphText");
+                String paragraphId = parameters.getString("paragraphId");
+                String paragraphText = parameters.getString("paragraphText");
 
-                Paragraph paragraph = paragraphs.get(paragraphId);
-                Script newScript = new Script(updatedParagraph);
-                paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), newScript));
+                if(paragraphs.containsKey(paragraphId)){
+                    Paragraph paragraph = paragraphs.get(paragraphId);
+                    Script newScript = new Script(paragraphText);
+                    paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), newScript));
+                }
+                else {
+                    throw new MalformedRequestException("Notebook at path "+notebook.path()+" doesn't contain a paragraph with id "+paragraphId);
+                }
             }
-
-            Notebook newNotebook = new Notebook(notebook.title(), notebook.id(), notebook.path(), paragraphs);
+            Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
             return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
         catch (IOException ioException) {
             return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to edit paragraph, reason:\n" + ioException
+                    "Server error while editing notebook: \n" + ioException
             );
         }
         catch (MalformedRequestException malformedRequestException) {

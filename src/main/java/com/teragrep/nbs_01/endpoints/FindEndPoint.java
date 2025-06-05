@@ -60,7 +60,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Returns the JSON content of a Notebook if a matching ID is provided.
+// Updates a notebook with the given parameters.
 public class FindEndPoint implements EndPoint {
 
     private final Directory root;

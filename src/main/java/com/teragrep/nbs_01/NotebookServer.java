@@ -85,7 +85,7 @@ public class NotebookServer implements Callable {
             contextHandler.setContextPath("/notebook");
             server.setHandler(contextHandler);
 
-            // Servlets mapped to paths
+            // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
             FilesystemServlet fileSystemServlet = new FilesystemServlet(
                     new FindEndPoint(root),
                     new UpdateNotebookEndpoint(root),
@@ -108,9 +108,6 @@ public class NotebookServer implements Callable {
 
             HttpServlet moveNotebookServlet = new HttpServlet(new MoveNotebookEndpoint(root));
             contextHandler.addServlet(moveNotebookServlet, "/moveNotebook");
-
-            HttpServlet updateParagraphServlet = new HttpServlet(new UpdateParagraphEndpoint(root));
-            contextHandler.addServlet(updateParagraphServlet, "/updateParagraph");
 
             server.start();
             LOGGER.info("Server started!");

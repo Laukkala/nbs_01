@@ -241,13 +241,12 @@ public class AbstractNotebookServerTest {
         output.close();
         int status = connection.getResponseCode();
         InputStreamReader connectionInputStreamReader;
-        if (status == 200) {
+        if (status == 204) {
             connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
         }
         else {
             connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
         }
-
         // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
         BufferedReader reader = new BufferedReader(connectionInputStreamReader);
 
