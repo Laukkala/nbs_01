@@ -49,7 +49,6 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -77,6 +76,10 @@ public class UpdateNotebookEndpoint implements EndPoint {
             JsonObject parameters = request.parameters();
             Path path = Paths.get(root.path().toString(), parameters.getString("path"));
 
+            if (!parameters.containsKey("title")) {
+                throw new MalformedRequestException("Request does not contain a title!");
+            }
+
             Directory updatedDirectory = root
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
@@ -84,26 +87,8 @@ public class UpdateNotebookEndpoint implements EndPoint {
             // Create a copy of the current paragraphs
             Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
 
-            // Add a modified title if one is provided, otherwise use the current title.
-            String title = parameters.containsKey("title") ? parameters.getString("title") : notebook.title();
-
-            // If a paragraph ID is provided, find the wanted paragraph and update it's Script object
-            if (parameters.containsKey("paragraphId") && parameters.containsKey("paragraphText")) {
-                String paragraphId = parameters.getString("paragraphId");
-                String paragraphText = parameters.getString("paragraphText");
-
-                if (paragraphs.containsKey(paragraphId)) {
-                    Paragraph paragraph = paragraphs.get(paragraphId);
-                    Script newScript = new Script(paragraphText);
-                    paragraphs.put(paragraphId, new Paragraph(paragraphId, paragraph.title(), newScript));
-                }
-                else {
-                    throw new MalformedRequestException(
-                            "Notebook at path " + notebook.path() + " doesn't contain a paragraph with id "
-                                    + paragraphId
-                    );
-                }
-            }
+            // Add a modified title
+            String title = parameters.getString("title");
             Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
             return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");

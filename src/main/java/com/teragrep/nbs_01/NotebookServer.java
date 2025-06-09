@@ -51,6 +51,7 @@ import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,24 +82,40 @@ public class NotebookServer implements Callable {
                     .initializeDirectory(configuration.notebookDirectory(), new ConcurrentHashMap<>());
 
             // Jetty setup
-            ServletContextHandler contextHandler = new ServletContextHandler();
-            contextHandler.setContextPath("/notebook");
-            server.setHandler(contextHandler);
+            ServletContextHandler notebookContextHandler = new ServletContextHandler();
+            notebookContextHandler.setContextPath("/notebook");
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
-            FilesystemServlet fileSystemServlet = new FilesystemServlet(
+            NotebookServlet notebookServlet = new NotebookServlet(
                     new FindEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
                     new CreateFileEndpoint(root), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
-            contextHandler.addServlet(fileSystemServlet, "/filesystem/*");
+            notebookContextHandler.addServlet(notebookServlet, "/");
+
+            ServletContextHandler paragraphContextHandler = new RegexServletContext(".*/paragraph/.*$");
+            paragraphContextHandler.setContextPath("/notebook");
+
+            ParagraphServlet paragraphServlet = new ParagraphServlet(
+                    new PingEndpoint(), // Endpoint to call on a GET Request
+                    new PingEndpoint(), // Endpoint to call on a POST Request
+                    new PingEndpoint(), // Endpoint to call on a PUT Request
+                    new PingEndpoint() // Endpoint to call on a DELETE Request
+            );
+            paragraphContextHandler.addServlet(paragraphServlet, "/");
 
             HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
-            contextHandler.addServlet(pingServlet, "/ping");
+            notebookContextHandler.addServlet(pingServlet, "/ping");
+            //
+            //HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
+            //notebookContextHandler.addServlet(listServlet, "/list");
 
-            HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
-            contextHandler.addServlet(listServlet, "/list");
+            ContextHandlerCollection collection = new ContextHandlerCollection();
+            collection.addHandler(paragraphContextHandler);
+            collection.addHandler(notebookContextHandler);
+
+            server.setHandler(collection);
 
             server.start();
             LOGGER.info("Server started!");

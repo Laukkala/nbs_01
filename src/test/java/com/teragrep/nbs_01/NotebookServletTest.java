@@ -55,13 +55,13 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class FilesystemServletTest extends AbstractNotebookServerTest {
+public class NotebookServletTest extends AbstractNotebookServerTest {
 
     private String parentDirectoryID = "2A94M5J1D";
     private Path parentDirectoryPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
     private String newDirectoryName = "new_directory";
 
-    public FilesystemServletTest() {
+    public NotebookServletTest() {
     }
 
     @BeforeEach
@@ -77,7 +77,7 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/notebook} endpoint results in a new file being saved on disk.
+    // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.
     public void httpCreateNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
 
@@ -87,7 +87,7 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookPath, "{\"title\":\"newTitle\"}"
+                    "http://" + serverAddress() + "/notebook/" + newNotebookPath, "{\"title\":\"newTitle\"}"
             );
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
@@ -97,7 +97,7 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/directory} endpoint results in a new file being saved on disk.
+    // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCreateDirectoryTest() {
         Assertions.assertDoesNotThrow(() -> {
 
@@ -106,8 +106,9 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+            Thread.sleep(5000); // TODO: ???? Why does waiting 5 seconds fix it
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookName, "{\"title\":\"newTitle\"}"
+                    "http://" + serverAddress() + "/notebook/" + newNotebookName, "{\"title\":\"newTitle\"}"
             );
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
@@ -117,17 +118,16 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/directory} endpoint results in a new file being saved on disk.
+    // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCopyDirectoryTest() {
         Assertions.assertDoesNotThrow(() -> {
-
             String newNotebookName = "testCopyFolderName/";
             Path newNotebookPath = Paths.get(newNotebookName);
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookName,
+                    "http://" + serverAddress() + "/notebook/" + newNotebookName,
                     "{\"sourcePath\":\"/my_folder_2A94M5J1D/\",\"title\":\"copyDirectory\"}"
             );
             // Assert that we receive the proper response.
@@ -138,7 +138,7 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/filesystem/{path/to/notebook} endpoint results in a copied file being saved on disk.
+    // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a copied file being saved on disk.
     public void httpCopyNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
 
@@ -148,8 +148,7 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + newNotebookPath
-                            + "?source=my_note3_2A94M5J3Z.zpln",
+                    "http://" + serverAddress() + "/notebook/" + newNotebookPath + "?source=my_note3_2A94M5J3Z.zpln",
                     "{\"sourcePath\":\"/my_note4_2A94M5J4Z.zpln\",\"title\":\"copyNotebook\"}"
             );
             // Assert that we receive the proper response.
@@ -160,8 +159,8 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP DELETE request to /notebook/filesystem/{path/to/notebook} endpoint results in a notebook being deleted
-    public void httpDeleteTest() {
+    // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
+    public void httpDeleteNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
 
             String notebookName = "my_note3_2A94M5J3Z.zpln";
@@ -171,9 +170,7 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
             Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
             // Assert that the file to be deleted exists.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
-            Response response = makeHttpDELETERequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + notebookName, "{}"
-            );
+            Response response = makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + notebookName, "{}");
             Assertions.assertEquals(204, response.status());
             // Assert that a file was deleted.
             Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
@@ -183,8 +180,29 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP GET request to /notebook/filesystem/{path/to/notebook} endpoint results in a response with the expected file contents
-    public void httpFindTest() {
+    // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
+    public void httpDeleteDirectoryTest() {
+        Assertions.assertDoesNotThrow(() -> {
+
+            String directoryName = "my_folder_2A94M5J1D";
+            Path directoryPath = Paths.get(directoryName);
+
+            // Assert that the correct number of files exist
+            Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            // Assert that the file to be deleted exists.
+            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), directoryPath.toString())));
+            Response response = makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryName, "{}");
+            Assertions.assertEquals(204, response.status());
+            // Assert that a file was deleted.
+            Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            // Assert that the correct file was deleted.
+            Assertions.assertFalse(Files.exists(directoryPath));
+        });
+    }
+
+    @Test
+    // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint results in a response with the expected file contents
+    public void httpFindNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
             Path notebookPath = Paths
                     .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
@@ -194,24 +212,21 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
             Assertions.assertTrue(Files.exists(notebookPath));
             Response response = makeHttpGETRequest(
                     "http://" + serverAddress()
-                            + "/notebook/filesystem/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln"
+                            + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln"
             );
             Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
         });
     }
 
     @Test
-    // Assert that a HTTP POST request to /notebook/filesystem/{path/to/notebook} endpoint results in an updated file containing the modifications contained in the request body.
+    // Assert that a HTTP POST request to /notebook/{path/to/notebook} endpoint results in an updated file containing the modifications contained in the request body.
     public void httpUpdateNotebookTest() {
         Assertions.assertDoesNotThrow(() -> {
             // Assert that the file content is the same as in the resource files before edits.
-            String notebookId = "2A94M5J2Z";
             Path notebookPath = Paths.get("my_folder_2A94M5J1D", "my_note2_2A94M5J2Z.zpln");
             String title = "editedTitle";
-            String paragraphId = "20150326-214658_12335843";
-            String paragraphContent = "test edit";
             String originalFileContent = "{  \"paragraphs\": [    {      \"text\": \"%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!\",      \"config\": {        \"colWidth\": 12.0,        \"graph\": {          \"mode\": \"table\",          \"height\": 300.0,          \"optionOpen\": false,          \"keys\": [],          \"values\": [],          \"groups\": [],          \"scatter\": {}        },        \"editorHide\": true      },      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1423836268492_216498320\",      \"id\": \"20150213-230428_1231780373\",      \"results\": {        \"code\": \"SUCCESS\",        \"msg\": [          {            \"type\": \"HTML\",            \"data\": \"\\u003ch2\\u003eCongratulations, it\\u0027s done.\\u003c/h2\\u003e\\n\\u003ch5\\u003eYou can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!\\u003c/h5\\u003e\\n\"          }        ]      },      \"dateCreated\": \"Feb 13, 2015 11:04:28 PM\",      \"dateStarted\": \"Apr 1, 2015 9:12:18 PM\",      \"dateFinished\": \"Apr 1, 2015 9:12:18 PM\",      \"status\": \"FINISHED\",      \"progressUpdateIntervalMs\": 500    },    {      \"text\": \"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\",      \"config\": {        \"colWidth\": 12.0,        \"graph\": {          \"mode\": \"table\",          \"height\": 300.0,          \"optionOpen\": false,          \"keys\": [],          \"values\": [],          \"groups\": [],          \"scatter\": {}        },        \"editorHide\": true      },      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1427420818407_872443482\",      \"id\": \"20150326-214658_12335843\",      \"results\": {        \"code\": \"SUCCESS\",        \"msg\": [          {            \"type\": \"HTML\",            \"data\": \"\\u003cp\\u003eAbout bank data\\u003c/p\\u003e\\n\\u003cpre\\u003e\\u003ccode\\u003eCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n\\u003c/code\\u003e\\u003c/pre\\u003e\\n\"          }        ]      },      \"dateCreated\": \"Mar 26, 2015 9:46:58 PM\",      \"dateStarted\": \"Jul 3, 2015 1:44:56 PM\",      \"dateFinished\": \"Jul 3, 2015 1:44:56 PM\",      \"status\": \"FINISHED\",      \"progressUpdateIntervalMs\": 500    },    {      \"config\": {},      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1435955447812_-158639899\",      \"id\": \"20150703-133047_853701097\",      \"dateCreated\": \"Jul 3, 2015 1:30:47 PM\",      \"status\": \"READY\",      \"progressUpdateIntervalMs\": 500    }  ],  \"id\": \"2A94M5J2Z\",  \"name\": \"my_note2\",  \"angularObjects\": {},  \"config\": {    \"looknfeel\": \"default\"  },  \"info\": {}}";
-            String expectedFileContent = "{\"id\":\"2A94M5J2Z\",\"name\":\"editedTitle\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Congratulations, it's done.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"test edit\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+            String expectedFileContent = "{\"id\":\"2A94M5J2Z\",\"name\":\"editedTitle\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Congratulations, it's done.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n\\\\nAbout bank data\\\\n\\\\n```\\\\nCitation Request:\\\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\\\n  Please include this citation if you plan to use this database:\\\\n\\\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\\\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\\\n\\\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\\\n```\\\"\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
             Assertions
                     .assertEquals(
@@ -220,9 +235,8 @@ public class FilesystemServletTest extends AbstractNotebookServerTest {
                     );
 
             Response response = makeHttpPOSTRequest(
-                    "http://" + serverAddress() + "/notebook/filesystem/" + notebookPath.toString(),
-                    "{\"title\":\"" + title + "\",\"paragraphId\":\"" + paragraphId + "\",\"paragraphText\":\""
-                            + paragraphContent + "\"}"
+                    "http://" + serverAddress() + "/notebook/" + notebookPath.toString(),
+                    "{\"title\":\"" + title + "\"}"
             );
             // Assert that we got the proper response.
             Assertions
