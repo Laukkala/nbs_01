@@ -86,6 +86,7 @@ public class CreateFileEndpoint implements EndPoint {
             ZeppelinFile newFile;
             JsonResponse response;
             if (pathString.endsWith("/")) {
+                // File is a directory
                 if (parameters.containsKey("sourcePath")) {
                     newFile = copyDirectory(
                             updatedDirectory,
@@ -98,6 +99,7 @@ public class CreateFileEndpoint implements EndPoint {
                 response = new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
             }
             else {
+                // File is a Notebook
                 if (parameters.containsKey("sourcePath")) {
                     newFile = copyNotebook(
                             updatedDirectory,
@@ -137,7 +139,7 @@ public class CreateFileEndpoint implements EndPoint {
     private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
         ZeppelinFile file = sourceDir.findFile(sourcePath).load();
         if (file.isDirectory()) {
-            return (Directory) file.copy(destinationPath, UUID.randomUUID().toString());
+            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
         }
         else {
             throw new IOException("File at " + sourcePath + " is not a directory!");
@@ -147,7 +149,7 @@ public class CreateFileEndpoint implements EndPoint {
     private Notebook copyNotebook(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
         ZeppelinFile file = sourceDir.findFile(sourcePath).load();
         if (!file.isDirectory()) {
-            return (Notebook) file.copy(destinationPath, UUID.randomUUID().toString());
+            return (Notebook) file.copy(destinationPath, destinationPath.getFileName().toString());
         }
         else {
             throw new IOException("File at " + sourcePath + " is not a notebook!");
