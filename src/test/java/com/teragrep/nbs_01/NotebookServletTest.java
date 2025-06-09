@@ -148,7 +148,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/" + newNotebookPath + "?source=my_note3_2A94M5J3Z.zpln",
+                    "http://" + serverAddress() + "/notebook/" + newNotebookPath,
                     "{\"sourcePath\":\"/my_note4_2A94M5J4Z.zpln\",\"title\":\"copyNotebook\"}"
             );
             // Assert that we receive the proper response.
