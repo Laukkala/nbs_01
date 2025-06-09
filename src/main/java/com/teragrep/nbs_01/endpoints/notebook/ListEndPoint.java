@@ -43,8 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.endpoints.notebook;
 
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
@@ -56,43 +57,61 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Updates a notebook with the given parameters.
-public class FindEndPoint implements EndPoint {
+// Lists all the ID's of saved notebooks
+public class ListEndPoint implements EndPoint {
 
     private final Directory root;
 
-    public FindEndPoint(Directory root) {
+    public ListEndPoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given ID
+        // Find all notebooks from Directory structure
+        StringBuilder sb = new StringBuilder();
+        ZeppelinFile foundFile;
+        Directory directoryToSearch;
         try {
+            directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            String id = parameters.getString("path");
-            id = root.path() + id;
-            Path path = Paths.get(id);
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            ZeppelinFile file = updatedDirectory.findFile(path);
-            if (!file.isDirectory()) {
-                return new JsonResponse(HttpStatus.OK_200, file.load().json().toString());
+            if (parameters.containsKey("directoryId")) {
+                try {
+                    foundFile = directoryToSearch.findFile(parameters.getString("directoryId"));
+                    if (foundFile.isDirectory()) {
+                        directoryToSearch = (Directory) foundFile;
+                    }
+                    else {
+                        return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
+                    }
+                }
+                catch (FileNotFoundException fileNotFoundException) {
+                    return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
+                }
             }
             else {
-                return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
+                directoryToSearch = root;
             }
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
+        catch (MalformedRequestException | IOException malformedRequestException) {
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+        }
+        try {
+            Directory updatedDirectory = directoryToSearch
+                    .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
+            List<ZeppelinFile> files = updatedDirectory.listAllChildren();
+            for (ZeppelinFile file : files) {
+                if (!file.isDirectory()) {
+                    sb.append(file.id());
+                    sb.append("\n");
+                }
+            }
+            return new JsonResponse(HttpStatus.OK_200, sb.toString());
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
-        }
-        catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
         }
     }
 }

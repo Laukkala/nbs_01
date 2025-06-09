@@ -43,60 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.endpoints.notebook;
 
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.Paragraph;
+import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Updates the text of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph in a comma-separated string
-public class UpdateNotebookEndpoint implements EndPoint {
+// Creates a new Directory or a Notebook. Should be provided with a path of the File
+public class DeleteFileEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public UpdateNotebookEndpoint(Directory root) {
+    public DeleteFileEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            Path path = Paths.get(root.path().toString(), parameters.getString("path"));
-
-            if (!parameters.containsKey("title")) {
-                throw new MalformedRequestException("Request does not contain a title!");
+            if (!parameters.containsKey("path")) {
+                throw new MalformedRequestException("Request must contain a path!");
             }
+            String pathString = parameters.getString("path");
+            Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
 
-            Directory updatedDirectory = root
-                    .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
-            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
-
-            // Create a copy of the current paragraphs
-            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
-
-            // Add a modified title
-            String title = parameters.getString("title");
-            Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
-            newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
+            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
+            deletedFile.delete();
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
         }
         catch (IOException ioException) {
             return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Server error while editing notebook: \n" + ioException
+                    "Failed to create directory, reason:\n" + ioException
             );
         }
         catch (MalformedRequestException malformedRequestException) {

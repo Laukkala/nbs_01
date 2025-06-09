@@ -43,74 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.endpoints.notebook;
 
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.Notebook;
+import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Lists all the ID's of saved notebooks
-public class ListEndPoint implements EndPoint {
+// Updates the text of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph in a comma-separated string
+public class UpdateNotebookEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public ListEndPoint(Directory root) {
+    public UpdateNotebookEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
-        // Find all notebooks from Directory structure
-        StringBuilder sb = new StringBuilder();
-        ZeppelinFile foundFile;
-        Directory directoryToSearch;
         try {
-            directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (parameters.containsKey("directoryId")) {
-                try {
-                    foundFile = directoryToSearch.findFile(parameters.getString("directoryId"));
-                    if (foundFile.isDirectory()) {
-                        directoryToSearch = (Directory) foundFile;
-                    }
-                    else {
-                        return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
-                    }
-                }
-                catch (FileNotFoundException fileNotFoundException) {
-                    return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
-                }
+            Path path = Paths.get(root.path().toString(), parameters.getString("path"));
+
+            if (!parameters.containsKey("title")) {
+                throw new MalformedRequestException("Request does not contain a title!");
             }
-            else {
-                directoryToSearch = root;
-            }
-        }
-        catch (MalformedRequestException | IOException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
-        }
-        try {
-            Directory updatedDirectory = directoryToSearch
-                    .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
-            List<ZeppelinFile> files = updatedDirectory.listAllChildren();
-            for (ZeppelinFile file : files) {
-                if (!file.isDirectory()) {
-                    sb.append(file.id());
-                    sb.append("\n");
-                }
-            }
-            return new JsonResponse(HttpStatus.OK_200, sb.toString());
+
+            Directory updatedDirectory = root
+                    .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
+            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
+
+            // Create a copy of the current paragraphs
+            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
+
+            // Add a modified title
+            String title = parameters.getString("title");
+            Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
+            newNotebook.save();
+            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
+            return new JsonResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    "Server error while editing notebook: \n" + ioException
+            );
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

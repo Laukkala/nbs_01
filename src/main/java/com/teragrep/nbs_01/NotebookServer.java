@@ -46,6 +46,10 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
+import com.teragrep.nbs_01.endpoints.notebook.CreateFileEndpoint;
+import com.teragrep.nbs_01.endpoints.notebook.DeleteFileEndpoint;
+import com.teragrep.nbs_01.endpoints.notebook.FindEndPoint;
+import com.teragrep.nbs_01.endpoints.notebook.UpdateNotebookEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;

@@ -43,8 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.endpoints.notebook;
 
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
@@ -60,37 +61,36 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Creates a new Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+// Updates a notebook with the given parameters.
+public class FindEndPoint implements EndPoint {
 
     private final Directory root;
 
-    public DeleteFileEndpoint(Directory root) {
+    public FindEndPoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
+        // Find a notebooks from Directory structure based on given ID
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            String id = parameters.getString("path");
+            id = root.path() + id;
+            Path path = Paths.get(id);
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            ZeppelinFile file = updatedDirectory.findFile(path);
+            if (!file.isDirectory()) {
+                return new JsonResponse(HttpStatus.OK_200, file.load().json().toString());
             }
-            String pathString = parameters.getString("path");
-            Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
-
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+            else {
+                return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
+            }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
         }
         catch (IOException ioException) {
-            return new JsonResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
-            );
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
         }
         catch (MalformedRequestException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);

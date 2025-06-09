@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.endpoints.notebook.CreateFileEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
@@ -66,6 +67,7 @@ public class CreateFileEndPointTest extends AbstractNotebookServerTest {
     public CreateFileEndPointTest() {
     }
 
+    //TODO: remove annotations from tests
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());

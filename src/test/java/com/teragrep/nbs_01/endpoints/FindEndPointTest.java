@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.endpoints.notebook.FindEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;

@@ -126,6 +126,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+            Thread.sleep(5000); // TODO: ???? Why does waiting 5 seconds fix it
             Response response = makeHttpPUTRequest(
                     "http://" + serverAddress() + "/notebook/" + newNotebookName,
                     "{\"sourcePath\":\"/my_folder_2A94M5J1D/\",\"title\":\"copyDirectory\"}"
