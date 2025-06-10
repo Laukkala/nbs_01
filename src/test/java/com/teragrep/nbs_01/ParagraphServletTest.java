@@ -181,7 +181,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP GET request to /notebook/{path/to/notebook}/paragraph/{paragraph_id} endpoint results in a response with the expected file contents
-    public void httpFindTest() {
+    public void httpFindParagraphTest() {
         Assertions.assertDoesNotThrow(() -> {
             Path notebookPath = Paths
                     .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
@@ -195,6 +195,38 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
             Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
         });
     }
+
+    // Assert that searching for a nonexistent paragraph results in a message saying that the paragraph was not found
+    @Test
+    public void httpFindNonexistentParagraphTest() {
+        Assertions.assertDoesNotThrow(() -> {
+            Path notebookPath = Paths
+                    .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
+            // Assert that the file exists, even if the paragraph doesn't
+            Assertions.assertTrue(Files.exists(notebookPath));
+            Response response = makeHttpGETRequest(
+                    "http://" + serverAddress()
+                            + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln/paragraph/nonexistent_id"
+            );
+            Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Paragraph not found"));
+        });
+    }
+    // Assert that searching for a paragraph from a notebook that doesn't exist results in a message saying that the notebook was not found
+    @Test
+    public void httpFindParagraphFromNonexistentNotebookTest() {
+        Assertions.assertDoesNotThrow(() -> {
+            Path notebookPath = Paths
+                    .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/nonexistent_paragraph.zpln");
+            // Assert that the file doesn't exist
+            Assertions.assertFalse(Files.exists(notebookPath));
+            Response response = makeHttpGETRequest(
+                    "http://" + serverAddress()
+                            + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/nonexistent_paragraph.zpln/paragraph/some_id"
+            );
+            Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Notebook not found"));
+        });
+    }
+
 
     //@Test
     // Assert that a HTTP POST request to /notebook/{path/to/notebook} endpoint results in an updated file containing the modifications contained in the request body.
