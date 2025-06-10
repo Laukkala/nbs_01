@@ -75,8 +75,10 @@ public class FindParagraphEndPoint implements EndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
-            String paragraphId = parameters.getString("paragraphId");
-            String notebookPath = parameters.getString("path");
+            String pathParameter = parameters.getString("path");
+            String paragraphId = pathParameter.substring(pathParameter.lastIndexOf("/")+1);
+            String notebookPath = pathParameter.substring(0,pathParameter.lastIndexOf("/paragraph/"));
+
             notebookPath = root.path() + notebookPath;
             Path path = Paths.get(notebookPath);
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());

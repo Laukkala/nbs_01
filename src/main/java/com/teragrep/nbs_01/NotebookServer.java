@@ -102,7 +102,7 @@ public class NotebookServer implements Callable {
             paragraphContextHandler.setContextPath("/notebook");
 
             ParagraphServlet paragraphServlet = new ParagraphServlet(
-                    new PingEndpoint(), // Endpoint to call on a GET Request
+                    new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new PingEndpoint(), // Endpoint to call on a POST Request
                     new PingEndpoint(), // Endpoint to call on a PUT Request
                     new PingEndpoint() // Endpoint to call on a DELETE Request
