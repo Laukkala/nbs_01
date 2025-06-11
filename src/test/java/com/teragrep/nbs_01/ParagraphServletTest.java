@@ -61,7 +61,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     private final String notebookName = "/my_note3_2A94M5J3Z.zpln";
     private final String paragraphId = "testParagraphId";
     private final Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
-    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\""+paragraphId+"\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\""
+            + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
     public ParagraphServletTest() {
     }
@@ -86,16 +87,15 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
             // Assert that the file we are creating a paragraph into exists.
             Assertions.assertTrue(Files.exists(notebookPath));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook" + notebookName + "/paragraph/"+paragraphId, "{}"
+                    "http://" + serverAddress() + "/notebook" + notebookName + "/paragraph/" + paragraphId, "{}"
             );
             // Assert that we receive the proper response.
-            Assertions.assertEquals(HttpStatus.CREATED_201,response.status());
+            Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
             Assertions.assertTrue(response.body().getString("message").contains("Created new paragraph "));
             // Assert that the paragraph was created into the file.
             Assertions
                     .assertEquals(
-                            expectedFileContent, com.google.common.io.Files
-                                    .readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
+                            expectedFileContent, com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
                     );
         });
     }
@@ -212,9 +212,11 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                     "http://" + serverAddress()
                             + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln/paragraph/nonexistent_id"
             );
-            Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Paragraph not found"));
+            Assertions
+                    .assertTrue(response.body().getString("message").strip().toString().contains("Paragraph not found"));
         });
     }
+
     // Assert that searching for a paragraph from a notebook that doesn't exist results in a message saying that the notebook was not found
     @Test
     public void httpFindParagraphFromNonexistentNotebookTest() {
@@ -227,10 +229,10 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                     "http://" + serverAddress()
                             + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/nonexistent_paragraph.zpln/paragraph/some_id"
             );
-            Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Notebook not found"));
+            Assertions
+                    .assertTrue(response.body().getString("message").strip().toString().contains("Notebook not found"));
         });
     }
-
 
     //@Test
     // Assert that a HTTP POST request to /notebook/{path/to/notebook} endpoint results in an updated file containing the modifications contained in the request body.

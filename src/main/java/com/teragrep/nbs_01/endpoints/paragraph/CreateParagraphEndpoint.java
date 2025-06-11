@@ -58,8 +58,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
@@ -82,15 +80,15 @@ public class CreateParagraphEndpoint implements EndPoint {
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 
-            if(!notebook.paragraphs().containsKey(paragraphId)){
-                Paragraph newParagraph = new Paragraph(paragraphId,"",new Script(""));
-                notebook.paragraphs().put(paragraphId,newParagraph);
+            if (!notebook.paragraphs().containsKey(paragraphId)) {
+                Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
+                notebook.paragraphs().put(paragraphId, newParagraph);
                 notebook.save();
 
                 return new JsonResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
             }
             else {
-                throw new MalformedRequestException("Paragraph "+paragraphId+" already exists!");
+                throw new MalformedRequestException("Paragraph " + paragraphId + " already exists!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {

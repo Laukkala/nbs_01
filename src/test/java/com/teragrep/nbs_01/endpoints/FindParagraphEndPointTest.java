@@ -84,7 +84,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
             FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
-            String body = "{\"path\":\""+notebookPath+"\",\"paragraphId\":\"" + paragraphId + "\"}";
+            String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + paragraphId + "\"}";
             Response response = endPoint.createResponse(new JsonRequest(body));
             stopServer();
             Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());

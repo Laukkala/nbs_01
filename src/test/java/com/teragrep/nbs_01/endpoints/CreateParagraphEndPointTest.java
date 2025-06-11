@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.endpoints.notebook.CreateFileEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
@@ -66,10 +65,12 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     private String notebookName = "/my_note3_2A94M5J3Z.zpln";
     private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
     private String paragraphId = "testParagraphId";
-    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\""+paragraphId+"\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\""
+            + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
     public CreateParagraphEndPointTest() {
     }
+
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
@@ -86,20 +87,21 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertTrue(Files.exists(notebookPath));
-            Directory root = new Directory("root",notebookDirectory());
+            Directory root = new Directory("root", notebookDirectory());
             CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
 
-            JsonRequest request = new JsonRequest("{\"path\":\"" + notebookName + "\",\"paragraphId\":\""+paragraphId+"\"}");
+            JsonRequest request = new JsonRequest(
+                    "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
+            );
             Response response = endPoint.createResponse(request);
             // Assert that we receive the proper response.
-            Assertions.assertEquals(HttpStatus.CREATED_201,response.status());
+            Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
             Assertions.assertTrue(response.body().getString("message").contains("Created new paragraph"));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(notebookPath));
             Assertions
                     .assertEquals(
-                            expectedFileContent, com.google.common.io.Files
-                                    .readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
+                            expectedFileContent, com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
                     );
 
         });

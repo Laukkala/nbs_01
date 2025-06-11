@@ -76,8 +76,8 @@ public class FindParagraphEndPoint implements EndPoint {
         try {
             JsonObject parameters = request.parameters();
             String pathParameter = parameters.getString("path");
-            String paragraphId = pathParameter.substring(pathParameter.lastIndexOf("/")+1);
-            String notebookPath = pathParameter.substring(0,pathParameter.lastIndexOf("/paragraph/"));
+            String paragraphId = pathParameter.substring(pathParameter.lastIndexOf("/") + 1);
+            String notebookPath = pathParameter.substring(0, pathParameter.lastIndexOf("/paragraph/"));
 
             notebookPath = root.path() + notebookPath;
             Path path = Paths.get(notebookPath);
