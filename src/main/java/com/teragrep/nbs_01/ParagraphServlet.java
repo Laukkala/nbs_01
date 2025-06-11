@@ -143,13 +143,17 @@ public final class ParagraphServlet extends jakarta.servlet.http.HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Extract the path of the requested file from the URL of the received request. getServletPath() removes the path to the endpoint automatically, leaving only the file path specified after /{ContextPath}/.
         String path = req.getServletPath();
+        // Parse the paragraphId and Notebook path from the URL string.
+        String[] splitPath = path.split("/paragraph/");
+        String notebookPath = splitPath[0];
+        String paragraphId = splitPath[1];
 
         // Read the body of the POST request
         BufferedReader reader = req.getReader();
         String body = reader.lines().collect(Collectors.joining());
         reader.close();
         // Create an endPointRequest based on the body.
-        JsonObject json = Json.createObjectBuilder(Json.createReader(new StringReader(body)).readObject()).add("path",path).build();
+        JsonObject json = Json.createObjectBuilder(Json.createReader(new StringReader(body)).readObject()).add("path",notebookPath).add("paragraphId",paragraphId).build();
 
         // Create an endPointRequest based on the body. Body should contain JSON key-value pairs containing information about the resource.
         Request endPointRequest = new JsonRequest(json.toString());

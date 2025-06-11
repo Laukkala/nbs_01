@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.responses.Response;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
@@ -57,9 +58,10 @@ import java.util.stream.Collectors;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParagraphServletTest extends AbstractNotebookServerTest {
 
-    private String parentDirectoryID = "2A94M5J1D";
-    private Path parentDirectoryPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
-    private String newDirectoryName = "new_directory";
+    private final String notebookName = "/my_note3_2A94M5J3Z.zpln";
+    private final String paragraphId = "testParagraphId";
+    private final Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
+    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\""+paragraphId+"\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
     public ParagraphServletTest() {
     }
@@ -78,21 +80,23 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.
-    public void httpCreateNotebookTest() {
+    public void httpCreateParagraphTest() {
         Assertions.assertDoesNotThrow(() -> {
 
-            String newNotebookName = "testFileName_12345.zpln";
-            Path newNotebookPath = Paths.get(newNotebookName);
-
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+            // Assert that the file we are creating a paragraph into exists.
+            Assertions.assertTrue(Files.exists(notebookPath));
             Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/" + newNotebookPath, "{\"title\":\"newTitle\"}"
+                    "http://" + serverAddress() + "/notebook" + notebookName + "/paragraph/"+paragraphId, "{}"
             );
             // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+            Assertions.assertEquals(HttpStatus.CREATED_201,response.status());
+            Assertions.assertTrue(response.body().getString("message").contains("Created new paragraph "));
+            // Assert that the paragraph was created into the file.
+            Assertions
+                    .assertEquals(
+                            expectedFileContent, com.google.common.io.Files
+                                    .readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
+                    );
         });
     }
 
