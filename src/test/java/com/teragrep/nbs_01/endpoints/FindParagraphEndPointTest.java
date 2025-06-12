@@ -77,7 +77,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP request to /notebook/find endpoint results in a response with the expected file contents
+    // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint results in a response with the expected file contents
     public void httpFindTest() {
         Assertions.assertDoesNotThrow(() -> {
             // Assert that the file exists.
