@@ -53,6 +53,7 @@ import com.teragrep.nbs_01.endpoints.notebook.UpdateNotebookEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
+import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;
@@ -106,7 +107,7 @@ public class NotebookServer implements Callable {
 
             ParagraphServlet paragraphServlet = new ParagraphServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
-                    new PingEndpoint(), // Endpoint to call on a POST Request
+                    new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
                     new CreateParagraphEndpoint(root), // Endpoint to call on a PUT Request
                     new DeleteParagraphEndpoint(root) // Endpoint to call on a DELETE Request
             );
