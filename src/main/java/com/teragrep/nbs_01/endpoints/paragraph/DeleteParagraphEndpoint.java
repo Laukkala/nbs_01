@@ -49,8 +49,6 @@ import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -90,7 +88,7 @@ public class DeleteParagraphEndpoint implements EndPoint {
                 return new JsonResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
             }
             else {
-                throw new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!");
+                return new JsonResponse(HttpStatus.NOT_FOUND_404, "Paragraph " + paragraphId + " doesn't exist!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {

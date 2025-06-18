@@ -88,19 +88,18 @@ public class UpdateParagraphEndpoint implements EndPoint {
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 
-
             String paragraphId = parameters.getString("paragraphId");
             String scriptText = parameters.getString("text");
 
             Script newScript = new Script(scriptText);
             // Copy the paragraphs from the notebook into a new map
-            Map<String,Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
+            Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
 
             // Find the paragraph to be edited
             Paragraph originalParagraph = paragraphs.get(paragraphId);
-            String title = parameters.containsKey("title") ? parameters.getString("title"): originalParagraph.title();
-            Paragraph newParagraph = new Paragraph(originalParagraph.id(),title,newScript);
-            paragraphs.put(newParagraph.id(),newParagraph);
+            String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
+            Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
+            paragraphs.put(newParagraph.id(), newParagraph);
             Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
             return new JsonResponse(HttpStatus.OK_200, "Paragraph edited successfully");
