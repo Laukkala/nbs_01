@@ -247,8 +247,7 @@ public class AbstractNotebookServerTest {
             return new JsonResponse(status, message);
         }
         else {
-            // If the response is not as expected, throw an exception
-            throw new IOException("Response to DELETE request is not 204!");
+            return new JsonResponse(status, output.toString());
         }
     }
 }

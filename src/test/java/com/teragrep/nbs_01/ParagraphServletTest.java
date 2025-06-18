@@ -46,14 +46,15 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.nio.charset.Charset;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParagraphServletTest extends AbstractNotebookServerTest {
@@ -79,139 +80,262 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         stopServer();
     }
 
+    // Searching for a paragraph should result in a message with the contents of the specified paragraph within the specified Notebook
     @Test
-    // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.
-    public void httpCreateParagraphTest() {
-        Assertions.assertDoesNotThrow(() -> {
-
-            // Assert that the file we are creating a paragraph into exists.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook" + notebookName + "/paragraph/" + paragraphId, "{}"
-            );
-            // Assert that we receive the proper response.
-            Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-            Assertions.assertTrue(response.body().getString("message").contains("Created new paragraph "));
-            // Assert that the paragraph was created into the file.
-            Assertions
-                    .assertEquals(
-                            expectedFileContent, com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
-                    );
-        });
-    }
-
-    @Test
-    // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
-    public void httpCreateDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
-
-            String newNotebookName = "testFolderName/";
-            Path newNotebookPath = Paths.get(newNotebookName);
-
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/" + newNotebookName, "{\"title\":\"newTitle\"}"
-            );
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-        });
-    }
-
-    @Test
-    // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
-    public void httpCopyDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
-
-            String newNotebookName = "testCopyFolderName/";
-            Path newNotebookPath = Paths.get(newNotebookName);
-
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Response response = makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/" + newNotebookName,
-                    "{\"sourcePath\":\"/my_folder_2A94M5J1D/\",\"title\":\"copyDirectory\"}"
-            );
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-        });
-    }
-
-    @Test
-    // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a copied file being saved on disk.
-    public void httpCopyNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
-        });
-    }
-
-    @Test
-    // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
-    public void httpDeleteTest() {
-        Assertions.assertDoesNotThrow(() -> {
-        });
-    }
-
-    @Test
-    // Assert that a HTTP GET request to /notebook/{path/to/notebook}/paragraph/{paragraph_id} endpoint results in a response with the expected file contents
     public void httpFindParagraphTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            Path notebookPath = Paths
-                    .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
-            String expectedFileContent = "{\"id\":\"20150213-231621_168813393\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Welcome to Zeppelin.\\\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)\\\"\"}}";
-            // Assert that the file exists.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            Response response = makeHttpGETRequest(
-                    "http://" + serverAddress()
-                            + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln/paragraph/20150213-231621_168813393"
-            );
-            Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
-        });
+        String notebookId = "2A94M5J1Z";
+        String paragraphId = "20150210-015259_1403135953";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        String expectedparagraphContent = "{\"id\":\"" + paragraphId
+                + "\",\"title\":\"Load data into table\",\"script\":{\"text\":\"\\\"%test import org.apache.commons.io.IOUtils\\\\nimport java.net.URL\\\\nimport java.nio.charset.Charset\\\\n\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\n// So you don't need create them manually\\\\n\\\\n// load bank data\\\\nval bankText = sc.parallelize(\\\\n    IOUtils.toString(\\\\n        new URL(\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\"),\\\\n        Charset.forName(\\\\\\\"utf8\\\\\\\")).split(\\\\\\\"\\\\\\\\n\\\\\\\"))\\\\n\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\n\\\\nval bank = bankText.map(s => s.split(\\\\\\\";\\\\\\\")).filter(s => s(0) != \\\\\\\"\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\"\\\\\\\").map(\\\\n    s => Bank(s(0).toInt, \\\\n            s(1).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(2).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(3).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(5).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\").toInt\\\\n        )\\\\n).toDF()\\\\nbank.registerTempTable(\\\\\\\"bank\\\\\\\")\\\"\"}}";
+
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpGETRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId
+                        )
+                );
+        // Assert that a GET request is responded to with the response code 200 OK
+        Assertions.assertEquals(HttpStatus.OK_200, response.status());
+        // Assert that the body of the response matches with the paragraph's text saved on file
+        Assertions.assertEquals(expectedparagraphContent, response.body().getString("message"));
     }
 
-    // Assert that searching for a nonexistent paragraph results in a message saying that the paragraph was not found
+    // Searching for a nonexistent paragraph should result in an error
     @Test
     public void httpFindNonexistentParagraphTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            Path notebookPath = Paths
-                    .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
-            // Assert that the file exists, even if the paragraph doesn't
-            Assertions.assertTrue(Files.exists(notebookPath));
-            Response response = makeHttpGETRequest(
-                    "http://" + serverAddress()
-                            + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln/paragraph/nonexistent_id"
-            );
-            Assertions
-                    .assertTrue(response.body().getString("message").strip().toString().contains("Paragraph not found"));
-        });
+        String notebookId = "2A94M5J1Z";
+        String paragraphId = "I_DONT_EXIST";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpGETRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId
+                        )
+                );
+        // As the user made a request with bad data, the server should respond with a response code 400 BAD REQUEST
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Paragraph not found"));
     }
 
-    // Assert that searching for a paragraph from a notebook that doesn't exist results in a message saying that the notebook was not found
+    // Searching for a paragraph from a notebook that doesn't exist should result in an error.
     @Test
     public void httpFindParagraphFromNonexistentNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            Path notebookPath = Paths
-                    .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/nonexistent_paragraph.zpln");
-            // Assert that the file doesn't exist
-            Assertions.assertFalse(Files.exists(notebookPath));
-            Response response = makeHttpGETRequest(
-                    "http://" + serverAddress()
-                            + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/nonexistent_paragraph.zpln/paragraph/"
-                            + paragraphId
-            );
-            Assertions
-                    .assertTrue(response.body().getString("message").strip().toString().contains("Notebook not found"));
-        });
+        String notebookId = "I_DONT_EXIST";
+        String paragraphId = "20150210-015259_1403135953";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", notebookId + ".zpln")
+                .toString();
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpGETRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId
+                        )
+                );
+        // As the user made a request with bad data, the server should respond with a response code 400 BAD REQUEST
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Notebook not found"));
     }
 
+    // Creating a paragraph should result in an existing notebook being saved to disk containing an additional paragraph.
     @Test
-    // Assert that a HTTP POST request to /notebook/{path/to/notebook} endpoint results in an updated file containing the modifications contained in the request body.
+    public void httpCreateParagraphTest() {
+        String notebookId = "2A94M5J1Z";
+        String paragraphId = "1234_new_paragraph";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        String expectedFileContent = "{\"id\":\"2A94M5J1Z\",\"name\":\"my_note1\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-231621_168813393\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Welcome to Zeppelin.\\\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)\\\"\"}},{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"\\\"%test import org.apache.commons.io.IOUtils\\\\nimport java.net.URL\\\\nimport java.nio.charset.Charset\\\\n\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\n// So you don't need create them manually\\\\n\\\\n// load bank data\\\\nval bankText = sc.parallelize(\\\\n    IOUtils.toString(\\\\n        new URL(\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\"),\\\\n        Charset.forName(\\\\\\\"utf8\\\\\\\")).split(\\\\\\\"\\\\\\\\n\\\\\\\"))\\\\n\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\n\\\\nval bank = bankText.map(s => s.split(\\\\\\\";\\\\\\\")).filter(s => s(0) != \\\\\\\"\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\"\\\\\\\").map(\\\\n    s => Bank(s(0).toInt, \\\\n            s(1).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(2).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(3).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(5).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\").toInt\\\\n        )\\\\n).toDF()\\\\nbank.registerTempTable(\\\\\\\"bank\\\\\\\")\\\"\"}},{\"id\":\"20150210-015302_1492795503\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value\\\\nfrom bank \\\\nwhere age < 30 \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150212-145404_867439529\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere age < ${maxAge=30} \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230422_1600658137\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere marital=\\\\\\\"${marital=single,single|divorced|married}\\\\\\\" \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Congratulations, it's done.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n\\\\nAbout bank data\\\\n\\\\n```\\\\nCitation Request:\\\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\\\n  Please include this citation if you plan to use this database:\\\\n\\\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\\\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\\\n\\\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\\\n```\\\"\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}},{\"id\":\""
+                + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
+                                "{}"
+                        )
+                );
+        // A PUT request should be responded to with the response code 201 CREATED
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Assertions.assertEquals("Created new paragraph " + paragraphId, response.body().getString("message"));
+
+        // Assert that the new paragraph exists in the correct notebook's saved file
+        String fileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath)));
+        Assertions.assertEquals(expectedFileContent, fileContent);
+    }
+
+    // Trying to create a paragraph in a notebook that doesn't exist should result in an error.
+    @Test
+    public void httpCreateParagraphInNonexistentNotebookTest() {
+        String notebookId = "I_DONT_EXIST";
+        String paragraphId = "1234_new_paragraph";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
+                                "{}"
+                        )
+                );
+        // A PUT request should be responded to with the response code 201 CREATED
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals("Notebook doesn't exist!", response.body().getString("message"));
+    }
+
+    // Deleting a specific paragraph from a specific should result in the notebook being saved to disk without the specified paragraph.
+    @Test
+    public void httpDeleteParagraphTest() {
+        String notebookId = "2A94M5J1Z";
+        String paragraphId = "20150213-231621_168813393";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        String expectedFileContent = "{\"id\":\"2A94M5J1Z\",\"name\":\"my_note1\",\"config\":{},\"paragraphs\":[{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"\\\"%test import org.apache.commons.io.IOUtils\\\\nimport java.net.URL\\\\nimport java.nio.charset.Charset\\\\n\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\n// So you don't need create them manually\\\\n\\\\n// load bank data\\\\nval bankText = sc.parallelize(\\\\n    IOUtils.toString(\\\\n        new URL(\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\"),\\\\n        Charset.forName(\\\\\\\"utf8\\\\\\\")).split(\\\\\\\"\\\\\\\\n\\\\\\\"))\\\\n\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\n\\\\nval bank = bankText.map(s => s.split(\\\\\\\";\\\\\\\")).filter(s => s(0) != \\\\\\\"\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\"\\\\\\\").map(\\\\n    s => Bank(s(0).toInt, \\\\n            s(1).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(2).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(3).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(5).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\").toInt\\\\n        )\\\\n).toDF()\\\\nbank.registerTempTable(\\\\\\\"bank\\\\\\\")\\\"\"}},{\"id\":\"20150210-015302_1492795503\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value\\\\nfrom bank \\\\nwhere age < 30 \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150212-145404_867439529\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere age < ${maxAge=30} \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230422_1600658137\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere marital=\\\\\\\"${marital=single,single|divorced|married}\\\\\\\" \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Congratulations, it's done.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n\\\\nAbout bank data\\\\n\\\\n```\\\\nCitation Request:\\\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\\\n  Please include this citation if you plan to use this database:\\\\n\\\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\\\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\\\n\\\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\\\n```\\\"\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+        // Make an HTTP DELETE request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
+                                "{}"
+                        )
+                );
+        // A DELETE Request should be responded to with the response code 204 NO CONTENT
+        Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
+
+        // Assert that the deleted paragraph no longer exists in the correct notebook's saved file
+        String fileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath)));
+        Assertions.assertEquals(expectedFileContent, fileContent);
+    }
+
+    // Deleting a nonexistent paragraph should result in an error.
+    @Test
+    public void httpDeleteNonexistentParagraphTest() {
+        String notebookId = "2A94M5J1Z";
+        String paragraphId = "I_DONT_EXIST";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        // Make an HTTP DELETE request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
+                                "{}"
+                        )
+                );
+        // As the user is requesting a resource that does not exist, the server should respond with a response code 404 NOT FOUND
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+    }
+
+    // Deleting a paragraph from a nonexistent notebook should result in an error.
+    @Test
+    public void httpDeleteParagraphFromNonexistentNotebookTest() {
+        String notebookId = "I_DONT_EXIST";
+        String paragraphId = "20150213-231621_168813393";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        // Make an HTTP DELETE request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
+                                "{}"
+                        )
+                );
+        // As the user is requesting a resource that does not exist, the server should respond with a response code 404 NOT FOUND
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+
+    }
+
+    // Updating a specific paragraph in a specific notebook should result in the notebook being saved to disk with the updated content
+    @Test
     public void httpUpdateParagraphTest() {
-        Assertions.assertDoesNotThrow(() -> {
-        });
+        String notebookId = "2A94M5J1Z";
+        String paragraphId = "20150213-231621_168813393";
+        String editedText = "Hello, I am testing stuff";
+        String expectedFileContent = "{\"id\":\"2A94M5J1Z\",\"name\":\"\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230422_1600658137\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere marital=\\\\\\\"${marital=single,single|divorced|married}\\\\\\\" \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Congratulations, it's done.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n\\\\nAbout bank data\\\\n\\\\n```\\\\nCitation Request:\\\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\\\n  Please include this citation if you plan to use this database:\\\\n\\\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\\\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\\\n\\\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\\\n```\\\"\"}},{\"id\":\"20150210-015302_1492795503\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value\\\\nfrom bank \\\\nwhere age < 30 \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"\\\"%test import org.apache.commons.io.IOUtils\\\\nimport java.net.URL\\\\nimport java.nio.charset.Charset\\\\n\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\n// So you don't need create them manually\\\\n\\\\n// load bank data\\\\nval bankText = sc.parallelize(\\\\n    IOUtils.toString(\\\\n        new URL(\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\"),\\\\n        Charset.forName(\\\\\\\"utf8\\\\\\\")).split(\\\\\\\"\\\\\\\\n\\\\\\\"))\\\\n\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\n\\\\nval bank = bankText.map(s => s.split(\\\\\\\";\\\\\\\")).filter(s => s(0) != \\\\\\\"\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\"\\\\\\\").map(\\\\n    s => Bank(s(0).toInt, \\\\n            s(1).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(2).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(3).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(5).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\").toInt\\\\n        )\\\\n).toDF()\\\\nbank.registerTempTable(\\\\\\\"bank\\\\\\\")\\\"\"}},{\"id\":\""
+                + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"" + editedText
+                + "\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}},{\"id\":\"20150212-145404_867439529\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere age < ${maxAge=30} \\\\ngroup by age \\\\norder by age\\\"\"}}]}";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPOSTRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
+                                "{\"text\":\"" + editedText + "\"}"
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.OK_200, response.status());
+
+        // Assert that the modified paragraph exists in the correct notebook's saved file
+        String fileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath)));
+        Assertions.assertEquals(expectedFileContent, fileContent);
+    }
+
+    // Copying is not an atomic operation. You must first create a new paragraph, then update it with the output of the source paragraph.
+    @Test
+    public void httpCopyParagraphTest() {
+        String notebookId = "2A94M5J1Z";
+        String sourceParagraphId = "20150213-231621_168813393";
+        String copyParagraphId = "copyParagraphId";
+        String notebookPath = Paths
+                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
+                .toString();
+
+        // Make an HTTP GET request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response getResponse = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpGETRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                        + sourceParagraphId
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.OK_200, getResponse.status());
+        JsonObject paragraph = Json
+                .createReader(new StringReader(getResponse.body().getString("message")))
+                .readObject();
+        String text = paragraph.getJsonObject("script").getString("text");
+
+        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response putResponse = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                        + copyParagraphId,
+                                "{}"
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.CREATED_201, putResponse.status());
+
+        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        Response postResponse = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPOSTRequest(
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                        + copyParagraphId,
+                                "{\"text\":" + text + "}"
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.OK_200, postResponse.status());
+
+        // Assert that the copied paragraph exists in the correct notebook's saved file
+        String expectedFileContent = "{\"id\":\"2A94M5J1Z\",\"name\":\"\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230422_1600658137\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test \\\\\\\\nselect age, count(1) value \\\\\\\\nfrom bank \\\\\\\\nwhere marital=\\\\\\\\\\\\\\\"${marital=single,single|divorced|married}\\\\\\\\\\\\\\\" \\\\\\\\ngroup by age \\\\\\\\norder by age\\\\\\\"\\\"}\"}},{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test\\\\\\\\n## Congratulations, it's done.\\\\\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\\\\\"\\\"}\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test\\\\\\\\n\\\\\\\\nAbout bank data\\\\\\\\n\\\\\\\\n```\\\\\\\\nCitation Request:\\\\\\\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\\\\\\\n  Please include this citation if you plan to use this database:\\\\\\\\n\\\\\\\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\\\\\\\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\\\\\\\n\\\\\\\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\\\\\\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\\\\\\\n```\\\\\\\"\\\"}\"}},{\"id\":\"20150210-015302_1492795503\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test \\\\\\\\nselect age, count(1) value\\\\\\\\nfrom bank \\\\\\\\nwhere age < 30 \\\\\\\\ngroup by age \\\\\\\\norder by age\\\\\\\"\\\"}\"}},{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test import org.apache.commons.io.IOUtils\\\\\\\\nimport java.net.URL\\\\\\\\nimport java.nio.charset.Charset\\\\\\\\n\\\\\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\\\\\n// So you don't need create them manually\\\\\\\\n\\\\\\\\n// load bank data\\\\\\\\nval bankText = sc.parallelize(\\\\\\\\n    IOUtils.toString(\\\\\\\\n        new URL(\\\\\\\\\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\\\\\\\\\"),\\\\\\\\n        Charset.forName(\\\\\\\\\\\\\\\"utf8\\\\\\\\\\\\\\\")).split(\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"))\\\\\\\\n\\\\\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\\\\\n\\\\\\\\nval bank = bankText.map(s => s.split(\\\\\\\\\\\\\\\";\\\\\\\\\\\\\\\")).filter(s => s(0) != \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\").map(\\\\\\\\n    s => Bank(s(0).toInt, \\\\\\\\n            s(1).replaceAll(\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\"),\\\\\\\\n            s(2).replaceAll(\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\"),\\\\\\\\n            s(3).replaceAll(\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\"),\\\\\\\\n            s(5).replaceAll(\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\").toInt\\\\\\\\n        )\\\\\\\\n).toDF()\\\\\\\\nbank.registerTempTable(\\\\\\\\\\\\\\\"bank\\\\\\\\\\\\\\\")\\\\\\\"\\\"}\"}},{\"id\":\"20150213-231621_168813393\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test\\\\\\\\n## Welcome to Zeppelin.\\\\\\\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)\\\\\\\"\\\"}\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\"}\"}},{\"id\":\"20150212-145404_867439529\",\"title\":\"\",\"script\":{\"text\":\"{\\\"text\\\":\\\"\\\\\\\"%test \\\\\\\\nselect age, count(1) value \\\\\\\\nfrom bank \\\\\\\\nwhere age < ${maxAge=30} \\\\\\\\ngroup by age \\\\\\\\norder by age\\\\\\\"\\\"}\"}},{\"id\":\"copyParagraphId\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Welcome to Zeppelin.\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)\"}}]}";
+        String fileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath)));
+        Assertions.assertEquals(expectedFileContent, fileContent);
     }
 
 }
