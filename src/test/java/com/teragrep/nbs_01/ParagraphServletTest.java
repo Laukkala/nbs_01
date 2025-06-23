@@ -59,12 +59,27 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParagraphServletTest extends AbstractNotebookServerTest {
 
-    private final String notebookName = "/my_note3_2A94M5J3Z.zpln";
-    private final String paragraphId = "testParagraphId";
-    private final Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
-    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\""
-            + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+    private final String notebookName = "/my_note4_2A94M5J4Z.zpln";
+    private final String firstParagraphId = "20150213-231621_168813393";
+    private final String firstParagraphText = "%test\\n## Welcome to Zeppelin.\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)";
+    private final String firstParagraphTitle = "";
 
+    private final String secondParagraphId = "20150210-015259_1403135953";
+    private final String secondParagraphText = "%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don\\u0027t need create them manually\\n\\n// load bank data\\nval bankText \\u003d sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank \\u003d bankText.map(s \\u003d\\u003e s.split(\\\";\\\")).filter(s \\u003d\\u003e s(0) !\\u003d \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s \\u003d\\u003e Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")";
+    private final String secondParagraphTitle = "Load data into table\\";
+
+    private final String thirdParagraphId = "20150210-015302_1492795503";
+    private final String thirdParagraphText = "%test \\nselect age, count(1) value\\nfrom bank \\nwhere age \\u003c 30 \\ngroup by age \\norder by age";
+
+    private final String fourthParagraphId = "20150213-230422_1600658137";
+    private final String fourthParagraphText = "%test \nselect age, count(1) value \nfrom bank \nwhere marital\u003d\"${marital\u003dsingle,single|divorced|married}\" \ngroup by age \norder by age";
+
+    private final String fifthParagraphId = "20150213-230428_1231780373";
+    private final String fifthParagraphText = "%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!";
+
+    private final String sixthParagraphId = "20150326-214658_12335843";
+    private final String sixthParagraphText = "%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```";
+    private final Path notebookPath = Paths.get(notebookName);
     public ParagraphServletTest() {
     }
 
@@ -83,18 +98,13 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Searching for a paragraph should result in a message with the contents of the specified paragraph within the specified Notebook
     @Test
     public void httpFindParagraphTest() {
-        String notebookId = "2A94M5J1Z";
-        String paragraphId = "20150210-015259_1403135953";
-        String notebookPath = Paths
-                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
-                .toString();
-        String expectedparagraphContent = "{\"id\":\"" + paragraphId
-                + "\",\"title\":\"Load data into table\",\"script\":{\"text\":\"\\\"%test import org.apache.commons.io.IOUtils\\\\nimport java.net.URL\\\\nimport java.nio.charset.Charset\\\\n\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\n// So you don't need create them manually\\\\n\\\\n// load bank data\\\\nval bankText = sc.parallelize(\\\\n    IOUtils.toString(\\\\n        new URL(\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\"),\\\\n        Charset.forName(\\\\\\\"utf8\\\\\\\")).split(\\\\\\\"\\\\\\\\n\\\\\\\"))\\\\n\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\n\\\\nval bank = bankText.map(s => s.split(\\\\\\\";\\\\\\\")).filter(s => s(0) != \\\\\\\"\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\"\\\\\\\").map(\\\\n    s => Bank(s(0).toInt, \\\\n            s(1).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(2).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(3).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(5).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\").toInt\\\\n        )\\\\n).toDF()\\\\nbank.registerTempTable(\\\\\\\"bank\\\\\\\")\\\"\"}}";
+        String expectedparagraphContent = "{\"id\":\"" + firstParagraphId
+                + "\",\"title\":\""+firstParagraphTitle+"\",\"script\":{\"text\":\""+firstParagraphText+"\"}}";
 
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId
+                                "http://" + serverAddress() + "/notebook" + notebookPath + "/paragraph/" + firstParagraphId
                         )
                 );
         // Assert that a GET request is responded to with the response code 200 OK
