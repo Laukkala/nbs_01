@@ -177,22 +177,25 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Trying to create a paragraph in a notebook that doesn't exist should result in an error.
     @Test
     public void httpCreateParagraphInNonexistentNotebookTest() {
-        String notebookId = "I_DONT_EXIST";
-        String paragraphId = "1234_new_paragraph";
-        String notebookPath = Paths
-                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
-                .toString();
-        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        String newParagraphId = "2025-01-01-021311-132-133";
+        String nonexistentNotebookId = "I_DONT_EXIST";
+        String requestBody = Json.createObjectBuilder().build().toString();
+        String expectedResponseMessage = "Notebook doesn't exist!";
+
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
-                                "{}"
+                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/" + newParagraphId,requestBody
                         )
                 );
-        // A PUT request should be responded to with the response code 201 CREATED
+        // Assert that a PUT request is responded to with the response code 201 CREATED
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals("Notebook doesn't exist!", response.body().getString("message"));
+        // Assert that the body of the response contains a message mentioning the creation of the paragraph
+        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+
+        // Assert that the created paragraph id is not contained within the saved file of the notebook
+        String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
+        Assertions.assertFalse(fileContents.contains(newParagraphId));
     }
 
     // Deleting a specific paragraph from a specific should result in the notebook being saved to disk without the specified paragraph.
