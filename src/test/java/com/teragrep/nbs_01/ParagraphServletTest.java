@@ -243,22 +243,23 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Deleting a paragraph from a nonexistent notebook should result in an error.
     @Test
     public void httpDeleteParagraphFromNonexistentNotebookTest() {
-        String notebookId = "I_DONT_EXIST";
-        String paragraphId = "20150213-231621_168813393";
-        String notebookPath = Paths
-                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
-                .toString();
-        // Make an HTTP DELETE request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        String nonexistentNotebookId = "I_DONT_EXIST";
+        String requestBody = Json.createObjectBuilder().build().toString();
+        String expectedResponseMessage = "Notebook doesn't exist!";
+
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
-                                "{}"
+                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/" + firstParagraphId, requestBody
                         )
                 );
-        // As the user is requesting a resource that does not exist, the server should respond with a response code 404 NOT FOUND
+        // Assert that a faulty DELETE request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
 
+        // Assert that the created paragraph is not contained within the saved file of the notebook
+        String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
+        Assertions.assertTrue(fileContents.contains(firstParagraphId));
     }
 
     // Updating a specific paragraph in a specific notebook should result in the notebook being saved to disk with the updated content
