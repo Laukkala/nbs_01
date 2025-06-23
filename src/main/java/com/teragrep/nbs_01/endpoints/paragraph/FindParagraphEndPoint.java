@@ -100,7 +100,10 @@ public class FindParagraphEndPoint implements EndPoint {
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Malformed request:\n" + new MalformedRequestException(fileNotFoundException));
+            return new JsonResponse(
+                    HttpStatus.NOT_FOUND_404,
+                    "Malformed request:\n" + new MalformedRequestException(fileNotFoundException)
+            );
         }
         catch (IOException ioException) {
             return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred" + ioException);

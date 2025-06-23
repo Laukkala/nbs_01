@@ -153,7 +153,7 @@ public final class UnloadedNotebook implements ZeppelinFile {
 
     @Override
     public Notebook load() throws IOException {
-        try{
+        try {
             String content = readFile().toString();
             StringReader stringReader = new StringReader(content);
             JsonReader jsonReader = Json.createReader(stringReader);
@@ -171,8 +171,9 @@ public final class UnloadedNotebook implements ZeppelinFile {
                 savedParagraphs.put(paragraph.id(), paragraph);
             }
             return new Notebook(savedName, savedId, path(), savedParagraphs);
-        } catch (JsonParsingException jsonParsingException){
-            throw new IOException("File "+path.toString()+" is not valid JSON!");
+        }
+        catch (JsonParsingException jsonParsingException) {
+            throw new IOException("File " + path.toString() + " is not valid JSON!");
         }
     }
 

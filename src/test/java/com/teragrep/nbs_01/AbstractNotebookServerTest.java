@@ -248,14 +248,15 @@ public class AbstractNotebookServerTest {
         }
         else {
             InputStreamReader connectionInputStreamReader;
-            if(connection.getErrorStream() != null){
+            if (connection.getErrorStream() != null) {
                 connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
             }
             else {
-                try{
+                try {
                     connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
-                } catch (IOException ioException){
-                    throw new IOException("Error while reading input from connection",ioException);
+                }
+                catch (IOException ioException) {
+                    throw new IOException("Error while reading input from connection", ioException);
                 }
             }
             BufferedReader reader = new BufferedReader(connectionInputStreamReader);

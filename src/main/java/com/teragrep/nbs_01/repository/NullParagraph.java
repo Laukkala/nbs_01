@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.repository;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public final class NullParagraph {
 
