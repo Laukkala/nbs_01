@@ -49,6 +49,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,23 +153,27 @@ public final class UnloadedNotebook implements ZeppelinFile {
 
     @Override
     public Notebook load() throws IOException {
-        String content = readFile().toString();
-        StringReader stringReader = new StringReader(content);
-        JsonReader jsonReader = Json.createReader(stringReader);
-        JsonObject object = jsonReader.readObject();
-        jsonReader.close();
-        stringReader.close();
+        try{
+            String content = readFile().toString();
+            StringReader stringReader = new StringReader(content);
+            JsonReader jsonReader = Json.createReader(stringReader);
+            JsonObject object = jsonReader.readObject();
+            jsonReader.close();
+            stringReader.close();
 
-        String savedName = object.getString("name");
-        String savedId = object.getString("id");
-        JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
-        Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
-        for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
-            NullParagraph nullParagraph = new NullParagraph();
-            Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
-            savedParagraphs.put(paragraph.id(), paragraph);
+            String savedName = object.getString("name");
+            String savedId = object.getString("id");
+            JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
+            Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
+            for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
+                NullParagraph nullParagraph = new NullParagraph();
+                Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
+                savedParagraphs.put(paragraph.id(), paragraph);
+            }
+            return new Notebook(savedName, savedId, path(), savedParagraphs);
+        } catch (JsonParsingException jsonParsingException){
+            throw new IOException("File "+path.toString()+" is not valid JSON!");
         }
-        return new Notebook(savedName, savedId, path(), savedParagraphs);
     }
 
     @Override
