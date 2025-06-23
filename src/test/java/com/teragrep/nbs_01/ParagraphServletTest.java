@@ -319,11 +319,19 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a GET request is responded to with the response code 201 CREATED
         Assertions.assertEquals(HttpStatus.CREATED_201, putResponse.status());
 
-        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to edit the copy with the same information as the source paragraph.
+        // Read the received paragraph into a JSON object.
+        JsonObject sourceParagraph = Json.createReader(new StringReader(getResponse.body().getString("message"))).readObject();
         String newParagraphTitle = sourceParagraph.getString("title");
         String newParagraphText = sourceParagraph.getJsonObject("script").getString("text");
         String postRequestBody = Json.createObjectBuilder().add("title",newParagraphTitle).add("text",newParagraphText).build().toString();
         String expectedParagraphContent = Json.createObjectBuilder().add("id",newParagraphId)
+                .add("title",newParagraphTitle)
+                .add("script",Json.createObjectBuilder()
+                        .add("text",newParagraphText))
+                .build().toString();
+
+        String originalParagraphContent = Json.createObjectBuilder().add("id",firstParagraphId)
                 .add("title",newParagraphTitle)
                 .add("script",Json.createObjectBuilder()
                         .add("text",newParagraphText))
@@ -341,7 +349,9 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the created paragraph is contained within the saved file of the notebook
         String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
         Assertions.assertTrue(fileContents.contains(expectedParagraphContent));
-        System.out.println(fileContents);
+
+        // Assert that the original paragraph is also contained within the saved file of the notebook
+        Assertions.assertTrue(fileContents.contains(originalParagraphContent));
     }
 
 }
