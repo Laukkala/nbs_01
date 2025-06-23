@@ -118,15 +118,15 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpFindNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
         String expectedResponseMessage = "Malformed request:\n" +
-                "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found";
+                "com.teragrep.nbs_01.exceptions.MalformedRequestException: java.io.FileNotFoundException: Paragraph not found!";
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + nonexistentParagraphId
                         )
                 );
-        // Assert that a GET request is responded to with the response code 400 BAD REQUEST
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the body of the response contains a message mentioning that the paragraph was not found
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
     }
@@ -143,9 +143,9 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/" + firstParagraphId
                         )
                 );
-        // Assert that a GET request is responded to with the response code 400 BAD REQUEST
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        // Assert that the body of the response contains a message mentioning that the paragraph was not found
+        // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Assert that the body of the response contains a message mentioning that the notebook was not found
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
     }
 
