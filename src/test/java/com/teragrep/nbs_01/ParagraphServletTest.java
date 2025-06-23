@@ -164,7 +164,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + newParagraphId,requestBody
                         )
                 );
-        // Assert that a GET request is responded to with the response code 201 CREATED
+        // Assert that a PUT request is responded to with the response code 201 CREATED
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         // Assert that the body of the response contains a message mentioning the creation of the paragraph
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
@@ -188,12 +188,12 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/" + newParagraphId,requestBody
                         )
                 );
-        // Assert that a PUT request is responded to with the response code 201 CREATED
+        // Assert that a faulty PUT request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        // Assert that the body of the response contains a message mentioning the creation of the paragraph
+        // Assert that the body of the response contains a message mentioning that the notebook doesn't exist
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
 
-        // Assert that the created paragraph id is not contained within the saved file of the notebook
+        // Assert that the paragraph id is not contained within the saved file of the notebook
         String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
         Assertions.assertFalse(fileContents.contains(newParagraphId));
     }
@@ -212,7 +212,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a DELETE request is responded to with the response code 204 NO CONTENT
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
 
-        // Assert that the created paragraph is not contained within the saved file of the notebook
+        // Assert that the created paragraph is not contained within the saved file of the notebook after deletion
         String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
         Assertions.assertFalse(fileContents.contains(firstParagraphId));
         Assertions.assertFalse(fileContents.contains(firstParagraphText));
@@ -280,12 +280,12 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + firstParagraphId,requestBody
                         )
                 );
-        // Assert that a GET request is responded to with the response code 201 CREATED
+        // Assert that a POST request is responded to with the response code 200 OK
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        // Assert that the body of the response contains a message mentioning the creation of the paragraph
+        // Assert that the body of the response contains a message mentioning the editing of the paragraph
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
 
-        // Assert that the created paragraph is contained within the saved file of the notebook
+        // Assert that the edited paragraph is contained within the saved file of the notebook
         String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
         Assertions.assertTrue(fileContents.contains(expectedParagraphContent));
     }
@@ -303,12 +303,11 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + firstParagraphId
                         )
                 );
-        // Assert that a GET request is responded to with the response code 200 OK
+        // Assert that the GET request is responded to with the response code 200 OK
         Assertions.assertEquals(HttpStatus.OK_200, getResponse.status());
 
-        JsonObject sourceParagraph = Json.createReader(new StringReader(getResponse.body().getString("message"))).readObject();
 
-        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to create the copy.
         String putRequestBody = Json.createObjectBuilder().build().toString();
         Response putResponse = Assertions
                 .assertDoesNotThrow(
@@ -316,7 +315,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + newParagraphId,putRequestBody
                         )
                 );
-        // Assert that a GET request is responded to with the response code 201 CREATED
+        // Assert that the PUT request is responded to with the response code 201 CREATED
         Assertions.assertEquals(HttpStatus.CREATED_201, putResponse.status());
 
         // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to edit the copy with the same information as the source paragraph.
@@ -343,10 +342,10 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + newParagraphId,postRequestBody
                         )
                 );
-        // Assert that a GET request is responded to with the response code 201 CREATED
+        // Assert that the POST request is responded to with the response code 200 OK
         Assertions.assertEquals(HttpStatus.OK_200, postResponse.status());
 
-        // Assert that the created paragraph is contained within the saved file of the notebook
+        // Assert that the copied paragraph is contained within the saved file of the notebook
         String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
         Assertions.assertTrue(fileContents.contains(expectedParagraphContent));
 
