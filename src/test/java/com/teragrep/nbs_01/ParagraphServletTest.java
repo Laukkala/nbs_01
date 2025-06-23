@@ -212,7 +212,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a DELETE request is responded to with the response code 204 NO CONTENT
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
 
-        // Assert that the created paragraph is contained within the saved file of the notebook
+        // Assert that the created paragraph is not contained within the saved file of the notebook
         String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
         Assertions.assertFalse(fileContents.contains(firstParagraphId));
         Assertions.assertFalse(fileContents.contains(firstParagraphText));
@@ -221,21 +221,23 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Deleting a nonexistent paragraph should result in an error.
     @Test
     public void httpDeleteNonexistentParagraphTest() {
-        String notebookId = "2A94M5J1Z";
-        String paragraphId = "I_DONT_EXIST";
-        String notebookPath = Paths
-                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
-                .toString();
-        // Make an HTTP DELETE request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
+        String nonexistentParagraphId = "I_DONT_EXIST";
+        String requestBody = Json.createObjectBuilder().build().toString();
+        String expectedResponseMessage = "Paragraph "+nonexistentParagraphId+" doesn't exist!";
+
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId,
-                                "{}"
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + nonexistentParagraphId, requestBody
                         )
                 );
-        // As the user is requesting a resource that does not exist, the server should respond with a response code 404 NOT FOUND
+        // Assert that a faulty DELETE request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+
+        // Assert that the created paragraph is not contained within the saved file of the notebook
+        String fileContents = Assertions.assertDoesNotThrow(()->Files.readString(Paths.get(notebookDirectory().toString(),notebookPath.toString())));
+        Assertions.assertFalse(fileContents.contains(nonexistentParagraphId));
     }
 
     // Deleting a paragraph from a nonexistent notebook should result in an error.

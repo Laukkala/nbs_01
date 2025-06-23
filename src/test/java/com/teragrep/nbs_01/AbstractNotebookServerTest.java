@@ -247,7 +247,24 @@ public class AbstractNotebookServerTest {
             return new JsonResponse(status, message);
         }
         else {
-            return new JsonResponse(status, output.toString());
+            InputStreamReader connectionInputStreamReader;
+            if(connection.getErrorStream() != null){
+                connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+            }
+            else {
+                try{
+                    connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+                } catch (IOException ioException){
+                    throw new IOException("Error while reading input from connection",ioException);
+                }
+            }
+            BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                messages.append(line + "\n");
+            }
+            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            return new JsonResponse(status, message);
         }
     }
 }
