@@ -73,7 +73,7 @@ public final class NullParagraph {
                 jsonScript = this.script.load("");
             }
             else {
-                jsonScript = this.script.load(json.getString("script"));
+                jsonScript = this.script.load(json.getJsonObject("script").getString("text"));
             }
         }
         //Script script = json.containsKey("script") ? this.script.load(json.getJsonObject("script")) : this.script.load(json.containsKey("text") ? json.getJsonObject("text").asJsonObject() : JsonObject.EMPTY_JSON_OBJECT);
