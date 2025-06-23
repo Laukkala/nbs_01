@@ -69,11 +69,7 @@ public final class NullScript {
         throw new UnsupportedOperationException("Cannot abort a NullScript!");
     }
 
-    public Script load(JsonValue json) {
-        if (json.equals(JsonValue.EMPTY_JSON_OBJECT)) {
-            return new Script("");
-        }
-        String text = json.toString();
+    public Script load(String text) {
         return new Script(text);
     }
 }

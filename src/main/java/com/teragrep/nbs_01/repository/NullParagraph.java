@@ -66,14 +66,14 @@ public final class NullParagraph {
         boolean isLegacy = json.containsKey("text");
         Script jsonScript;
         if (isLegacy) {
-            jsonScript = this.script.load(json.get("text"));
+            jsonScript = this.script.load(json.getString("text"));
         }
         else {
             if (!json.containsKey("script")) {
-                jsonScript = this.script.load(JsonValue.EMPTY_JSON_OBJECT);
+                jsonScript = this.script.load("");
             }
             else {
-                jsonScript = this.script.load(json.get("script"));
+                jsonScript = this.script.load(json.getString("script"));
             }
         }
         //Script script = json.containsKey("script") ? this.script.load(json.getJsonObject("script")) : this.script.load(json.containsKey("text") ? json.getJsonObject("text").asJsonObject() : JsonObject.EMPTY_JSON_OBJECT);
