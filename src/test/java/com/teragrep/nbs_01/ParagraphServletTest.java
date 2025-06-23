@@ -59,7 +59,7 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParagraphServletTest extends AbstractNotebookServerTest {
 
-    private final String notebookName = "/my_note4_2A94M5J4Z.zpln";
+    private final String notebookName = "my_note4_2A94M5J4Z.zpln";
     private final String firstParagraphId = "20150213-231621_168813393";
     private final String firstParagraphText = "%test\\n## Welcome to Zeppelin.\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)";
     private final String firstParagraphTitle = "";
@@ -104,7 +104,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook" + notebookPath + "/paragraph/" + firstParagraphId
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + firstParagraphId
                         )
                 );
         // Assert that a GET request is responded to with the response code 200 OK
@@ -116,39 +116,37 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Searching for a nonexistent paragraph should result in an error
     @Test
     public void httpFindNonexistentParagraphTest() {
-        String notebookId = "2A94M5J1Z";
-        String paragraphId = "I_DONT_EXIST";
-        String notebookPath = Paths
-                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_" + notebookId + ".zpln")
-                .toString();
+        String nonexistentParagraphId = "I_DONT_EXIST";
+        String expectedResponseMessage = "Malformed request:\n" +
+                "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found";
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId
+                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + nonexistentParagraphId
                         )
                 );
-        // As the user made a request with bad data, the server should respond with a response code 400 BAD REQUEST
+        // Assert that a GET request is responded to with the response code 400 BAD REQUEST
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Paragraph not found"));
+        // Assert that the body of the response contains a message mentioning that the paragraph was not found
+        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
     }
 
     // Searching for a paragraph from a notebook that doesn't exist should result in an error.
     @Test
     public void httpFindParagraphFromNonexistentNotebookTest() {
-        String notebookId = "I_DONT_EXIST";
-        String paragraphId = "20150210-015259_1403135953";
-        String notebookPath = Paths
-                .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", notebookId + ".zpln")
-                .toString();
+        String nonexistentNotebookId = "I_DONT_EXIST";
+        String expectedResponseMessage = "Malformed request:\n" +
+                "com.teragrep.nbs_01.exceptions.MalformedRequestException: java.io.FileNotFoundException: Notebook or directory with path target/notebooks/"+nonexistentNotebookId+" not found!";
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/" + paragraphId
+                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/" + firstParagraphId
                         )
                 );
-        // As the user made a request with bad data, the server should respond with a response code 400 BAD REQUEST
+        // Assert that a GET request is responded to with the response code 400 BAD REQUEST
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertTrue(response.body().getString("message").strip().toString().contains("Notebook not found"));
+        // Assert that the body of the response contains a message mentioning that the paragraph was not found
+        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
     }
 
     // Creating a paragraph should result in an existing notebook being saved to disk containing an additional paragraph.
