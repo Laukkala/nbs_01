@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
@@ -239,33 +240,41 @@ public class AbstractNotebookServerTest {
         OutputStream output = connection.getOutputStream();
         output.write(bytes);
         output.close();
-        int status = connection.getResponseCode();
-        if (status == 204) {
-            // Successful responses to DELETE requests should have no content.
-            JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
-            connection.disconnect();
-            return new JsonResponse(status, message);
-        }
-        else {
-            InputStreamReader connectionInputStreamReader;
-            if (connection.getErrorStream() != null) {
-                connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+        int status;
+        try {
+            status = connection.getResponseCode();
+            if (status == 204) {
+                // Successful responses to DELETE requests should have no content.
+                JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
+                connection.disconnect();
+                return new JsonResponse(status, message);
             }
             else {
-                try {
-                    connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+                InputStreamReader connectionInputStreamReader;
+                if (connection.getErrorStream() != null) {
+                    connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
                 }
-                catch (IOException ioException) {
-                    throw new IOException("Error while reading input from connection", ioException);
+                else {
+                    try {
+                        connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+                    }
+                    catch (IOException ioException) {
+                        throw new IOException("Error while reading input from connection", ioException);
+                    }
                 }
+                BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    messages.append(line + "\n");
+                }
+                JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+                return new JsonResponse(status, message);
             }
-            BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                messages.append(line + "\n");
-            }
-            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-            return new JsonResponse(status, message);
+
+        }
+        catch (IOException e) {
+            System.out.println(e);
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, e.toString());
         }
     }
 }
