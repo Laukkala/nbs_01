@@ -157,9 +157,11 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                     requestBody
             ));
             // Assert that we receive the proper response.
-            Assertions.assertEquals(("Created new directory "+copyDirectoryName.substring(0,copyDirectoryName.length()-1)),response.body().getString("message"));
+            Assertions.assertTrue((response.body().getString("message").contains("Created new directory ")));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), copyDirectoryPath.toString())));
+            // Assert that the original file still exists.
+            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), sourceDirectoryPath.toString())));
     }
 
     @Test

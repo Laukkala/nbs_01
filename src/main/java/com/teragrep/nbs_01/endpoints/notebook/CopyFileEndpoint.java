@@ -65,36 +65,44 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
-public class CreateFileEndpoint implements EndPoint {
+public class CopyFileEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public CreateFileEndpoint(Directory root) {
+    public CopyFileEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
+                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
             }
             String pathString = parameters.getString("path");
-            String title = parameters.containsKey("title") ? parameters.getString("title") : "";
+            String sourcePath = parameters.getString("sourcePath");
+
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
 
+            ZeppelinFile newFile;
+            JsonResponse response;
             if (pathString.endsWith("/")) {
-                // File is a directory
-                Directory newFile = createDirectory(path);
-                newFile.save();
-                return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
+                    newFile = copyDirectory(
+                            updatedDirectory,
+                            Paths.get(updatedDirectory.path().toString() + sourcePath), path
+                    );
+                response = new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
             }
             else {
-                Notebook newFile = createNotebook(title, path);
-                newFile.save();
-                return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
+                    newFile = copyNotebook(
+                            updatedDirectory,
+                            Paths.get(updatedDirectory.path().toString() + sourcePath), path
+                    );
+                response = new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
             }
+            newFile.save();
+            return response;
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");

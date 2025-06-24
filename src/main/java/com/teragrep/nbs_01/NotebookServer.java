@@ -46,10 +46,7 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
-import com.teragrep.nbs_01.endpoints.notebook.CreateFileEndpoint;
-import com.teragrep.nbs_01.endpoints.notebook.DeleteFileEndpoint;
-import com.teragrep.nbs_01.endpoints.notebook.FindEndPoint;
-import com.teragrep.nbs_01.endpoints.notebook.UpdateNotebookEndpoint;
+import com.teragrep.nbs_01.endpoints.notebook.*;
 import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
@@ -97,7 +94,7 @@ public class NotebookServer implements Callable {
             NotebookServlet notebookServlet = new NotebookServlet(
                     new FindEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
-                    new CreateFileEndpoint(root), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyFileEndpoint(root),new CreateFileEndpoint(root),new DoesKeyExistDelegate("sourceId")), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
