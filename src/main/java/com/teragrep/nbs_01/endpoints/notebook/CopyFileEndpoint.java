@@ -88,17 +88,15 @@ public class CopyFileEndpoint implements EndPoint {
             ZeppelinFile newFile;
             JsonResponse response;
             if (pathString.endsWith("/")) {
-                    newFile = copyDirectory(
-                            updatedDirectory,
-                            Paths.get(updatedDirectory.path().toString() + sourcePath), path
-                    );
+                newFile = copyDirectory(
+                        updatedDirectory, Paths.get(updatedDirectory.path().toString() + sourcePath), path
+                );
                 response = new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
             }
             else {
-                    newFile = copyNotebook(
-                            updatedDirectory,
-                            Paths.get(updatedDirectory.path().toString() + sourcePath), path
-                    );
+                newFile = copyNotebook(
+                        updatedDirectory, Paths.get(updatedDirectory.path().toString() + sourcePath), path
+                );
                 response = new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
             }
             newFile.save();

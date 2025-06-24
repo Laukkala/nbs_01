@@ -60,7 +60,6 @@ public class DelegatingEndpoint implements EndPoint {
     private final EndPoint falseEndpoint;
     private final Delegate delegationFunction;
 
-
     public DelegatingEndpoint(EndPoint trueEndpoint, EndPoint falseEndpoint, Delegate delegationFunction) {
         this.trueEndpoint = trueEndpoint;
         this.falseEndpoint = falseEndpoint;
@@ -69,7 +68,7 @@ public class DelegatingEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            if(delegationFunction.resolve(request)){
+            if (delegationFunction.resolve(request)) {
                 return trueEndpoint.createResponse(request);
             }
             else {
@@ -78,9 +77,6 @@ public class DelegatingEndpoint implements EndPoint {
         }
         catch (MalformedRequestException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
-        }
-        catch (Exception exception){
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Internal error:\n" + exception);
         }
     }
 }
