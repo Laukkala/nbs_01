@@ -105,19 +105,20 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCreateDirectoryTest() {
 
-            String newNotebookName = "testFolderName/";
-            Path newNotebookPath = Paths.get(newNotebookName);
+        String newDirectoryName = "testFolderName/";
+        Path newDirectoryPath = Paths.get(newDirectoryName);
+        String requestBody = Json.createObjectBuilder().build().toString();
 
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Assertions.assertDoesNotThrow(()->Thread.sleep(5000)); // TODO: ???? Why does waiting 5 seconds fix it
-            Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/" + newNotebookName, "{\"title\":\"newTitle\"}"
-            ));
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newDirectoryPath.toString())));
+        Assertions.assertDoesNotThrow(()->Thread.sleep(5000)); // TODO: ???? Why does waiting 5 seconds fix it
+        Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
+                "http://" + serverAddress() + "/notebook/" + newDirectoryName, requestBody
+        ));
+        // Assert that we receive the proper response.
+        Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newDirectoryPath.toString())));
     }
 
     @Test

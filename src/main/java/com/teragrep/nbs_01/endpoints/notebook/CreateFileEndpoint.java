@@ -77,11 +77,11 @@ public class CreateFileEndpoint implements EndPoint {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path") | !parameters.containsKey("title")) {
-                throw new MalformedRequestException("Request must contain a title and a path!");
+            if (!parameters.containsKey("path")) {
+                throw new MalformedRequestException("Request must contain a path!");
             }
             String pathString = parameters.getString("path");
-            String title = parameters.getString("title");
+            String title = parameters.containsKey("title") ? parameters.getString("title") : "";
             Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
 
             ZeppelinFile newFile;
