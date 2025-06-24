@@ -46,6 +46,8 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
@@ -57,9 +59,12 @@ import java.util.stream.Collectors;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NotebookServletTest extends AbstractNotebookServerTest {
 
-    private String parentDirectoryID = "2A94M5J1D";
-    private Path parentDirectoryPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
-    private String newDirectoryName = "new_directory";
+    private final String notebookName = "my_note2_2A94M5J2Z.zpln";
+    private final Path notebookPath = Paths.get(notebookName);
+    private final String directoryName = "my_second_folder_2A94M5J2D";
+    private final Path directoryPath = Paths.get(notebookName);
+
+
 
     public NotebookServletTest() {
     }
@@ -80,18 +85,20 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.
     public void httpCreateNotebookTest() {
 
-            String newNotebookName = "testFileName_12345.zpln";
-            Path newNotebookPath = Paths.get(newNotebookName);
-
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
-                    "http://" + serverAddress() + "/notebook/" + newNotebookPath, "{\"title\":\"newTitle\"}"
-            ));
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+        String newNotebookName = "testFileName_12345.zpln";
+        Path newNotebookPath = Paths.get(newNotebookName);
+        String newNotebookTitle = "newTitle";
+        String requestBody = Json.createObjectBuilder().add("title",newNotebookTitle).build().toString();
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+        Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
+                "http://" + serverAddress() + "/notebook/" + newNotebookPath, requestBody
+        ));
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.CREATED_201,response.status());
+        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
     }
 
     @Test
