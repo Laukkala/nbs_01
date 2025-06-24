@@ -102,6 +102,25 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
+    // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk, even if no title parameter is provided.
+    public void httpCreateNotebookWithNoTitleTest() {
+
+        String newNotebookName = "testFileName_12345.zpln";
+        Path newNotebookPath = Paths.get(newNotebookName);
+        String requestBody = Json.createObjectBuilder().build().toString();
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+        Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
+                "http://" + serverAddress() + "/notebook/" + newNotebookPath, requestBody
+        ));
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.CREATED_201,response.status());
+        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
+    }
+
+    @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCreateDirectoryTest() {
 
