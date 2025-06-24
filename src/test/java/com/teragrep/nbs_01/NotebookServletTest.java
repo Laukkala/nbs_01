@@ -79,150 +79,135 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.
     public void httpCreateNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
 
             String newNotebookName = "testFileName_12345.zpln";
             Path newNotebookPath = Paths.get(newNotebookName);
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Response response = makeHttpPUTRequest(
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
                     "http://" + serverAddress() + "/notebook/" + newNotebookPath, "{\"title\":\"newTitle\"}"
-            );
+            ));
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-        });
     }
 
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCreateDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
 
             String newNotebookName = "testFolderName/";
             Path newNotebookPath = Paths.get(newNotebookName);
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Thread.sleep(5000); // TODO: ???? Why does waiting 5 seconds fix it
-            Response response = makeHttpPUTRequest(
+            Assertions.assertDoesNotThrow(()->Thread.sleep(5000)); // TODO: ???? Why does waiting 5 seconds fix it
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
                     "http://" + serverAddress() + "/notebook/" + newNotebookName, "{\"title\":\"newTitle\"}"
-            );
+            ));
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-        });
     }
 
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCopyDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
             String newNotebookName = "testCopyFolderName/";
             Path newNotebookPath = Paths.get(newNotebookName);
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Thread.sleep(5000); // TODO: ???? Why does waiting 5 seconds fix it
-            Response response = makeHttpPUTRequest(
+            Assertions.assertDoesNotThrow(()->Thread.sleep(5000)); // TODO: ???? Why does waiting 5 seconds fix it
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
                     "http://" + serverAddress() + "/notebook/" + newNotebookName,
                     "{\"sourcePath\":\"/my_folder_2A94M5J1D/\",\"title\":\"copyDirectory\"}"
-            );
+            ));
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-        });
     }
 
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a copied file being saved on disk.
     public void httpCopyNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
 
             String newNotebookName = "testFileName_12345.zpln";
             Path newNotebookPath = Paths.get(newNotebookName);
 
             // Assert that the file we are creating doesn't already exist.
             Assertions.assertFalse(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-            Response response = makeHttpPUTRequest(
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpPUTRequest(
                     "http://" + serverAddress() + "/notebook/" + newNotebookPath,
                     "{\"sourcePath\":\"/my_note4_2A94M5J4Z.zpln\",\"title\":\"copyNotebook\"}"
-            );
+            ));
             // Assert that we receive the proper response.
             Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
             // Assert that the file was created.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), newNotebookPath.toString())));
-        });
     }
 
     @Test
     // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
     public void httpDeleteNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
 
             String notebookName = "my_note3_2A94M5J3Z.zpln";
             Path notebookPath = Paths.get(notebookName);
 
             // Assert that the correct number of files exist
-            Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            Assertions.assertEquals(4, Assertions.assertDoesNotThrow(()->Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
             // Assert that the file to be deleted exists.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
-            Response response = makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + notebookName, "{}");
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + notebookName, "{}"));
             Assertions.assertEquals(204, response.status());
             // Assert that a file was deleted.
-            Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            Assertions.assertEquals(3, Assertions.assertDoesNotThrow(()->Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
             // Assert that the correct file was deleted.
             Assertions.assertFalse(Files.exists(notebookPath));
-        });
     }
 
     @Test
     // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
     public void httpDeleteDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
 
             String directoryName = "my_folder_2A94M5J1D";
             Path directoryPath = Paths.get(directoryName);
 
             // Assert that the correct number of files exist
-            Assertions.assertEquals(4, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            Assertions.assertEquals(4, Assertions.assertDoesNotThrow(()->Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
             // Assert that the file to be deleted exists.
             Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), directoryPath.toString())));
-            Response response = makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryName, "{}");
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryName, "{}"));
             Assertions.assertEquals(204, response.status());
             // Assert that a file was deleted.
-            Assertions.assertEquals(3, Files.list(notebookDirectory()).collect(Collectors.toList()).size());
+            Assertions.assertEquals(3, Assertions.assertDoesNotThrow(()->Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
             // Assert that the correct file was deleted.
             Assertions.assertFalse(Files.exists(directoryPath));
-        });
     }
 
     @Test
     // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint results in a response with the expected file contents
     public void httpFindNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
             Path notebookPath = Paths
                     .get("src/test/resources/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
             String expectedFileContent = "{\"id\":\"2A94M5J1Z\",\"name\":\"my_note1\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-231621_168813393\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Welcome to Zeppelin.\\\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)\\\"\"}},{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"\\\"%test import org.apache.commons.io.IOUtils\\\\nimport java.net.URL\\\\nimport java.nio.charset.Charset\\\\n\\\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\\\n// So you don't need create them manually\\\\n\\\\n// load bank data\\\\nval bankText = sc.parallelize(\\\\n    IOUtils.toString(\\\\n        new URL(\\\\\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\\\\\"),\\\\n        Charset.forName(\\\\\\\"utf8\\\\\\\")).split(\\\\\\\"\\\\\\\\n\\\\\\\"))\\\\n\\\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\\\n\\\\nval bank = bankText.map(s => s.split(\\\\\\\";\\\\\\\")).filter(s => s(0) != \\\\\\\"\\\\\\\\\\\\\\\"age\\\\\\\\\\\\\\\"\\\\\\\").map(\\\\n    s => Bank(s(0).toInt, \\\\n            s(1).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(2).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(3).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\"),\\\\n            s(5).replaceAll(\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\", \\\\\\\"\\\\\\\").toInt\\\\n        )\\\\n).toDF()\\\\nbank.registerTempTable(\\\\\\\"bank\\\\\\\")\\\"\"}},{\"id\":\"20150210-015302_1492795503\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value\\\\nfrom bank \\\\nwhere age < 30 \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150212-145404_867439529\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere age < ${maxAge=30} \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230422_1600658137\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test \\\\nselect age, count(1) value \\\\nfrom bank \\\\nwhere marital=\\\\\\\"${marital=single,single|divorced|married}\\\\\\\" \\\\ngroup by age \\\\norder by age\\\"\"}},{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n## Congratulations, it's done.\\\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\\\"\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"\\\"%test\\\\n\\\\nAbout bank data\\\\n\\\\n```\\\\nCitation Request:\\\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\\\n  Please include this citation if you plan to use this database:\\\\n\\\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\\\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\\\n\\\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\\\n```\\\"\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
             String notebookId = "2A94M5J1Z";
             // Assert that the file exists.
             Assertions.assertTrue(Files.exists(notebookPath));
-            Response response = makeHttpGETRequest(
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpGETRequest(
                     "http://" + serverAddress()
                             + "/notebook/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln"
-            );
+            ));
             Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
-        });
     }
 
     @Test
     // Assert that a HTTP POST request to /notebook/{path/to/notebook} endpoint results in an updated file containing the modifications contained in the request body.
     public void httpUpdateNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
             // Assert that the file content is the same as in the resource files before edits.
             Path notebookPath = Paths.get("my_folder_2A94M5J1D", "my_note2_2A94M5J2Z.zpln");
             String title = "editedTitle";
@@ -232,23 +217,22 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
             Assertions
                     .assertEquals(
                             originalFileContent,
-                            Files.readAllLines(Paths.get(notebookDirectory().toString(), notebookPath.toString()), Charset.defaultCharset()).stream().collect(Collectors.joining())
+                            Assertions.assertDoesNotThrow(()->Files.readAllLines(Paths.get(notebookDirectory().toString(), notebookPath.toString()), Charset.defaultCharset()).stream().collect(Collectors.joining()))
                     );
 
-            Response response = makeHttpPOSTRequest(
+            Response response = Assertions.assertDoesNotThrow(()->makeHttpPOSTRequest(
                     "http://" + serverAddress() + "/notebook/" + notebookPath.toString(),
                     "{\"title\":\"" + title + "\"}"
-            );
+            ));
             // Assert that we got the proper response.
             Assertions
                     .assertTrue(response.body().getString("message").strip().contains("Notebook edited successfully"));
             // Assert that the file content has the edited paragraph saved to file in the correct place.
             Assertions
                     .assertEquals(
-                            expectedFileContent, com.google.common.io.Files
-                                    .readLines(Paths.get(notebookDirectory().toString(), notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
+                            expectedFileContent, Assertions.assertDoesNotThrow(()->com.google.common.io.Files
+                                    .readLines(Paths.get(notebookDirectory().toString(), notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining()))
                     );
-        });
     }
 
 }
