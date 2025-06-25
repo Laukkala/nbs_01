@@ -75,24 +75,20 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpListAllTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            ListEndPoint listEndPoint = new ListEndPoint(new Directory("root", notebookDirectory()));
-            Response response = listEndPoint.createResponse(new JsonRequest("{}"));
-            for (String filename : allFileIds) {
-                Assertions.assertTrue(response.body().getString("message").contains(filename));
-            }
-        });
+        ListEndPoint listEndPoint = new ListEndPoint(new Directory("root", notebookDirectory()));
+        Response response = listEndPoint.createResponse(new JsonRequest("{}"));
+        for (String filename : allFileIds) {
+            Assertions.assertTrue(response.body().getString("message").contains(filename));
+        }
     }
 
     @Test
     // Assert that a HTTP request with a defined DirectoryId to /notebook/list endpoint results in a list of notebook IDs contained in that directory
     public void httpListWithinFolderTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            ListEndPoint listEndPoint = new ListEndPoint(new Directory("root", notebookDirectory()));
-            Response response = listEndPoint.createResponse(new JsonRequest("{\"directoryId\":\"2A94M5J1D\"}"));
-            for (String filename : allFileIdsWithinDirectory) {
-                Assertions.assertTrue(response.body().getString("message").contains(filename));
-            }
-        });
+        ListEndPoint listEndPoint = new ListEndPoint(new Directory("root", notebookDirectory()));
+        Response response = listEndPoint.createResponse(new JsonRequest("{\"directoryId\":\"2A94M5J1D\"}"));
+        for (String filename : allFileIdsWithinDirectory) {
+            Assertions.assertTrue(response.body().getString("message").contains(filename));
+        }
     }
 }

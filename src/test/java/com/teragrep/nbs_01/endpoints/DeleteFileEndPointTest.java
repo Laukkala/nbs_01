@@ -80,32 +80,28 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
     public void httpDeleteNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertTrue(Files.exists(deletedNotebookPath));
-            DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
-            String body = "{\"path\":\"/" + deletedNotebookName + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
-            // Assert that we receive the proper response.
-            Assertions.assertEquals(204, response.status());
-            // Assert that the file was created.
-            Assertions.assertFalse(Files.exists(deletedNotebookPath));
-        });
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertTrue(Files.exists(deletedNotebookPath));
+        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
+        String body = "{\"path\":\"/" + deletedNotebookName + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body));
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(204, response.status());
+        // Assert that the file was created.
+        Assertions.assertFalse(Files.exists(deletedNotebookPath));
     }
 
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in new directory being saved on disk.
     public void httpDeleteDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertTrue(Files.exists(deletedDirectoryPath));
-            DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
-            String body = "{\"path\":\"/" + deletedDirectoryName + "/" + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
-            // Assert that we receive the proper response.
-            Assertions.assertEquals(204, response.status());
-            // Assert that the file was created.
-            Assertions.assertFalse(Files.exists(deletedDirectoryPath));
-        });
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertTrue(Files.exists(deletedDirectoryPath));
+        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
+        String body = "{\"path\":\"/" + deletedDirectoryName + "/" + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body));
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(204, response.status());
+        // Assert that the file was created.
+        Assertions.assertFalse(Files.exists(deletedDirectoryPath));
     }
 }

@@ -90,12 +90,10 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     public void httpNotebookNotFoundTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Start server and wait for it to initialize.
-            FindEndPoint endPoint = new FindEndPoint(new Directory("root", notebookDirectory()));
-            String body = "{\"path\":\"/" + "nonexistentId" + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
-            Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());
-        });
+        // Start server and wait for it to initialize.
+        FindEndPoint endPoint = new FindEndPoint(new Directory("root", notebookDirectory()));
+        String body = "{\"path\":\"/" + "nonexistentId" + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body));
+        Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());
     }
 }

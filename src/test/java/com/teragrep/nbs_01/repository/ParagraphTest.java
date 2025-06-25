@@ -55,14 +55,12 @@ class ParagraphTest {
     // Paragraph should be in the proper JSON format when json() is called.
     @Test
     void json() {
-        Assertions.assertDoesNotThrow(() -> {
-            Script testScript = new Script("%spark\nprintln(\"Hello Spark\")");
-            Paragraph paragraph = new Paragraph("testParagraph", "testTitle", testScript);
-            Assertions
-                    .assertEquals(
-                            "{\"id\":\"testParagraph\",\"title\":\"testTitle\",\"script\":{\"text\":\"%spark\\nprintln(\\\"Hello Spark\\\")\"}}",
-                            paragraph.json().toString()
-                    );
-        });
+        Script testScript = new Script("%spark\nprintln(\"Hello Spark\")");
+        Paragraph paragraph = new Paragraph("testParagraph", "testTitle", testScript);
+        Assertions
+                .assertEquals(
+                        "{\"id\":\"testParagraph\",\"title\":\"testTitle\",\"script\":{\"text\":\"%spark\\nprintln(\\\"Hello Spark\\\")\"}}",
+                        paragraph.json().toString()
+                );
     }
 }

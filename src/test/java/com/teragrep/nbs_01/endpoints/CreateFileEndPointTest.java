@@ -81,35 +81,30 @@ public class CreateFileEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a Request containing a Title and a Path results in a new Notebook being saved on disk
     public void createNotebookTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            String path = "/" + newNotebookName;
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(newNotebookPath));
-            CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
-            String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(newNotebookPath));
-
-        });
+        String path = "/" + newNotebookName;
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertFalse(Files.exists(newNotebookPath));
+        CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
+        String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body));
+        // Assert that we receive the proper response.
+        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(newNotebookPath));
     }
 
     @Test
     // Assert that a Request containing a Title and a Path results in a new Directory being saved on disk
     public void createDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            String path = "/" + newDirectoryName + "/";
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertFalse(Files.exists(newDirectoryPath));
-            CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
-            String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
-            // Assert that we receive the proper response.
-            Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(newDirectoryPath));
-        });
+        String path = "/" + newDirectoryName + "/";
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertFalse(Files.exists(newDirectoryPath));
+        CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
+        String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body));
+        // Assert that we receive the proper response.
+        Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(newDirectoryPath));
     }
 }

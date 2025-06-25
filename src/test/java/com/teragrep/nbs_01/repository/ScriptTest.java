@@ -55,10 +55,7 @@ class ScriptTest {
 
     @Test
     void json() {
-        Assertions.assertDoesNotThrow(() -> {
-            Script testScript = new Script("%spark\nprintln(\"Hello Spark\")");
-            Assertions
-                    .assertEquals("{\"text\":\"%spark\\nprintln(\\\"Hello Spark\\\")\"}", testScript.json().toString());
-        });
+        Script testScript = new Script("%spark\nprintln(\"Hello Spark\")");
+        Assertions.assertEquals("{\"text\":\"%spark\\nprintln(\\\"Hello Spark\\\")\"}", testScript.json().toString());
     }
 }

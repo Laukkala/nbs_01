@@ -83,26 +83,28 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
     public void httpDeleteParagraphTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            // Assert that the file we are creating doesn't already exist.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            Directory root = new Directory("root", notebookDirectory());
-            DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertTrue(Files.exists(notebookPath));
+        Directory root = new Directory("root", notebookDirectory());
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
-            JsonRequest request = new JsonRequest(
-                    "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
-            );
-            Response response = endPoint.createResponse(request);
-            // Assert that we receive the proper response.
-            Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
-            Assertions.assertTrue(response.body().getString("message").contains("Deleted paragraph"));
-            // Assert that the file was created.
-            Assertions.assertTrue(Files.exists(notebookPath));
-            Assertions
-                    .assertEquals(
-                            expectedFileContent, com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
-                    );
+        JsonRequest request = new JsonRequest(
+                "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
+        );
+        Response response = endPoint.createResponse(request);
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
+        Assertions.assertTrue(response.body().getString("message").contains("Deleted paragraph"));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(notebookPath));
+        Assertions
+                .assertEquals(
+                        expectedFileContent,
+                        Assertions
+                                .assertDoesNotThrow(
+                                        () -> com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
+                                )
+                );
 
-        });
     }
 }

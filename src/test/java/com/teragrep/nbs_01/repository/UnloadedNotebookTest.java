@@ -62,33 +62,29 @@ class UnloadedNotebookTest {
     private final Path notebookDirectory = Paths.get("target/notebooks");
 
     public void copyFileRecursively(File fileToCopy, File destination) {
-        Assertions.assertDoesNotThrow(() -> {
-            if (fileToCopy.isDirectory()) {
-                File[] children = fileToCopy.listFiles();
-                for (File child : children) {
-                    copyFileRecursively(child, Paths.get(destination.toString(), child.getName()).toFile());
-                }
+        if (fileToCopy.isDirectory()) {
+            File[] children = fileToCopy.listFiles();
+            for (File child : children) {
+                copyFileRecursively(child, Paths.get(destination.toString(), child.getName()).toFile());
             }
-            if (!destination.exists()) {
-                File parent = destination.getParentFile();
-                if (!parent.exists()) {
-                    parent.mkdirs();
-                }
-                Files.copy(fileToCopy.toPath(), destination.toPath());
+        }
+        if (!destination.exists()) {
+            File parent = destination.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
             }
-        });
+            Assertions.assertDoesNotThrow(() -> Files.copy(fileToCopy.toPath(), destination.toPath()));
+        }
     }
 
     public void deleteFileRecursively(File fileToDelete) {
-        Assertions.assertDoesNotThrow(() -> {
-            File[] children = fileToDelete.listFiles();
-            if (children != null) {
-                for (File child : children) {
-                    deleteFileRecursively(child);
-                }
+        File[] children = fileToDelete.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                deleteFileRecursively(child);
             }
-            fileToDelete.delete();
-        });
+        }
+        fileToDelete.delete();
     }
 
     @BeforeEach
