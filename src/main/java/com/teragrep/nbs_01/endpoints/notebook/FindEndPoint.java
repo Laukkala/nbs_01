@@ -58,7 +58,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates a notebook with the given parameters.
@@ -75,8 +74,7 @@ public class FindEndPoint implements EndPoint {
         try {
             JsonObject parameters = request.parameters();
             String id = parameters.getString("path");
-            id = root.path() + id;
-            Path path = Paths.get(id);
+            Path path = root.path().resolve(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             ZeppelinFile file = updatedDirectory.findFile(path);
             if (!file.isDirectory()) {

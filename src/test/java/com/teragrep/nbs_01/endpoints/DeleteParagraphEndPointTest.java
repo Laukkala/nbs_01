@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
-    private String notebookName = "/my_note3_2A94M5J3Z.zpln";
+    private String notebookName = "my_note3_2A94M5J3Z.zpln";
     private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
     private String paragraphId = "20150213-230428_1231780373";
     private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";

@@ -59,7 +59,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates a notebook with the given parameters.
@@ -75,12 +74,11 @@ public class FindParagraphEndPoint implements EndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
-            String notebookPath = parameters.getString("path");
+            String pathString = parameters.getString("path");
             String paragraphId = parameters.getString("paragraphId");
 
-            notebookPath = root.path() + notebookPath;
-            Path path = Paths.get(notebookPath);
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            Path path = updatedDirectory.path().resolve(pathString);
             ZeppelinFile file = updatedDirectory.findFile(path).load();
             if (!file.isDirectory()) {
                 Notebook notebook = (Notebook) file.load();

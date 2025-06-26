@@ -81,7 +81,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
         FindEndPoint endPoint = new FindEndPoint(new Directory("root", notebookDirectory()));
-        String body = "{\"path\":\"/" + notebookPath + "\"}";
+        String body = "{\"path\":\"" + notebookPath + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
     }

@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
-    private String notebookName = "/my_note3_2A94M5J3Z.zpln";
+    private String notebookName = "my_note3_2A94M5J3Z.zpln";
     private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
     private String paragraphId = "testParagraphId";
     private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"testParagraphId\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";

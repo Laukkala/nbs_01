@@ -57,7 +57,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
@@ -76,7 +75,7 @@ public class CreateParagraphEndpoint implements EndPoint {
             String paragraphId = parameters.getString("paragraphId");
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
+            Path path = updatedDirectory.path().resolve(pathString);
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 

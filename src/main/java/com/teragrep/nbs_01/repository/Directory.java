@@ -152,8 +152,7 @@ public final class Directory implements ZeppelinFile {
             if (child.isStub()) {
                 child = child.load();
             }
-            ZeppelinFile movedChild = child
-                    .copy(Paths.get(destination.toString(), child.path().getFileName().toString()), child.id());
+            ZeppelinFile movedChild = child.copy(destination.resolve(child.path().getFileName()), child.id());
             movedChildren.put(movedChild.id(), movedChild);
         }
 
@@ -163,7 +162,7 @@ public final class Directory implements ZeppelinFile {
     }
 
     public void move(Directory destinationDirectory) throws IOException {
-        move(Paths.get(destinationDirectory.path().toString(), path().getFileName().toString()));
+        move(destinationDirectory.path.resolve(path().getFileName()));
     }
 
     public void delete() throws IOException {
@@ -184,7 +183,7 @@ public final class Directory implements ZeppelinFile {
             StringBuilder sb = new StringBuilder(childCopyFileName);
             sb
                     .replace(childCopyFileName.lastIndexOf("_") + 1, (childCopyFileName.endsWith(".zpln") ? childCopyFileName.lastIndexOf(".zpln") : childCopyFileName.length()), childCopyId);
-            Path copyChildPath = Paths.get(destinationPath.toString(), sb.toString());
+            Path copyChildPath = destinationPath.resolve(sb.toString());
             copyChildren.put(childCopyId, child.copy(copyChildPath, childCopyId));
         }
         Directory copiedDirectory = new Directory(copyId, destinationPath, copyChildren);
@@ -224,7 +223,7 @@ public final class Directory implements ZeppelinFile {
     }
 
     public void rename(String fileName) throws IOException {
-        move(Paths.get(path().getParent().toString(), fileName));
+        move(path.getParent().resolve(fileName));
     }
 
     public boolean isDirectory() {

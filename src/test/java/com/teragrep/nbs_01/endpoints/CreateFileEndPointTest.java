@@ -59,7 +59,7 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateFileEndPointTest extends AbstractNotebookServerTest {
 
-    private String newNotebookName = "/testFileName.zpln";
+    private String newNotebookName = "testFileName.zpln";
     private String newDirectoryName = "testDirectoryName/";
     private Path newNotebookPath = Paths.get(notebookDirectory().toString(), newNotebookName);
     private Path newDirectoryPath = Paths.get(notebookDirectory().toString(), newDirectoryName);
@@ -81,7 +81,7 @@ public class CreateFileEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a Request containing a Title and a Path results in a new Notebook being saved on disk
     public void createNotebookTest() {
-        String path = "/" + newNotebookName;
+        String path = newNotebookName;
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
@@ -96,7 +96,7 @@ public class CreateFileEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a Request containing a Title and a Path results in a new Directory being saved on disk
     public void createDirectoryTest() {
-        String path = "/" + newDirectoryName + "/";
+        String path = newDirectoryName;
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newDirectoryPath));
         CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));

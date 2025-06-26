@@ -60,7 +60,7 @@ import java.nio.file.Paths;
 public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
 
     private String deletedNotebookName = "my_note3_2A94M5J3Z.zpln";
-    private String deletedDirectoryName = "my_folder_2A94M5J1D";
+    private String deletedDirectoryName = "my_folder_2A94M5J1D/";
     private Path deletedNotebookPath = Paths.get(notebookDirectory().toString(), deletedNotebookName);
     private Path deletedDirectoryPath = Paths.get(notebookDirectory().toString(), deletedDirectoryName);
 
@@ -83,7 +83,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedNotebookPath));
         DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
-        String body = "{\"path\":\"/" + deletedNotebookName + "\"}";
+        String body = "{\"path\":\"" + deletedNotebookName + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
@@ -97,7 +97,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedDirectoryPath));
         DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
-        String body = "{\"path\":\"/" + deletedDirectoryName + "/" + "\"}";
+        String body = "{\"path\":\"" + deletedDirectoryName + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());

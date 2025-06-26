@@ -58,7 +58,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
@@ -78,7 +77,7 @@ public class DeleteFileEndpoint implements EndPoint {
                 throw new MalformedRequestException("Request must contain a path!");
             }
             String pathString = parameters.getString("path");
-            Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
+            Path path = updatedDirectory.path().resolve(pathString);
 
             ZeppelinFile deletedFile = updatedDirectory.findFile(path);
             deletedFile.delete();

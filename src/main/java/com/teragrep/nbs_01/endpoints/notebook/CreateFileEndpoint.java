@@ -59,7 +59,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,7 +81,7 @@ public class CreateFileEndpoint implements EndPoint {
             }
             String pathString = parameters.getString("path");
             String title = parameters.containsKey("title") ? parameters.getString("title") : "";
-            Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
+            Path path = updatedDirectory.path().resolve(pathString);
 
             if (pathString.endsWith("/")) {
                 // File is a directory
@@ -91,6 +90,7 @@ public class CreateFileEndpoint implements EndPoint {
                 return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
             }
             else {
+                // File is not a directory
                 Notebook newFile = createNotebook(title, path);
                 newFile.save();
                 return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());

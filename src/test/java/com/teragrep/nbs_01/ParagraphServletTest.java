@@ -233,7 +233,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that a DELETE request is responded to with the response code 204 NO CONTENT
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
-
         // Assert that the created paragraph is not contained within the saved file of the notebook after deletion
         String fileContents = Assertions
                 .assertDoesNotThrow(

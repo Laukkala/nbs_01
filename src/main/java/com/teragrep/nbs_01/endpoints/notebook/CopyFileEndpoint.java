@@ -59,7 +59,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,20 +82,16 @@ public class CopyFileEndpoint implements EndPoint {
             String sourcePath = parameters.getString("sourcePath");
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            Path path = Paths.get(updatedDirectory.path().toString() + pathString.toString());
+            Path path = updatedDirectory.path().resolve(pathString);
 
             ZeppelinFile newFile;
             JsonResponse response;
             if (pathString.endsWith("/")) {
-                newFile = copyDirectory(
-                        updatedDirectory, Paths.get(updatedDirectory.path().toString() + sourcePath), path
-                );
+                newFile = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
                 response = new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
             }
             else {
-                newFile = copyNotebook(
-                        updatedDirectory, Paths.get(updatedDirectory.path().toString() + sourcePath), path
-                );
+                newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
                 response = new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
             }
             newFile.save();

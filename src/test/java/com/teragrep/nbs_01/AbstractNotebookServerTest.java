@@ -70,11 +70,11 @@ public class AbstractNotebookServerTest {
     private final Configuration testConfiguration = new Configuration(notebookDirectory, serverPort);
     private final NotebookServer server = new NotebookServer(testConfiguration);
 
-    public void startServer() throws Exception {
+    public synchronized void startServer() throws Exception {
         server.call();
     }
 
-    public void stopServer() throws Exception {
+    public synchronized void stopServer() throws Exception {
         server.stop();
     }
 

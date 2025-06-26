@@ -58,7 +58,6 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,7 +74,7 @@ public class UpdateNotebookEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
-            Path path = Paths.get(root.path().toString(), parameters.getString("path"));
+            Path path = root.path().resolve(parameters.getString("path")); //TODO: why is this here?
 
             if (!parameters.containsKey("title")) {
                 throw new MalformedRequestException("Request does not contain a title!");

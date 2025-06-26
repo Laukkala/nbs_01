@@ -149,6 +149,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/directory} endpoint results in a new file being saved on disk.
+    // TODO: separate copying into its own endpoint
     public void httpCopyDirectoryTest() {
         String copyDirectoryName = "testCopyFolderName/";
         Path copyDirectoryPath = Paths.get(copyDirectoryName);
@@ -227,7 +228,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
     public void httpDeleteDirectoryTest() {
 
-        String directoryName = "my_folder_2A94M5J1D";
+        String directoryName = "my_folder_2A94M5J1D/";
         Path directoryPath = Paths.get(directoryName);
 
         // Assert that the correct number of files exist
