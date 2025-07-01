@@ -60,28 +60,34 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
+public class CopyDirectoryEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public DeleteFileEndpoint(Directory root) {
+    public CopyDirectoryEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
+                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
             }
             String pathString = parameters.getString("path");
+            String sourcePath = parameters.getString("sourcePath");
+
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             Path path = updatedDirectory.path().resolve(pathString);
 
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+            Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
+            JsonResponse response = new JsonResponse(
+                    HttpStatus.CREATED_201,
+                    "Created new notebook " + newDirectory.id()
+            );
+            newDirectory.save();
+            return response;
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
@@ -94,6 +100,16 @@ public class DeleteFileEndpoint implements EndPoint {
         }
         catch (MalformedRequestException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+        }
+    }
+
+    private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
+        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
+        if (file.isDirectory()) {
+            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
+        }
+        else {
+            throw new IOException("File at " + sourcePath + " is not a directory!");
         }
     }
 }

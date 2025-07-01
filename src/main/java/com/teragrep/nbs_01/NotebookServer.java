@@ -92,12 +92,24 @@ public class NotebookServer implements Callable {
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
             NotebookServlet notebookServlet = new NotebookServlet(
-                    new FindEndPoint(root), // Endpoint to call on a GET Request
+                    new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyFileEndpoint(root), new CreateFileEndpoint(root), new DoesKeyExistDelegate("sourceId")), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourceId")), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
+
+            ServletContextHandler directoryContextHandler = new ServletContextHandler();
+            directoryContextHandler.setContextPath("/directory");
+
+            // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
+            DirectoryServlet directoryServlet = new DirectoryServlet(
+                    new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
+                    new StubEndpoint(), // Endpoint to call on a POST Request
+                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourceId")), // Endpoint to call on a PUT Request
+                    new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
+            );
+            directoryContextHandler.addServlet(directoryServlet, "/");
 
             ServletContextHandler paragraphContextHandler = new RegexServletContext(".*/paragraph/.*$");
             paragraphContextHandler.setContextPath("/notebook");
@@ -119,6 +131,7 @@ public class NotebookServer implements Callable {
             ContextHandlerCollection collection = new ContextHandlerCollection();
             collection.addHandler(paragraphContextHandler);
             collection.addHandler(notebookContextHandler);
+            collection.addHandler(directoryContextHandler);
 
             server.setHandler(collection);
 

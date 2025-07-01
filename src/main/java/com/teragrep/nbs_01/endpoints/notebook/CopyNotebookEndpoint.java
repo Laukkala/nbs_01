@@ -63,38 +63,33 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Creates a new Directory or a Notebook. Should be provided with a path of the File
-public class CreateFileEndpoint implements EndPoint {
+// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
+public class CopyNotebookEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public CreateFileEndpoint(Directory root) {
+    public CopyNotebookEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
+                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
             }
             String pathString = parameters.getString("path");
-            String title = parameters.containsKey("title") ? parameters.getString("title") : "";
+            String sourcePath = parameters.getString("sourcePath");
+
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             Path path = updatedDirectory.path().resolve(pathString);
 
-            if (pathString.endsWith("/")) {
-                // File is a directory
-                Directory newFile = createDirectory(path);
-                newFile.save();
-                return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
-            }
-            else {
-                // File is not a directory
-                Notebook newFile = createNotebook(title, path);
-                newFile.save();
-                return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
-            }
+            ZeppelinFile newFile;
+            JsonResponse response;
+            newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
+            response = new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
+            newFile.save();
+            return response;
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
@@ -116,16 +111,6 @@ public class CreateFileEndpoint implements EndPoint {
 
     private Notebook createNotebook(String title, Path path) {
         return new Notebook(title, UUID.randomUUID().toString(), path, new HashMap<>());
-    }
-
-    private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
-        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
-        if (file.isDirectory()) {
-            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
-        }
-        else {
-            throw new IOException("File at " + sourcePath + " is not a directory!");
-        }
     }
 
     private Notebook copyNotebook(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {

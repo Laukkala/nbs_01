@@ -60,37 +60,35 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+// Updates a notebook with the given parameters.
+public class FindNotebookEndPoint implements EndPoint {
 
     private final Directory root;
 
-    public DeleteFileEndpoint(Directory root) {
+    public FindNotebookEndPoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
+        // Find a notebooks from Directory structure based on given ID
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            String id = parameters.getString("path");
+            Path path = root.path().resolve(id);
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            ZeppelinFile file = updatedDirectory.findFile(path);
+            if (!file.isDirectory()) {
+                return new JsonResponse(HttpStatus.OK_200, file.load().json().toString());
             }
-            String pathString = parameters.getString("path");
-            Path path = updatedDirectory.path().resolve(pathString);
-
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+            else {
+                return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
+            }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
         }
         catch (IOException ioException) {
-            return new JsonResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
-            );
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
         }
         catch (MalformedRequestException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);

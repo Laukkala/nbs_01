@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.endpoints.notebook.CreateFileEndpoint;
+import com.teragrep.nbs_01.endpoints.notebook.CreateNotebookEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
@@ -84,27 +84,12 @@ public class CreateFileEndPointTest extends AbstractNotebookServerTest {
         String path = newNotebookName;
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
-        CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory("root", notebookDirectory()));
         String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newNotebookPath));
-    }
-
-    @Test
-    // Assert that a Request containing a Title and a Path results in a new Directory being saved on disk
-    public void createDirectoryTest() {
-        String path = newDirectoryName;
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertFalse(Files.exists(newDirectoryPath));
-        CreateFileEndpoint endPoint = new CreateFileEndpoint(new Directory("root", notebookDirectory()));
-        String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
-        // Assert that we receive the proper response.
-        Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
-        // Assert that the file was created.
-        Assertions.assertTrue(Files.exists(newDirectoryPath));
     }
 }

@@ -48,8 +48,6 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -59,43 +57,31 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Creates a new Directory or a Notebook. Should be provided with a path of the File
-public class CopyFileEndpoint implements EndPoint {
+// Creates a new Notebook. Should be provided with a path of the File
+public class CreateDirectoryEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public CopyFileEndpoint(Directory root) {
+    public CreateDirectoryEndpoint(Directory root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
-                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
+            if (!parameters.containsKey("path")) {
+                throw new MalformedRequestException("Request must contain a path!");
             }
             String pathString = parameters.getString("path");
-            String sourcePath = parameters.getString("sourcePath");
-
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             Path path = updatedDirectory.path().resolve(pathString);
 
-            ZeppelinFile newFile;
-            JsonResponse response;
-            if (pathString.endsWith("/")) {
-                newFile = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-                response = new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newFile.id());
-            }
-            else {
-                newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-                response = new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
-            }
-            newFile.save();
-            return response;
+            Directory newDirectory = createDirectory(path);
+            newDirectory.save();
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newDirectory.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
@@ -113,29 +99,5 @@ public class CopyFileEndpoint implements EndPoint {
 
     private Directory createDirectory(Path path) {
         return new Directory(UUID.randomUUID().toString(), path);
-    }
-
-    private Notebook createNotebook(String title, Path path) {
-        return new Notebook(title, UUID.randomUUID().toString(), path, new HashMap<>());
-    }
-
-    private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
-        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
-        if (file.isDirectory()) {
-            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
-        }
-        else {
-            throw new IOException("File at " + sourcePath + " is not a directory!");
-        }
-    }
-
-    private Notebook copyNotebook(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
-        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
-        if (!file.isDirectory()) {
-            return (Notebook) file.copy(destinationPath, destinationPath.getFileName().toString());
-        }
-        else {
-            throw new IOException("File at " + sourcePath + " is not a notebook!");
-        }
     }
 }

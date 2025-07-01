@@ -43,57 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.concurrent.ConcurrentHashMap;
+public class StubEndpoint implements EndPoint {
 
-// Deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+    // On receiving a request, returns a 405 METHOD NOT ALLOWED
+    public StubEndpoint() {
 
-    private final Directory root;
-
-    public DeleteFileEndpoint(Directory root) {
-        this.root = root;
     }
 
     public Response createResponse(Request request) {
-        try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
-            }
-            String pathString = parameters.getString("path");
-            Path path = updatedDirectory.path().resolve(pathString);
-
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
-        }
-        catch (IOException ioException) {
-            return new JsonResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
-            );
-        }
-        catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
-        }
+        return new JsonResponse(HttpStatus.METHOD_NOT_ALLOWED_405, "");
     }
 }

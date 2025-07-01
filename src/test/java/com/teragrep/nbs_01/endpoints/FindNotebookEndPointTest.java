@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.endpoints.notebook.FindEndPoint;
+import com.teragrep.nbs_01.endpoints.notebook.FindNotebookEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
@@ -57,7 +57,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class FindEndPointTest extends AbstractNotebookServerTest {
+public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
 
     private final Path notebookPath = Paths
             .get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
@@ -80,7 +80,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
-        FindEndPoint endPoint = new FindEndPoint(new Directory("root", notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"" + notebookPath + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
@@ -89,7 +89,7 @@ public class FindEndPointTest extends AbstractNotebookServerTest {
     @Test
     public void httpNotebookNotFoundTest() {
         // Start server and wait for it to initialize.
-        FindEndPoint endPoint = new FindEndPoint(new Directory("root", notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"/" + "nonexistentId" + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());

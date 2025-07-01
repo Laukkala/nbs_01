@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.endpoints.notebook.FindEndPoint;
+import com.teragrep.nbs_01.endpoints.notebook.FindNotebookEndPoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
@@ -91,7 +91,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     @Test
     public void httpNotebookNotFoundTest() {
         // Start server and wait for it to initialize.
-        FindEndPoint endPoint = new FindEndPoint(new Directory("root", notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"/" + "nonexistentId" + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());

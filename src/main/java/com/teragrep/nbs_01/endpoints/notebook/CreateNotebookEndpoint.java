@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -58,14 +58,16 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+// Creates a new Notebook. Should be provided with a path of the File
+public class CreateNotebookEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public DeleteFileEndpoint(Directory root) {
+    public CreateNotebookEndpoint(Directory root) {
         this.root = root;
     }
 
@@ -77,11 +79,12 @@ public class DeleteFileEndpoint implements EndPoint {
                 throw new MalformedRequestException("Request must contain a path!");
             }
             String pathString = parameters.getString("path");
+            String title = parameters.containsKey("title") ? parameters.getString("title") : "";
             Path path = updatedDirectory.path().resolve(pathString);
 
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+            Notebook newFile = createNotebook(title, path);
+            newFile.save();
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
@@ -95,5 +98,9 @@ public class DeleteFileEndpoint implements EndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
+    }
+
+    private Notebook createNotebook(String title, Path path) {
+        return new Notebook(title, UUID.randomUUID().toString(), path, new HashMap<>());
     }
 }

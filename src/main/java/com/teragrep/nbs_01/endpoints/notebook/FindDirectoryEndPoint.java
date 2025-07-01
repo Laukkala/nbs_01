@@ -48,7 +48,6 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -61,11 +60,11 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates a notebook with the given parameters.
-public class FindEndPoint implements EndPoint {
+public class FindDirectoryEndPoint implements EndPoint {
 
     private final Directory root;
 
-    public FindEndPoint(Directory root) {
+    public FindDirectoryEndPoint(Directory root) {
         this.root = root;
     }
 
@@ -76,16 +75,11 @@ public class FindEndPoint implements EndPoint {
             String id = parameters.getString("path");
             Path path = root.path().resolve(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            ZeppelinFile file = updatedDirectory.findFile(path);
-            if (!file.isDirectory()) {
-                return new JsonResponse(HttpStatus.OK_200, file.load().json().toString());
-            }
-            else {
-                return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
-            }
+            Directory directory = (Directory) updatedDirectory.findFile(path);
+            return new JsonResponse(HttpStatus.OK_200, directory.json());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
         }
         catch (IOException ioException) {
             return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
