@@ -180,6 +180,9 @@ public final class Notebook implements ZeppelinFile {
     }
 
     public Notebook copy(String copyTitle, Path destinationPath, String copyId) throws IOException {
+        if (Files.exists(destinationPath)) {
+            throw new IOException("Path at " + destinationPath + " is already in use!");
+        }
         Map<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
         for (Paragraph paragraph : paragraphs.values()) {
             String copyParagraphId = UUID.randomUUID().toString();
@@ -214,6 +217,9 @@ public final class Notebook implements ZeppelinFile {
     }
 
     public void move(Path destinationPath) throws IOException {
+        if (Files.exists(destinationPath)) {
+            throw new IOException("Path at " + destinationPath + " is already in use!");
+        }
         Notebook movedNotebook = copy(destinationPath, id());
         movedNotebook.save();
         delete();

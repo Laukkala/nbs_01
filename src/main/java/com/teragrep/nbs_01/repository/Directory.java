@@ -140,9 +140,12 @@ public final class Directory implements ZeppelinFile {
         }
     }
 
-    public void move(Path destination) throws IOException {
-        if (destination.toAbsolutePath().startsWith(path().toAbsolutePath())) {
-            if (destination.toAbsolutePath().equals(path().toAbsolutePath())) {
+    public void move(Path destinationPath) throws IOException {
+        if (Files.exists(destinationPath)) {
+            throw new IOException("Path at " + destinationPath + " is already in use!");
+        }
+        if (destinationPath.toAbsolutePath().startsWith(path().toAbsolutePath())) {
+            if (destinationPath.toAbsolutePath().equals(path().toAbsolutePath())) {
                 throw new IOException("Directory is already located in the given destination!");
             }
             throw new IOException("Cannot move a directory into one of its own children!");
@@ -152,11 +155,11 @@ public final class Directory implements ZeppelinFile {
             if (child.isStub()) {
                 child = child.load();
             }
-            ZeppelinFile movedChild = child.copy(destination.resolve(child.path().getFileName()), child.id());
+            ZeppelinFile movedChild = child.copy(destinationPath.resolve(child.path().getFileName()), child.id());
             movedChildren.put(movedChild.id(), movedChild);
         }
 
-        Directory movedDirectory = new Directory(id(), destination, movedChildren);
+        Directory movedDirectory = new Directory(id(), destinationPath, movedChildren);
         movedDirectory.save();
         delete();
     }
@@ -173,6 +176,9 @@ public final class Directory implements ZeppelinFile {
     }
 
     public Directory copy(Path destinationPath, String copyId) throws IOException {
+        if (Files.exists(destinationPath)) {
+            throw new IOException("Path at " + destinationPath + " is already in use!");
+        }
         Map<String, ZeppelinFile> copyChildren = new HashMap<>();
         for (ZeppelinFile child : children.values()) {
             if (child.isStub()) {
