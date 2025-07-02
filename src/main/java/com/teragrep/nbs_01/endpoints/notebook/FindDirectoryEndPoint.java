@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -75,8 +76,12 @@ public class FindDirectoryEndPoint implements EndPoint {
             String id = parameters.getString("path");
             Path path = root.path().resolve(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            Directory directory = (Directory) updatedDirectory.findFile(path);
-            return new JsonResponse(HttpStatus.OK_200, directory.json());
+            ZeppelinFile directory = updatedDirectory.findFile(path);
+            if (directory instanceof Directory) {
+                return new JsonResponse(HttpStatus.OK_200, directory.json());
+            }
+            else
+                throw new FileNotFoundException("Not a directory!");
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
