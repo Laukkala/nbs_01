@@ -106,7 +106,7 @@ public class NotebookServer implements Callable {
             DirectoryServlet directoryServlet = new DirectoryServlet(
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourceId")), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
