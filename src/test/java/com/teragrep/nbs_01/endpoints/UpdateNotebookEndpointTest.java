@@ -50,7 +50,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.notebook.UpdateNotebookEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
@@ -102,7 +102,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
                 );
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new Directory("root", notebookDirectory()));
-        Response response = endpoint
+        JsonResponse response = endpoint
                 .createResponse(
                         new JsonRequest(
                                 "{\"path\":\"" + notebookPath + "\",\"title\":\"" + editedTitle

@@ -51,8 +51,8 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -71,7 +71,7 @@ public class UpdateNotebookEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public JsonResponse createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
             Path path = root.path().resolve(parameters.getString("path")); //TODO: why is this here?
@@ -91,16 +91,16 @@ public class UpdateNotebookEndpoint implements EndPoint {
             String title = parameters.getString("title");
             Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
+            return new SimpleResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
         catch (IOException ioException) {
-            return new JsonResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Server error while editing notebook: \n" + ioException
             );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

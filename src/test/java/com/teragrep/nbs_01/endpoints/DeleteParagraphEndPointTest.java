@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -91,7 +91,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         JsonRequest request = new JsonRequest(
                 "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
         );
-        Response response = endPoint.createResponse(request);
+        JsonResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Deleted paragraph"));

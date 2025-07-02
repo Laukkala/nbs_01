@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
@@ -92,7 +92,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Assertions.assertDoesNotThrow(() -> {
             Thread.sleep(5000);
         });
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath, requestBody
@@ -114,7 +114,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         String requestBody = Json.createObjectBuilder().build().toString();
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookName)));
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath, requestBody
@@ -136,7 +136,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookName)));
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath,
@@ -160,7 +160,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that the file to be deleted exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + notebookPath, "{}")
                 );
@@ -183,7 +183,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
         // Assert that the file to be deleted exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryName, "{}")
                 );
@@ -201,7 +201,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         String expectedFileContent = "{\"id\":\"2A94M5J2Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + notebookPath));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
     }
@@ -220,7 +220,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         Assertions.assertDoesNotThrow(() -> Files.readAllLines(notebookDirectory().resolve(notebookPath)).stream().collect(Collectors.joining()))
                 );
 
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath,

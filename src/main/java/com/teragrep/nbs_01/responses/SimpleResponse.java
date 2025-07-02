@@ -43,21 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.responses;
 
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.SimpleResponse;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import org.eclipse.jetty.http.HttpStatus;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
-public class PingEndpoint implements EndPoint {
+// Response object that contains a JsonObject as its body
+public final class SimpleResponse implements JsonResponse {
 
-    // Simply returns a "pong" response to any request. Can be used as a heartbeat function.
-    public PingEndpoint() {
+    private final int status;
+    private final JsonObject json;
 
+    public SimpleResponse(int status, String body) {
+        this(status, Json.createObjectBuilder().add("message", body).build());
     }
 
-    public JsonResponse createResponse(Request request) {
-        return new SimpleResponse(HttpStatus.OK_200, "pong");
+    public SimpleResponse(int status, JsonObject body) {
+        this.status = status;
+        this.json = body;
+    }
+
+    public int status() {
+        return status;
+    }
+
+    public JsonObject body() {
+        return json;
+    }
+
+    public String contentType() {
+        return "application-json";
     }
 }

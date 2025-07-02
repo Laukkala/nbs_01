@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -102,7 +102,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedparagraphContent = "{\"id\":\"" + firstParagraphId + "\",\"title\":\"" + firstParagraphTitle
                 + "\",\"script\":{\"text\":\"" + firstParagraphText + "\"}}";
 
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -121,7 +121,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String nonexistentParagraphId = "I_DONT_EXIST";
         String expectedResponseMessage = "Malformed request:\n"
                 + "com.teragrep.nbs_01.exceptions.MalformedRequestException: java.io.FileNotFoundException: Paragraph not found!";
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -141,7 +141,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedResponseMessage = "Malformed request:\n"
                 + "com.teragrep.nbs_01.exceptions.MalformedRequestException: java.io.FileNotFoundException: Notebook or directory with path target/notebooks/"
                 + nonexistentNotebookId + " not found!";
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
@@ -163,7 +163,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedparagraphContent = "{\"id\":\"" + newParagraphId
                 + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
 
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -192,7 +192,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String requestBody = Json.createObjectBuilder().build().toString();
         String expectedResponseMessage = "Notebook doesn't exist!";
 
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
@@ -223,7 +223,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -249,7 +249,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String requestBody = Json.createObjectBuilder().build().toString();
         String expectedResponseMessage = "Paragraph " + nonexistentParagraphId + " doesn't exist!";
 
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -276,7 +276,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String requestBody = Json.createObjectBuilder().build().toString();
         String expectedResponseMessage = "Notebook doesn't exist!";
 
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
@@ -315,7 +315,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("script", Json.createObjectBuilder().add("text", newParagraphText))
                 .build()
                 .toString();
-        Response response = Assertions
+        JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -343,7 +343,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String newParagraphId = "2025-01-01-021311-132-133";
 
         // Make an HTTP GET request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
-        Response getResponse = Assertions
+        JsonResponse getResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -355,7 +355,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
         // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to create the copy.
         String putRequestBody = Json.createObjectBuilder().build().toString();
-        Response putResponse = Assertions
+        JsonResponse putResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -395,7 +395,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .build()
                 .toString();
 
-        Response postResponse = Assertions
+        JsonResponse postResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"

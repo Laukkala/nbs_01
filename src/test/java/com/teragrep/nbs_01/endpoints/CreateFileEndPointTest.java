@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.notebook.CreateNotebookEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -86,7 +86,7 @@ public class CreateFileEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(newNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory("root", notebookDirectory()));
         String body = "{\"title\":\"newTitle\",\"path\":\"" + path + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
         // Assert that the file was created.

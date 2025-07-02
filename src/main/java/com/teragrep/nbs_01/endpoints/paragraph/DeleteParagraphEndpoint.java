@@ -50,8 +50,8 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -69,7 +69,7 @@ public class DeleteParagraphEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public JsonResponse createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
             String pathString = parameters.getString("path");
@@ -84,23 +84,23 @@ public class DeleteParagraphEndpoint implements EndPoint {
                 notebook.paragraphs().remove(paragraphId);
                 notebook.save();
 
-                return new JsonResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
+                return new SimpleResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
             }
             else {
-                return new JsonResponse(HttpStatus.NOT_FOUND_404, "Paragraph " + paragraphId + " doesn't exist!");
+                return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Paragraph " + paragraphId + " doesn't exist!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Notebook doesn't exist!");
+            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Notebook doesn't exist!");
         }
         catch (IOException ioException) {
-            return new JsonResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to delete paragraph, reason:\n" + ioException
             );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

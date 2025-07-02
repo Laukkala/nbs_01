@@ -50,8 +50,8 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -69,7 +69,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public JsonResponse createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
             if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
@@ -82,7 +82,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
             Path path = updatedDirectory.path().resolve(pathString);
 
             Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-            JsonResponse response = new JsonResponse(
+            SimpleResponse response = new SimpleResponse(
                     HttpStatus.CREATED_201,
                     "Created new notebook " + newDirectory.id()
             );
@@ -90,16 +90,16 @@ public class CopyDirectoryEndpoint implements EndPoint {
             return response;
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
+            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
         }
         catch (IOException ioException) {
-            return new JsonResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create directory, reason:\n" + ioException
             );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 

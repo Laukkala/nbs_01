@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.notebook.DeleteFileEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -84,7 +84,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(deletedNotebookPath));
         DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"" + deletedNotebookName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
         // Assert that the file was created.
@@ -98,7 +98,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(deletedDirectoryPath));
         DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"" + deletedDirectoryName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
         // Assert that the file was created.

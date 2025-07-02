@@ -51,8 +51,8 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -70,7 +70,7 @@ public class FindParagraphEndPoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public JsonResponse createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
@@ -83,7 +83,7 @@ public class FindParagraphEndPoint implements EndPoint {
             if (!file.isDirectory()) {
                 Notebook notebook = (Notebook) file.load();
                 if (notebook.paragraphs().containsKey(paragraphId)) {
-                    return new JsonResponse(
+                    return new SimpleResponse(
                             HttpStatus.OK_200,
                             notebook.paragraphs().get(paragraphId).json().toString()
                     );
@@ -98,16 +98,16 @@ public class FindParagraphEndPoint implements EndPoint {
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(
+            return new SimpleResponse(
                     HttpStatus.NOT_FOUND_404,
                     "Malformed request:\n" + new MalformedRequestException(fileNotFoundException)
             );
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred" + ioException);
+            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred" + ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

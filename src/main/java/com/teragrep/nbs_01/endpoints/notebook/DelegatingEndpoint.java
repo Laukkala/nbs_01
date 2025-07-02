@@ -49,8 +49,8 @@ import com.teragrep.nbs_01.Delegate;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 
 // Delegates between CreateFileEndpoint and CopyFileEndpoint based on whether the passed Callable returns a true or false.
@@ -66,7 +66,7 @@ public class DelegatingEndpoint implements EndPoint {
         this.delegationFunction = delegationFunction;
     }
 
-    public Response createResponse(Request request) {
+    public JsonResponse createResponse(Request request) {
         try {
             if (delegationFunction.resolve(request)) {
                 return trueEndpoint.createResponse(request);
@@ -76,7 +76,7 @@ public class DelegatingEndpoint implements EndPoint {
             }
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

@@ -49,8 +49,8 @@ import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -68,7 +68,7 @@ public class CreateParagraphEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public JsonResponse createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
             String pathString = parameters.getString("path");
@@ -84,23 +84,23 @@ public class CreateParagraphEndpoint implements EndPoint {
                 notebook.paragraphs().put(paragraphId, newParagraph);
                 notebook.save();
 
-                return new JsonResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
+                return new SimpleResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
             }
             else {
                 throw new MalformedRequestException("Paragraph " + paragraphId + " already exists!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Notebook doesn't exist!");
+            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Notebook doesn't exist!");
         }
         catch (IOException ioException) {
-            return new JsonResponse(
+            return new SimpleResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to create paragraph, reason:\n" + ioException
             );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 }

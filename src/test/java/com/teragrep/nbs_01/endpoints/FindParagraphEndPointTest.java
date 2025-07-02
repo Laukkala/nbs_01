@@ -50,7 +50,7 @@ import com.teragrep.nbs_01.endpoints.notebook.FindNotebookEndPoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.responses.JsonResponse;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -84,7 +84,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + paragraphId + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
     }
 
@@ -93,7 +93,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"/" + "nonexistentId" + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());
     }
 }
