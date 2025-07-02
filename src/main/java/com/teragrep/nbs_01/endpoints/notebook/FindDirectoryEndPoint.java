@@ -80,8 +80,9 @@ public class FindDirectoryEndPoint implements EndPoint {
             if (directory instanceof Directory) {
                 return new SimpleResponse(HttpStatus.OK_200, directory.json());
             }
-            else
+            else {
                 throw new FileNotFoundException("Not a directory!");
+            }
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
