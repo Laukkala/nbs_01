@@ -164,4 +164,30 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryName));
         Assertions.assertEquals(expectedJson, response.body().toString());
     }
+
+    @Test
+    // Assert that a HTTP GET request to /directory/{path/to/directory} endpoint with nonexistent path results in a response with the expected contents
+    public void httpFindNonexistentDirectoryTest() {
+        String nonexistentDirectoryName = "nonexistent_directory";
+        String expectedJson = "{\"message\":\"Directory not found!\"}";
+        // Assert that the file does not exist.
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonexistentDirectoryName)));
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + nonexistentDirectoryName)
+                );
+        Assertions.assertEquals(expectedJson, response.body().toString());
+    }
+
+    @Test
+    // Assert that a HTTP GET request to /directory/{path/to/directory} endpoint with a path corresponding to a notebook results in a response with the expected contents
+    public void httpFindDirectoryWithNotebookNameTest() {
+        String notebookName = "my_note4_2A94M5J4Z.zpln";
+        String expectedJson = "{\"message\":\"Directory not found!\"}";
+        // Assert that the path we are looking for exists, even though it's not a directory.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookName)));
+        Response response = Assertions
+                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + notebookName));
+        Assertions.assertEquals(expectedJson, response.body().toString());
+    }
 }
