@@ -104,7 +104,6 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint results in a new file being saved on disk.
-    // TODO: separate copying into its own endpoint
     public void httpCopyDirectoryTest() {
         String copyDirectoryName = "testCopyFolderName/";
         Path copyDirectoryPath = Paths.get(copyDirectoryName);
@@ -123,6 +122,29 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue((response.body().getString("message").contains("Created new directory ")));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(copyDirectoryPath)));
+        // Assert that the original file still exists.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint where something already exists in the path results in an error.
+    public void httpCopyDirectoryToExistingPathTest() {
+        String copyDirectoryName = "testCopyFolderName/";
+        Path copyDirectoryPath = Paths.get(copyDirectoryName);
+        String requestBody = Json.createObjectBuilder().add("sourcePath", directoryPath.toString()).build().toString();
+
+        // Assert that there is a file in the path where we plan to copy our directory to.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryName)));
+        JsonResponse response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/directory/" + directoryName, requestBody
+                        )
+                );
+        // Assert that we receive the proper response.
+        Assertions.assertTrue((response.body().getString("message").contains("Path at "+notebookDirectory().toString()+"/"+directoryName+" is already in use!")));
+        // Assert that the file was not created.
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(copyDirectoryPath)));
         // Assert that the original file still exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
     }

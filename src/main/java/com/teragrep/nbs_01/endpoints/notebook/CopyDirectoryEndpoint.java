@@ -84,7 +84,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
             Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
             SimpleResponse response = new SimpleResponse(
                     HttpStatus.CREATED_201,
-                    "Created new notebook " + newDirectory.id()
+                    "Created new directory " + newDirectory.id()
             );
             newDirectory.save();
             return response;
