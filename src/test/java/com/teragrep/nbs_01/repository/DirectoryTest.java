@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.repository;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -311,5 +312,25 @@ class DirectoryTest {
         // Files for both the directory and its children should exist after saving.
         Assertions.assertTrue(Files.exists(newDirectoryPath));
         Assertions.assertTrue(Files.exists(Paths.get(newDirectoryPath.toString(), "newNotebook_newNotebook.zpln")));
+    }
+
+    /**
+     * Assert that when attempting to copy a directory into a path where a file already exists, the existing file is not
+     * overwritten, and an Exception is thrown.
+     */
+    @Test
+    void testCopyingToExistingPath() {
+        Path sourcePath = Paths.get(notebookDirectory.toString(), "my_folder_2A94M5J1D");
+        Path destinationPath = Paths.get(notebookDirectory.toString(), "my_note3_2A94M5J3Z.zpln");
+
+        List<String> destinationContents = Assertions.assertDoesNotThrow(() -> Files.readAllLines(destinationPath));
+
+        Directory sourceDirectory = new Directory("originalDirectory", sourcePath);
+        Assertions
+                .assertThrows(FileAlreadyExistsException.class, () -> sourceDirectory.copy(destinationPath, "copyId"));
+
+        List<String> destinationContentsAfterCopying = Assertions
+                .assertDoesNotThrow(() -> Files.readAllLines(destinationPath));
+        Assertions.assertEquals(destinationContents, destinationContentsAfterCopying);
     }
 }
