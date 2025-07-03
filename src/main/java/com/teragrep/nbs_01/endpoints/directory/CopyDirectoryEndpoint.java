@@ -43,13 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.JsonObject;
@@ -57,61 +58,60 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Lists all the ID's of saved notebooks
-public class ListEndPoint implements EndPoint {
+// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
+public class CopyDirectoryEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public ListEndPoint(Directory root) {
+    public CopyDirectoryEndpoint(Directory root) {
         this.root = root;
     }
 
     public JsonResponse createResponse(Request request) {
-        // Find all notebooks from Directory structure
-        StringBuilder sb = new StringBuilder();
-        ZeppelinFile foundFile;
-        Directory directoryToSearch;
         try {
-            directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (parameters.containsKey("directoryId")) {
-                try {
-                    foundFile = directoryToSearch.findFile(parameters.getString("directoryId"));
-                    if (foundFile.isDirectory()) {
-                        directoryToSearch = (Directory) foundFile;
-                    }
-                    else {
-                        return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
-                    }
-                }
-                catch (FileNotFoundException fileNotFoundException) {
-                    return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
-                }
+            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
+                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
             }
-            else {
-                directoryToSearch = root;
-            }
+            String pathString = parameters.getString("path");
+            String sourcePath = parameters.getString("sourcePath");
+
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            Path path = updatedDirectory.path().resolve(pathString);
+
+            Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
+            SimpleResponse response = new SimpleResponse(
+                    HttpStatus.CREATED_201,
+                    "Created new directory " + newDirectory.id()
+            );
+            newDirectory.save();
+            return response;
         }
-        catch (MalformedRequestException | IOException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+        catch (FileNotFoundException fileNotFoundException) {
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
-        try {
-            Directory updatedDirectory = directoryToSearch
-                    .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
-            List<ZeppelinFile> files = updatedDirectory.listAllChildren();
-            for (ZeppelinFile file : files) {
-                if (!file.isDirectory()) {
-                    sb.append(file.id());
-                    sb.append("\n");
-                }
-            }
-            return new SimpleResponse(HttpStatus.OK_200, sb.toString());
+        catch (FileAlreadyExistsException fileAlreadyExistsException) {
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileAlreadyExistsException);
         }
         catch (IOException ioException) {
-            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+        }
+    }
+
+    private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
+        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
+        if (file.isDirectory()) {
+            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
+        }
+        else {
+            throw new IOException("File at " + sourcePath + " is not a directory!");
         }
     }
 }

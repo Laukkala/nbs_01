@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01;
+package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.requests.JsonRequest;

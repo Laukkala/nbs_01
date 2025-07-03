@@ -43,37 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.Delegate;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
-// Delegates between CreateFileEndpoint and CopyFileEndpoint based on whether the passed Callable returns a true or false.
-public class DelegatingEndpoint implements EndPoint {
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.ConcurrentHashMap;
 
-    private final EndPoint trueEndpoint;
-    private final EndPoint falseEndpoint;
-    private final Delegate delegationFunction;
+// Deletes a Directory or a Notebook. Should be provided with a path of the File
+public class DeleteFileEndpoint implements EndPoint {
 
-    public DelegatingEndpoint(EndPoint trueEndpoint, EndPoint falseEndpoint, Delegate delegationFunction) {
-        this.trueEndpoint = trueEndpoint;
-        this.falseEndpoint = falseEndpoint;
-        this.delegationFunction = delegationFunction;
+    private final Directory root;
+
+    public DeleteFileEndpoint(Directory root) {
+        this.root = root;
     }
 
     public JsonResponse createResponse(Request request) {
         try {
-            if (delegationFunction.resolve(request)) {
-                return trueEndpoint.createResponse(request);
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            JsonObject parameters = request.parameters();
+            if (!parameters.containsKey("path")) {
+                throw new MalformedRequestException("Request must contain a path!");
             }
-            else {
-                return falseEndpoint.createResponse(request);
-            }
+            String pathString = parameters.getString("path");
+            Path path = updatedDirectory.path().resolve(pathString);
+
+            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
+            deletedFile.delete();
+            return new SimpleResponse(HttpStatus.NO_CONTENT_204, "");
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
+        }
+        catch (IOException ioException) {
+            return new SimpleResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    "Failed to create directory, reason:\n" + ioException
+            );
         }
         catch (MalformedRequestException malformedRequestException) {
             return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);

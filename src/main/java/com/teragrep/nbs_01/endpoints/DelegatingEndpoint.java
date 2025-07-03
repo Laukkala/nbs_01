@@ -43,61 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints;
 
+import com.teragrep.nbs_01.Delegate;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+// Delegates between CreateFileEndpoint and CopyFileEndpoint based on whether the passed Callable returns a true or false.
+public class DelegatingEndpoint implements EndPoint {
 
-// Creates a new Notebook. Should be provided with a path of the File
-public class CreateDirectoryEndpoint implements EndPoint {
+    private final EndPoint trueEndpoint;
+    private final EndPoint falseEndpoint;
+    private final Delegate delegationFunction;
 
-    private final Directory root;
-
-    public CreateDirectoryEndpoint(Directory root) {
-        this.root = root;
+    public DelegatingEndpoint(EndPoint trueEndpoint, EndPoint falseEndpoint, Delegate delegationFunction) {
+        this.trueEndpoint = trueEndpoint;
+        this.falseEndpoint = falseEndpoint;
+        this.delegationFunction = delegationFunction;
     }
 
     public JsonResponse createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            if (delegationFunction.resolve(request)) {
+                return trueEndpoint.createResponse(request);
             }
-            String pathString = parameters.getString("path");
-            Path path = updatedDirectory.path().resolve(pathString);
-
-            Directory newDirectory = createDirectory(path);
-            newDirectory.save();
-            return new SimpleResponse(HttpStatus.CREATED_201, "Created new directory " + newDirectory.id());
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
-        }
-        catch (IOException ioException) {
-            return new SimpleResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
-            );
+            else {
+                return falseEndpoint.createResponse(request);
+            }
         }
         catch (MalformedRequestException malformedRequestException) {
             return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
-    }
-
-    private Directory createDirectory(Path path) {
-        return new Directory(UUID.randomUUID().toString(), path);
     }
 }

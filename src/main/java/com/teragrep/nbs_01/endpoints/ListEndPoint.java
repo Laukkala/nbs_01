@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
@@ -57,41 +57,61 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Updates a notebook with the given parameters.
-public class FindDirectoryEndPoint implements EndPoint {
+// Lists all the ID's of saved notebooks
+public class ListEndPoint implements EndPoint {
 
     private final Directory root;
 
-    public FindDirectoryEndPoint(Directory root) {
+    public ListEndPoint(Directory root) {
         this.root = root;
     }
 
     public JsonResponse createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given ID
+        // Find all notebooks from Directory structure
+        StringBuilder sb = new StringBuilder();
+        ZeppelinFile foundFile;
+        Directory directoryToSearch;
         try {
+            directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            String id = parameters.getString("path");
-            Path path = root.path().resolve(id);
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            ZeppelinFile directory = updatedDirectory.findFile(path);
-            if (directory instanceof Directory) {
-                return new SimpleResponse(HttpStatus.OK_200, directory.json());
+            if (parameters.containsKey("directoryId")) {
+                try {
+                    foundFile = directoryToSearch.findFile(parameters.getString("directoryId"));
+                    if (foundFile.isDirectory()) {
+                        directoryToSearch = (Directory) foundFile;
+                    }
+                    else {
+                        return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
+                    }
+                }
+                catch (FileNotFoundException fileNotFoundException) {
+                    return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
+                }
             }
             else {
-                throw new FileNotFoundException("Not a directory!");
+                directoryToSearch = root;
             }
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
+        catch (MalformedRequestException | IOException malformedRequestException) {
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+        }
+        try {
+            Directory updatedDirectory = directoryToSearch
+                    .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
+            List<ZeppelinFile> files = updatedDirectory.listAllChildren();
+            for (ZeppelinFile file : files) {
+                if (!file.isDirectory()) {
+                    sb.append(file.id());
+                    sb.append("\n");
+                }
+            }
+            return new SimpleResponse(HttpStatus.OK_200, sb.toString());
         }
         catch (IOException ioException) {
-            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
-        }
-        catch (MalformedRequestException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
         }
     }
 }

@@ -43,8 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01;
+package com.teragrep.nbs_01.servlets;
 
+import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

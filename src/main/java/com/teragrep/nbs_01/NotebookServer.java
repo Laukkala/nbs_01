@@ -46,12 +46,19 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
+import com.teragrep.nbs_01.endpoints.directory.CopyDirectoryEndpoint;
+import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
+import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
 import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
 import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.servlets.DirectoryServlet;
+import com.teragrep.nbs_01.servlets.HttpServlet;
+import com.teragrep.nbs_01.servlets.NotebookServlet;
+import com.teragrep.nbs_01.servlets.ParagraphServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;

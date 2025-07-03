@@ -43,14 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.JsonObject;
@@ -58,60 +56,48 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public class CopyDirectoryEndpoint implements EndPoint {
+// Creates a new Notebook. Should be provided with a path of the File
+public class CreateDirectoryEndpoint implements EndPoint {
 
     private final Directory root;
 
-    public CopyDirectoryEndpoint(Directory root) {
+    public CreateDirectoryEndpoint(Directory root) {
         this.root = root;
     }
 
     public JsonResponse createResponse(Request request) {
         try {
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
-                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
+            if (!parameters.containsKey("path")) {
+                throw new MalformedRequestException("Request must contain a path!");
             }
             String pathString = parameters.getString("path");
-            String sourcePath = parameters.getString("sourcePath");
-
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             Path path = updatedDirectory.path().resolve(pathString);
 
-            Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-            SimpleResponse response = new SimpleResponse(
-                    HttpStatus.CREATED_201,
-                    "Created new directory " + newDirectory.id()
-            );
+            Directory newDirectory = createDirectory(path);
             newDirectory.save();
-            return response;
+            return new SimpleResponse(HttpStatus.CREATED_201, "Created new directory " + newDirectory.id());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
-        }
-        catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileAlreadyExistsException);
+            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new SimpleResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    "Failed to create directory, reason:\n" + ioException
+            );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
     }
 
-    private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
-        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
-        if (file.isDirectory()) {
-            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
-        }
-        else {
-            throw new IOException("File at " + sourcePath + " is not a directory!");
-        }
+    private Directory createDirectory(Path path) {
+        return new Directory(UUID.randomUUID().toString(), path);
     }
 }

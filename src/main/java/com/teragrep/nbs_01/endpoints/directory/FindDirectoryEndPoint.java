@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
@@ -60,37 +60,35 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+// Updates a notebook with the given parameters.
+public class FindDirectoryEndPoint implements EndPoint {
 
     private final Directory root;
 
-    public DeleteFileEndpoint(Directory root) {
+    public FindDirectoryEndPoint(Directory root) {
         this.root = root;
     }
 
     public JsonResponse createResponse(Request request) {
+        // Find a notebooks from Directory structure based on given ID
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
+            String id = parameters.getString("path");
+            Path path = root.path().resolve(id);
+            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            ZeppelinFile directory = updatedDirectory.findFile(path);
+            if (directory instanceof Directory) {
+                return new SimpleResponse(HttpStatus.OK_200, directory.json());
             }
-            String pathString = parameters.getString("path");
-            Path path = updatedDirectory.path().resolve(pathString);
-
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new SimpleResponse(HttpStatus.NO_CONTENT_204, "");
+            else {
+                throw new FileNotFoundException("Not a directory!");
+            }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
+            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
         }
         catch (IOException ioException) {
-            return new SimpleResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
-            );
+            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
         }
         catch (MalformedRequestException malformedRequestException) {
             return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
