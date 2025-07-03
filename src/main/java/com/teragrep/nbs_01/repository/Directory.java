@@ -177,7 +177,7 @@ public final class Directory implements ZeppelinFile {
 
     public Directory copy(Path destinationPath, String copyId) throws IOException {
         if (Files.exists(destinationPath)) {
-            throw new IOException("Path at " + destinationPath + " is already in use!");
+            throw new FileAlreadyExistsException("Path at " + destinationPath + " is already in use!");
         }
         Map<String, ZeppelinFile> copyChildren = new HashMap<>();
         for (ZeppelinFile child : children.values()) {

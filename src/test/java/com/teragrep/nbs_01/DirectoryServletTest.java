@@ -142,7 +142,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions.assertTrue((response.body().getString("message").contains("Path at "+notebookDirectory().toString()+"/"+directoryName+" is already in use!")));
+        Assertions
+                .assertTrue((response.body().getString("message").contains("Path at " + notebookDirectory().toString() + "/" + directoryName + " is already in use!")));
         // Assert that the file was not created.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(copyDirectoryPath)));
         // Assert that the original file still exists.
