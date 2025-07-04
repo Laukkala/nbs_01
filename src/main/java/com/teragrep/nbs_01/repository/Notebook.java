@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -181,7 +182,7 @@ public final class Notebook implements ZeppelinFile {
 
     public Notebook copy(String copyTitle, Path destinationPath, String copyId) throws IOException {
         if (Files.exists(destinationPath)) {
-            throw new IOException("Path at " + destinationPath + " is already in use!");
+            throw new FileAlreadyExistsException("Path at " + destinationPath + " is already in use!");
         }
         Map<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
         for (Paragraph paragraph : paragraphs.values()) {
