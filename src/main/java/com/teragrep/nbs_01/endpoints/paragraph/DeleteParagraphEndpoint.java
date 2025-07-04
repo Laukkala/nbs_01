@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.JsonObject;
@@ -87,20 +88,17 @@ public class DeleteParagraphEndpoint implements EndPoint {
                 return new SimpleResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
             }
             else {
-                return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Paragraph " + paragraphId + " doesn't exist!");
+                throw new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Notebook doesn't exist!");
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (IOException ioException) {
-            return new SimpleResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to delete paragraph, reason:\n" + ioException
-            );
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
     }
 }

@@ -80,9 +80,9 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
+    // Assert that a request to DeleteParagraphEndpoint results in a file with edited content being saved on disk.
     public void httpDeleteParagraphTest() {
-        // Assert that the file we are creating doesn't already exist.
+        // Assert that the file we are deleting from exists.
         Assertions.assertTrue(Files.exists(notebookPath));
         Directory root = new Directory("root", notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
@@ -103,6 +103,54 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
                                 .assertDoesNotThrow(
                                         () -> com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
                                 )
+                );
+
+    }
+
+    @Test
+    // Assert that a request to DeleteParagraphEndpoint with an invalid paragraphId results in an error.
+    public void httpDeleteNonexistentParagraphTest() {
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertTrue(Files.exists(notebookPath));
+        String nonExistentParagraphId = "nonExistentParagraphId";
+        Directory root = new Directory("root", notebookDirectory());
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
+
+        JsonRequest request = new JsonRequest(
+                "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + nonExistentParagraphId + "\"}"
+        );
+        JsonResponse response = endPoint.createResponse(request);
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions
+                .assertEquals(
+                        "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph " + nonExistentParagraphId
+                                + " doesn't exist!",
+                        response.body().getString("message")
+                );
+    }
+
+    @Test
+    // Assert that a request to DeleteParagraphEndpoint a path to a nonexistent notebook results in an error.
+    public void httpDeleteParagraphFromNonexistentNotebookTest() {
+        // Assert that the file we are creating doesn't already exist.
+        String nonExistentNotebookName = "nonExistentNotebook";
+        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
+        Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
+        Directory root = new Directory("root", notebookDirectory());
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
+
+        JsonRequest request = new JsonRequest(
+                "{\"path\":\"" + nonExistentNotebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
+        );
+        JsonResponse response = endPoint.createResponse(request);
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions
+                .assertEquals(
+                        "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentNotebookPath
+                                + " not found!",
+                        response.body().getString("message")
                 );
 
     }

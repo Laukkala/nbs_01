@@ -248,7 +248,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpDeleteNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
         String requestBody = Json.createObjectBuilder().build().toString();
-        String expectedResponseMessage = "Paragraph " + nonexistentParagraphId + " doesn't exist!";
+        String expectedResponseMessage = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph "
+                + nonexistentParagraphId + " doesn't exist!";
 
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
@@ -259,7 +260,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that a faulty DELETE request is responded to with the response code 404 NOT FOUND
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
 
         // Assert that the created paragraph is not contained within the saved file of the notebook
@@ -274,8 +275,11 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpDeleteParagraphFromNonexistentNotebookTest() {
         String nonexistentNotebookId = "I_DONT_EXIST";
+        Path nonexistentNotebookPath = Paths.get(notebookDirectory().toString(), nonexistentNotebookId);
+        Assertions.assertFalse(Files.exists(nonexistentNotebookPath));
         String requestBody = Json.createObjectBuilder().build().toString();
-        String expectedResponseMessage = "Notebook doesn't exist!";
+        String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
+                + nonexistentNotebookPath + " not found!";
 
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
