@@ -87,11 +87,16 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     @Test
     public void httpNotebookNotFoundTest() {
         String nonExistentNotebookName = "nonExistentNotebook";
-        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(),nonExistentNotebookName);
+        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory("root", notebookDirectory()));
         String body = "{\"path\":\"" + nonExistentNotebookName + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
-        Assertions.assertEquals("java.io.FileNotFoundException: Notebook or directory with path "+nonExistentNotebookPath+" not found!", response.body().getString("message").strip());
+        Assertions
+                .assertEquals(
+                        "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentNotebookPath
+                                + " not found!",
+                        response.body().getString("message").strip()
+                );
     }
 }

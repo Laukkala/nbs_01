@@ -87,7 +87,10 @@ public class CopyNotebookEndpoint implements EndPoint {
             Path path = updatedDirectory.path().resolve(pathString);
 
             ZeppelinFile newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-            SimpleResponse response = new SimpleResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
+            SimpleResponse response = new SimpleResponse(
+                    HttpStatus.CREATED_201,
+                    "Created new notebook " + newFile.id()
+            );
             newFile.save();
             return response;
         }
