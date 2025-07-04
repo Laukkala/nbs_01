@@ -120,8 +120,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpFindNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
-        String expectedResponseMessage = "Malformed request:\n"
-                + "com.teragrep.nbs_01.exceptions.MalformedRequestException: java.io.FileNotFoundException: Paragraph not found!";
+        String expectedResponseMessage = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!";
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
@@ -130,7 +129,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         // Assert that the body of the response contains a message mentioning that the paragraph was not found
         Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
     }
@@ -138,14 +137,13 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Searching for a paragraph from a notebook that doesn't exist should result in an error.
     @Test
     public void httpFindParagraphFromNonexistentNotebookTest() {
-        String nonexistentNotebookId = "I_DONT_EXIST";
-        String expectedResponseMessage = "Malformed request:\n"
-                + "com.teragrep.nbs_01.exceptions.MalformedRequestException: java.io.FileNotFoundException: Notebook or directory with path target/notebooks/"
-                + nonexistentNotebookId + " not found!";
+        String nonexistentNotebookName = "I_DONT_EXIST";
+        String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
+                + notebookDirectory() + "/" + nonexistentNotebookName + " not found!";
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
+                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookName + "/paragraph/"
                                         + firstParagraphId
                         )
                 );

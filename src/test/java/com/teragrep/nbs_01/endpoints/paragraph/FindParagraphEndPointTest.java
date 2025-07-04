@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.endpoints.notebook.FindNotebookEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -88,11 +87,33 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    public void httpNotebookNotFoundTest() {
-        // Start server and wait for it to initialize.
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory("root", notebookDirectory()));
-        String body = "{\"path\":\"/" + "nonexistentId" + "\"}";
+    // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent Notebook results in an error
+    public void httpFindParagraphFromNonExistentNotebookTest() {
+        String nonExistentNotebookName = "nonexistentNotebook";
+        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
+        String body = "{\"path\":\"" + nonExistentNotebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
-        Assertions.assertEquals("Notebook not found!", response.body().getString("message").strip());
+        Assertions
+                .assertEquals(
+                        "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentNotebookPath
+                                + " not found!",
+                        response.body().getString("message").strip()
+                );
     }
+
+    @Test
+    // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent paragraphId results in an error
+    public void httpFindNonexistentParagraph() {
+        String nonExistentParagraphId = "nonExistentParagraphId";
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
+        String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + nonExistentParagraphId + "\"}";
+        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Assertions
+                .assertEquals(
+                        "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!",
+                        response.body().getString("message").strip()
+                );
+    }
+
 }
