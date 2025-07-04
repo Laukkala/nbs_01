@@ -111,7 +111,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
             return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
         }
         else {
-            throw new IOException("File at " + sourcePath + " is not a directory!");
+            throw new FileNotFoundException("File at " + sourcePath + " is not a directory!");
         }
     }
 }
