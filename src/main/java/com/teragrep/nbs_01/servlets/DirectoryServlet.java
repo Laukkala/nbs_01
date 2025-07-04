@@ -66,9 +66,6 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 // HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks or Directories.
-
-//localhost/filesystem/notebook/{path/to/notebook}    // its a notebook TODO: implement
-//localhost/filesystem/directory/{path/to/directory}  // its a directory TODO: implement
 public final class DirectoryServlet extends jakarta.servlet.http.HttpServlet {
 
     private final EndPoint getEndPoint;

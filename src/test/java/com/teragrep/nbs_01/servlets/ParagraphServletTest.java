@@ -218,12 +218,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpDeleteParagraphTest() {
         String requestBody = Json.createObjectBuilder().build().toString();
-        try {
-            Thread.sleep(5000); // This should not be necessary
-        }
-        catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(

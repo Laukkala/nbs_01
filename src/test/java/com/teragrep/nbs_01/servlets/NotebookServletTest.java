@@ -90,9 +90,6 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         String requestBody = Json.createObjectBuilder().add("title", newNotebookTitle).build().toString();
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookName)));
-        Assertions.assertDoesNotThrow(() -> {
-            Thread.sleep(5000);
-        });
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(

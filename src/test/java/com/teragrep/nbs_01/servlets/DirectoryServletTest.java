@@ -112,7 +112,6 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(copyDirectoryPath)));
-        Assertions.assertDoesNotThrow(() -> Thread.sleep(5000)); // TODO: ???? Why does waiting 5 seconds fix it
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
