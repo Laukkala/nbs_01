@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.JsonObject;
@@ -81,17 +82,17 @@ public class FindNotebookEndPoint implements EndPoint {
                 return new SimpleResponse(HttpStatus.OK_200, file.load().json().toString());
             }
             else {
-                return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found");
+                throw new FileNotFoundException("Not a Notebook");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Notebook not found!");
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileNotFoundException);
         }
         catch (IOException ioException) {
-            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "An error occurred");
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
     }
 }
