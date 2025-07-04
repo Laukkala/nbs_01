@@ -129,7 +129,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
                 + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
                 .assertEquals(
                         "java.nio.file.FileAlreadyExistsException: Path at " + existingPath + " is already in use!",
