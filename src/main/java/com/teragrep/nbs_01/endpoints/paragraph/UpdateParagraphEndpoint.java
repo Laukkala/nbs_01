@@ -52,12 +52,15 @@ import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,6 +85,9 @@ public class UpdateParagraphEndpoint implements EndPoint {
             if (!parameters.containsKey("text")) {
                 throw new MalformedRequestException("Request does not contain a paragraphId!");
             }
+            if (!Files.exists(path)) {
+                throw new FileNotFoundException("Notebook with path " + path + " not found!");
+            }
 
             Directory updatedDirectory = root
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
@@ -95,6 +101,9 @@ public class UpdateParagraphEndpoint implements EndPoint {
             Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
 
             // Find the paragraph to be edited
+            if (!paragraphs.containsKey(paragraphId)) {
+                throw new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!");
+            }
             Paragraph originalParagraph = paragraphs.get(paragraphId);
             String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
@@ -103,14 +112,14 @@ public class UpdateParagraphEndpoint implements EndPoint {
             newNotebook.save();
             return new SimpleResponse(HttpStatus.OK_200, "Paragraph edited successfully");
         }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
+        }
         catch (IOException ioException) {
-            return new SimpleResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Server error while editing paragraph: \n" + ioException
-            );
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
     }
 }

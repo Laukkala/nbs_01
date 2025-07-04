@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
@@ -81,7 +82,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
     @Test
     public void httpUpdateParagraphTest() {
-        // Assert that the file content is the same as in the resource files before edits.
+        // Assert that a request to UpdateParagraphEndpoint results in a modified file being saved on disk.
         Assertions
                 .assertEquals(
                         originalFileContent,
@@ -133,5 +134,50 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                                                 .collect(Collectors.joining())
                                 )
                 );
+    }
+
+    @Test
+    public void httpUpdateParagraphInNonexistentNotebookTest() {
+        // Assert that a request to UpdateParagraphEndpoint with a nonexistent notebook path results in an error.
+        String nonExistentNotebookName = "nonExistentNotebook";
+        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
+
+        String expectedResponse = "java.io.FileNotFoundException: Notebook with path " + nonExistentNotebookPath
+                + " not found!";
+        // Make a request editing the title of a notebook that doesn't exist.
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory("root", notebookDirectory()));
+        JsonResponse response = endpoint
+                .createResponse(
+                        new JsonRequest(
+                                "{\"path\":\"" + nonExistentNotebookName + "\",\"title\":\"" + editedTitle
+                                        + "\",\"paragraphId\":\"" + paragraphId + "\",\"text\":\"" + editedParagraphText
+                                        + "\"}"
+                        )
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
+    }
+
+    @Test
+    public void httpUpdateNonexistentParagraphTest() {
+        // Assert that a request to UpdateParagraphEndpoint with a nonexistent paragraphId results in an error.
+        String nonexistentParagraphId = "nonexistentId";
+        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph with Id "
+                + nonexistentParagraphId + " not found!";
+
+        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory("root", notebookDirectory()));
+        JsonResponse response = endpoint
+                .createResponse(
+                        new JsonRequest(
+                                "{\"path\":\"" + notebookPath + "\",\"title\":\"" + editedTitle
+                                        + "\",\"paragraphId\":\"" + nonexistentParagraphId + "\",\"text\":\""
+                                        + editedParagraphText + "\"}"
+                        )
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 }
