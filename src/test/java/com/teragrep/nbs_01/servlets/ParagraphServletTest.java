@@ -85,18 +85,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public ParagraphServletTest() {
     }
 
-    @BeforeEach
-    private void setUp() throws Exception {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-        startServer();
-    }
-
-    @AfterEach
-    private void tearDown() throws Exception {
-        deleteFileRecursively(notebookDirectory().toFile());
-        stopServer();
-    }
-
     // Searching for a paragraph should result in a message with the contents of the specified paragraph within the specified Notebook
     @Test
     public void httpFindParagraphTest() {

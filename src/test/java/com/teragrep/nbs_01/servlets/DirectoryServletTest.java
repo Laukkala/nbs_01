@@ -69,18 +69,6 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
     public DirectoryServletTest() {
     }
 
-    @BeforeEach
-    private void setUp() throws Exception {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-        startServer();
-    }
-
-    @AfterEach
-    private void tearDown() throws Exception {
-        deleteFileRecursively(notebookDirectory().toFile());
-        stopServer();
-    }
-
     @Test
     // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint results in a new file being saved on disk.
     public void httpCreateDirectoryTest() {

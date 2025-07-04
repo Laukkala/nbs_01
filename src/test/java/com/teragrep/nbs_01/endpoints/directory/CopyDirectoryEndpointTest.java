@@ -50,9 +50,7 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -71,16 +69,6 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
     private Path nonExistentSourcePath = Paths.get(notebookDirectory().toString(), "tillintallin", "tallintillin");
     private Path existingPathEndpointParameter = Paths.get("my_folder_2A94M5J1D");
     private Path existingPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     // Assert that a proper request to CopyDirectoryEndpoint results in a correct response and a file being saved to disk.

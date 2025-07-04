@@ -68,18 +68,6 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     public NotebookServletTest() {
     }
 
-    @BeforeEach
-    private void setUp() throws Exception {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-        startServer();
-    }
-
-    @AfterEach
-    private void tearDown() throws Exception {
-        deleteFileRecursively(notebookDirectory().toFile());
-        stopServer();
-    }
-
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.
     public void httpCreateNotebookTest() {

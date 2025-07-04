@@ -55,23 +55,12 @@ public class NotebookServerTest extends AbstractNotebookServerTest {
     public NotebookServerTest() {
     }
 
-    @BeforeAll
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterAll
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
-
     @Test
     // Assert that a simple HTTP request to an existing endpoint results in return code 200 OK
     public void httpConnectTest() {
-        Assertions.assertDoesNotThrow(() -> startServer());
+        ;
         JsonResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/ping"));
-        Assertions.assertDoesNotThrow(() -> stopServer());
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Assertions.assertEquals("pong", response.body().getString("message"));
     }

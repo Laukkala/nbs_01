@@ -51,7 +51,9 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import org.eclipse.jetty.http.HttpStatus;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -70,11 +72,15 @@ public class AbstractNotebookServerTest {
     private final Configuration testConfiguration = new Configuration(notebookDirectory, serverPort);
     private final NotebookServer server = new NotebookServer(testConfiguration);
 
+    @BeforeEach
     public synchronized void startServer() throws Exception {
+        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
         server.call();
     }
 
+    @AfterEach
     public synchronized void stopServer() throws Exception {
+        deleteFileRecursively(notebookDirectory().toFile());
         server.stop();
     }
 
