@@ -45,22 +45,25 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
 
     private final Path notebookPath = Paths.get("my_folder_2A94M5J1D", "my_note2_2A94M5J2Z.zpln");
+    private final Path absoluteNotebookPath = Paths.get(notebookDirectory().toString(), notebookPath.toString());
     private final String paragraphId = "20150326-214658_12335843";
     private final String editedParagraphText = "test edit";
     private final String editedTitle = "testTitle";
@@ -80,26 +83,12 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpUpdateNotebookTest() {
         // Assert that the file content is the same as in the resource files before edits.
-        Assertions
-                .assertEquals(
-                        originalFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
-                );
-        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
+        List<String> lines = Assertions
+                .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
+        String fileContent = lines.stream().collect(Collectors.joining());
+        Assertions.assertEquals(originalFileContent, fileContent);
+
+        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with a path.
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new Directory("root", notebookDirectory()));
         JsonResponse response = endpoint
                 .createResponse(
@@ -110,26 +99,47 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Assertions.assertEquals(response.body().getString("message").strip(), "Notebook edited successfully");
+
+        List<String> updatedLines = Assertions
+                .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
+        String updatedFileContent = updatedLines.stream().collect(Collectors.joining());
         // Assert that the file content has the edited paragraph saved to file in the correct place.
+        Assertions.assertEquals(expectedFileContent, updatedFileContent);
+    }
+
+    // Assert that trying to update a nonexistent notebook results in an error.
+    @Test
+    public void httpUpdateNonexistentNotebookTest() {
+        String nonExistentNotebookName = "nonExistentNotebook";
+        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
+        // Make sure the file doesn't exist
+        Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
+
+        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new Directory("root", notebookDirectory()));
+        JsonResponse response = endpoint
+                .createResponse(
+                        new JsonRequest(
+                                "{\"path\":\"" + nonExistentNotebookName + "\",\"title\":\"" + editedTitle
+                                        + "\",\"paragraphId\":\"" + paragraphId + "\",\"paragraphText\":\""
+                                        + editedParagraphText + "\"}"
+                        )
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
                 .assertEquals(
-                        expectedFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                        "java.io.FileNotFoundException: Notebook at path " + nonExistentNotebookPath
+                                + " does not exist!",
+                        response.body().getString("message").strip()
                 );
+
+        List<String> lines = Assertions
+                .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
+        String fileContent = lines.stream().collect(Collectors.joining());
+        // Assert that the file content has the edited paragraph saved to file in the correct place.
+        Assertions.assertEquals(fileContent, originalFileContent);
     }
+
 }

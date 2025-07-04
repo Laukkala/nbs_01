@@ -51,12 +51,15 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -74,10 +77,14 @@ public class UpdateNotebookEndpoint implements EndPoint {
     public JsonResponse createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
-            Path path = root.path().resolve(parameters.getString("path")); //TODO: why is this here?
+            Path path = root.path().resolve(parameters.getString("path"));
 
             if (!parameters.containsKey("title")) {
                 throw new MalformedRequestException("Request does not contain a title!");
+            }
+
+            if (!Files.exists(path)) {
+                throw new FileNotFoundException("Notebook at path " + path + " does not exist!");
             }
 
             Directory updatedDirectory = root
@@ -93,14 +100,14 @@ public class UpdateNotebookEndpoint implements EndPoint {
             newNotebook.save();
             return new SimpleResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
+        }
         catch (IOException ioException) {
-            return new SimpleResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Server error while editing notebook: \n" + ioException
-            );
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
     }
 }
