@@ -141,7 +141,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath,
-                                "{\"sourcePath\":\"/my_note4_2A94M5J4Z.zpln\",\"title\":\"copyNotebook\"}"
+                                "{\"sourcePath\":\"my_note4_2A94M5J4Z.zpln\",\"title\":\"copyNotebook\"}"
                         )
                 );
         // Assert that we receive the proper response.

@@ -101,7 +101,7 @@ public class NotebookServer implements Callable {
             NotebookServlet notebookServlet = new NotebookServlet(
                     new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourceId")), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
