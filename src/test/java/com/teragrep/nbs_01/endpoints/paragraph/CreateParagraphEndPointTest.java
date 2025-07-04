@@ -80,7 +80,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
+    // Assert that a HTTP request to CreateParagraphEndpoint results in a new file being saved on disk.
     public void httpCreateParagraphTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookPath));
@@ -103,6 +103,31 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
                                 .assertDoesNotThrow(
                                         () -> com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
                                 )
+                );
+    }
+
+    @Test
+    // Assert that a HTTP request to /notebook/new endpoint with a path that alreday doesn't contain a file results in an error.
+    public void httpCreateParagraphInNonExistentPathTest() {
+
+        String nonexistentFileName = "NonExistentFile";
+        Path nonexistentFilePath = Paths.get(notebookDirectory().toString(), nonexistentFileName);
+        // Assert that the file we are creating doesn't exist.
+        Assertions.assertFalse(Files.exists(nonexistentFilePath));
+        Directory root = new Directory("root", notebookDirectory());
+        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
+
+        JsonRequest request = new JsonRequest(
+                "{\"path\":\"" + nonexistentFileName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
+        );
+        JsonResponse response = endPoint.createResponse(request);
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions
+                .assertEquals(
+                        "java.io.FileNotFoundException: Notebook or directory with path " + nonexistentFilePath
+                                + " not found!",
+                        response.body().getString("message")
                 );
     }
 }

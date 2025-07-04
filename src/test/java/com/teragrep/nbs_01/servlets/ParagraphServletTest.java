@@ -188,8 +188,10 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpCreateParagraphInNonexistentNotebookTest() {
         String newParagraphId = "2025-01-01-021311-132-133";
         String nonexistentNotebookId = "I_DONT_EXIST";
+        Path nonexistentNotebookPath = Paths.get(notebookDirectory().toString(), nonexistentNotebookId);
         String requestBody = Json.createObjectBuilder().build().toString();
-        String expectedResponseMessage = "Notebook doesn't exist!";
+        String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
+                + nonexistentNotebookPath + " not found!";
 
         JsonResponse response = Assertions
                 .assertDoesNotThrow(
