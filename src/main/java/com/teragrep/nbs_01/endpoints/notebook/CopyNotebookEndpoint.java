@@ -97,7 +97,7 @@ public class CopyNotebookEndpoint implements EndPoint {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileAlreadyExistsException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
