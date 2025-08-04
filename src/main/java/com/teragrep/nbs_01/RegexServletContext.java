@@ -52,7 +52,7 @@ import org.eclipse.jetty.util.Callback;
 
 import java.util.regex.Pattern;
 
-// Custom Jetty Handler that
+// Custom Jetty Handler that only handles requests that match a given Regex pattern.
 public final class RegexServletContext extends ServletContextHandler {
 
     private final String regex;

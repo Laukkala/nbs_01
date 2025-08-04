@@ -202,7 +202,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(fileContents.contains(newParagraphId));
     }
 
-    // Deleting a specific paragraph from a specific should result in the notebook being saved to disk without the specified paragraph.
+    // Deleting a specific paragraph from a specific notebook should result in the notebook being saved to disk without the specified paragraph.
     @Test
     public void httpDeleteParagraphTest() {
         String requestBody = Json.createObjectBuilder().build().toString();
@@ -323,12 +323,14 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(fileContents.contains(expectedParagraphContent));
     }
 
+    // Copying a paragraph into the same notebook should result in a new paragraph with the same content as the source appearing in the notebook.
     // Copying is not an atomic operation. You must first create a new paragraph, then update it with the output of the source paragraph.
     @Test
     public void httpCopyParagraphTest() {
 
         String newParagraphId = "2025-01-01-021311-132-133";
 
+        // Verify that the source paragraph we want to copy exists
         // Make an HTTP GET request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
         JsonResponse getResponse = Assertions
                 .assertDoesNotThrow(
@@ -353,7 +355,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the PUT request is responded to with the response code 201 CREATED
         Assertions.assertEquals(HttpStatus.CREATED_201, putResponse.status());
 
-        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to edit the copy with the same information as the source paragraph.
         // Read the received paragraph into a JSON object.
         JsonObject sourceParagraph = Json
                 .createReader(new StringReader(getResponse.body().getString("message")))
@@ -382,6 +383,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .build()
                 .toString();
 
+        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to edit the copy with the same information as the source paragraph.
         JsonResponse postResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
@@ -393,14 +395,14 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the POST request is responded to with the response code 200 OK
         Assertions.assertEquals(HttpStatus.OK_200, postResponse.status());
 
-        // Assert that the copied paragraph is contained within the saved file of the notebook
+        // Assert that the copied paragraph is contained within the saved file of the target notebook
         String fileContents = Assertions
                 .assertDoesNotThrow(
                         () -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath.toString()))
                 );
         Assertions.assertTrue(fileContents.contains(expectedParagraphContent));
 
-        // Assert that the original paragraph is also contained within the saved file of the notebook
+        // Assert that the original paragraph is also contained within the saved file of the original notebook
         Assertions.assertTrue(fileContents.contains(originalParagraphContent));
     }
 

@@ -92,7 +92,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint results in a new file being saved on disk.
+    // Copying a directory
     public void httpCopyDirectoryTest() {
         String copyDirectoryName = "testCopyFolderName/";
         Path copyDirectoryPath = Paths.get(copyDirectoryName);
