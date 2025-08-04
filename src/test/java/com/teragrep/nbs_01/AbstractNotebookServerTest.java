@@ -168,9 +168,6 @@ public class AbstractNotebookServerTest {
         connection.setDoOutput(true);
 
         byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
-        int length = bytes.length;
-
-        connection.setFixedLengthStreamingMode(length);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
         OutputStream output = connection.getOutputStream();
@@ -233,9 +230,6 @@ public class AbstractNotebookServerTest {
         connection.setDoOutput(true);
 
         byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
-        int length = bytes.length;
-
-        connection.setFixedLengthStreamingMode(length);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
         OutputStream output = connection.getOutputStream();
@@ -271,9 +265,6 @@ public class AbstractNotebookServerTest {
         connection.setDoOutput(true);
 
         byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
-        int length = bytes.length;
-
-        connection.setFixedLengthStreamingMode(length);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
         OutputStream output = connection.getOutputStream();
