@@ -88,7 +88,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory("root", notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newNotebookName + "\",\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -103,7 +103,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCopyNonExistentNotebookTest() {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory("root", notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newNotebookName + "\",\"sourcePath\":\"" + nonExistentNotebookPath + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -124,7 +124,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory("root", notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + existingPathEndpointParameter + "\",\"sourcePath\":\"" + sourceNotebookParameter
                 + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));

@@ -56,11 +56,7 @@ public interface ZeppelinFile extends Stubable {
 
     public abstract void delete() throws IOException;
 
-    public abstract ZeppelinFile findFile(String id) throws FileNotFoundException;
-
     public abstract ZeppelinFile findFile(Path path) throws FileNotFoundException;
-
-    public abstract String id();
 
     public abstract Path path();
 
@@ -68,9 +64,9 @@ public interface ZeppelinFile extends Stubable {
 
     public abstract boolean isDirectory();
 
-    public abstract ZeppelinFile copy(Path path, String id) throws IOException;
+    public abstract ZeppelinFile copy(Path path) throws IOException;
 
-    public abstract Map<String, ZeppelinFile> children();
+    public abstract Map<Path, ZeppelinFile> children();
 
     public abstract void printTree();
 

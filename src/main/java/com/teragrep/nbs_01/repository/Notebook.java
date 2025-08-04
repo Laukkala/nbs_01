@@ -69,11 +69,9 @@ public final class Notebook implements ZeppelinFile {
     private static final Logger LOGGER = LoggerFactory.getLogger(Notebook.class);
     private final Map<String, Paragraph> paragraphs;
     private final String title;
-    private final String id;
     private final Path path;
 
-    public Notebook(String title, String id, Path path, Map<String, Paragraph> paragraphs) {
-        this.id = id;
+    public Notebook(String title, Path path, Map<String, Paragraph> paragraphs) {
         this.path = path;
         this.title = title;
         this.paragraphs = paragraphs;
@@ -85,17 +83,6 @@ public final class Notebook implements ZeppelinFile {
         Files.delete(path());
     }
 
-    // Checks if searched ID matches with this Notebooks ID.
-    @Override
-    public ZeppelinFile findFile(String searchedId) throws FileNotFoundException {
-        if (id().equals(searchedId)) {
-            return this;
-        }
-        else {
-            throw new FileNotFoundException("Searched id " + searchedId + " does not match with" + id());
-        }
-    }
-
     // Checks if searched path matches with this Notebooks path.
     @Override
     public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
@@ -105,10 +92,6 @@ public final class Notebook implements ZeppelinFile {
         else {
             throw new FileNotFoundException("Searched path " + searchedPath + " does not match with" + path());
         }
-    }
-
-    public String id() {
-        return id;
     }
 
     public Path path() {
@@ -125,7 +108,6 @@ public final class Notebook implements ZeppelinFile {
 
     public JsonObject json() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("id", id());
         builder.add("name", title);
         //compatibility fields//
         builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
@@ -140,18 +122,18 @@ public final class Notebook implements ZeppelinFile {
         return builder.build();
     }
 
-    public Notebook copy(Path destinationPath, String copyId) throws IOException {
-        return copy(title, destinationPath, copyId);
+    public Notebook copy(Path destinationPath) throws IOException {
+        return copy(title, destinationPath);
     }
 
     @Override
-    public Map<String, ZeppelinFile> children() {
+    public Map<Path, ZeppelinFile> children() {
         return new HashMap<>();
     }
 
     @Override
     public void printTree() {
-        LOGGER.debug("File, ID: {}, Path: {}", id(), path());
+        LOGGER.debug("File, Path: {}", path());
     }
 
     @Override
@@ -164,7 +146,6 @@ public final class Notebook implements ZeppelinFile {
         stringReader.close();
 
         String savedName = object.getString("name");
-        String savedId = object.getString("id");
         JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
         Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
         for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
@@ -172,7 +153,7 @@ public final class Notebook implements ZeppelinFile {
             Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
             savedParagraphs.put(paragraph.id(), paragraph);
         }
-        return new Notebook(savedName, savedId, path(), savedParagraphs);
+        return new Notebook(savedName, path(), savedParagraphs);
     }
 
     @Override
@@ -180,7 +161,7 @@ public final class Notebook implements ZeppelinFile {
         return new ArrayList<>();
     }
 
-    public Notebook copy(String copyTitle, Path destinationPath, String copyId) throws IOException {
+    public Notebook copy(String copyTitle, Path destinationPath) throws IOException {
         if (Files.exists(destinationPath)) {
             throw new FileAlreadyExistsException("Path at " + destinationPath + " is already in use!");
         }
@@ -191,7 +172,7 @@ public final class Notebook implements ZeppelinFile {
             Paragraph copyParagraph = new Paragraph(copyParagraphId, paragraph.title(), copyScript);
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
         }
-        Notebook copyNotebook = new Notebook(copyTitle, copyId, destinationPath, copyParagraphs);
+        Notebook copyNotebook = new Notebook(copyTitle, destinationPath, copyParagraphs);
         copyNotebook.save();
         return copyNotebook;
     }
@@ -221,7 +202,7 @@ public final class Notebook implements ZeppelinFile {
         if (Files.exists(destinationPath)) {
             throw new IOException("Path at " + destinationPath + " is already in use!");
         }
-        Notebook movedNotebook = copy(destinationPath, id());
+        Notebook movedNotebook = copy(destinationPath);
         movedNotebook.save();
         delete();
     }
@@ -231,7 +212,7 @@ public final class Notebook implements ZeppelinFile {
     }
 
     public Notebook move(Directory parentDirectory, String fileName) throws IOException {
-        Notebook movedNotebook = copy(Paths.get(parentDirectory.path().toString(), fileName), id());
+        Notebook movedNotebook = copy(Paths.get(parentDirectory.path().toString(), fileName));
         movedNotebook.save();
         delete();
         return movedNotebook;

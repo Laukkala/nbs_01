@@ -62,7 +62,6 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     private final Path notebookPath = Paths
             .get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
     private final String expectedFileContent = "{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}}";
-    private final String notebookId = "2A94M5J1Z";
 
     @BeforeEach
     private void setUp() {
@@ -80,7 +79,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + paragraphId + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
@@ -91,7 +90,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpFindParagraphFromNonExistentNotebookTest() {
         String nonExistentNotebookName = "nonexistentNotebook";
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + nonExistentNotebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions
@@ -106,7 +105,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent paragraphId results in an error
     public void httpFindNonexistentParagraph() {
         String nonExistentParagraphId = "nonExistentParagraphId";
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory("root", notebookDirectory()));
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + nonExistentParagraphId + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions

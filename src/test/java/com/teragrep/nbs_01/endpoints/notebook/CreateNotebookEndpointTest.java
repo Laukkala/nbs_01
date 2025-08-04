@@ -81,7 +81,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory("root", notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newNotebookName + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -96,7 +96,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateNotebookIntoUnavailablePathTest() {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingNotebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory("root", notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + existingNotebookName + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -118,7 +118,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName.toString());
         // Assert that the file we are creating already exists.
         Assertions.assertFalse(Files.exists(notebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory("root", notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + notebookName + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.

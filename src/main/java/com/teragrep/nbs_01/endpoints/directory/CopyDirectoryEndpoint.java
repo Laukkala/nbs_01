@@ -86,7 +86,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
             Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
             SimpleResponse response = new SimpleResponse(
                     HttpStatus.CREATED_201,
-                    "Created new directory " + newDirectory.id()
+                    "Created new directory " + newDirectory.path()
             );
             newDirectory.save();
             return response;
@@ -108,7 +108,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
     private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
         ZeppelinFile file = sourceDir.findFile(sourcePath).load();
         if (file.isDirectory()) {
-            return (Directory) file.copy(destinationPath, destinationPath.getFileName().toString());
+            return (Directory) file.copy(destinationPath);
         }
         else {
             throw new FileNotFoundException("File at " + sourcePath + " is not a directory!");

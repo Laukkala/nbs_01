@@ -68,14 +68,12 @@ import java.util.stream.Collectors;
  */
 public final class UnloadedNotebook implements ZeppelinFile {
 
-    private final String id;
     private final Path path;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnloadedNotebook.class);
     private final Map<String, Paragraph> paragraphs;
 
-    public UnloadedNotebook(String id, Path path) {
-        this.id = id;
+    public UnloadedNotebook(Path path) {
         this.path = path;
         this.paragraphs = new HashMap<>();
     }
@@ -86,16 +84,6 @@ public final class UnloadedNotebook implements ZeppelinFile {
     }
 
     @Override
-    public ZeppelinFile findFile(String searchedId) throws FileNotFoundException {
-        if (searchedId.equals(id())) {
-            return this;
-        }
-        else {
-            throw new FileNotFoundException("Searched id " + searchedId + " does not match with" + id());
-        }
-    }
-
-    @Override
     public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
         if (path().equals(searchedPath)) {
             return this;
@@ -103,10 +91,6 @@ public final class UnloadedNotebook implements ZeppelinFile {
         else {
             throw new FileNotFoundException("Searched path " + searchedPath + " does not match with" + path());
         }
-    }
-
-    public String id() {
-        return id;
     }
 
     @Override
@@ -131,12 +115,12 @@ public final class UnloadedNotebook implements ZeppelinFile {
     }
 
     @Override
-    public UnloadedNotebook copy(Path destinationPath, String copyId) throws IOException {
+    public UnloadedNotebook copy(Path destinationPath) throws IOException {
         throw new UnsupportedOperationException("Cannot copy UnloadedNotebook!");
     }
 
     @Override
-    public Map<String, ZeppelinFile> children() {
+    public Map<Path, ZeppelinFile> children() {
         return new HashMap<>();
     }
 
@@ -162,7 +146,6 @@ public final class UnloadedNotebook implements ZeppelinFile {
             stringReader.close();
 
             String savedName = object.getString("name");
-            String savedId = object.getString("id");
             JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
             Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
             for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
@@ -170,7 +153,7 @@ public final class UnloadedNotebook implements ZeppelinFile {
                 Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
                 savedParagraphs.put(paragraph.id(), paragraph);
             }
-            return new Notebook(savedName, savedId, path(), savedParagraphs);
+            return new Notebook(savedName, path(), savedParagraphs);
         }
         catch (JsonParsingException jsonParsingException) {
             throw new IOException("File " + path.toString() + " is not valid JSON!");

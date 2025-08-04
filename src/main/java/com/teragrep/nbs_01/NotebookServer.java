@@ -90,7 +90,7 @@ public class NotebookServer implements Callable {
         try {
 
             // Initialize filesystem
-            Directory root = new Directory("root", configuration.notebookDirectory())
+            Directory root = new Directory(configuration.notebookDirectory())
                     .initializeDirectory(configuration.notebookDirectory(), new ConcurrentHashMap<>());
 
             // Jetty setup

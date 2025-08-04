@@ -69,6 +69,15 @@ public class AbstractNotebookServerTest {
     private final String serverAddress = "localhost:" + serverPort;
     private final Path notebookResources = Paths.get("src/test/resources");
     private final Path notebookDirectory = Paths.get("target/notebooks");
+    private final Path notebook1 = Paths
+            .get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
+    private final Path notebook2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_note2_2A94M5J2Z.zpln");
+    private final Path notebook3 = Paths.get("target/notebooks/my_note3_2A94M5J3Z.zpln");
+    private final Path notebook4 = Paths.get("target/notebooks/my_note4_2A94M5J4Z.zpln");
+    private final Path directory1 = Paths.get("target/notebooks/my_folder_2A94M5J1D");
+    private final Path directory2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
+    private final Path junkfile = Paths.get("target/notebooks/junkfile");
+
     private final Configuration testConfiguration = new Configuration(notebookDirectory, serverPort);
     private final NotebookServer server = new NotebookServer(testConfiguration);
 
@@ -86,6 +95,34 @@ public class AbstractNotebookServerTest {
 
     public Path notebookDirectory() {
         return notebookDirectory;
+    }
+
+    public Path notebook1() {
+        return notebook1;
+    }
+
+    public Path notebook2() {
+        return notebook2;
+    }
+
+    public Path notebook3() {
+        return notebook3;
+    }
+
+    public Path notebook4() {
+        return notebook4;
+    }
+
+    public Path directory1() {
+        return directory1;
+    }
+
+    public Path directory2() {
+        return directory2;
+    }
+
+    public Path junkfile() {
+        return junkfile;
     }
 
     public Path notebookResources() {

@@ -81,7 +81,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedNotebookPath));
-        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
+        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + deletedNotebookName + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -95,7 +95,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteDirectoryTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedDirectoryPath));
-        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory("root", notebookDirectory()));
+        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + deletedDirectoryName + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.

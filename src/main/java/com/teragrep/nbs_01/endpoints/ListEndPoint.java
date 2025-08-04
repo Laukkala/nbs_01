@@ -56,6 +56,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -76,9 +77,9 @@ public class ListEndPoint implements EndPoint {
         try {
             directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
             JsonObject parameters = request.parameters();
-            if (parameters.containsKey("directoryId")) {
+            if (parameters.containsKey("directoryPath")) {
                 try {
-                    foundFile = directoryToSearch.findFile(parameters.getString("directoryId"));
+                    foundFile = directoryToSearch.findFile(Paths.get(parameters.getString("directoryPath")));
                     if (foundFile.isDirectory()) {
                         directoryToSearch = (Directory) foundFile;
                     }
@@ -103,7 +104,7 @@ public class ListEndPoint implements EndPoint {
             List<ZeppelinFile> files = updatedDirectory.listAllChildren();
             for (ZeppelinFile file : files) {
                 if (!file.isDirectory()) {
-                    sb.append(file.id());
+                    sb.append(file.path());
                     sb.append("\n");
                 }
             }

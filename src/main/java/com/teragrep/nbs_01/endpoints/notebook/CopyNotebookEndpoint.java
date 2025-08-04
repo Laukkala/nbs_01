@@ -62,7 +62,6 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
@@ -89,7 +88,7 @@ public class CopyNotebookEndpoint implements EndPoint {
             ZeppelinFile newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
             SimpleResponse response = new SimpleResponse(
                     HttpStatus.CREATED_201,
-                    "Created new notebook " + newFile.id()
+                    "Created new notebook " + newFile.path()
             );
             newFile.save();
             return response;
@@ -109,17 +108,17 @@ public class CopyNotebookEndpoint implements EndPoint {
     }
 
     private Directory createDirectory(Path path) {
-        return new Directory(UUID.randomUUID().toString(), path);
+        return new Directory(path);
     }
 
     private Notebook createNotebook(String title, Path path) {
-        return new Notebook(title, UUID.randomUUID().toString(), path, new HashMap<>());
+        return new Notebook(title, path, new HashMap<>());
     }
 
     private Notebook copyNotebook(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
         ZeppelinFile file = sourceDir.findFile(sourcePath).load();
         if (!file.isDirectory()) {
-            return (Notebook) file.copy(destinationPath, destinationPath.getFileName().toString());
+            return (Notebook) file.copy(destinationPath);
         }
         else {
             throw new IOException("File at " + sourcePath + " is not a notebook!");

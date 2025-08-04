@@ -76,7 +76,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(copiedDirectoryPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
-        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory("root", notebookDirectory()));
+        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newDirectoryName + "\",\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -91,7 +91,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
     public void httpCopyNonExistentDirectoryTest() {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(faultyEndpointParameter));
-        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory("root", notebookDirectory()));
+        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newDirectoryName + "\",\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
@@ -112,7 +112,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
-        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory("root", notebookDirectory()));
+        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + existingPathEndpointParameter + "\",\"sourcePath\":\"" + sourceDirectoryParameter
                 + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));

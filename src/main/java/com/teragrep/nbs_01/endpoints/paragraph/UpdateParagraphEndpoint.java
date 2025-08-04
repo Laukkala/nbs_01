@@ -108,7 +108,7 @@ public class UpdateParagraphEndpoint implements EndPoint {
             String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
-            Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
+            Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
             newNotebook.save();
             return new SimpleResponse(HttpStatus.OK_200, "Paragraph edited successfully");
         }

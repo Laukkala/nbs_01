@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExceptionResponseTest {
 
     private final String throwable1message = "Failed to open notebook!";
-    private final String throwable2message = "Notebook with ID 12345 was not found!";
+    private final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
 

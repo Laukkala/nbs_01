@@ -59,7 +59,8 @@ import java.nio.file.Paths;
 public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
 
     private final Path directoryPath = Paths.get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/");
-    private final String expectedFileContent = "{\"id\":\"2A94M5J2D\",\"name\":\"my_second_folder_2A94M5J2D\",\"chidlren\":\"[2A94M5J1Z]\"}";
+    private final String expectedFileContent = "{\"name\":\"my_second_folder_2A94M5J2D\",\"chidlren\":\"[" + notebook1()
+            + "]\"}";
 
     @BeforeEach
     private void setUp() {
@@ -77,7 +78,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), directoryPath.toString())));
 
-        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory("root", notebookDirectory()));
+        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + directoryPath + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().toString());
@@ -87,7 +88,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
     public void httpNotebookNotFoundTest() {
         // Start server and wait for it to initialize.
         String nonExistentPath = "nonExistentPath";
-        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory("root", notebookDirectory()));
+        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + nonExistentPath + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions

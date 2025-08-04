@@ -96,7 +96,7 @@ public class UpdateNotebookEndpoint implements EndPoint {
 
             // Add a modified title
             String title = parameters.getString("title");
-            Notebook newNotebook = new Notebook(title, notebook.id(), notebook.path(), paragraphs);
+            Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
             newNotebook.save();
             return new SimpleResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }

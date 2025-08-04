@@ -62,7 +62,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Notebook. Should be provided with a path of the File
@@ -91,7 +90,7 @@ public class CreateNotebookEndpoint implements EndPoint {
 
             Notebook newFile = createNotebook(title, path);
             newFile.save();
-            return new SimpleResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.id());
+            return new SimpleResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.path());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -108,6 +107,6 @@ public class CreateNotebookEndpoint implements EndPoint {
     }
 
     private Notebook createNotebook(String title, Path path) {
-        return new Notebook(title, UUID.randomUUID().toString(), path, new HashMap<>());
+        return new Notebook(title, path, new HashMap<>());
     }
 }

@@ -64,7 +64,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     private String notebookName = "my_note3_2A94M5J3Z.zpln";
     private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
     private String paragraphId = "20150213-230428_1231780373";
-    private String expectedFileContent = "{\"id\":\"2A94M5J3Z\",\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
+    private String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
 
     public DeleteParagraphEndPointTest() {
     }
@@ -84,7 +84,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteParagraphTest() {
         // Assert that the file we are deleting from exists.
         Assertions.assertTrue(Files.exists(notebookPath));
-        Directory root = new Directory("root", notebookDirectory());
+        Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
         JsonRequest request = new JsonRequest(
@@ -113,7 +113,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookPath));
         String nonExistentParagraphId = "nonExistentParagraphId";
-        Directory root = new Directory("root", notebookDirectory());
+        Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
         JsonRequest request = new JsonRequest(
@@ -137,7 +137,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String nonExistentNotebookName = "nonExistentNotebook";
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
-        Directory root = new Directory("root", notebookDirectory());
+        Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
         JsonRequest request = new JsonRequest(
