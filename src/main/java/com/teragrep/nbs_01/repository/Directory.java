@@ -177,7 +177,8 @@ public final class Directory implements ZeppelinFile {
         return Json
                 .createObjectBuilder()
                 .add("name", path.getFileName().toString())
-                .add("children", children.keySet().stream().map((childPath) -> childPath.getFileName()).collect(Collectors.toList()).toString()).build();
+                .add("children", children.keySet().stream().map((path)-> path.getFileName()).collect(Collectors.toList()).toString())
+                .build();
     }
 
     public void save() throws IOException {
