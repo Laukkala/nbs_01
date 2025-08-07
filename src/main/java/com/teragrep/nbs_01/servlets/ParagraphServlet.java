@@ -103,8 +103,8 @@ public final class ParagraphServlet extends jakarta.servlet.http.HttpServlet {
         String pathString = req.getServletPath();
         Path path = Paths.get("/").relativize(Paths.get(pathString));
         // Parse the paragraphId and Notebook path from the URL string.
-        Path notebookPath = path.subpath(0, 1);
-        Path paragraphId = path.subpath(2, 3);
+        Path notebookPath = path.subpath(0, path.getNameCount() - 2);
+        Path paragraphId = path.subpath(path.getNameCount() - 1, path.getNameCount());
 
         JsonObject json = Json
                 .createObjectBuilder()
