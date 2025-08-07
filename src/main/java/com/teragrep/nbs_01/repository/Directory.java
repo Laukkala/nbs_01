@@ -176,7 +176,7 @@ public final class Directory implements ZeppelinFile {
         return Json
                 .createObjectBuilder()
                 .add("name", path.getFileName().toString())
-                .add("chidlren", children.keySet().toString())
+                .add("children", children.keySet().toString())
                 .build();
     }
 

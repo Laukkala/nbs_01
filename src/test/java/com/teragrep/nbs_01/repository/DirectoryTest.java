@@ -292,7 +292,7 @@ class DirectoryTest {
                 .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
         Assertions
                 .assertEquals(
-                        "{\"name\":\"notebooks\",\"chidlren\":\"[" + notebook3 + ", " + junkfile + ", " + directory1
+                        "{\"name\":\"notebooks\",\"children\":\"[" + notebook3 + ", " + junkfile + ", " + directory1
                                 + ", " + notebook4 + "]\"}",
                         root.json().toString()
                 );
