@@ -56,6 +56,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public final class Directory implements ZeppelinFile {
 
@@ -176,7 +177,7 @@ public final class Directory implements ZeppelinFile {
         return Json
                 .createObjectBuilder()
                 .add("name", path.getFileName().toString())
-                .add("children", children.keySet().toString())
+                .add("children", children.keySet().stream().map((path)-> path.getFileName()).collect(Collectors.toList()).toString())
                 .build();
     }
 
@@ -213,11 +214,12 @@ public final class Directory implements ZeppelinFile {
         return false;
     }
 
+    // This method traverses the file tree recursively and depth first, and creates a Directory object with a complete map of child Directories and Notebooks.
     public Directory initializeDirectory(Path pathToVisit, ConcurrentHashMap<Path, ZeppelinFile> existingFiles)
             throws IOException {
         // Create a copy of existingFiles so that we don't make any direct edits to it.
-        Map<Path, ZeppelinFile> existingChildren = new HashMap<>();
-        existingChildren.putAll(existingFiles);
+        Map<Path, ZeppelinFile> children = new HashMap<>();
+        children.putAll(existingFiles);
         Files.walkFileTree(pathToVisit, new SimpleFileVisitor<Path>() {
 
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
@@ -233,12 +235,12 @@ public final class Directory implements ZeppelinFile {
                 try {
                     // Here we create any child Directories by calling this function recursively.
                     // First we will check if we already have the files of the child Directory in existingFiles, and pass them to the recursive call so that we don't do any unnecessary operations in later recursions.
-                    ConcurrentHashMap<Path, ZeppelinFile> subtreeChildren = new ConcurrentHashMap<>();
-                    if (existingChildren.containsKey(dir)) {
-                        subtreeChildren.putAll(existingChildren.get(dir).children());
+                    ConcurrentHashMap<Path, ZeppelinFile> childrenOfChildDirectory = new ConcurrentHashMap<>();
+                    if (children.containsKey(dir)) {
+                        childrenOfChildDirectory.putAll(children.get(dir).children());
                     }
-                    Directory subtree = initializeDirectory(dir, subtreeChildren);
-                    existingChildren.put(subtree.path(), subtree);
+                    Directory childDirectory = initializeDirectory(dir, childrenOfChildDirectory);
+                    children.put(childDirectory.path(), childDirectory);
                 }
                 catch (IOException exception) {
                     throw new RuntimeException(exception);
@@ -248,8 +250,8 @@ public final class Directory implements ZeppelinFile {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                if (!existingChildren.containsKey(file)) {
-                    existingChildren.put(file, new UnloadedNotebook(file));
+                if (!children.containsKey(file)) {
+                    children.put(file, new UnloadedNotebook(file));
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -264,7 +266,7 @@ public final class Directory implements ZeppelinFile {
                 return super.postVisitDirectory(dir, exc);
             }
         });
-        Directory root = new Directory(pathToVisit, existingChildren);
+        Directory root = new Directory(pathToVisit, children);
         return root;
     }
 
