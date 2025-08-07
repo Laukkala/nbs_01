@@ -292,8 +292,9 @@ class DirectoryTest {
                 .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
         Assertions
                 .assertEquals(
-                        "{\"name\":\"notebooks\",\"children\":\"[" + notebook3 + ", " + junkfile + ", " + directory1
-                                + ", " + notebook4 + "]\"}",
+                        "{\"name\":\"notebooks\",\"children\":\"[" + notebook3.getFileName() + ", "
+                                + junkfile.getFileName() + ", " + directory1.getFileName() + ", "
+                                + notebook4.getFileName() + "]\"}",
                         root.json().toString()
                 );
     }

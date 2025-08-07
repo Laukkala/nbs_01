@@ -59,8 +59,8 @@ import java.nio.file.Paths;
 public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
 
     private final Path directoryPath = Paths.get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/");
-    private final String expectedFileContent = "{\"name\":\"my_second_folder_2A94M5J2D\",\"children\":\"[" + notebook1()
-            + "]\"}";
+    private final String expectedFileContent = "{\"name\":\"my_second_folder_2A94M5J2D\",\"children\":\"["
+            + notebook1().getFileName() + "]\"}";
 
     @BeforeEach
     private void setUp() {

@@ -168,8 +168,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP GET request to /directory/{path/to/directory} endpoint results in a response with the expected contents
     public void httpFindDirectoryTest() {
-        String expectedJson = "{\"name\":\"my_folder_2A94M5J1D\",\"children\":\"[" + directory2() + ", " + notebook2()
-                + "]\"}";
+        String expectedJson = "{\"name\":\"my_folder_2A94M5J1D\",\"children\":\"[" + directory2().getFileName() + ", "
+                + notebook2().getFileName() + "]\"}";
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         JsonResponse response = Assertions
