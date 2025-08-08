@@ -303,7 +303,6 @@ public class AbstractNotebookServerTest {
 
         }
         catch (IOException e) {
-            System.out.println(e);
             return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, e.toString());
         }
     }
