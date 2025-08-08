@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -60,7 +61,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
     private String paragraphId = "20150210-015259_1403135953";
     private final Path notebookPath = Paths
-            .get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
+            .get("my_folder_2A94M5J1D", "my_second_folder_2A94M5J2D", "my_note1_2A94M5J1Z.zpln");
     private final String expectedFileContent = "{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}}";
 
     @BeforeEach
@@ -79,8 +80,9 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
+        Path requestPath = Paths.get(notebookPath.toString(), "/paragraph/" + paragraphId);
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + paragraphId + "\"}";
+        String body = "{\"path\":\"" + requestPath + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
     }
@@ -88,15 +90,16 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent Notebook results in an error
     public void httpFindParagraphFromNonExistentNotebookTest() {
-        String nonExistentNotebookName = "nonexistentNotebook";
-        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
+        String nonExistentNotebookName = "NonExistentNotebook";
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + nonExistentNotebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}";
+
+        Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
+        String body = "{\"path\":\"" + requestPath + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions
                 .assertEquals(
-                        "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentNotebookPath
-                                + " not found!",
+                        "java.io.FileNotFoundException: Notebook or directory with path " + notebookDirectory() + "/"
+                                + nonExistentNotebookName + " not found!",
                         response.body().getString("message").strip()
                 );
     }
@@ -106,13 +109,32 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpFindNonexistentParagraph() {
         String nonExistentParagraphId = "nonExistentParagraphId";
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + notebookPath + "\",\"paragraphId\":\"" + nonExistentParagraphId + "\"}";
+
+        Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
+        String body = "{\"path\":\"" + requestPath + "\"}";
         JsonResponse response = endPoint.createResponse(new JsonRequest(body));
         Assertions
                 .assertEquals(
                         "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!",
                         response.body().getString("message").strip()
                 );
+    }
+
+    @Test
+    public void httpInvalidRequestFormatTest() {
+        // Assert that a request to FindParagraphEndpoint with an improperly formatted Request results in an error.
+        String nonexistentParagraphId = "nonexistentId";
+        String nonexistentNotebookName = "nonexistentNotebookPath";
+
+        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"";
+        Path queryPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
+
+        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
+        FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
+        JsonResponse response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + queryPath + "\"}"));
+        // Assert that we got the proper response.
+        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
 }

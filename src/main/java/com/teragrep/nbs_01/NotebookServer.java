@@ -55,10 +55,8 @@ import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
 import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.servlets.DirectoryServlet;
 import com.teragrep.nbs_01.servlets.HttpServlet;
-import com.teragrep.nbs_01.servlets.NotebookServlet;
-import com.teragrep.nbs_01.servlets.ParagraphServlet;
+import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -98,7 +96,7 @@ public class NotebookServer implements Callable {
             notebookContextHandler.setContextPath("/notebook");
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
-            NotebookServlet notebookServlet = new NotebookServlet(
+            FileSystemServlet notebookServlet = new FileSystemServlet(
                     new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
                     new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
@@ -110,7 +108,7 @@ public class NotebookServer implements Callable {
             directoryContextHandler.setContextPath("/directory");
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
-            DirectoryServlet directoryServlet = new DirectoryServlet(
+            FileSystemServlet directoryServlet = new FileSystemServlet(
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
                     new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
@@ -118,10 +116,10 @@ public class NotebookServer implements Callable {
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
 
-            ServletContextHandler paragraphContextHandler = new RegexServletContext(".*/paragraph/.*$");
+            ServletContextHandler paragraphContextHandler = new RegexServletContext(".*/paragraph/[^/]*/?$");
             paragraphContextHandler.setContextPath("/notebook");
 
-            ParagraphServlet paragraphServlet = new ParagraphServlet(
+            FileSystemServlet paragraphServlet = new FileSystemServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
                     new CreateParagraphEndpoint(root), // Endpoint to call on a PUT Request

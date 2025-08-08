@@ -59,6 +59,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
@@ -72,12 +73,17 @@ public class DeleteParagraphEndpoint implements EndPoint {
 
     public JsonResponse createResponse(Request request) {
         try {
+            validateRequestParameters(request);
             JsonObject parameters = request.parameters();
             String pathString = parameters.getString("path");
-            String paragraphId = parameters.getString("paragraphId");
+            Path requestPath = Paths.get(pathString);
+            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
+            String paragraphId = requestPath
+                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                    .toString();
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
-            Path path = updatedDirectory.path().resolve(pathString);
+            Path path = updatedDirectory.path().resolve(notebookPath);
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 
@@ -99,6 +105,21 @@ public class DeleteParagraphEndpoint implements EndPoint {
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+        }
+    }
+
+    private void validateRequestParameters(Request request) throws MalformedRequestException {
+        String pathString = request.parameters().getString("path");
+        Path requestPath = Paths.get(pathString);
+        if (requestPath.getNameCount() < 3) {
+            throw new MalformedRequestException(
+                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
+            );
+        }
+        if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
+            throw new MalformedRequestException(
+                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
+            );
         }
     }
 }

@@ -62,6 +62,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -76,24 +77,22 @@ public class UpdateParagraphEndpoint implements EndPoint {
 
     public JsonResponse createResponse(Request request) {
         try {
+            validateRequestParameters(request);
             JsonObject parameters = request.parameters();
-            Path path = root.path().resolve(parameters.getString("path"));
+            Path requestPath = Paths.get(parameters.getString("path"));
+            Path notebookPath = root.path().resolve(requestPath.subpath(0, requestPath.getNameCount() - 2));
 
-            if (!parameters.containsKey("paragraphId")) {
-                throw new MalformedRequestException("Request does not contain a paragraphId!");
-            }
-            if (!parameters.containsKey("text")) {
-                throw new MalformedRequestException("Request does not contain a paragraphId!");
-            }
-            if (!Files.exists(path)) {
-                throw new FileNotFoundException("Notebook with path " + path + " not found!");
+            if (!Files.exists(notebookPath)) {
+                throw new FileNotFoundException("Notebook with path " + notebookPath + " not found!");
             }
 
+            String paragraphId = requestPath
+                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                    .toString();
             Directory updatedDirectory = root
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
-            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
+            Notebook notebook = (Notebook) updatedDirectory.findFile(notebookPath).load();
 
-            String paragraphId = parameters.getString("paragraphId");
             String scriptText = parameters.getString("text");
 
             Script newScript = new Script(scriptText);
@@ -112,14 +111,33 @@ public class UpdateParagraphEndpoint implements EndPoint {
             newNotebook.save();
             return new SimpleResponse(HttpStatus.OK_200, "Paragraph edited successfully");
         }
+        catch (MalformedRequestException malformedRequestException) {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+        }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+
+    }
+
+    private void validateRequestParameters(Request request) throws MalformedRequestException {
+        String pathString = request.parameters().getString("path");
+        Path requestPath = Paths.get(pathString);
+        if (requestPath.getNameCount() < 3) {
+            throw new MalformedRequestException(
+                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
+            );
+        }
+        if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
+            throw new MalformedRequestException(
+                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
+            );
+        }
+        if (!request.parameters().containsKey("text") || !request.parameters().containsKey("title")) {
+            throw new MalformedRequestException("Request does not contain either a text or a title field!");
         }
     }
 }

@@ -104,12 +104,13 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 );
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
+
+        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
         JsonResponse response = endpoint
                 .createResponse(
                         new JsonRequest(
-                                "{\"path\":\"" + notebookPath + "\",\"title\":\"" + editedTitle
-                                        + "\",\"paragraphId\":\"" + paragraphId + "\",\"text\":\"" + editedParagraphText
-                                        + "\"}"
+                                "{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\",\"text\":\""
+                                        + editedParagraphText + "\"}"
                         )
                 );
         // Assert that we got the proper response.
@@ -140,18 +141,18 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpUpdateParagraphInNonexistentNotebookTest() {
         // Assert that a request to UpdateParagraphEndpoint with a nonexistent notebook path results in an error.
         String nonExistentNotebookName = "nonExistentNotebook";
-        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
 
-        String expectedResponse = "java.io.FileNotFoundException: Notebook with path " + nonExistentNotebookPath
-                + " not found!";
+        String expectedResponse = "java.io.FileNotFoundException: Notebook with path " + notebookDirectory() + "/"
+                + nonExistentNotebookName + " not found!";
         // Make a request editing the title of a notebook that doesn't exist.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
+
+        Path requestPath = Paths.get(nonExistentNotebookName, "paragraph", paragraphId);
         JsonResponse response = endpoint
                 .createResponse(
                         new JsonRequest(
-                                "{\"path\":\"" + nonExistentNotebookName + "\",\"title\":\"" + editedTitle
-                                        + "\",\"paragraphId\":\"" + paragraphId + "\",\"text\":\"" + editedParagraphText
-                                        + "\"}"
+                                "{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\",\"text\":\""
+                                        + editedParagraphText + "\"}"
                         )
                 );
         // Assert that we got the proper response.
@@ -168,14 +169,48 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
+
+        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", nonexistentParagraphId);
         JsonResponse response = endpoint
                 .createResponse(
                         new JsonRequest(
-                                "{\"path\":\"" + notebookPath + "\",\"title\":\"" + editedTitle
-                                        + "\",\"paragraphId\":\"" + nonexistentParagraphId + "\",\"text\":\""
-                                        + editedParagraphText + "\"}"
+                                "{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\",\"paragraphId\":\""
+                                        + nonexistentParagraphId + "\",\"text\":\"" + editedParagraphText + "\"}"
                         )
                 );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+    }
+
+    @Test
+    public void httpInvalidRequestFormatTest() {
+        // Assert that a request to UpdateParagraphEndpoint with an improperly formatted Request results in an error.
+        String nonexistentParagraphId = "nonexistentId";
+        String nonexistentNotebookName = "nonexistentNotebookPath";
+
+        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"";
+
+        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
+
+        Path requestPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
+        JsonResponse response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\"}"));
+        // Assert that we got the proper response.
+        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+    }
+
+    @Test
+    public void httpInvalidRequestParametersTest() {
+        // Assert that a request to UpdateParagraphEndpoint with an improperly formatted Request results in an error.
+        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Request does not contain either a text or a title field!";
+
+        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
+
+        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
+        JsonResponse response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\"}"));
         // Assert that we got the proper response.
         Assertions.assertEquals(expectedResponse, response.body().getString("message"));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());

@@ -57,7 +57,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class NotebookServletTest extends AbstractNotebookServerTest {
+public class FileSystemServletTest extends AbstractNotebookServerTest {
 
     private final String directoryName = "my_folder_2A94M5J1D";
     private final Path directoryPath = Paths.get(directoryName);
@@ -65,7 +65,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     private final String notebookName = "my_note2_2A94M5J2Z.zpln";
     private final Path notebookPath = Paths.get(directoryPath.toString(), notebookName);
 
-    public NotebookServletTest() {
+    public FileSystemServletTest() {
     }
 
     @Test

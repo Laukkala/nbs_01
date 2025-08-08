@@ -61,10 +61,10 @@ import java.util.stream.Collectors;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
-    private String notebookName = "my_note3_2A94M5J3Z.zpln";
-    private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
-    private String paragraphId = "20150213-230428_1231780373";
-    private String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
+    private final String notebookName = "my_note3_2A94M5J3Z.zpln";
+    private final Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
+    private final String paragraphId = "20150213-230428_1231780373";
+    private final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
 
     public DeleteParagraphEndPointTest() {
     }
@@ -87,9 +87,8 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
-        JsonRequest request = new JsonRequest(
-                "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
-        );
+        Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
+        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
         JsonResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
@@ -116,9 +115,9 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
-        JsonRequest request = new JsonRequest(
-                "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + nonExistentParagraphId + "\"}"
-        );
+        Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
+
+        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
         JsonResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
@@ -140,9 +139,8 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
-        JsonRequest request = new JsonRequest(
-                "{\"path\":\"" + nonExistentNotebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
-        );
+        Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
+        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
         JsonResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());

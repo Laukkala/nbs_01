@@ -87,9 +87,8 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Directory root = new Directory(notebookDirectory());
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
 
-        JsonRequest request = new JsonRequest(
-                "{\"path\":\"" + notebookName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
-        );
+        Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
+        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
         JsonResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
@@ -112,13 +111,14 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
         String nonexistentFileName = "NonExistentFile";
         Path nonexistentFilePath = Paths.get(notebookDirectory().toString(), nonexistentFileName);
-        // Assert that the file we are creating doesn't exist.
+        // Assert that the file we are trying to add a paragraph to doesn't exist.
         Assertions.assertFalse(Files.exists(nonexistentFilePath));
         Directory root = new Directory(notebookDirectory());
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
 
+        Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest(
-                "{\"path\":\"" + nonexistentFileName + "\",\"paragraphId\":\"" + paragraphId + "\"}"
+                "{\"path\":\"" + requestPath + "\",\"paragraphId\":\"" + paragraphId + "\"}"
         );
         JsonResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.

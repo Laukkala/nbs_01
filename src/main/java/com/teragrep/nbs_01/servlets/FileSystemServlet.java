@@ -65,8 +65,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
-// HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks or Directories.
-public final class NotebookServlet extends jakarta.servlet.http.HttpServlet {
+// HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks, Directories and Paragraphs.
+public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
 
     private final EndPoint getEndPoint;
     private final EndPoint postEndPoint;
@@ -75,11 +75,16 @@ public final class NotebookServlet extends jakarta.servlet.http.HttpServlet {
     private final Charset charset;
 
     // Servlet that assigns an endpoint for each of the supported HTTP request types (GET,POST,PUT,DELETE)
-    public NotebookServlet(EndPoint getEndPoint, EndPoint postEndPoint, EndPoint putEndPoint, EndPoint deleteEndPoint) {
+    public FileSystemServlet(
+            EndPoint getEndPoint,
+            EndPoint postEndPoint,
+            EndPoint putEndPoint,
+            EndPoint deleteEndPoint
+    ) {
         this(getEndPoint, postEndPoint, putEndPoint, deleteEndPoint, Charset.defaultCharset());
     }
 
-    public NotebookServlet(
+    public FileSystemServlet(
             EndPoint getEndPoint,
             EndPoint postEndPoint,
             EndPoint putEndPoint,
