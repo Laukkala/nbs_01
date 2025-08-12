@@ -62,7 +62,6 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
 public class CopyNotebookEndpoint implements EndPoint {
@@ -82,7 +81,7 @@ public class CopyNotebookEndpoint implements EndPoint {
             String pathString = parameters.getString("path");
             String sourcePath = parameters.getString("sourcePath");
 
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(pathString);
 
             ZeppelinFile newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);

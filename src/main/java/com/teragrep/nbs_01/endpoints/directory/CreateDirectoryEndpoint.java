@@ -60,7 +60,6 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Notebook. Should be provided with a path of the File
 public class CreateDirectoryEndpoint implements EndPoint {
@@ -73,7 +72,7 @@ public class CreateDirectoryEndpoint implements EndPoint {
 
     public JsonResponse createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             JsonObject parameters = request.parameters();
             if (!parameters.containsKey("path")) {
                 throw new MalformedRequestException("Request must contain a path!");

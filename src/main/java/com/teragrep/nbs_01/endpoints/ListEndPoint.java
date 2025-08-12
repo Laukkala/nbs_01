@@ -58,7 +58,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Lists all the ID's of saved notebooks
 public class ListEndPoint implements EndPoint {
@@ -75,7 +74,7 @@ public class ListEndPoint implements EndPoint {
         ZeppelinFile foundFile;
         Directory directoryToSearch;
         try {
-            directoryToSearch = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            directoryToSearch = root.initializeDirectory(root.path(), root.children());
             JsonObject parameters = request.parameters();
             if (parameters.containsKey("directoryPath")) {
                 try {
@@ -100,7 +99,7 @@ public class ListEndPoint implements EndPoint {
         }
         try {
             Directory updatedDirectory = directoryToSearch
-                    .initializeDirectory(directoryToSearch.path(), new ConcurrentHashMap<>());
+                    .initializeDirectory(directoryToSearch.path(), directoryToSearch.children());
             List<ZeppelinFile> files = updatedDirectory.listAllChildren();
             for (ZeppelinFile file : files) {
                 if (!file.isDirectory()) {

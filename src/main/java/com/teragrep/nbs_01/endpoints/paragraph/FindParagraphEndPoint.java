@@ -61,7 +61,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Updates a notebook with the given parameters.
 public class FindParagraphEndPoint implements EndPoint {
@@ -84,7 +83,7 @@ public class FindParagraphEndPoint implements EndPoint {
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
 
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(notebookPath);
             ZeppelinFile file = updatedDirectory.findFile(path).load();
             if (!file.isDirectory()) {

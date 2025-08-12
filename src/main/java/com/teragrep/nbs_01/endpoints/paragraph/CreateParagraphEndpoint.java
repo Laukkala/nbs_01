@@ -59,7 +59,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
 public class CreateParagraphEndpoint implements EndPoint {
@@ -81,7 +80,7 @@ public class CreateParagraphEndpoint implements EndPoint {
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
 
-            Directory updatedDirectory = root.initializeDirectory(root.path(), new ConcurrentHashMap<>());
+            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(notebookPath);
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
