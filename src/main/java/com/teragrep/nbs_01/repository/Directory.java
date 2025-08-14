@@ -102,7 +102,7 @@ public final class Directory implements ZeppelinFile {
             findFile(searchedPath);
             return true;
         }
-        catch (FileNotFoundException fileNotFoundException) {
+        catch (IOException ioException) {
             return false;
         }
     }
@@ -214,8 +214,7 @@ public final class Directory implements ZeppelinFile {
     }
 
     // This method traverses the file tree recursively and depth first, and creates a Directory object with a complete map of child Directories and Notebooks.
-    public Directory initializeDirectory(Path pathToVisit, ConcurrentHashMap<Path, ZeppelinFile> existingFiles)
-            throws IOException {
+    public Directory initializeDirectory(Path pathToVisit, Map<Path, ZeppelinFile> existingFiles) throws IOException {
         // Create a copy of existingFiles so that we don't make any direct edits to it.
         Map<Path, ZeppelinFile> directoryChildren = new HashMap<>();
         directoryChildren.putAll(existingFiles);
@@ -250,7 +249,7 @@ public final class Directory implements ZeppelinFile {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 if (!directoryChildren.containsKey(file)) {
-                    directoryChildren.put(file, new UnloadedNotebook(file));
+                    directoryChildren.put(file, new Notebook(file));
                 }
                 return FileVisitResult.CONTINUE;
             }

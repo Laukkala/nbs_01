@@ -43,70 +43,92 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.notebook;
+package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.TimestampedZeppelinFile;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.SimpleResponse;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
-// Updates a notebook with the given parameters.
-public class FindNotebookEndPoint implements FileSystemEndPoint {
+// Decorator for an endpoint that keeps a cache of filesystem objects.
+public class CachingFileSystemEndPoint implements FileSystemEndPoint {
 
-    private final Directory root;
+    private final FileSystemEndPoint endPoint;
+    private final Map<Path, TimestampedZeppelinFile> cache;
 
-    public FindNotebookEndPoint(Directory root) {
-        this.root = root;
+    public CachingFileSystemEndPoint(FileSystemEndPoint endPoint) {
+        this.endPoint = endPoint;
+        cache = new HashMap<>();
     }
 
     @Override
     public JsonResponse createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given ID
         try {
-            JsonObject parameters = request.parameters();
-            String id = parameters.getString("path");
-            Path path = root.path().resolve(id);
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            String pathString = request.parameters().getString("path");
+            Path path = endPoint.root().path().resolve(Paths.get(pathString));
+
+            Directory updatedDirectory = endPoint
+                    .root()
+                    .initializeDirectory(endPoint.root().path(), endPoint.root().children());
             ZeppelinFile file = updatedDirectory.findFile(path);
-            return createResponse(file.load());
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileNotFoundException);
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return createResponse(file);
+
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, fileNotFoundException);
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 
     @Override
     public JsonResponse createResponse(ZeppelinFile file) {
         try {
-            if (!file.isDirectory()) {
-                return new SimpleResponse(HttpStatus.OK_200, file.json().toString());
+            if (cache.containsKey(file.path())) {
+                long fileTimestamp = file.path().toFile().lastModified();
+                long cachedTimestamp = cache.get(file.path()).lastModified();
+
+                if (cachedTimestamp >= fileTimestamp) {
+                    // Cache has the latest version
+                    return endPoint.createResponse(cache.get(file.path()));
+                }
+                else {
+                    // Cache has an outdated version
+                    ZeppelinFile updatedFile = file.load();
+                    cache.put(file.path(), new TimestampedZeppelinFile(updatedFile));
+                    return endPoint.createResponse(updatedFile);
+                }
             }
             else {
-                throw new FileNotFoundException("Not a Notebook");
+                // Cache does not have any version of the file
+                ZeppelinFile updatedFile = file.load();
+                cache.put(file.path(), new TimestampedZeppelinFile(updatedFile));
+                return endPoint.createResponse(updatedFile);
             }
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileNotFoundException);
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 
+    @Override
     public Directory root() {
-        return root;
+        return endPoint.root();
     }
+
 }

@@ -70,11 +70,21 @@ public final class Notebook implements ZeppelinFile {
     private final Map<String, Paragraph> paragraphs;
     private final String title;
     private final Path path;
+    private final boolean isStub;
+
+    // Constructor for a stub notebook that can be loaded from file.
+    public Notebook(Path path) {
+        this.path = path;
+        this.title = "";
+        this.paragraphs = new LinkedHashMap<>();
+        isStub = true;
+    }
 
     public Notebook(String title, Path path, Map<String, Paragraph> paragraphs) {
         this.path = path;
         this.title = title;
         this.paragraphs = paragraphs;
+        isStub = false;
     }
 
     // Remove file from disk
@@ -219,7 +229,7 @@ public final class Notebook implements ZeppelinFile {
     }
 
     public boolean isStub() {
-        return false;
+        return isStub;
     }
 
     private String readFile() throws IOException {
