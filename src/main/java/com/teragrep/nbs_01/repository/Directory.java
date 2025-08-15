@@ -267,24 +267,4 @@ public final class Directory implements ZeppelinFile {
         Directory root = new Directory(pathToVisit, directoryChildren);
         return root;
     }
-
-    private static String extractIDFromFileName(Path file) {
-        return extractIDFromFileName(file, "_");
-    }
-
-    private static String extractIDFromFileName(Path file, String delimiter) {
-        String fileName = file.getFileName().toString();
-        if (fileName.contains(delimiter)) {
-            int idStartIndex = fileName.lastIndexOf(delimiter);
-            if (fileName.endsWith(".zpln")) {
-                int idEndIndex = fileName.lastIndexOf(".zpln");
-                return fileName.substring(idStartIndex + 1, idEndIndex);
-            }
-            return fileName.substring(idStartIndex + 1);
-        }
-        // If filename doesn't conform to naming conventions, return the filename itself.
-        else {
-            return fileName;
-        }
-    }
 }
