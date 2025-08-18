@@ -45,10 +45,11 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
+import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
@@ -62,7 +63,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
-public class DeleteParagraphEndpoint implements EndPoint {
+public class DeleteParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -77,24 +78,12 @@ public class DeleteParagraphEndpoint implements EndPoint {
             String pathString = parameters.getString("path");
             Path requestPath = Paths.get(pathString);
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
-            String paragraphId = requestPath
-                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                    .toString();
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(notebookPath);
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
-
-            if (notebook.paragraphs().containsKey(paragraphId)) {
-                notebook.paragraphs().remove(paragraphId);
-                notebook.save();
-
-                return new SimpleResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
-            }
-            else {
-                throw new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!");
-            }
+            return createResponse(notebook, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -120,5 +109,44 @@ public class DeleteParagraphEndpoint implements EndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            if (file instanceof Notebook) {
+                Notebook notebook = (Notebook) file;
+                String pathString = parameters.getString("path");
+                Path requestPath = Paths.get(pathString);
+                String paragraphId = requestPath
+                        .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                        .toString();
+                if (notebook.paragraphs().containsKey(paragraphId)) {
+                    notebook.paragraphs().remove(paragraphId);
+                    notebook.save();
+                    return new SimpleResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
+                }
+                else {
+                    return new ExceptionResponse(
+                            HttpStatus.BAD_REQUEST_400,
+                            new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!")
+                    );
+                }
+            }
+            else {
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException("Not a Notebook!")
+                );
+            }
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

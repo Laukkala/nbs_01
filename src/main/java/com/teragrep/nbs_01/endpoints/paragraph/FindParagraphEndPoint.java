@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
@@ -63,7 +63,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 // Updates a notebook with the given parameters.
-public class FindParagraphEndPoint implements EndPoint {
+public class FindParagraphEndPoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -79,29 +79,11 @@ public class FindParagraphEndPoint implements EndPoint {
             String pathString = parameters.getString("path");
             Path requestPath = Paths.get(pathString);
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
-            String paragraphId = requestPath
-                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                    .toString();
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(notebookPath);
             ZeppelinFile file = updatedDirectory.findFile(path).load();
-            if (!file.isDirectory()) {
-                Notebook notebook = (Notebook) file.load();
-                if (notebook.paragraphs().containsKey(paragraphId)) {
-                    return new SimpleResponse(
-                            HttpStatus.OK_200,
-                            notebook.paragraphs().get(paragraphId).json().toString()
-                    );
-                }
-                else {
-                    throw new MalformedRequestException("Paragraph not found!");
-                }
-
-            }
-            else {
-                throw new MalformedRequestException("Not a notebook");
-            }
+            return createResponse(file, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -127,5 +109,49 @@ public class FindParagraphEndPoint implements EndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            if (!file.isDirectory()) {
+                String pathString = parameters.getString("path");
+                Path requestPath = Paths.get(pathString);
+                String paragraphId = requestPath
+                        .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                        .toString();
+
+                Notebook notebook = (Notebook) file.load();
+                if (notebook.paragraphs().containsKey(paragraphId)) {
+                    return new SimpleResponse(
+                            HttpStatus.OK_200,
+                            notebook.paragraphs().get(paragraphId).json().toString()
+                    );
+                }
+                else {
+                    return new ExceptionResponse(
+                            HttpStatus.BAD_REQUEST_400,
+                            new MalformedRequestException("Paragraph not found!")
+                    );
+                }
+            }
+            else {
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException("Not a notebook")
+                );
+            }
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new MalformedRequestException("Failed to save notebook!")
+            );
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

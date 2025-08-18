@@ -78,7 +78,7 @@ public class FindNotebookEndPoint implements FileSystemEndPoint {
             Path path = root.path().resolve(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             ZeppelinFile file = updatedDirectory.findFile(path);
-            return createResponse(file.load());
+            return createResponse(file.load(), parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileNotFoundException);
@@ -92,7 +92,7 @@ public class FindNotebookEndPoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file) {
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             if (!file.isDirectory()) {
                 return new SimpleResponse(HttpStatus.OK_200, file.json().toString());

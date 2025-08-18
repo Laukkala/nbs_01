@@ -59,7 +59,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 // Deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements EndPoint {
+public class DeleteFileEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -78,20 +78,36 @@ public class DeleteFileEndpoint implements EndPoint {
             Path path = updatedDirectory.path().resolve(pathString);
 
             ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            deletedFile.delete();
-            return new SimpleResponse(HttpStatus.NO_CONTENT_204, "");
+            return createResponse(deletedFile, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
         }
-        catch (IOException ioException) {
-            return new SimpleResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to create directory, reason:\n" + ioException
-            );
-        }
+
         catch (MalformedRequestException malformedRequestException) {
             return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
+        catch (IOException ioException) {
+            return new SimpleResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    "Failed to read files from notebook directory:\n" + ioException
+            );
+        }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            file.delete();
+            return new SimpleResponse(HttpStatus.NO_CONTENT_204, "");
+        }
+        catch (IOException ioException) {
+            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to delete file:\n" + ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

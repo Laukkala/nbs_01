@@ -45,11 +45,12 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
+import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
@@ -66,7 +67,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the text of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph in a comma-separated string
-public class UpdateNotebookEndpoint implements EndPoint {
+public class UpdateNotebookEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -97,8 +98,7 @@ public class UpdateNotebookEndpoint implements EndPoint {
             // Add a modified title
             String title = parameters.getString("title");
             Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
-            newNotebook.save();
-            return new SimpleResponse(HttpStatus.OK_200, "Notebook edited successfully");
+            return createResponse(newNotebook, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -109,5 +109,21 @@ public class UpdateNotebookEndpoint implements EndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            file.save();
+            return new SimpleResponse(HttpStatus.OK_200, "Notebook edited successfully");
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

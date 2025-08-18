@@ -52,6 +52,7 @@ import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -75,14 +76,15 @@ public class CachingFileSystemEndPoint implements FileSystemEndPoint {
     @Override
     public JsonResponse createResponse(Request request) {
         try {
-            String pathString = request.parameters().getString("path");
+            JsonObject parameters = request.parameters();
+            String pathString = parameters.getString("path");
             Path path = endPoint.root().path().resolve(Paths.get(pathString));
 
             Directory updatedDirectory = endPoint
                     .root()
                     .initializeDirectory(endPoint.root().path(), endPoint.root().children());
             ZeppelinFile file = updatedDirectory.findFile(path);
-            return createResponse(file);
+            return createResponse(file, parameters);
 
         }
         catch (MalformedRequestException malformedRequestException) {
@@ -97,7 +99,7 @@ public class CachingFileSystemEndPoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file) {
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             if (cache.containsKey(file.path())) {
                 long fileTimestamp = file.path().toFile().lastModified();
@@ -105,20 +107,20 @@ public class CachingFileSystemEndPoint implements FileSystemEndPoint {
 
                 if (cachedTimestamp >= fileTimestamp) {
                     // Cache has the latest version
-                    return endPoint.createResponse(cache.get(file.path()));
+                    return endPoint.createResponse(cache.get(file.path()), parameters);
                 }
                 else {
                     // Cache has an outdated version
                     ZeppelinFile updatedFile = file.load();
                     cache.put(file.path(), new TimestampedZeppelinFile(updatedFile));
-                    return endPoint.createResponse(updatedFile);
+                    return endPoint.createResponse(updatedFile, parameters);
                 }
             }
             else {
                 // Cache does not have any version of the file
                 ZeppelinFile updatedFile = file.load();
                 cache.put(file.path(), new TimestampedZeppelinFile(updatedFile));
-                return endPoint.createResponse(updatedFile);
+                return endPoint.createResponse(updatedFile, parameters);
             }
         }
         catch (IOException ioException) {

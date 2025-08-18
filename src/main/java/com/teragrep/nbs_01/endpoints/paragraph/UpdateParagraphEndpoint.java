@@ -45,12 +45,9 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.repository.Script;
+import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
@@ -67,7 +64,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the text and optionally the title of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph.
-public class UpdateParagraphEndpoint implements EndPoint {
+public class UpdateParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -85,31 +82,10 @@ public class UpdateParagraphEndpoint implements EndPoint {
             if (!Files.exists(notebookPath)) {
                 throw new FileNotFoundException("Notebook with path " + notebookPath + " not found!");
             }
-
-            String paragraphId = requestPath
-                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                    .toString();
             Directory updatedDirectory = root
                     .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
             Notebook notebook = (Notebook) updatedDirectory.findFile(notebookPath).load();
-
-            String scriptText = parameters.getString("text");
-
-            Script newScript = new Script(scriptText);
-            // Copy the paragraphs from the notebook into a new map
-            Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
-
-            // Find the paragraph to be edited
-            if (!paragraphs.containsKey(paragraphId)) {
-                throw new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!");
-            }
-            Paragraph originalParagraph = paragraphs.get(paragraphId);
-            String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
-            Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
-            paragraphs.put(newParagraph.id(), newParagraph);
-            Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
-            newNotebook.save();
-            return new SimpleResponse(HttpStatus.OK_200, "Paragraph edited successfully");
+            return createResponse(notebook, parameters);
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
@@ -139,5 +115,47 @@ public class UpdateParagraphEndpoint implements EndPoint {
         if (!request.parameters().containsKey("text") || !request.parameters().containsKey("title")) {
             throw new MalformedRequestException("Request does not contain either a text or a title field!");
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            Path requestPath = Paths.get(parameters.getString("path"));
+            String paragraphId = requestPath
+                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                    .toString();
+            Notebook notebook = (Notebook) file;
+            String scriptText = parameters.getString("text");
+
+            Script newScript = new Script(scriptText);
+            // Copy the paragraphs from the notebook into a new map
+            Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
+
+            // Find the paragraph to be edited
+            if (!paragraphs.containsKey(paragraphId)) {
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!")
+                );
+            }
+            Paragraph originalParagraph = paragraphs.get(paragraphId);
+            String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
+            Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
+            paragraphs.put(newParagraph.id(), newParagraph);
+            Notebook newNotebook = new Notebook(notebook.title(), notebook.path(), paragraphs);
+            newNotebook.save();
+            return new SimpleResponse(HttpStatus.OK_200, "Paragraph edited successfully");
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new IOException("Failed to save edited notebook!", ioException)
+            );
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

@@ -45,10 +45,11 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
+import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.SimpleResponse;
@@ -64,7 +65,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 
 // Creates a new Notebook. Should be provided with a path of the File
-public class CreateNotebookEndpoint implements EndPoint {
+public class CreateNotebookEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -88,8 +89,7 @@ public class CreateNotebookEndpoint implements EndPoint {
             }
 
             Notebook newFile = createNotebook(title, path);
-            newFile.save();
-            return new SimpleResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.path());
+            return createResponse(newFile, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -107,5 +107,21 @@ public class CreateNotebookEndpoint implements EndPoint {
 
     private Notebook createNotebook(String title, Path path) {
         return new Notebook(title, path, new HashMap<>());
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            file.save();
+            return new SimpleResponse(HttpStatus.CREATED_201, "Created new notebook " + file.path());
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

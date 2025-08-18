@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.Notebook;
@@ -64,7 +64,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public class CopyNotebookEndpoint implements EndPoint {
+public class CopyNotebookEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -85,12 +85,7 @@ public class CopyNotebookEndpoint implements EndPoint {
             Path path = updatedDirectory.path().resolve(pathString);
 
             ZeppelinFile newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-            SimpleResponse response = new SimpleResponse(
-                    HttpStatus.CREATED_201,
-                    "Created new notebook " + newFile.path()
-            );
-            newFile.save();
-            return response;
+            return createResponse(newFile, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -122,5 +117,21 @@ public class CopyNotebookEndpoint implements EndPoint {
         else {
             throw new IOException("File at " + sourcePath + " is not a notebook!");
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            file.save();
+            return new SimpleResponse(HttpStatus.CREATED_201, "Created new notebook " + file.path());
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

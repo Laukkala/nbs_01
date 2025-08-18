@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
@@ -61,7 +61,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 // Updates a notebook with the given parameters.
-public class FindDirectoryEndPoint implements EndPoint {
+public class FindDirectoryEndPoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -77,15 +77,7 @@ public class FindDirectoryEndPoint implements EndPoint {
             Path path = root.path().resolve(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             ZeppelinFile directory = updatedDirectory.findFile(path);
-            if (directory instanceof Directory) {
-                return new SimpleResponse(HttpStatus.OK_200, directory.json());
-            }
-            else {
-                throw new FileNotFoundException("Not a directory!");
-            }
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileNotFoundException);
+            return createResponse(directory, parameters);
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
@@ -93,5 +85,20 @@ public class FindDirectoryEndPoint implements EndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        if (file instanceof Directory) {
+            return new SimpleResponse(HttpStatus.OK_200, file.json());
+        }
+        else {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, new FileNotFoundException("Not a directory!"));
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
@@ -61,7 +61,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 // Creates a new Directory or a Notebook. Should be provided with a path of the File
-public class CreateParagraphEndpoint implements EndPoint {
+public class CreateParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -84,17 +84,7 @@ public class CreateParagraphEndpoint implements EndPoint {
             Path path = updatedDirectory.path().resolve(notebookPath);
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
-
-            if (!notebook.paragraphs().containsKey(paragraphId)) {
-                Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
-                notebook.paragraphs().put(paragraphId, newParagraph);
-                notebook.save();
-
-                return new SimpleResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
-            }
-            else {
-                throw new MalformedRequestException("Paragraph " + paragraphId + " already exists!");
-            }
+            return createResponse(notebook, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -120,5 +110,47 @@ public class CreateParagraphEndpoint implements EndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            if (file instanceof Notebook) {
+                String pathString = parameters.getString("path");
+                Path requestPath = Paths.get(pathString);
+                String paragraphId = requestPath
+                        .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                        .toString();
+
+                Notebook notebook = (Notebook) file;
+                if (!notebook.paragraphs().containsKey(paragraphId)) {
+                    Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
+                    notebook.paragraphs().put(paragraphId, newParagraph);
+                    notebook.save();
+
+                    return new SimpleResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
+                }
+                else {
+                    return new ExceptionResponse(
+                            HttpStatus.BAD_REQUEST_400,
+                            new MalformedRequestException("Paragraph " + paragraphId + " already exists!")
+                    );
+                }
+            }
+            else {
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException("Not a Notebook")
+                );
+            }
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }

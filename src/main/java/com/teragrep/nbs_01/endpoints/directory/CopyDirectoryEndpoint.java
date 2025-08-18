@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
@@ -62,7 +62,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public class CopyDirectoryEndpoint implements EndPoint {
+public class CopyDirectoryEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -83,12 +83,7 @@ public class CopyDirectoryEndpoint implements EndPoint {
             Path path = updatedDirectory.path().resolve(pathString);
 
             Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-            SimpleResponse response = new SimpleResponse(
-                    HttpStatus.CREATED_201,
-                    "Created new directory " + newDirectory.path()
-            );
-            newDirectory.save();
-            return response;
+            return createResponse(newDirectory, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -112,5 +107,21 @@ public class CopyDirectoryEndpoint implements EndPoint {
         else {
             throw new FileNotFoundException("File at " + sourcePath + " is not a directory!");
         }
+    }
+
+    @Override
+    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+        try {
+            file.save();
+            return new SimpleResponse(HttpStatus.CREATED_201, "Created new directory " + file.path());
+        }
+        catch (IOException ioException) {
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+        }
+    }
+
+    @Override
+    public Directory root() {
+        return root;
     }
 }
