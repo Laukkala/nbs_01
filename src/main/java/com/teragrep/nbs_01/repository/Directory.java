@@ -220,7 +220,7 @@ public final class Directory implements ZeppelinFile {
         directoryChildren.putAll(existingFiles);
         Files.walkFileTree(pathToVisit, new SimpleFileVisitor<Path>() {
 
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 // walkFileTree visits the root directory it's called on.
                 // This method operates on the given directory's children so we skip the processing of the root directory here.
                 if (dir.equals(pathToVisit)) {
@@ -230,19 +230,14 @@ public final class Directory implements ZeppelinFile {
                 if (dir.startsWith(pathToVisit + "/.git")) {
                     return FileVisitResult.SKIP_SUBTREE;
                 }
-                try {
-                    // Here we create any child Directories by calling this function recursively.
-                    // First we will check if we already have the files of the child Directory in existingFiles, and pass them to the recursive call so that we don't do any unnecessary operations in later recursions.
-                    ConcurrentHashMap<Path, ZeppelinFile> childrenOfChildDirectory = new ConcurrentHashMap<>();
-                    if (directoryChildren.containsKey(dir)) {
-                        childrenOfChildDirectory.putAll(directoryChildren.get(dir).children());
-                    }
-                    Directory childDirectory = initializeDirectory(dir, childrenOfChildDirectory);
-                    directoryChildren.put(childDirectory.path(), childDirectory);
+                // Here we create any child Directories by calling this function recursively.
+                // First we will check if we already have the files of the child Directory in existingFiles, and pass them to the recursive call so that we don't do any unnecessary operations in later recursions.
+                ConcurrentHashMap<Path, ZeppelinFile> childrenOfChildDirectory = new ConcurrentHashMap<>();
+                if (directoryChildren.containsKey(dir)) {
+                    childrenOfChildDirectory.putAll(directoryChildren.get(dir).children());
                 }
-                catch (IOException exception) {
-                    throw new RuntimeException(exception);
-                }
+                Directory childDirectory = initializeDirectory(dir, childrenOfChildDirectory);
+                directoryChildren.put(childDirectory.path(), childDirectory);
                 return FileVisitResult.SKIP_SUBTREE;
             }
 
