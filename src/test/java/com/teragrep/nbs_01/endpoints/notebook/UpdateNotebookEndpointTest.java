@@ -93,9 +93,9 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         Response response = endpoint
                 .createResponse(
                         new JsonRequest(
-                                "{\"path\":\"" + notebookPath + "\",\"title\":\"" + editedTitle
-                                        + "\",\"paragraphId\":\"" + paragraphId + "\",\"paragraphText\":\""
-                                        + editedParagraphText + "\"}"
+                                "{\"title\":\"" + editedTitle + "\",\"paragraphId\":\"" + paragraphId
+                                        + "\",\"paragraphText\":\"" + editedParagraphText + "\"}",
+                                notebookPath
                         )
                 );
         // Assert that we got the proper response.
@@ -121,9 +121,9 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         Response response = endpoint
                 .createResponse(
                         new JsonRequest(
-                                "{\"path\":\"" + nonExistentNotebookName + "\",\"title\":\"" + editedTitle
-                                        + "\",\"paragraphId\":\"" + paragraphId + "\",\"paragraphText\":\""
-                                        + editedParagraphText + "\"}"
+                                "{\"title\":\"" + editedTitle + "\",\"paragraphId\":\"" + paragraphId
+                                        + "\",\"paragraphText\":\"" + editedParagraphText + "\"}",
+                                Paths.get(nonExistentNotebookName)
                         )
                 );
         // Assert that we got the proper response.

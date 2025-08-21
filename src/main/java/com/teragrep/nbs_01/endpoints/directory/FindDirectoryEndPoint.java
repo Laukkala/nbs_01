@@ -73,8 +73,7 @@ public class FindDirectoryEndPoint implements FileSystemEndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
-            String id = parameters.getString("path");
-            Path path = root.path().resolve(id);
+            Path path = root.path().resolve(request.path());
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             ZeppelinFile directory = updatedDirectory.findFile(path);
             return createResponse(directory, parameters);

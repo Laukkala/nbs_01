@@ -52,6 +52,7 @@ import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -59,7 +60,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,10 +75,15 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
     public Response createResponse(Request request) {
         try {
             validateRequestParameters(request);
-            JsonObject parameters = request.parameters();
-            Path requestPath = Paths.get(parameters.getString("path"));
+            Path requestPath = request.path();
+            String paragraphId = requestPath
+                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                    .toString();
             Path notebookPath = root.path().resolve(requestPath.subpath(0, requestPath.getNameCount() - 2));
-
+            JsonObject parameters = Json
+                    .createObjectBuilder(request.parameters())
+                    .add("paragraphId", paragraphId)
+                    .build();
             if (!Files.exists(notebookPath)) {
                 throw new FileNotFoundException("Notebook with path " + notebookPath + " not found!");
             }
@@ -100,8 +105,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
     }
 
     private void validateRequestParameters(Request request) throws MalformedRequestException {
-        String pathString = request.parameters().getString("path");
-        Path requestPath = Paths.get(pathString);
+        Path requestPath = request.path();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
@@ -120,10 +124,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
     @Override
     public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
-            Path requestPath = Paths.get(parameters.getString("path"));
-            String paragraphId = requestPath
-                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                    .toString();
+            String paragraphId = parameters.getString("paragraphId");
             Notebook notebook = (Notebook) file;
 
             // Copy the paragraphs from the notebook into a new map

@@ -58,7 +58,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,8 +77,7 @@ public class CachingFileSystemEndPoint implements FileSystemEndPoint {
     public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
-            String pathString = parameters.getString("path");
-            Path path = endPoint.root().path().resolve(Paths.get(pathString));
+            Path path = endPoint.root().path().resolve(request.path());
 
             Directory updatedDirectory = endPoint
                     .root()

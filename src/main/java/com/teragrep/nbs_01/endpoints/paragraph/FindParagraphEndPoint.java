@@ -54,13 +54,13 @@ import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 // Searches for a paragraph from a given Notebook based on a given ParagraphId, and returns its contents in JSON format.
 public class FindParagraphEndPoint implements FileSystemEndPoint {
@@ -75,10 +75,16 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             validateRequestParameters(request);
-            JsonObject parameters = request.parameters();
-            String pathString = parameters.getString("path");
-            Path requestPath = Paths.get(pathString);
+            Path requestPath = request.path();
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
+
+            String paragraphId = requestPath
+                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                    .toString();
+            JsonObject parameters = Json
+                    .createObjectBuilder(request.parameters())
+                    .add("paragraphId", paragraphId)
+                    .build();
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(notebookPath);
@@ -97,8 +103,7 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
     }
 
     private void validateRequestParameters(Request request) throws MalformedRequestException {
-        String pathString = request.parameters().getString("path");
-        Path requestPath = Paths.get(pathString);
+        Path requestPath = request.path();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
@@ -115,12 +120,7 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
     public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             if (!file.isDirectory()) {
-                String pathString = parameters.getString("path");
-                Path requestPath = Paths.get(pathString);
-                String paragraphId = requestPath
-                        .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                        .toString();
-
+                String paragraphId = parameters.getString("paragraphId");
                 Notebook notebook = (Notebook) file.load();
                 if (notebook.paragraphs().containsKey(paragraphId)) {
                     return new JsonResponse(

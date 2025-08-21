@@ -74,9 +74,8 @@ public class FindNotebookEndPoint implements FileSystemEndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
-            String id = parameters.getString("path");
-            Path path = root.path().resolve(id);
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Path path = updatedDirectory.path().resolve(request.path());
             ZeppelinFile file = updatedDirectory.findFile(path);
             return createResponse(file.load(), parameters);
         }

@@ -82,8 +82,8 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + newNotebookName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
@@ -97,8 +97,8 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + existingNotebookName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, existingNotebookName));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
@@ -120,7 +120,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(notebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + notebookName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body, notebookName));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));

@@ -79,8 +79,8 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + notebookPath + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, notebookPath));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
     }
 
@@ -90,8 +90,8 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + nonExistentNotebookName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(nonExistentNotebookName)));
         Assertions
                 .assertEquals(
                         "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentNotebookPath

@@ -89,8 +89,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(newNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + newNotebookName + "\",\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
@@ -104,8 +104,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + newNotebookName + "\",\"sourcePath\":\"" + nonExistentNotebookPath + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{\"sourcePath\":\"" + nonExistentNotebookPath + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
@@ -125,9 +125,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + existingPathEndpointParameter + "\",\"sourcePath\":\"" + sourceNotebookParameter
-                + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

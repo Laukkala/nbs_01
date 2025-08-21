@@ -77,8 +77,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(copiedDirectoryPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + newDirectoryName + "\",\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
@@ -92,8 +92,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(faultyEndpointParameter));
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + newDirectoryName + "\",\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
@@ -113,9 +113,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + existingPathEndpointParameter + "\",\"sourcePath\":\"" + sourceDirectoryParameter
-                + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
+        Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

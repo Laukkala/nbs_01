@@ -78,7 +78,7 @@ public class UpdateNotebookEndpoint implements FileSystemEndPoint {
     public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
-            Path path = root.path().resolve(parameters.getString("path"));
+            Path path = root.path().resolve(request.path());
 
             if (!parameters.containsKey("title")) {
                 throw new MalformedRequestException("Request does not contain a title!");

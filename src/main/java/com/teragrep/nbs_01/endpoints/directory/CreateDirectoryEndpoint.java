@@ -75,11 +75,8 @@ public class CreateDirectoryEndpoint implements FileSystemEndPoint {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path")) {
-                throw new MalformedRequestException("Request must contain a path!");
-            }
-            String pathString = parameters.getString("path");
-            Path path = updatedDirectory.path().resolve(pathString);
+
+            Path path = updatedDirectory.path().resolve(request.path());
 
             if (Files.exists(path)) {
                 throw new FileAlreadyExistsException("Path at " + path + " is already in use!");

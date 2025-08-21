@@ -84,15 +84,15 @@ public class CachingFilesystemEndPointTest extends AbstractNotebookServerTest {
             EndPoint endPoint = new CachingFileSystemEndPoint(
                     new FindNotebookEndPoint(new Directory(notebookDirectory()))
             );
-            String body = "{\"path\":\"" + notebookPath + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
+            String body = "{}";
+            Response response = endPoint.createResponse(new JsonRequest(body, notebookPath));
             Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
 
             // Once the file has been cached after the first invocation, set the readable tag to false in order to prevent subsequent reads from file.
             // setReadable returns a boolean indicating if setting the readable status was successful or not.
             Assertions.assertTrue(path.toFile().setReadable(false));
 
-            Response subsequentResponse = endPoint.createResponse(new JsonRequest(body));
+            Response subsequentResponse = endPoint.createResponse(new JsonRequest(body, notebookPath));
 
             // Assert that the subsequent request gets responded to, even though the file is not readable anymore.
             Assertions
@@ -113,8 +113,8 @@ public class CachingFilesystemEndPointTest extends AbstractNotebookServerTest {
             EndPoint endPoint = new CachingFileSystemEndPoint(
                     new FindNotebookEndPoint(new Directory(notebookDirectory()))
             );
-            String body = "{\"path\":\"" + notebookPath + "\"}";
-            Response response = endPoint.createResponse(new JsonRequest(body));
+            String body = "{}";
+            Response response = endPoint.createResponse(new JsonRequest(body, notebookPath));
 
             Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
 
@@ -122,7 +122,7 @@ public class CachingFilesystemEndPointTest extends AbstractNotebookServerTest {
             Files.delete(path);
 
             // If the file no longer exists, the caching endpoint should not respond with the cached notebook, instead returning an error message.
-            Response subsequentResponse = endPoint.createResponse(new JsonRequest(body));
+            Response subsequentResponse = endPoint.createResponse(new JsonRequest(body, notebookPath));
             Assertions
                     .assertEquals(expectedExceptionResponse, subsequentResponse.body().getString("message").strip().toString());
         });

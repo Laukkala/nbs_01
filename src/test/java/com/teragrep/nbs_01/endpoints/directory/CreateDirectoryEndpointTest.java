@@ -82,8 +82,8 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + newDirectoryName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
@@ -97,8 +97,8 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + existingDirectoryName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(existingDirectoryName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

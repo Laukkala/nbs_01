@@ -73,14 +73,13 @@ public class CopyDirectoryEndpoint implements FileSystemEndPoint {
     public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
-            if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
-                throw new MalformedRequestException("Request must contain a path and a sourcePath!");
+            if (!parameters.containsKey("sourcePath")) {
+                throw new MalformedRequestException("Request must contain a sourcePath!");
             }
-            String pathString = parameters.getString("path");
             String sourcePath = parameters.getString("sourcePath");
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
-            Path path = updatedDirectory.path().resolve(pathString);
+            Path path = updatedDirectory.path().resolve(request.path());
 
             Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
             return createResponse(newDirectory, parameters);

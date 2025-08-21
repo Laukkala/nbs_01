@@ -88,7 +88,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
+        JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
@@ -117,9 +117,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
 
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest(
-                "{\"path\":\"" + requestPath + "\",\"paragraphId\":\"" + paragraphId + "\"}"
-        );
+        JsonRequest request = new JsonRequest("{\"paragraphId\":\"" + paragraphId + "\"}", requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());

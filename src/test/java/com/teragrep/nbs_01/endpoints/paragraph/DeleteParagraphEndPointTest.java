@@ -88,7 +88,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
+        JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
@@ -117,7 +117,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
 
-        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
+        JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
@@ -140,7 +140,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
+        JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());

@@ -54,13 +54,13 @@ import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 // Deletes a Paragraph from a given Notebook. Should be provided with a path of the Notebook
 public class DeleteParagraphEndpoint implements FileSystemEndPoint {
@@ -74,10 +74,17 @@ public class DeleteParagraphEndpoint implements FileSystemEndPoint {
     public Response createResponse(Request request) {
         try {
             validateRequestParameters(request);
-            JsonObject parameters = request.parameters();
-            String pathString = parameters.getString("path");
-            Path requestPath = Paths.get(pathString);
+            Path requestPath = request.path();
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
+
+            String paragraphId = requestPath
+                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+                    .toString();
+
+            JsonObject parameters = Json
+                    .createObjectBuilder(request.parameters())
+                    .add("paragraphId", paragraphId)
+                    .build();
 
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             Path path = updatedDirectory.path().resolve(notebookPath);
@@ -97,8 +104,7 @@ public class DeleteParagraphEndpoint implements FileSystemEndPoint {
     }
 
     private void validateRequestParameters(Request request) throws MalformedRequestException {
-        String pathString = request.parameters().getString("path");
-        Path requestPath = Paths.get(pathString);
+        Path requestPath = request.path();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
@@ -116,11 +122,7 @@ public class DeleteParagraphEndpoint implements FileSystemEndPoint {
         try {
             if (file instanceof Notebook) {
                 Notebook notebook = (Notebook) file;
-                String pathString = parameters.getString("path");
-                Path requestPath = Paths.get(pathString);
-                String paragraphId = requestPath
-                        .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                        .toString();
+                String paragraphId = parameters.getString("paragraphId");
                 if (notebook.paragraphs().containsKey(paragraphId)) {
                     notebook.paragraphs().remove(paragraphId);
                     notebook.save();

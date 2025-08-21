@@ -82,8 +82,8 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookPath.toString(), "/paragraph/" + paragraphId);
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
-        String body = "{\"path\":\"" + requestPath + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
     }
 
@@ -94,8 +94,8 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
-        String body = "{\"path\":\"" + requestPath + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
         Assertions
                 .assertEquals(
                         "java.io.FileNotFoundException: Notebook or directory with path " + notebookDirectory() + "/"
@@ -111,8 +111,8 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
-        String body = "{\"path\":\"" + requestPath + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body));
+        String body = "{}";
+        Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
         Assertions
                 .assertEquals(
                         "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!",
@@ -131,7 +131,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
-        Response response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + queryPath + "\"}"));
+        Response response = endpoint.createResponse(new JsonRequest("{}", queryPath));
         // Assert that we got the proper response.
         Assertions.assertEquals(expectedResponse, response.body().getString("message"));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());

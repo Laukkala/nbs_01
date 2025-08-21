@@ -49,23 +49,35 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import jakarta.json.*;
 
 import java.io.StringReader;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 // A Request that accepts a String, and parses it into a JSON object.
 public final class JsonRequest implements Request {
 
     private final String body;
+    private final Path path;
 
     public JsonRequest(String body) {
+        this(body, FileSystems.getDefault().getPath(""));
+    }
+
+    public JsonRequest(String body, Path path) {
         this.body = body;
+        this.path = path;
     }
 
     public String body() {
         return body;
     }
 
+    public Path path() {
+        return path;
+    }
+
     public JsonObject parameters() throws MalformedRequestException {
         try {
-            if ("".equals(body)) {
+            if (body.isEmpty()) {
                 return JsonValue.EMPTY_JSON_OBJECT;
             }
             JsonReader jsonReader = Json.createReader(new StringReader(body));
