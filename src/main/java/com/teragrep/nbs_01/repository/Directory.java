@@ -121,9 +121,7 @@ public final class Directory implements ZeppelinFile {
         }
         Map<Path, ZeppelinFile> movedChildren = new HashMap<>();
         for (ZeppelinFile child : children.values()) {
-            if (child.isStub()) {
-                child = child.load();
-            }
+            child = child.load();
             ZeppelinFile movedChild = child.copy(destinationPath.resolve(child.path().getFileName()));
             movedChildren.put(movedChild.path(), movedChild);
         }
@@ -150,9 +148,7 @@ public final class Directory implements ZeppelinFile {
         }
         Map<Path, ZeppelinFile> copyChildren = new HashMap<>();
         for (ZeppelinFile child : children.values()) {
-            if (child.isStub()) {
-                child = child.load();
-            }
+            child = child.load();
             String childCopyFileName = child.path().getFileName().toString();
             Path copyChildPath = destinationPath.resolve(childCopyFileName);
             copyChildren.put(copyChildPath, child.copy(copyChildPath));

@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Represents the text that a user can write into a Paragraph.
-public final class Script implements Stubable {
+public final class Script {
 
     private static Logger LOGGER = LoggerFactory.getLogger(Script.class);
     private final String text;
@@ -82,10 +82,5 @@ public final class Script implements Stubable {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("text", text);
         return builder.build();
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
     }
 }

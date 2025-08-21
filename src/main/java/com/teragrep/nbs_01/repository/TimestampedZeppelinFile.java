@@ -74,11 +74,6 @@ public final class TimestampedZeppelinFile implements ZeppelinFile {
     }
 
     @Override
-    public boolean isStub() {
-        return origin.isStub();
-    }
-
-    @Override
     public void delete() throws IOException {
         origin.delete();
     }

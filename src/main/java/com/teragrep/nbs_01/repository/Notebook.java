@@ -228,10 +228,6 @@ public final class Notebook implements ZeppelinFile {
         return movedNotebook;
     }
 
-    public boolean isStub() {
-        return isStub;
-    }
-
     private String readFile() throws IOException {
         List<String> lines = Files.readAllLines(path(), Charset.defaultCharset());
         String concatenatedLines = lines.stream().map(n -> String.valueOf(n)).collect(Collectors.joining("\n"));
