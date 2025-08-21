@@ -50,5 +50,6 @@ import com.teragrep.nbs_01.requests.Request;
 
 // Interface for a Delegate, that inspects a Request object, and returns either a true or a false value according to implementation details.
 public abstract interface Delegate {
+
     public abstract Boolean resolve(Request request) throws MalformedRequestException;
 }

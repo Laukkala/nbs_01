@@ -46,5 +46,6 @@
 package com.teragrep.nbs_01.repository;
 
 public interface Stubable {
+
     public abstract boolean isStub();
 }

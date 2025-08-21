@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import org.eclipse.jetty.http.HttpStatus;
+
 // Endpoint that returns a "pong" response to any request. Can be used as a heartbeat function.
 public class PingEndpoint implements EndPoint {
 

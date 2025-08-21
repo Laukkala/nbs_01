@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import jakarta.json.*;
 
 import java.io.StringReader;
+
 // A Request that accepts a String, and parses it into a JSON object.
 public final class JsonRequest implements Request {
 
