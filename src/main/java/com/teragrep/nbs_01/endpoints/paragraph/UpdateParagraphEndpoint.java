@@ -112,7 +112,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
-        if (!request.parameters().containsKey("text") || !request.parameters().containsKey("title")) {
+        if (!request.parameters().containsKey("text") && !request.parameters().containsKey("title")) {
             throw new MalformedRequestException("Request does not contain either a text or a title field!");
         }
     }
@@ -125,9 +125,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
             Notebook notebook = (Notebook) file;
-            String scriptText = parameters.getString("text");
 
-            Script newScript = new Script(scriptText);
             // Copy the paragraphs from the notebook into a new map
             Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
 
@@ -139,7 +137,11 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
                 );
             }
             Paragraph originalParagraph = paragraphs.get(paragraphId);
+            String scriptText = parameters.containsKey("text") ? parameters
+                    .getString("text") : originalParagraph.script().text();
             String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
+            Script newScript = new Script(scriptText);
+
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
             Notebook newNotebook = new Notebook(notebook.title(), notebook.path(), paragraphs);
