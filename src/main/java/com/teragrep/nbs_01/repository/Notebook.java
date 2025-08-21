@@ -160,8 +160,7 @@ public final class Notebook implements ZeppelinFile {
         JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
         Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
         for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
-            NullParagraph nullParagraph = new NullParagraph();
-            Paragraph paragraph = nullParagraph.fromJson(paragraphJson);
+            Paragraph paragraph = new Paragraph().load(paragraphJson);
             savedParagraphs.put(paragraph.id(), paragraph);
         }
         return new Notebook(savedName, path(), savedParagraphs);

@@ -57,12 +57,25 @@ public final class Script implements Stubable {
     private static Logger LOGGER = LoggerFactory.getLogger(Script.class);
     private final String text;
 
+    public Script() {
+        this.text = "";
+    }
+
     public Script(String text) {
         this.text = text;
     }
 
     public String text() {
         return text;
+    }
+
+    public Script load(JsonObject json) {
+        String jsonText = json.getString("text");
+        return load(jsonText);
+    }
+
+    public Script load(String jsonText) {
+        return new Script(jsonText);
     }
 
     public JsonObject json() {

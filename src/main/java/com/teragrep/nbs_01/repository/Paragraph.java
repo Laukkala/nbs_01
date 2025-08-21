@@ -56,6 +56,12 @@ public final class Paragraph {
     private final String title;
     private final Script script;
 
+    public Paragraph() {
+        this.id = "";
+        this.title = "";
+        this.script = new Script();
+    }
+
     public Paragraph(String id, String title, Script script) {
         this.id = id;
         this.title = title;
@@ -80,5 +86,25 @@ public final class Paragraph {
 
     public Script script() {
         return script;
+    }
+
+    public Paragraph load(JsonObject json) {
+        String jsonId = json.getString("id");
+        String jsonTitle = json.containsKey("title") ? json.getString("title") : "";
+        boolean isLegacy = json.containsKey("text");
+        Script jsonScript;
+        if (isLegacy) {
+            jsonScript = this.script.load(json.getString("text"));
+        }
+        else {
+            if (!json.containsKey("script")) {
+                jsonScript = this.script.load("");
+            }
+            else {
+                jsonScript = this.script.load(json.getJsonObject("script").getString("text"));
+            }
+        }
+        //Script script = json.containsKey("script") ? this.script.load(json.getJsonObject("script")) : this.script.load(json.containsKey("text") ? json.getJsonObject("text").asJsonObject() : JsonObject.EMPTY_JSON_OBJECT);
+        return new Paragraph(jsonId, jsonTitle, jsonScript);
     }
 }
