@@ -47,13 +47,13 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 
 // Endpoint that accepts a filesystem object as a parameter
 public interface FileSystemEndPoint extends EndPoint {
 
-    public abstract JsonResponse createResponse(ZeppelinFile file, JsonObject parameters);
+    public abstract Response createResponse(ZeppelinFile file, JsonObject parameters);
 
     public abstract Directory root();
 }

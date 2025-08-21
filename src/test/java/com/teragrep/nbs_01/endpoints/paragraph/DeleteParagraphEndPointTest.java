@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -89,7 +89,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
-        JsonResponse response = endPoint.createResponse(request);
+        Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Deleted paragraph"));
@@ -118,7 +118,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
 
         JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
-        JsonResponse response = endPoint.createResponse(request);
+        Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
@@ -141,7 +141,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{\"path\":\"" + requestPath + "\"}");
-        JsonResponse response = endPoint.createResponse(request);
+        Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions

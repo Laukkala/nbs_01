@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -83,7 +83,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(newNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newNotebookName + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
@@ -98,7 +98,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(existingNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + existingNotebookName + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
@@ -120,7 +120,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(notebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + notebookName + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));

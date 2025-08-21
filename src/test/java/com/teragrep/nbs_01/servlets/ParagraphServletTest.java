@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -91,7 +91,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedparagraphContent = "{\"id\":\"" + firstParagraphId + "\",\"title\":\"" + firstParagraphTitle
                 + "\",\"script\":{\"text\":\"" + firstParagraphText + "\"}}";
 
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -109,7 +109,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpFindNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
         String expectedResponseMessage = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!";
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -128,7 +128,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String nonexistentNotebookName = "I_DONT_EXIST";
         String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
                 + notebookDirectory() + "/" + nonexistentNotebookName + " not found!";
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookName + "/paragraph/"
@@ -150,7 +150,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedparagraphContent = "{\"id\":\"" + newParagraphId
                 + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
 
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -181,7 +181,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
                 + nonexistentNotebookPath + " not found!";
 
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
@@ -206,7 +206,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpDeleteParagraphTest() {
         String requestBody = Json.createObjectBuilder().build().toString();
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -233,7 +233,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedResponseMessage = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph "
                 + nonexistentParagraphId + " doesn't exist!";
 
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -263,7 +263,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
                 + nonexistentNotebookPath + " not found!";
 
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
@@ -302,7 +302,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("script", Json.createObjectBuilder().add("text", newParagraphText))
                 .build()
                 .toString();
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -332,7 +332,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
         // Verify that the source paragraph we want to copy exists
         // Make an HTTP GET request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
-        JsonResponse getResponse = Assertions
+        Response getResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -344,7 +344,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
         // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to create the copy.
         String putRequestBody = Json.createObjectBuilder().build().toString();
-        JsonResponse putResponse = Assertions
+        Response putResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -384,7 +384,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .toString();
 
         // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to edit the copy with the same information as the source paragraph.
-        JsonResponse postResponse = Assertions
+        Response postResponse = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"

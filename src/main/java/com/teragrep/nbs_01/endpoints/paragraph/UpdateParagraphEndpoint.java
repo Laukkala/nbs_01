@@ -50,8 +50,8 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -72,7 +72,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
         this.root = root;
     }
 
-    public JsonResponse createResponse(Request request) {
+    public Response createResponse(Request request) {
         try {
             validateRequestParameters(request);
             JsonObject parameters = request.parameters();
@@ -118,7 +118,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             Path requestPath = Paths.get(parameters.getString("path"));
             String paragraphId = requestPath
@@ -146,7 +146,7 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
             paragraphs.put(newParagraph.id(), newParagraph);
             Notebook newNotebook = new Notebook(notebook.title(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new SimpleResponse(HttpStatus.OK_200, "Paragraph edited successfully");
+            return new JsonResponse(HttpStatus.OK_200, "Paragraph edited successfully");
         }
         catch (IOException ioException) {
             return new ExceptionResponse(

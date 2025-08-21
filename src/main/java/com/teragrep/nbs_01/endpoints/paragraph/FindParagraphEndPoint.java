@@ -52,8 +52,8 @@ import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -71,7 +71,7 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
         this.root = root;
     }
 
-    public JsonResponse createResponse(Request request) {
+    public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
             validateRequestParameters(request);
@@ -112,7 +112,7 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             if (!file.isDirectory()) {
                 String pathString = parameters.getString("path");
@@ -123,7 +123,7 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
 
                 Notebook notebook = (Notebook) file.load();
                 if (notebook.paragraphs().containsKey(paragraphId)) {
-                    return new SimpleResponse(
+                    return new JsonResponse(
                             HttpStatus.OK_200,
                             notebook.paragraphs().get(paragraphId).json().toString()
                     );

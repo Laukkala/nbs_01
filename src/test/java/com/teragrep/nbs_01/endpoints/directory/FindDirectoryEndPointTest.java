@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.directory;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -80,7 +80,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
 
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + directoryPath + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         Assertions.assertEquals(expectedFileContent, response.body().toString());
     }
 
@@ -90,7 +90,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         String nonExistentPath = "nonExistentPath";
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + nonExistentPath + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         Assertions
                 .assertEquals(
                         "java.io.FileNotFoundException: Notebook or directory with path " + notebookDirectory() + "/"

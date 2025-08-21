@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.directory;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -83,7 +83,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(newDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + newDirectoryName + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
@@ -98,7 +98,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(existingDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"path\":\"" + existingDirectoryName + "\"}";
-        JsonResponse response = endPoint.createResponse(new JsonRequest(body));
+        Response response = endPoint.createResponse(new JsonRequest(body));
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

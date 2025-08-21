@@ -50,7 +50,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
 // Response object that takes a Throwable and generates a message body based on the causes of the throwable.
-public final class ExceptionResponse implements JsonResponse {
+public final class ExceptionResponse implements Response {
 
     private final int status;
     private final Throwable throwable;

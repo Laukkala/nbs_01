@@ -49,8 +49,8 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -68,7 +68,7 @@ public class ListEndPoint implements EndPoint {
         this.root = root;
     }
 
-    public JsonResponse createResponse(Request request) {
+    public Response createResponse(Request request) {
         // Find all notebooks from Directory structure
         StringBuilder sb = new StringBuilder();
         ZeppelinFile foundFile;
@@ -83,11 +83,11 @@ public class ListEndPoint implements EndPoint {
                         directoryToSearch = (Directory) foundFile;
                     }
                     else {
-                        return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
+                        return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
                     }
                 }
                 catch (FileNotFoundException fileNotFoundException) {
-                    return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
+                    return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
                 }
             }
             else {
@@ -95,7 +95,7 @@ public class ListEndPoint implements EndPoint {
             }
         }
         catch (MalformedRequestException | IOException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
         try {
             Directory updatedDirectory = directoryToSearch
@@ -107,10 +107,10 @@ public class ListEndPoint implements EndPoint {
                     sb.append("\n");
                 }
             }
-            return new SimpleResponse(HttpStatus.OK_200, sb.toString());
+            return new JsonResponse(HttpStatus.OK_200, sb.toString());
         }
         catch (IOException ioException) {
-            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
         }
     }
 }

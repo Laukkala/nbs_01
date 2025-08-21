@@ -49,8 +49,8 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -67,7 +67,7 @@ public class DeleteFileEndpoint implements FileSystemEndPoint {
         this.root = root;
     }
 
-    public JsonResponse createResponse(Request request) {
+    public Response createResponse(Request request) {
         try {
             Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
             JsonObject parameters = request.parameters();
@@ -81,14 +81,14 @@ public class DeleteFileEndpoint implements FileSystemEndPoint {
             return createResponse(deletedFile, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new SimpleResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
         }
 
         catch (MalformedRequestException malformedRequestException) {
-            return new SimpleResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
         catch (IOException ioException) {
-            return new SimpleResponse(
+            return new JsonResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Failed to read files from notebook directory:\n" + ioException
             );
@@ -96,13 +96,13 @@ public class DeleteFileEndpoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             file.delete();
-            return new SimpleResponse(HttpStatus.NO_CONTENT_204, "");
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
         }
         catch (IOException ioException) {
-            return new SimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to delete file:\n" + ioException);
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to delete file:\n" + ioException);
         }
     }
 

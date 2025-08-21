@@ -46,8 +46,8 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 
 // Stub object for Endpoints.
@@ -58,7 +58,7 @@ public class StubEndpoint implements EndPoint {
 
     }
 
-    public JsonResponse createResponse(Request request) {
-        return new SimpleResponse(HttpStatus.METHOD_NOT_ALLOWED_405, "");
+    public Response createResponse(Request request) {
+        return new JsonResponse(HttpStatus.METHOD_NOT_ALLOWED_405, "");
     }
 }

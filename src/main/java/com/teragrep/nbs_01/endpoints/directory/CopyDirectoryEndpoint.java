@@ -51,8 +51,8 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -70,7 +70,7 @@ public class CopyDirectoryEndpoint implements FileSystemEndPoint {
         this.root = root;
     }
 
-    public JsonResponse createResponse(Request request) {
+    public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
             if (!parameters.containsKey("path") | !parameters.containsKey("sourcePath")) {
@@ -110,10 +110,10 @@ public class CopyDirectoryEndpoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         try {
             file.save();
-            return new SimpleResponse(HttpStatus.CREATED_201, "Created new directory " + file.path());
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + file.path());
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);

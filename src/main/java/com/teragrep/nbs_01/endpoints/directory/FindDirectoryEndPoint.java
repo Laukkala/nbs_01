@@ -51,8 +51,8 @@ import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -69,7 +69,7 @@ public class FindDirectoryEndPoint implements FileSystemEndPoint {
         this.root = root;
     }
 
-    public JsonResponse createResponse(Request request) {
+    public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
             JsonObject parameters = request.parameters();
@@ -88,9 +88,9 @@ public class FindDirectoryEndPoint implements FileSystemEndPoint {
     }
 
     @Override
-    public JsonResponse createResponse(ZeppelinFile file, JsonObject parameters) {
+    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
         if (file instanceof Directory) {
-            return new SimpleResponse(HttpStatus.OK_200, file.json());
+            return new JsonResponse(HttpStatus.OK_200, file.json());
         }
         else {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, new FileNotFoundException("Not a directory!"));

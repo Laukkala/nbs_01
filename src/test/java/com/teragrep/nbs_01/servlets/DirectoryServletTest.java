@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import org.junit.jupiter.api.*;
 
@@ -79,7 +79,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newDirectoryPath)));
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + newDirectoryName, requestBody
@@ -100,7 +100,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(copyDirectoryPath)));
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + copyDirectoryName, requestBody
@@ -123,7 +123,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that there is a file in the path where we plan to copy our directory to.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryName)));
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + directoryName, requestBody
@@ -151,7 +151,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(childNotebookPath)));
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(childDirectoryPath)));
 
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + directoryName, "{}")
                 );
@@ -172,7 +172,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 + notebook2().getFileName() + "]\"}";
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryName));
         Assertions.assertEquals(expectedJson, response.body().toString());
     }
@@ -184,7 +184,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         String expectedJson = "{\"message\":\"java.io.FileNotFoundException: Notebook or directory with path target/notebooks/nonexistent_directory not found!\"}";
         // Assert that the file does not exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonexistentDirectoryName)));
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + nonexistentDirectoryName)
                 );
@@ -198,7 +198,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         String expectedJson = "{\"message\":\"java.io.FileNotFoundException: Not a directory!\"}";
         // Assert that the path we are looking for exists, even though it's not a directory.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookName)));
-        JsonResponse response = Assertions
+        Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + notebookName));
         Assertions.assertEquals(expectedJson, response.body().toString());
     }

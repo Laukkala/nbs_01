@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.servlets;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -80,7 +80,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         Request endPointRequest = new JsonRequest("");
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        JsonResponse endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = endPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());
@@ -102,7 +102,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        JsonResponse endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = endPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());
@@ -125,7 +125,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        JsonResponse endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = endPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());
@@ -148,7 +148,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        JsonResponse endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = endPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setContentType(endPointResponse.contentType());
         resp.setCharacterEncoding(charset.name());

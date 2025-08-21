@@ -49,7 +49,7 @@ import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -110,7 +110,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
-        JsonResponse response = endpoint
+        Response response = endpoint
                 .createResponse(
                         new JsonRequest(
                                 "{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\",\"text\":\""
@@ -172,7 +172,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
-        JsonResponse response = endpoint
+        Response response = endpoint
                 .createResponse(
                         new JsonRequest("{\"path\":\"" + requestPath + "\",\"text\":\"" + editedParagraphText + "\"}")
                 );
@@ -231,7 +231,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
-        JsonResponse response = endpoint
+        Response response = endpoint
                 .createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\"}"));
         // Assert that we got the proper response.
         Assertions.assertEquals(response.body().getString("message").strip(), "Paragraph edited successfully");
@@ -268,7 +268,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName, "paragraph", paragraphId);
-        JsonResponse response = endpoint
+        Response response = endpoint
                 .createResponse(
                         new JsonRequest(
                                 "{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\",\"text\":\""
@@ -291,7 +291,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", nonexistentParagraphId);
-        JsonResponse response = endpoint
+        Response response = endpoint
                 .createResponse(
                         new JsonRequest(
                                 "{\"path\":\"" + requestPath + "\",\"title\":\"" + editedTitle + "\",\"paragraphId\":\""
@@ -315,7 +315,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
-        JsonResponse response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\"}"));
+        Response response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\"}"));
         // Assert that we got the proper response.
         Assertions.assertEquals(expectedResponse, response.body().getString("message"));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
@@ -330,7 +330,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
-        JsonResponse response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\"}"));
+        Response response = endpoint.createResponse(new JsonRequest("{\"path\":\"" + requestPath + "\"}"));
         // Assert that we got the proper response.
         Assertions.assertEquals(expectedResponse, response.body().getString("message"));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
