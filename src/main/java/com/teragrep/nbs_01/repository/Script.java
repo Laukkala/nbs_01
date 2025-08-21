@@ -51,6 +51,7 @@ import jakarta.json.JsonObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Represents the text that a user can write into a Paragraph.
 public final class Script implements Stubable {
 
     private static Logger LOGGER = LoggerFactory.getLogger(Script.class);

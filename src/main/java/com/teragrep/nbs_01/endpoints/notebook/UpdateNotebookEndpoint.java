@@ -66,7 +66,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Updates the text of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph in a comma-separated string
+// Updates the title of a Notebook.
 public class UpdateNotebookEndpoint implements FileSystemEndPoint {
 
     private final Directory root;

@@ -52,6 +52,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+// An interface for Filesystem objects, such as Notebooks and Directories.
 public interface ZeppelinFile extends Stubable {
 
     public abstract void delete() throws IOException;

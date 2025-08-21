@@ -59,7 +59,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-// Lists all the ID's of saved notebooks
+// Endpoint that lists all the paths of saved notebooks in a given Directory.
 public class ListEndPoint implements EndPoint {
 
     private final Directory root;

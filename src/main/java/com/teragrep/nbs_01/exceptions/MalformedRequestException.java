@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.exceptions;
 
+// Exception to be thrown when a request is malformed in some way, indicating a user error.
 public final class MalformedRequestException extends Exception {
 
     public MalformedRequestException(String errorMessage) {

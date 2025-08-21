@@ -62,7 +62,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-// Updates a notebook with the given parameters.
+// Searches for a paragraph from a given Notebook based on a given ParagraphId, and returns its contents in JSON format.
 public class FindParagraphEndPoint implements FileSystemEndPoint {
 
     private final Directory root;

@@ -52,7 +52,7 @@ import com.teragrep.nbs_01.responses.SimpleResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
-// Delegates between CreateFileEndpoint and CopyFileEndpoint based on whether the passed Callable returns a true or false.
+// Delegates between trueFileEndpoint and falseEndpoint based on whether the passed Delegate returns a true or false.
 public class DelegatingEndpoint implements EndPoint {
 
     private final EndPoint trueEndpoint;

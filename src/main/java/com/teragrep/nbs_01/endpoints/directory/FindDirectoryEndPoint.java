@@ -60,7 +60,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
-// Updates a notebook with the given parameters.
+// Finds a given Directory and returns the names of its children in JSON format.
 public class FindDirectoryEndPoint implements FileSystemEndPoint {
 
     private final Directory root;

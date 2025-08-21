@@ -60,7 +60,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-// Creates a new Directory or a Notebook. Should be provided with a path of the File
+// Creates a new Paragraph into a given Notebook. Should be provided with a path of the Notebook
 public class CreateParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;

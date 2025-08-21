@@ -62,7 +62,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Represents a single Notebook within Zeppelin
+ * Represents a single Notebook that can be added to a Directory.
+ * Is identified by a Path, and corresponds to a file saved on the filesystem.
  */
 public final class Notebook implements ZeppelinFile {
 

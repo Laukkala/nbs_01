@@ -60,7 +60,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
-// Updates a notebook with the given parameters.
+// Finds a given Notebook and returns its contents in JSON format.
 public class FindNotebookEndPoint implements FileSystemEndPoint {
 
     private final Directory root;

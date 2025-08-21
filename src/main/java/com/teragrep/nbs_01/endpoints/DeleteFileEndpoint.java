@@ -58,7 +58,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
-// Deletes a Directory or a Notebook. Should be provided with a path of the File
+// Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
 public class DeleteFileEndpoint implements FileSystemEndPoint {
 
     private final Directory root;

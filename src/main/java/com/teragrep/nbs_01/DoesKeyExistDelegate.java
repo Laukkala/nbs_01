@@ -48,6 +48,7 @@ package com.teragrep.nbs_01;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.requests.Request;
 
+// Delegate that checks if a key is present in a Request, and returns either true or false based on the keys existence.
 public class DoesKeyExistDelegate implements Delegate {
 
     private final String key;

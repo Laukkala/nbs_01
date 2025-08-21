@@ -49,6 +49,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
+// Represents a Paragraph that can be added to a Notebook.
 public final class Paragraph {
 
     private final String id;

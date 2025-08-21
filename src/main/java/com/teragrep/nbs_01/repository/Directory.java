@@ -58,6 +58,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+ // Represents a single Directory that can contain Filesystem objects.
+ // Is identified by a Path, and corresponds to a directory file on the filesystem.
 public final class Directory implements ZeppelinFile {
 
     private final Logger LOGGER = LoggerFactory.getLogger(Directory.class);

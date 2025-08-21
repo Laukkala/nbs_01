@@ -59,7 +59,7 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.stream.Collectors;
 
-// Generic HTTPServlet that delegates received HTTP requests to an Endpoint, and generates an HTTP response based on output from the Endpoint.
+// Generic HTTPServlet that delegates received HTTP requests to a single Endpoint, and generates an HTTP response based on output from the Endpoint.
 public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
 
     private final EndPoint endPoint;

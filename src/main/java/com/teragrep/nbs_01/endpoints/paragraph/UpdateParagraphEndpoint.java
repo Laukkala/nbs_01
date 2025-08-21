@@ -63,7 +63,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Updates the text and optionally the title of a given paragraph within a notebook. Should be provided with a notebook ID and a Paragraph ID as well as the updated content of the paragraph.
+// Updates the text and optionally the title of a given paragraph within a Notebook. Should be provided with the path to the Notebook, the ID of the  Paragraph as well as the updated content of the Paragraph.
 public class UpdateParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;

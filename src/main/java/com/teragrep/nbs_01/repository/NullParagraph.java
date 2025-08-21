@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.repository;
 
 import jakarta.json.JsonObject;
 
+// Stub Paragraph object
 public final class NullParagraph {
 
     private final NullScript script;

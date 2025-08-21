@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Decorator for caching notebooks so that you don't always have to read the file from disk.
+ * Decorator that stores the last modified date of the underlying File at the time of decorator creation in memory.
  */
 public final class TimestampedZeppelinFile implements ZeppelinFile {
 

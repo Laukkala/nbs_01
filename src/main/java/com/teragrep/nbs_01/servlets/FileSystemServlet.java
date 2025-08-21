@@ -66,6 +66,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 // HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks, Directories and Paragraphs.
+// Delegates each different HTTP request type to a different endpoint.
 public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
 
     private final EndPoint getEndPoint;

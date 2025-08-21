@@ -63,6 +63,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // Decorator for an endpoint that keeps a cache of filesystem objects.
+// If the cached object is up to date, passes the cached object to the underlying endpoint, otherwise directs the Endpoint to load the filesystem object itself, and caches the result.
 public class CachingFileSystemEndPoint implements FileSystemEndPoint {
 
     private final FileSystemEndPoint endPoint;
