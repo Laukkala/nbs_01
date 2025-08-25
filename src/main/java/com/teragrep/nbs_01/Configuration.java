@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Configuration object for any settings the NotebookServer might need.
 public final class Configuration {
@@ -64,5 +65,22 @@ public final class Configuration {
 
     public Path notebookDirectory() {
         return notebookDirectory;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()){
+            return false;
+        }
+        Configuration that = (Configuration) o;
+        return serverPort == that.serverPort && Objects.equals(notebookDirectory, that.notebookDirectory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(notebookDirectory, serverPort);
     }
 }
