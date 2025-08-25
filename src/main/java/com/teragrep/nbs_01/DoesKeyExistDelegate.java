@@ -59,7 +59,7 @@ public final class DoesKeyExistDelegate implements Delegate {
         this.key = key;
     }
 
-    public Boolean resolve(Request request) throws MalformedRequestException {
+    public boolean resolve(Request request) throws MalformedRequestException {
         return request.parameters().containsKey(key);
     }
 
