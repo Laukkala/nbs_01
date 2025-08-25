@@ -51,6 +51,8 @@ import jakarta.json.JsonObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 // Represents the text that a user can write into a Paragraph.
 public final class Script {
 
@@ -82,5 +84,22 @@ public final class Script {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("text", text);
         return builder.build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Script script = (Script) o;
+        return Objects.equals(text, script.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text);
     }
 }

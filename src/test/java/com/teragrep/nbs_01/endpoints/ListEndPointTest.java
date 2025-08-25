@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.*;
 
 import java.util.Arrays;
@@ -90,5 +91,10 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         for (String filename : allFileIdsWithinDirectory) {
             Assertions.assertTrue(response.body().getString("message").contains(filename));
         }
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(ListEndPoint.class).verify();
     }
 }

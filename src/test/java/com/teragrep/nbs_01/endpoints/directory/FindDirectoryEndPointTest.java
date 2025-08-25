@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -97,5 +98,10 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
                                 + nonExistentPath + " not found!",
                         response.body().getString("message").strip()
                 );
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(FindDirectoryEndPoint.class).verify();
     }
 }

@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -134,6 +135,11 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
                         "java.nio.file.FileAlreadyExistsException: Path at " + existingPath + " is already in use!",
                         response.body().getString("message")
                 );
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(CopyNotebookEndpoint.class).verify();
     }
 
 }

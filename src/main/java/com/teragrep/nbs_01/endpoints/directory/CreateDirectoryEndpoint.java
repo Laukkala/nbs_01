@@ -61,9 +61,10 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Creates a new Notebook. Should be provided with a path of the File
-public class CreateDirectoryEndpoint implements FileSystemEndPoint {
+public final class CreateDirectoryEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -117,5 +118,22 @@ public class CreateDirectoryEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CreateDirectoryEndpoint that = (CreateDirectoryEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

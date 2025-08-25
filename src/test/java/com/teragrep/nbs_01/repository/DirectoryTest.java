@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -335,5 +336,10 @@ class DirectoryTest {
         List<String> destinationContentsAfterCopying = Assertions
                 .assertDoesNotThrow(() -> Files.readAllLines(destinationPath));
         Assertions.assertEquals(destinationContents, destinationContentsAfterCopying);
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(Directory.class).verify();
     }
 }

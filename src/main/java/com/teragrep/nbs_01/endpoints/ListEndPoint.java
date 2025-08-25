@@ -58,9 +58,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 // Endpoint that lists all the paths of saved notebooks in a given Directory.
-public class ListEndPoint implements EndPoint {
+public final class ListEndPoint implements EndPoint {
 
     private final Directory root;
 
@@ -112,5 +113,22 @@ public class ListEndPoint implements EndPoint {
         catch (IOException ioException) {
             return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ListEndPoint that = (ListEndPoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

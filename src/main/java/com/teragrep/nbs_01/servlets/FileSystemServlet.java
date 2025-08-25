@@ -59,6 +59,7 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 // HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks, Directories and Paragraphs.
@@ -177,5 +178,24 @@ public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
         writer.write(endPointResponse.body().toString());
         writer.flush();
         writer.close();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        FileSystemServlet that = (FileSystemServlet) o;
+        return Objects.equals(getEndPoint, that.getEndPoint) && Objects
+                .equals(postEndPoint, that.postEndPoint) && Objects.equals(putEndPoint, that.putEndPoint)
+                && Objects.equals(deleteEndPoint, that.deleteEndPoint) && Objects.equals(charset, that.charset);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getEndPoint, postEndPoint, putEndPoint, deleteEndPoint, charset);
     }
 }

@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -190,5 +191,10 @@ class NotebookTest {
         Assertions.assertFalse(Files.exists(originalPath));
         Assertions
                 .assertTrue(Files.exists(Assertions.assertDoesNotThrow(() -> updatedDirectory.findFile(newPath).path())));
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(Notebook.class).verify();
     }
 }

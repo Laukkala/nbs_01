@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,5 +117,28 @@ class TimestampedZeppelinFileTest {
             // Creating a new TimestampedZeppelinFile should use the latest edit timestamp.
             Assertions.assertEquals(newTimestampedFile.lastModified(), notebook1.toFile().lastModified());
         });
+    }
+
+    @Test
+    public void testEquals() {
+        Assertions.assertDoesNotThrow(() -> {
+            TimestampedZeppelinFile timestampedFile = new TimestampedZeppelinFile(new Notebook(notebook1));
+            // Creating a new TimestampedZeppelinFile should use the latest edit timestamp.
+            Assertions.assertEquals(timestampedFile.lastModified(), notebook1.toFile().lastModified());
+
+            Files.write(notebook1, "Overwrote some text".getBytes());
+            // Timestamp should not be updated when the file is edited.
+            Assertions.assertNotEquals(timestampedFile.lastModified(), notebook1.toFile().lastModified());
+
+            TimestampedZeppelinFile newTimestampedFile = new TimestampedZeppelinFile(new Notebook(notebook1));
+            // Creating a new TimestampedZeppelinFile should use the latest edit timestamp.
+            Assertions.assertEquals(newTimestampedFile.lastModified(), notebook1.toFile().lastModified());
+            Assertions.assertFalse(timestampedFile.equals(newTimestampedFile));
+        });
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(TimestampedZeppelinFile.class).verify();
     }
 }

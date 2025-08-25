@@ -49,6 +49,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
+import java.util.Objects;
+
 // Represents a Paragraph that can be added to a Notebook.
 public final class Paragraph {
 
@@ -106,5 +108,23 @@ public final class Paragraph {
         }
         //Script script = json.containsKey("script") ? this.script.load(json.getJsonObject("script")) : this.script.load(json.containsKey("text") ? json.getJsonObject("text").asJsonObject() : JsonObject.EMPTY_JSON_OBJECT);
         return new Paragraph(jsonId, jsonTitle, jsonScript);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Paragraph paragraph = (Paragraph) o;
+        return Objects.equals(id, paragraph.id) && Objects.equals(title, paragraph.title)
+                && Objects.equals(script, paragraph.script);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, script);
     }
 }

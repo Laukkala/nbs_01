@@ -61,9 +61,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Deletes a Paragraph from a given Notebook. Should be provided with a path of the Notebook
-public class DeleteParagraphEndpoint implements FileSystemEndPoint {
+public final class DeleteParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -150,5 +151,22 @@ public class DeleteParagraphEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DeleteParagraphEndpoint that = (DeleteParagraphEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

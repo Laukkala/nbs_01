@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -140,6 +141,11 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         String fileContent = lines.stream().collect(Collectors.joining());
         // Assert that the file content has the edited paragraph saved to file in the correct place.
         Assertions.assertEquals(fileContent, originalFileContent);
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(UpdateNotebookEndpoint.class).verify();
     }
 
 }

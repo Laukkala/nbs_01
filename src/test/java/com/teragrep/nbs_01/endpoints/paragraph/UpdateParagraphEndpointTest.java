@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -333,5 +334,10 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that we got the proper response.
         Assertions.assertEquals(expectedResponse, response.body().getString("message"));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(UpdateParagraphEndpoint.class).verify();
     }
 }

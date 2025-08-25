@@ -60,10 +60,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 // Decorator for an endpoint that keeps a cache of filesystem objects.
 // If the cached object is up to date, passes the cached object to the underlying endpoint, otherwise directs the Endpoint to load the filesystem object itself, and caches the result.
-public class CachingFileSystemEndPoint implements FileSystemEndPoint {
+public final class CachingFileSystemEndPoint implements FileSystemEndPoint {
 
     private final FileSystemEndPoint endPoint;
     private final Map<Path, TimestampedZeppelinFile> cache;
@@ -132,4 +133,20 @@ public class CachingFileSystemEndPoint implements FileSystemEndPoint {
         return endPoint.root();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CachingFileSystemEndPoint that = (CachingFileSystemEndPoint) o;
+        return Objects.equals(endPoint, that.endPoint) && Objects.equals(cache, that.cache);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(endPoint, cache);
+    }
 }

@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.servlets;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -221,6 +222,16 @@ public class FileSystemServletTest extends AbstractNotebookServerTest {
                         expectedFileContent,
                         Assertions.assertDoesNotThrow(() -> Files.readAllLines(notebookDirectory().resolve(notebookPath)).stream().collect(Collectors.joining()))
                 );
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier
+                .forClass(FileSystemServlet.class)
+                // legacyHeadHandling is a boolean within jakarta.servlet.http.HttpServlet, which FileSystemServlet extends.
+                // EqualsVerifier complains that it is not included in FileSystemServlets equals() method, but FileSystemServlet cannot access the boolen, so it is ignored
+                .withIgnoredFields("legacyHeadHandling")
+                .verify();
     }
 
 }

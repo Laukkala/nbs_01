@@ -64,7 +64,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the text and optionally the title of a given paragraph within a Notebook. Should be provided with the path to the Notebook, the ID of the  Paragraph as well as the updated content of the Paragraph.
-public class UpdateParagraphEndpoint implements FileSystemEndPoint {
+public final class UpdateParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -160,5 +160,22 @@ public class UpdateParagraphEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UpdateParagraphEndpoint that = (UpdateParagraphEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

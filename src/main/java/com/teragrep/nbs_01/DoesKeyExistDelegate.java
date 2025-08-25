@@ -48,8 +48,10 @@ package com.teragrep.nbs_01;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.requests.Request;
 
+import java.util.Objects;
+
 // Delegate that checks if a key is present in a Request, and returns either true or false based on the keys existence.
-public class DoesKeyExistDelegate implements Delegate {
+public final class DoesKeyExistDelegate implements Delegate {
 
     private final String key;
 
@@ -59,5 +61,22 @@ public class DoesKeyExistDelegate implements Delegate {
 
     public Boolean resolve(Request request) throws MalformedRequestException {
         return request.parameters().containsKey(key);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DoesKeyExistDelegate delegate = (DoesKeyExistDelegate) o;
+        return Objects.equals(key, delegate.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
     }
 }

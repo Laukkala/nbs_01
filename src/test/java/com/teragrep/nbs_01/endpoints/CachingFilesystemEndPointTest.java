@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.endpoints.notebook.FindNotebookEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -126,5 +127,10 @@ public class CachingFilesystemEndPointTest extends AbstractNotebookServerTest {
             Assertions
                     .assertEquals(expectedExceptionResponse, subsequentResponse.body().getString("message").strip().toString());
         });
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(CachingFileSystemEndPoint.class).verify();
     }
 }

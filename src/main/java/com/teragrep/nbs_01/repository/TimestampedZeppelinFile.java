@@ -54,13 +54,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Decorator that stores the last modified date of the underlying File at the time of decorator creation in memory.
  */
 public final class TimestampedZeppelinFile implements ZeppelinFile {
 
-    private final Logger logger = LoggerFactory.getLogger(TimestampedZeppelinFile.class);
+    private static final Logger logger = LoggerFactory.getLogger(TimestampedZeppelinFile.class);
     private final ZeppelinFile origin;
     private final long lastModifiedTimestamp;
 
@@ -136,5 +137,23 @@ public final class TimestampedZeppelinFile implements ZeppelinFile {
     @Override
     public JsonObject json() {
         return origin.json();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TimestampedZeppelinFile timestampedZeppelinFile = (TimestampedZeppelinFile) o;
+        return lastModifiedTimestamp == timestampedZeppelinFile.lastModifiedTimestamp
+                && Objects.equals(origin, timestampedZeppelinFile.origin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(origin, lastModifiedTimestamp);
     }
 }

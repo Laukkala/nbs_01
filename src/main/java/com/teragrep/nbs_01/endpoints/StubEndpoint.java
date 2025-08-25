@@ -51,7 +51,7 @@ import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 
 // Stub object for Endpoints.
-public class StubEndpoint implements EndPoint {
+public final class StubEndpoint implements EndPoint {
 
     // On receiving a request, returns a 405 METHOD NOT ALLOWED
     public StubEndpoint() {

@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
 // Is identified by a Path, and corresponds to a directory file on the filesystem.
 public final class Directory implements ZeppelinFile {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
     private final Map<Path, ZeppelinFile> children;
     private final Path path;
 
@@ -259,5 +259,22 @@ public final class Directory implements ZeppelinFile {
         });
         Directory root = new Directory(pathToVisit, directoryChildren);
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Directory directory = (Directory) o;
+        return Objects.equals(children, directory.children) && Objects.equals(path, directory.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(children, path);
     }
 }

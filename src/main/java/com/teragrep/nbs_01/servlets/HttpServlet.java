@@ -57,6 +57,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 // Generic HTTPServlet that delegates received HTTP requests to a single Endpoint, and generates an HTTP response based on output from the Endpoint.
@@ -158,5 +159,22 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
 
         // Close the writer to avoid resource leaks
         writer.close();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        HttpServlet that = (HttpServlet) o;
+        return Objects.equals(endPoint, that.endPoint) && Objects.equals(charset, that.charset);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(endPoint, charset);
     }
 }

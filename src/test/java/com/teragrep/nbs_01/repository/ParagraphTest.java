@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -62,5 +63,10 @@ class ParagraphTest {
                         "{\"id\":\"testParagraph\",\"title\":\"testTitle\",\"script\":{\"text\":\"%spark\\nprintln(\\\"Hello Spark\\\")\"}}",
                         paragraph.json().toString()
                 );
+    }
+
+    @Test
+    public void testContract() {
+        EqualsVerifier.forClass(Paragraph.class).verify();
     }
 }

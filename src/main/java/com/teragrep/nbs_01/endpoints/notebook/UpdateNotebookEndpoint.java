@@ -64,10 +64,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the title of a Notebook.
-public class UpdateNotebookEndpoint implements FileSystemEndPoint {
+public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -125,5 +126,22 @@ public class UpdateNotebookEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UpdateNotebookEndpoint that = (UpdateNotebookEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

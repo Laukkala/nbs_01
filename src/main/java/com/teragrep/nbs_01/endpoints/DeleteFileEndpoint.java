@@ -57,9 +57,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
-public class DeleteFileEndpoint implements FileSystemEndPoint {
+public final class DeleteFileEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -105,5 +106,22 @@ public class DeleteFileEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DeleteFileEndpoint that = (DeleteFileEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

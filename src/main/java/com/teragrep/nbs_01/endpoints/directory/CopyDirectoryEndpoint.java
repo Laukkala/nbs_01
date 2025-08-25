@@ -60,9 +60,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public class CopyDirectoryEndpoint implements FileSystemEndPoint {
+public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -122,5 +123,22 @@ public class CopyDirectoryEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CopyDirectoryEndpoint that = (CopyDirectoryEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

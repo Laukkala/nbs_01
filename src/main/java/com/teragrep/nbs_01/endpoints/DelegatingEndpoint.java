@@ -52,8 +52,10 @@ import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 
+import java.util.Objects;
+
 // Delegates between trueFileEndpoint and falseEndpoint based on whether the passed Delegate returns a true or false.
-public class DelegatingEndpoint implements EndPoint {
+public final class DelegatingEndpoint implements EndPoint {
 
     private final EndPoint trueEndpoint;
     private final EndPoint falseEndpoint;
@@ -77,5 +79,23 @@ public class DelegatingEndpoint implements EndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DelegatingEndpoint that = (DelegatingEndpoint) o;
+        return Objects.equals(trueEndpoint, that.trueEndpoint) && Objects.equals(falseEndpoint, that.falseEndpoint)
+                && Objects.equals(delegationFunction, that.delegationFunction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(trueEndpoint, falseEndpoint, delegationFunction);
     }
 }

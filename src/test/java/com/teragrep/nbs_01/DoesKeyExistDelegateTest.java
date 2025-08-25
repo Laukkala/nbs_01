@@ -45,38 +45,42 @@
  */
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.requests.Request;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class ConfigurationTest {
+class DoesKeyExistDelegateTest {
 
-    private final int serverPort = 8080;
-    private final Path notebookDir = Paths.get("src/test/resources/notebook");
+    private final String testKey = "test";
 
     @Test
-    void serverPortTest() {
+    public void resolvePresentKey() {
         Assertions.assertDoesNotThrow(() -> {
-            Configuration configuration = new Configuration(notebookDir, serverPort);
-            assertEquals(serverPort, configuration.serverPort());
+            DoesKeyExistDelegate delegate = new DoesKeyExistDelegate(testKey);
+            JsonObject body = Json.createObjectBuilder().add(testKey, "testValue").build();
+            Request testRequest = new JsonRequest(body.toString());
+            Assertions.assertTrue(delegate.resolve(testRequest));
         });
     }
 
     @Test
-    void notebookDirectoryTest() {
+    public void resolveMissingKey() {
         Assertions.assertDoesNotThrow(() -> {
-            Configuration configuration = new Configuration(notebookDir, serverPort);
-            assertEquals(notebookDir, configuration.notebookDirectory());
+            DoesKeyExistDelegate delegate = new DoesKeyExistDelegate(testKey);
+            JsonObject body = Json.createObjectBuilder().add("some other key", "testValue").build();
+            Request testRequest = new JsonRequest(body.toString());
+            Assertions.assertFalse(delegate.resolve(testRequest));
         });
     }
 
     @Test
     public void testContract() {
-        EqualsVerifier.forClass(Configuration.class).verify();
+        EqualsVerifier.forClass(DoesKeyExistDelegate.class).verify();
     }
 }

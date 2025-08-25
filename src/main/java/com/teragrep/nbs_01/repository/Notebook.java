@@ -230,4 +230,22 @@ public final class Notebook implements ZeppelinFile {
         String concatenatedLines = lines.stream().map(n -> String.valueOf(n)).collect(Collectors.joining("\n"));
         return concatenatedLines;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Notebook notebook = (Notebook) o;
+        return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(title, notebook.title)
+                && Objects.equals(path, notebook.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(paragraphs, title, path);
+    }
 }

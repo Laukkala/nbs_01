@@ -59,9 +59,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Finds a given Directory and returns the names of its children in JSON format.
-public class FindDirectoryEndPoint implements FileSystemEndPoint {
+public final class FindDirectoryEndPoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -99,5 +100,22 @@ public class FindDirectoryEndPoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        FindDirectoryEndPoint that = (FindDirectoryEndPoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

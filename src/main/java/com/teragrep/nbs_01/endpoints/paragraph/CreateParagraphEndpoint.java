@@ -59,9 +59,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Creates a new Paragraph into a given Notebook. Should be provided with a path of the Notebook
-public class CreateParagraphEndpoint implements FileSystemEndPoint {
+public final class CreateParagraphEndpoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -149,5 +150,22 @@ public class CreateParagraphEndpoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CreateParagraphEndpoint that = (CreateParagraphEndpoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

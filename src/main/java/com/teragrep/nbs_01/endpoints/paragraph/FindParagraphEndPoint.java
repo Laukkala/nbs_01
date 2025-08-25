@@ -61,9 +61,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Searches for a paragraph from a given Notebook based on a given ParagraphId, and returns its contents in JSON format.
-public class FindParagraphEndPoint implements FileSystemEndPoint {
+public final class FindParagraphEndPoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -153,5 +154,22 @@ public class FindParagraphEndPoint implements FileSystemEndPoint {
     @Override
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        FindParagraphEndPoint that = (FindParagraphEndPoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

@@ -59,9 +59,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 // Finds a given Notebook and returns its contents in JSON format.
-public class FindNotebookEndPoint implements FileSystemEndPoint {
+public final class FindNotebookEndPoint implements FileSystemEndPoint {
 
     private final Directory root;
 
@@ -107,5 +108,22 @@ public class FindNotebookEndPoint implements FileSystemEndPoint {
 
     public Directory root() {
         return root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        FindNotebookEndPoint that = (FindNotebookEndPoint) o;
+        return Objects.equals(root, that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }
