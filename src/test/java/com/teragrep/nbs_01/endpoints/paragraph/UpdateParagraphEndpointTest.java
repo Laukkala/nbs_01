@@ -47,13 +47,16 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
+import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -261,8 +264,6 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that a request to UpdateParagraphEndpoint with a nonexistent notebook path results in an error.
         String nonExistentNotebookName = "nonExistentNotebook";
 
-        String expectedResponse = "java.io.FileNotFoundException: Notebook with path " + notebookDirectory() + "/"
-                + nonExistentNotebookName + " not found!";
         // Make a request editing the title of a notebook that doesn't exist.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
@@ -274,17 +275,27 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                                 requestPath
                         )
                 );
-        // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.NOT_FOUND_404,
+                new FileNotFoundException(
+                        "Notebook with path " + notebookDirectory() + "/" + nonExistentNotebookName + " not found!"
+                )
+        );
+        Assertions
+                .assertEquals(
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
+                );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test
     public void httpUpdateNonexistentParagraphTest() {
         // Assert that a request to UpdateParagraphEndpoint with a nonexistent paragraphId results in an error.
         String nonexistentParagraphId = "nonexistentId";
-        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph with Id "
-                + nonexistentParagraphId + " not found!";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
@@ -298,9 +309,19 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                                 requestPath
                         )
                 );
-        // Assert that we got the proper response.
-        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new MalformedRequestException("Paragraph with Id " + nonexistentParagraphId + " not found!")
+        );
+        Assertions
+                .assertEquals(
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
+                );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test
@@ -309,31 +330,48 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         String nonexistentParagraphId = "nonexistentId";
         String nonexistentNotebookName = "nonexistentNotebookPath";
 
-        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"";
-
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
         Response response = endpoint.createResponse(new JsonRequest("{}", requestPath));
-        // Assert that we got the proper response.
-        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new MalformedRequestException(
+                        "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
+                )
+        );
+        Assertions
+                .assertEquals(
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
+                );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test
     public void httpInvalidRequestParametersTest() {
-        // Assert that a request to UpdateParagraphEndpoint with an improperly formatted Request results in an error.
-        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Request does not contain either a text or a title field!";
-
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new Directory(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
         Response response = endpoint.createResponse(new JsonRequest("{}", requestPath));
-        // Assert that we got the proper response.
-        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new MalformedRequestException("Request does not contain either a text or a title field!")
+        );
+        Assertions
+                .assertEquals(
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
+                );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test

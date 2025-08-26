@@ -48,10 +48,13 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,12 +96,19 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(nonExistentNotebookName)));
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new FileNotFoundException("Notebook or directory with path " + nonExistentNotebookPath + " not found!")
+        );
         Assertions
                 .assertEquals(
-                        "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentNotebookPath
-                                + " not found!",
-                        response.body().getString("message").strip()
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
                 );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test

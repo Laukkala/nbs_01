@@ -80,6 +80,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
     private final String sixthParagraphId = "20150326-214658_12335843";
     private final String sixthParagraphText = "%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```";
+    private final String expectedErrorResponseMessage = "An error occurred while processing your Request. See event id ";
     private final Path notebookPath = Paths.get(notebookName);
 
     public ParagraphServletTest() {
@@ -108,7 +109,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpFindNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
-        String expectedResponseMessage = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!";
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
@@ -119,15 +119,13 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         // Assert that the body of the response contains a message mentioning that the paragraph was not found
-        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+        Assertions.assertTrue(response.body().getString("message").contains(expectedErrorResponseMessage));
     }
 
     // Searching for a paragraph from a notebook that doesn't exist should result in an error.
     @Test
     public void httpFindParagraphFromNonexistentNotebookTest() {
         String nonexistentNotebookName = "I_DONT_EXIST";
-        String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
-                + notebookDirectory() + "/" + nonexistentNotebookName + " not found!";
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
@@ -138,7 +136,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the body of the response contains a message mentioning that the notebook was not found
-        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+        Assertions.assertTrue(response.body().getString("message").contains(expectedErrorResponseMessage));
     }
 
     // Creating a paragraph should result in an existing notebook being saved to disk containing an additional paragraph.
@@ -192,7 +190,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a faulty PUT request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the body of the response contains a message mentioning that the notebook doesn't exist
-        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+        Assertions.assertTrue(response.body().getString("message").contains(expectedErrorResponseMessage));
 
         // Assert that the paragraph id is not contained within the saved file of the notebook
         String fileContents = Assertions
@@ -243,7 +241,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that a faulty DELETE request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+        Assertions.assertTrue(response.body().getString("message").contains(expectedErrorResponseMessage));
 
         // Assert that the created paragraph is not contained within the saved file of the notebook
         String fileContents = Assertions
@@ -273,7 +271,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that a faulty DELETE request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedResponseMessage, response.body().getString("message"));
+        Assertions.assertTrue(response.body().getString("message").contains(expectedErrorResponseMessage));
 
         // Assert that the created paragraph is not contained within the saved file of the notebook
         String fileContents = Assertions

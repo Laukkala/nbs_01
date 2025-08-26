@@ -46,13 +46,16 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,12 +100,22 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.NOT_FOUND_404,
+                new FileNotFoundException(
+                        "Notebook or directory with path " + notebookDirectory() + "/" + nonExistentNotebookName
+                                + " not found!"
+                )
+        );
         Assertions
                 .assertEquals(
-                        "java.io.FileNotFoundException: Notebook or directory with path " + notebookDirectory() + "/"
-                                + nonExistentNotebookName + " not found!",
-                        response.body().getString("message").strip()
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
                 );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test
@@ -114,11 +127,19 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new MalformedRequestException("Paragraph not found!")
+        );
         Assertions
                 .assertEquals(
-                        "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph not found!",
-                        response.body().getString("message").strip()
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
                 );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test
@@ -127,15 +148,26 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         String nonexistentParagraphId = "nonexistentId";
         String nonexistentNotebookName = "nonexistentNotebookPath";
 
-        String expectedResponse = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"";
         Path queryPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new Directory(notebookDirectory()));
         Response response = endpoint.createResponse(new JsonRequest("{}", queryPath));
-        // Assert that we got the proper response.
-        Assertions.assertEquals(expectedResponse, response.body().getString("message"));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new MalformedRequestException(
+                        "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
+                )
+        );
+        Assertions
+                .assertEquals(
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
+                );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test

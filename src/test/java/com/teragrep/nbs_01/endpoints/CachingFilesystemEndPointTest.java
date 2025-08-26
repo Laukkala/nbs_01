@@ -49,10 +49,13 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.notebook.FindNotebookEndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -124,8 +127,18 @@ public class CachingFilesystemEndPointTest extends AbstractNotebookServerTest {
 
             // If the file no longer exists, the caching endpoint should not respond with the cached notebook, instead returning an error message.
             Response subsequentResponse = endPoint.createResponse(new JsonRequest(body, notebookPath));
+
+            // The endpoint should return an ExceptionResponse with the specified cause.
+            Assertions.assertTrue(subsequentResponse.getClass().equals(ExceptionResponse.class));
+            Response expectedResponse = new ExceptionResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new FileNotFoundException("Notebook or directory with path " + path + " not found!")
+            );
             Assertions
-                    .assertEquals(expectedExceptionResponse, subsequentResponse.body().getString("message").strip().toString());
+                    .assertEquals(
+                            ((ExceptionResponse) expectedResponse).exception().getCause(),
+                            ((ExceptionResponse) subsequentResponse).exception().getCause()
+                    );
         });
     }
 

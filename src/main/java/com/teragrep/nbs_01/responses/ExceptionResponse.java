@@ -48,30 +48,50 @@ package com.teragrep.nbs_01.responses;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 // Response object that takes a Throwable and generates a message body based on the causes of the throwable.
 public final class ExceptionResponse implements Response {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionResponse.class);
+    private final UUID eventId;
     private final int status;
     private final Throwable throwable;
 
     public ExceptionResponse(int status, Throwable throwable) {
+        this(status, throwable, UUID.randomUUID());
+    }
+
+    public ExceptionResponse(int status, Throwable throwable, UUID eventId) {
         this.status = status;
         this.throwable = throwable;
+        this.eventId = eventId;
     }
 
     public int status() {
         return status;
     }
 
+    public Throwable exception() {
+        return throwable;
+    }
+
+    public UUID eventId() {
+        return eventId;
+    }
+
     public JsonObject body() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(throwable);
-        for (Throwable cause = throwable.getCause(); cause != null; cause = cause.getCause()) {
-            stringBuilder.append("\nCaused by: " + cause);
-        }
+        LOGGER.error("Event_" + eventId, throwable);
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder.add("message", stringBuilder.toString());
+        jsonObjectBuilder
+                .add(
+                        "message",
+                        "An error occurred while processing your Request. See event id " + eventId
+                                + " in the technical log for details."
+                );
         JsonObject json = jsonObjectBuilder.build();
         return json;
     }

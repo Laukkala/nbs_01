@@ -60,31 +60,18 @@ class ExceptionResponseTest {
     private final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
 
-    // An ExceptionResponse should combine the underlying cause messages of the given Throwable and form it into a proper response.
+    // An ExceptionResponse should generate an EventId on creation, and provide a prompt to check technical logs with the matching ID for details.
     @Test
     void testBodyGeneration() {
         Throwable throwable4 = new FileNotFoundException(throwable4message);
         Throwable throwable3 = new IOException(throwable3message, throwable4);
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
-        String expectedMessage = throwable1 + "\nCaused by: " + throwable2 + "\nCaused by: " + throwable3
-                + "\nCaused by: " + throwable4;
 
         ExceptionResponse response = new ExceptionResponse(500, throwable1);
-        Assertions.assertEquals(expectedMessage, response.body().getString("message"));
-    }
-
-    // An ExceptionResponse should be able to take exceptions that don't have specific messages as well.
-    @Test
-    void testBodyGenerationWithExceptionsWithoutMessages() {
-        Throwable throwable4 = new FileNotFoundException();
-        Throwable throwable3 = new IOException(throwable3message, throwable4);
-        Throwable throwable2 = new RuntimeException(throwable3);
-        Throwable throwable1 = new Exception(throwable1message, throwable2);
-        String expectedMessage = throwable1 + "\nCaused by: " + throwable2 + "\nCaused by: " + throwable3
-                + "\nCaused by: " + throwable4;
-
-        ExceptionResponse response = new ExceptionResponse(500, throwable1);
-        Assertions.assertEquals(expectedMessage, response.body().getString("message"));
+        final String expectedBody = "An error occurred while processing your Request. See event id "
+                + response.eventId() + " in the technical log for details.";
+        Assertions.assertTrue(response.exception().equals(throwable1));
+        Assertions.assertEquals(expectedBody, response.body().getString("message"));
     }
 }

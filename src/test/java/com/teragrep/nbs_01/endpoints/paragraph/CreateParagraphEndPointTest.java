@@ -48,11 +48,13 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
+import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -120,14 +122,18 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{\"paragraphId\":\"" + paragraphId + "\"}", requestPath);
         Response response = endPoint.createResponse(request);
-        // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.NOT_FOUND_404,
+                new FileNotFoundException("Notebook or directory with path " + nonexistentFilePath + " not found!")
+        );
         Assertions
                 .assertEquals(
-                        "java.io.FileNotFoundException: Notebook or directory with path " + nonexistentFilePath
-                                + " not found!",
-                        response.body().getString("message")
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
                 );
+        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test

@@ -48,12 +48,15 @@ package com.teragrep.nbs_01.endpoints.directory;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.requests.JsonRequest;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileNotFoundException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -95,13 +98,17 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
-        // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.NOT_FOUND_404,
+                new FileNotFoundException("Notebook or directory with path " + nonExistentSourcePath + " not found!")
+        );
         Assertions
                 .assertEquals(
-                        "java.io.FileNotFoundException: Notebook or directory with path " + nonExistentSourcePath
-                                + " not found!",
-                        response.body().getString("message")
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
                 );
         // Assert that the file was not created.
         Assertions.assertFalse(Files.exists(copiedDirectoryPath));
@@ -116,12 +123,17 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
-        // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+
+        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
+        Response expectedResponse = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST_400,
+                new FileAlreadyExistsException("Path at " + existingPath + " is already in use!")
+        );
         Assertions
                 .assertEquals(
-                        "java.nio.file.FileAlreadyExistsException: Path at " + existingPath + " is already in use!",
-                        response.body().getString("message")
+                        ((ExceptionResponse) expectedResponse).exception().getCause(),
+                        ((ExceptionResponse) response).exception().getCause()
                 );
     }
 
