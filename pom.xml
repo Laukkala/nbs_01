@@ -161,7 +161,7 @@
                   <version>3.2.5</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>17</version>
+                  <version>11</version>
                 </requireJavaVersion>
                 <banDynamicVersions>
                   <ignores>
@@ -431,6 +431,8 @@
             <exclude>.github/pull_request_template.md</exclude>
             <exclude>toolchains.xml</exclude>
             <exclude>settings.xml</exclude>
+            <!-- doxygen -->
+            <exclude>Doxyfile</exclude>
             <!-- maven -->
             <exclude>pom.xml</exclude>
             <exclude>eclipse-java-formatter.xml</exclude>
@@ -479,7 +481,7 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <source>17</source>
+              <source>11</source>
               <doclint>none</doclint>
               <tags>
                 <tag>
