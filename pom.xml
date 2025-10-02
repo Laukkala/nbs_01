@@ -479,7 +479,7 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <source>11</source> <!--TODO:lol-->
+              <source>17</source>
               <doclint>none</doclint>
               <tags>
                 <tag>
