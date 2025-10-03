@@ -54,7 +54,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 class DirectoryTest {
@@ -110,8 +109,7 @@ class DirectoryTest {
     // Directory should contain a child for each file and directory within notebookDirectory after initialization.
     @Test
     void testInitializeDirectory() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Assertions.assertEquals(4, root.children().size());
         Assertions.assertEquals(2, root.children().get(directory1).children().size());
         Assertions.assertEquals(1, root.children().get(directory1).children().get(directory2).children().size());
@@ -120,8 +118,7 @@ class DirectoryTest {
     // List of all children should contain an ID for every directory and file.
     @Test
     void testListAllChildren() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         List<Path> paths = root.listAllChildren().stream().map(zeppelinFile -> {
             return zeppelinFile.path();
         }).collect(Collectors.toList());
@@ -139,8 +136,7 @@ class DirectoryTest {
     // Searching in directories should result in a notebook or a directory object being returned with a valid ID.
     @Test
     void testFindFile() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         ZeppelinFile file = Assertions.assertDoesNotThrow(() -> root.findFile(notebook4));
         Assertions.assertFalse(file.isDirectory());
         Assertions.assertEquals(file.path(), Paths.get(notebookDirectory.toString(), "my_note4_2A94M5J4Z.zpln"));
@@ -153,8 +149,7 @@ class DirectoryTest {
     // Calling contains with a valid ID should return true, and false when called with an ID that doesn't exist
     @Test
     void testContains() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Assertions.assertTrue(root.contains(notebook1));
         Assertions.assertFalse(root.contains(Paths.get("NonexistentPath")));
     }
@@ -162,14 +157,12 @@ class DirectoryTest {
     // Moving a directory should result in the directory being moved to the correct path along with its children.
     @Test
     void testMoveToPath() {
-        Directory roote = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory roote = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory directorye = (Directory) Assertions.assertDoesNotThrow(() -> roote.findFile(directory2));
         Path destinationPath = Paths.get(roote.path().toString(), directorye.path().getFileName().toString());
         Assertions.assertDoesNotThrow(() -> directorye.move(destinationPath));
         // Re-initialize directory as we have made modifications.
-        Directory updatedroot = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory updatedroot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory updatedDirectory = (Directory) Assertions
                 .assertDoesNotThrow(() -> updatedroot.findFile(destinationPath));
         Assertions
@@ -186,15 +179,13 @@ class DirectoryTest {
 
     @Test
     void testMoveToDirectory() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         Directory parentDirectory = root;
         Assertions.assertDoesNotThrow(() -> directory.move(parentDirectory));
 
         // Re-initialize directory as we have made modifications.
-        Directory updatedRoot = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory updatedRoot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory updatedDirectory = (Directory) Assertions
                 .assertDoesNotThrow(() -> updatedRoot.findFile(Paths.get("target/notebooks/my_second_folder_2A94M5J2D")));
         Assertions
@@ -222,8 +213,7 @@ class DirectoryTest {
     // Deleting a Directory should result in the deletion of the directory file as well as all of its children from disk.
     @Test
     void testDelete() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         ZeppelinFile child = directory.children().get(notebook1);
 
@@ -239,8 +229,7 @@ class DirectoryTest {
     // Copying a directory should result in the original and a new copy existing on disk.
     @Test
     void testCopy() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         Path copyDirectoryPath = Paths
                 .get(
@@ -249,8 +238,7 @@ class DirectoryTest {
                 );
         Assertions.assertDoesNotThrow(() -> directory.copy(copyDirectoryPath));
         // Re-initialize directory as we have made modifications.
-        Directory updatedRoot = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory updatedRoot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
 
         // Both copied directory and the original directory (and their children) should exist
         Assertions
@@ -268,13 +256,11 @@ class DirectoryTest {
     // Renaming a directory should result in the file being renamed.
     @Test
     void testRename() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         Assertions.assertDoesNotThrow(() -> directory.rename("renamedDirectory_2A94M5J2D"));
         // Re-initialize directory as we have made modifications.
-        Directory updatedRoot = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory updatedRoot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Directory updatedDirectory = (Directory) Assertions
                 .assertDoesNotThrow(
                         () -> updatedRoot
@@ -289,8 +275,7 @@ class DirectoryTest {
     // Calling json() should result in a valid JSON object.
     @Test
     void testJson() {
-        Directory root = Assertions
-                .assertDoesNotThrow(() -> new Directory(notebookDirectory).initializeDirectory(notebookDirectory, new ConcurrentHashMap<>()));
+        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Assertions
                 .assertEquals(
                         "{\"name\":\"notebooks\",\"children\":\"[" + notebook3.getFileName() + ", "

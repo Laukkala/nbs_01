@@ -67,7 +67,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 
 // A thread that registers all endpoints users can connect to and starts the Jetty server.
 public class NotebookServer implements Callable {
@@ -88,8 +87,7 @@ public class NotebookServer implements Callable {
         try {
 
             // Initialize filesystem
-            Directory root = new Directory(configuration.notebookDirectory())
-                    .initializeDirectory(configuration.notebookDirectory(), new ConcurrentHashMap<>());
+            Directory root = new Directory(configuration.notebookDirectory()).load();
 
             // Jetty setup
             ServletContextHandler notebookContextHandler = new ServletContextHandler();

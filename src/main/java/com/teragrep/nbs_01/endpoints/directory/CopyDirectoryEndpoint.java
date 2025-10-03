@@ -79,7 +79,7 @@ public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
             }
             String sourcePath = parameters.getString("sourcePath");
 
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Directory updatedDirectory = root.load();
             Path path = updatedDirectory.path().resolve(request.path());
 
             Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);

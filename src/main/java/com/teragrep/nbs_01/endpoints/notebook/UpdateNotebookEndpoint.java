@@ -65,7 +65,6 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the title of a Notebook.
 public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
@@ -89,8 +88,7 @@ public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
                 throw new FileNotFoundException("Notebook at path " + path + " does not exist!");
             }
 
-            Directory updatedDirectory = root
-                    .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
+            Directory updatedDirectory = root.load();
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
 
             // Create a copy of the current paragraphs

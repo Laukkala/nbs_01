@@ -75,7 +75,7 @@ public final class ListEndPoint implements EndPoint {
         ZeppelinFile foundFile;
         Directory directoryToSearch;
         try {
-            directoryToSearch = root.initializeDirectory(root.path(), root.children());
+            directoryToSearch = root.load();
             JsonObject parameters = request.parameters();
             if (parameters.containsKey("directoryPath")) {
                 try {
@@ -99,8 +99,7 @@ public final class ListEndPoint implements EndPoint {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
         try {
-            Directory updatedDirectory = directoryToSearch
-                    .initializeDirectory(directoryToSearch.path(), directoryToSearch.children());
+            Directory updatedDirectory = directoryToSearch.load();
             List<ZeppelinFile> files = updatedDirectory.listAllChildren();
             for (ZeppelinFile file : files) {
                 if (!file.isDirectory()) {

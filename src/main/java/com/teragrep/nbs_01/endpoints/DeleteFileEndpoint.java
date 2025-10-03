@@ -70,7 +70,7 @@ public final class DeleteFileEndpoint implements FileSystemEndPoint {
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Directory updatedDirectory = root.load();
             JsonObject parameters = request.parameters();
             Path path = updatedDirectory.path().resolve(request.path());
 

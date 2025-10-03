@@ -61,7 +61,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Updates the text and optionally the title of a given paragraph within a Notebook. Should be provided with the path to the Notebook, the ID of the  Paragraph as well as the updated content of the Paragraph.
 public final class UpdateParagraphEndpoint implements FileSystemEndPoint {
@@ -87,8 +86,7 @@ public final class UpdateParagraphEndpoint implements FileSystemEndPoint {
             if (!Files.exists(notebookPath)) {
                 throw new FileNotFoundException("Notebook with path " + notebookPath + " not found!");
             }
-            Directory updatedDirectory = root
-                    .initializeDirectory(root.path(), new ConcurrentHashMap<>(root.children()));
+            Directory updatedDirectory = root.load();
             Notebook notebook = (Notebook) updatedDirectory.findFile(notebookPath).load();
             return createResponse(notebook, parameters);
         }

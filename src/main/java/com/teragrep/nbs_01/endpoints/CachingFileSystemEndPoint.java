@@ -80,9 +80,7 @@ public final class CachingFileSystemEndPoint implements FileSystemEndPoint {
             JsonObject parameters = request.parameters();
             Path path = endPoint.root().path().resolve(request.path());
 
-            Directory updatedDirectory = endPoint
-                    .root()
-                    .initializeDirectory(endPoint.root().path(), endPoint.root().children());
+            Directory updatedDirectory = endPoint.root().load();
             ZeppelinFile file = updatedDirectory.findFile(path);
             return createResponse(file, parameters);
 

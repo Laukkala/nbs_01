@@ -75,7 +75,7 @@ public final class FindDirectoryEndPoint implements FileSystemEndPoint {
         try {
             JsonObject parameters = request.parameters();
             Path path = root.path().resolve(request.path());
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Directory updatedDirectory = root.load();
             ZeppelinFile directory = updatedDirectory.findFile(path);
             return createResponse(directory, parameters);
         }

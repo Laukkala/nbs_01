@@ -78,7 +78,7 @@ public final class CopyNotebookEndpoint implements FileSystemEndPoint {
             JsonObject parameters = request.parameters();
             String sourcePath = parameters.getString("sourcePath");
 
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Directory updatedDirectory = root.load();
             Path path = updatedDirectory.path().resolve(request.path());
 
             ZeppelinFile newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);

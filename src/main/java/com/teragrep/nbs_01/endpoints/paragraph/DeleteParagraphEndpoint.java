@@ -87,7 +87,7 @@ public final class DeleteParagraphEndpoint implements FileSystemEndPoint {
                     .add("paragraphId", paragraphId)
                     .build();
 
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Directory updatedDirectory = root.load();
             Path path = updatedDirectory.path().resolve(notebookPath);
 
             Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();

@@ -202,17 +202,16 @@ public final class Directory implements ZeppelinFile {
         }
     }
 
-    // Directories don't require any operation for lazy loading
-    public Directory load() throws IOException {
-        return this;
-    }
-
     public boolean isStub() {
         return false;
     }
 
+    public Directory load() throws IOException {
+        return load(path, children);
+    }
+
     // This method traverses the file tree recursively and depth first, and creates a Directory object with a complete map of child Directories and Notebooks.
-    public Directory initializeDirectory(Path pathToVisit, Map<Path, ZeppelinFile> existingFiles) throws IOException {
+    private Directory load(Path pathToVisit, Map<Path, ZeppelinFile> existingFiles) throws IOException {
         // Create a copy of existingFiles so that we don't make any direct edits to it.
         Map<Path, ZeppelinFile> directoryChildren = new HashMap<>();
         directoryChildren.putAll(existingFiles);
@@ -234,7 +233,7 @@ public final class Directory implements ZeppelinFile {
                 if (directoryChildren.containsKey(dir)) {
                     childrenOfChildDirectory.putAll(directoryChildren.get(dir).children());
                 }
-                Directory childDirectory = initializeDirectory(dir, childrenOfChildDirectory);
+                Directory childDirectory = load(dir, childrenOfChildDirectory);
                 directoryChildren.put(childDirectory.path(), childDirectory);
                 return FileVisitResult.SKIP_SUBTREE;
             }

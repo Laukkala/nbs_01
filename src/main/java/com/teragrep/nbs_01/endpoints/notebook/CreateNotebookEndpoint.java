@@ -76,7 +76,7 @@ public final class CreateNotebookEndpoint implements FileSystemEndPoint {
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.initializeDirectory(root.path(), root.children());
+            Directory updatedDirectory = root.load();
             JsonObject parameters = request.parameters();
             String title = parameters.containsKey("title") ? parameters.getString("title") : "";
             Path path = updatedDirectory.path().resolve(request.path());
