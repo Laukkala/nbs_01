@@ -177,39 +177,6 @@ class DirectoryTest {
                 );
     }
 
-    @Test
-    void testMoveToDirectory() {
-        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
-        Directory parentDirectory = root;
-        Assertions.assertDoesNotThrow(() -> directory.move(parentDirectory));
-
-        // Re-initialize directory as we have made modifications.
-        Directory updatedRoot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory updatedDirectory = (Directory) Assertions
-                .assertDoesNotThrow(() -> updatedRoot.findFile(Paths.get("target/notebooks/my_second_folder_2A94M5J2D")));
-        Assertions
-                .assertEquals(Paths.get(parentDirectory.path().toString(), "my_second_folder_2A94M5J2D").toString(), updatedDirectory.path().toString());
-
-        // Assert that the children of the moved directory were moved as well.
-        ZeppelinFile subFile = Assertions
-                .assertDoesNotThrow(
-                        () -> updatedDirectory
-                                .findFile(
-                                        Paths.get("target/notebooks/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln")
-                                )
-                );
-        Assertions
-                .assertEquals(
-                        Paths
-                                .get(
-                                        parentDirectory.path().toString(), "my_second_folder_2A94M5J2D",
-                                        "my_note1_2A94M5J1Z.zpln"
-                                ),
-                        subFile.path()
-                );
-    }
-
     // Deleting a Directory should result in the deletion of the directory file as well as all of its children from disk.
     @Test
     void testDelete() {

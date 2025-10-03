@@ -131,10 +131,6 @@ public final class Directory implements ZeppelinFile {
         delete();
     }
 
-    public void move(Directory destinationDirectory) throws IOException {
-        move(destinationDirectory.path.resolve(path().getFileName()));
-    }
-
     public void delete() throws IOException {
         for (ZeppelinFile child : children.values()) {
             child.delete();
