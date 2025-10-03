@@ -82,7 +82,9 @@ public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
             Directory updatedDirectory = root.load();
             Path path = updatedDirectory.path().resolve(request.path());
 
-            Directory newDirectory = copyDirectory(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
+            ZeppelinFile newDirectory = copyDirectory(
+                    updatedDirectory, updatedDirectory.path().resolve(sourcePath), path
+            );
             return createResponse(newDirectory, parameters);
         }
         catch (FileNotFoundException fileNotFoundException) {
@@ -99,10 +101,10 @@ public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
         }
     }
 
-    private Directory copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
+    private ZeppelinFile copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
         ZeppelinFile file = sourceDir.findFile(sourcePath).load();
         if (file.isDirectory()) {
-            return (Directory) file.copy(destinationPath);
+            return file.copy(destinationPath);
         }
         else {
             throw new FileNotFoundException("File at " + sourcePath + " is not a directory!");

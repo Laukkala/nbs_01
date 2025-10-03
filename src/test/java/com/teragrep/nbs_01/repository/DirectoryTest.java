@@ -158,13 +158,12 @@ class DirectoryTest {
     @Test
     void testMoveToPath() {
         Directory roote = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory directorye = (Directory) Assertions.assertDoesNotThrow(() -> roote.findFile(directory2));
+        ZeppelinFile directorye = Assertions.assertDoesNotThrow(() -> roote.findFile(directory2));
         Path destinationPath = Paths.get(roote.path().toString(), directorye.path().getFileName().toString());
         Assertions.assertDoesNotThrow(() -> directorye.move(destinationPath));
         // Re-initialize directory as we have made modifications.
         Directory updatedroot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory updatedDirectory = (Directory) Assertions
-                .assertDoesNotThrow(() -> updatedroot.findFile(destinationPath));
+        ZeppelinFile updatedDirectory = Assertions.assertDoesNotThrow(() -> updatedroot.findFile(destinationPath));
         Assertions
                 .assertEquals(Paths.get(notebookDirectory.toString(), "my_second_folder_2A94M5J2D").toString(), updatedDirectory.path().toString());
 
@@ -181,7 +180,7 @@ class DirectoryTest {
     @Test
     void testDelete() {
         Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
+        ZeppelinFile directory = Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         ZeppelinFile child = directory.children().get(notebook1);
 
         // Verify that the file we are about to delete exists.
@@ -197,7 +196,7 @@ class DirectoryTest {
     @Test
     void testCopy() {
         Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
+        ZeppelinFile directory = Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         Path copyDirectoryPath = Paths
                 .get(
                         root.path().toString(),
@@ -224,11 +223,11 @@ class DirectoryTest {
     @Test
     void testRename() {
         Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory directory = (Directory) Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
+        ZeppelinFile directory = Assertions.assertDoesNotThrow(() -> root.findFile(directory2));
         Assertions.assertDoesNotThrow(() -> directory.rename("renamedDirectory_2A94M5J2D"));
         // Re-initialize directory as we have made modifications.
         Directory updatedRoot = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory updatedDirectory = (Directory) Assertions
+        ZeppelinFile updatedDirectory = Assertions
                 .assertDoesNotThrow(
                         () -> updatedRoot
                                 .findFile(Paths.get("target/notebooks/my_folder_2A94M5J1D/renamedDirectory_2A94M5J2D"))

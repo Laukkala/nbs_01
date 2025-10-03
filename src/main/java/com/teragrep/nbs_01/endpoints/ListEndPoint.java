@@ -73,7 +73,7 @@ public final class ListEndPoint implements EndPoint {
         // Find all notebooks from Directory structure
         StringBuilder sb = new StringBuilder();
         ZeppelinFile foundFile;
-        Directory directoryToSearch;
+        ZeppelinFile directoryToSearch;
         try {
             directoryToSearch = root.load();
             JsonObject parameters = request.parameters();
@@ -81,7 +81,7 @@ public final class ListEndPoint implements EndPoint {
                 try {
                     foundFile = directoryToSearch.findFile(Paths.get(parameters.getString("directoryPath")));
                     if (foundFile.isDirectory()) {
-                        directoryToSearch = (Directory) foundFile;
+                        directoryToSearch = foundFile;
                     }
                     else {
                         return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
@@ -99,7 +99,7 @@ public final class ListEndPoint implements EndPoint {
             return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
         }
         try {
-            Directory updatedDirectory = directoryToSearch.load();
+            ZeppelinFile updatedDirectory = directoryToSearch.load();
             List<ZeppelinFile> files = updatedDirectory.listAllChildren();
             for (ZeppelinFile file : files) {
                 if (!file.isDirectory()) {
