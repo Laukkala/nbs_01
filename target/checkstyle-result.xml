@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="9.3">
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/Configuration.java">
+<error line="57" column="26" severity="warning" message="Parameter notebookDirectory should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="57" column="50" severity="warning" message="Parameter serverPort should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="71" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="78" column="23" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/Delegate.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/DoesKeyExistDelegate.java">
+<error line="58" column="26" severity="warning" message="Parameter key should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="62" column="28" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="67" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="30" severity="warning" message="Variable &apos;delegate&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/RegexServletContext.java">
+<error line="61" column="32" severity="warning" message="Parameter regex should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="66" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="66" column="27" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="66" column="44" severity="warning" message="Parameter response should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="66" column="63" severity="warning" message="Parameter callback should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/DelegatingEndpoint.java">
+<error line="64" column="31" severity="warning" message="Parameter trueEndpoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="64" column="54" severity="warning" message="Parameter falseEndpoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="64" column="78" severity="warning" message="Parameter delegationFunction should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="70" column="5" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="70" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="85" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="92" column="28" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/EndPoint.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/PingEndpoint.java">
+<error line="60" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/StubEndpoint.java">
+<error line="61" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/directory/CreateDirectoryEndpoint.java">
+<error line="71" column="36" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="75" column="5" severity="warning" message="Return count is 5 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="75" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="77" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="78" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="80" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="86" column="23" severity="warning" message="Variable &apos;newDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="103" column="39" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="107" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="108" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="108" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="124" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="131" column="33" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/directory/CopyDirectoryEndpoint.java">
+<error line="70" column="34" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="5" severity="warning" message="Return count is 5 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="74" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="76" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="80" column="20" severity="warning" message="Variable &apos;sourcePath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="82" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="83" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="85" column="26" severity="warning" message="Variable &apos;newDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="104" column="40" severity="warning" message="Parameter sourceDir should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="104" column="61" severity="warning" message="Parameter sourcePath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="104" column="78" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="105" column="22" severity="warning" message="Variable &apos;file&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="114" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="115" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="115" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="131" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="138" column="31" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/directory/FindDirectoryEndPoint.java">
+<error line="69" column="34" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="5" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="73" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="76" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="77" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="78" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="79" column="26" severity="warning" message="Variable &apos;directory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="90" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="91" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="91" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="106" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="113" column="31" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/notebook/CreateNotebookEndpoint.java">
+<error line="73" column="35" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="77" column="5" severity="warning" message="Return count is 5 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="77" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="79" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="80" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="81" column="20" severity="warning" message="Variable &apos;title&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="82" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="88" column="22" severity="warning" message="Variable &apos;newFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="105" column="37" severity="warning" message="Parameter title should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="105" column="51" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="109" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="110" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="110" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="126" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="133" column="32" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/notebook/CopyNotebookEndpoint.java">
+<error line="72" column="33" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="76" column="5" severity="warning" message="Return count is 5 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="76" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="78" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="79" column="20" severity="warning" message="Variable &apos;sourcePath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="81" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="82" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="84" column="26" severity="warning" message="Variable &apos;newFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="101" column="39" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="105" column="37" severity="warning" message="Parameter title should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="105" column="51" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="109" column="35" severity="warning" message="Parameter sourceDir should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="109" column="56" severity="warning" message="Parameter sourcePath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="109" column="73" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="110" column="18" severity="warning" message="Variable &apos;file&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="114" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="115" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="115" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="131" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="138" column="30" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/notebook/FindNotebookEndPoint.java">
+<error line="69" column="33" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="74" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="77" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="78" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="79" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="80" column="26" severity="warning" message="Variable &apos;file&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="94" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="95" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="95" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="114" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="121" column="30" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/notebook/UpdateNotebookEndpoint.java">
+<error line="74" column="35" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="78" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="78" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="80" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="81" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="91" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="92" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="95" column="36" severity="warning" message="Variable &apos;paragraphs&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="98" column="20" severity="warning" message="Variable &apos;title&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="99" column="22" severity="warning" message="Variable &apos;newNotebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="113" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="114" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="114" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="130" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="137" column="32" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/paragraph/CreateParagraphEndpoint.java">
+<error line="50" column="38" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - com.teragrep.nbs_01.repository.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="69" column="36" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="73" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="76" column="18" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="77" column="18" severity="warning" message="Variable &apos;notebookPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="78" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="82" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="86" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="87" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="89" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="103" column="44" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="104" column="14" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="105" column="42" severity="warning" message="&apos;3&apos; is a magic number." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="117" column="5" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="118" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="118" column="51" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="120" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="121" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="123" column="27" severity="warning" message="Variable &apos;newParagraph&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="141" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="142" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="142" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="157" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="164" column="33" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/paragraph/DeleteParagraphEndpoint.java">
+<error line="71" column="36" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="75" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="75" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="78" column="18" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="79" column="18" severity="warning" message="Variable &apos;notebookPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="81" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="85" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="90" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="91" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="93" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="107" column="44" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="108" column="14" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="109" column="42" severity="warning" message="&apos;3&apos; is a magic number." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="121" column="5" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="122" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="122" column="51" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="124" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="125" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="149" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="156" column="33" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="160" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="161" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="161" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/paragraph/UpdateParagraphEndpoint.java">
+<error line="50" column="38" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - com.teragrep.nbs_01.repository.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="63" column="17" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - java.util.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="70" column="36" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="74" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="77" column="18" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="78" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="81" column="18" severity="warning" message="Variable &apos;notebookPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="82" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="89" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="90" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="105" column="44" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="106" column="14" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="107" column="42" severity="warning" message="&apos;3&apos; is a magic number." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="122" column="5" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="123" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="123" column="51" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="125" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="126" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="129" column="36" severity="warning" message="Variable &apos;paragraphs&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="138" column="23" severity="warning" message="Variable &apos;originalParagraph&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="139" column="20" severity="warning" message="Variable &apos;scriptText&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="141" column="20" severity="warning" message="Variable &apos;title&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="142" column="20" severity="warning" message="Variable &apos;newScript&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="144" column="23" severity="warning" message="Variable &apos;newParagraph&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="146" column="22" severity="warning" message="Variable &apos;newNotebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="158" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="159" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="159" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="174" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="181" column="33" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/paragraph/FindParagraphEndPoint.java">
+<error line="71" column="34" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="75" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="75" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="79" column="18" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="80" column="18" severity="warning" message="Variable &apos;notebookPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="82" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="85" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="90" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="91" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="92" column="26" severity="warning" message="Variable &apos;file&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="106" column="44" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="107" column="14" severity="warning" message="Variable &apos;requestPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="108" column="42" severity="warning" message="&apos;3&apos; is a magic number." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="120" column="5" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="121" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="121" column="51" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="123" column="20" severity="warning" message="Variable &apos;paragraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="124" column="22" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="143" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="144" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="144" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="159" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="166" column="31" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/CachingFileSystemEndPoint.java">
+<error line="72" column="38" severity="warning" message="Parameter endPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="77" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="78" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="80" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="81" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="83" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="84" column="26" severity="warning" message="Variable &apos;file&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="99" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="100" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="100" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="103" column="22" severity="warning" message="Variable &apos;fileTimestamp&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="104" column="22" severity="warning" message="Variable &apos;cachedTimestamp&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="112" column="34" severity="warning" message="Variable &apos;updatedFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="119" column="30" severity="warning" message="Variable &apos;updatedFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="135" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="142" column="35" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/DeleteFileEndpoint.java">
+<error line="67" column="31" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="71" column="5" severity="warning" message="Return count is 4 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="71" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="23" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="74" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="75" column="18" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="77" column="26" severity="warning" message="Variable &apos;deletedFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="95" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="96" column="36" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="96" column="55" severity="warning" message="Parameter parameters should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="112" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="119" column="28" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/FileSystemEndPoint.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/ListEndPoint.java">
+<error line="68" column="25" severity="warning" message="Parameter root should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="72" column="5" severity="warning" message="Return count is 5 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="72" column="36" severity="warning" message="Parameter request should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="23" severity="warning" message="Variable &apos;sb&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="75" column="22" severity="warning" message="Variable &apos;foundFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="79" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="102" column="26" severity="warning" message="Variable &apos;updatedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="103" column="32" severity="warning" message="Variable &apos;files&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="118" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="125" column="22" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/endpoints/NotebookFileEndpoint.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/exceptions/MalformedRequestException.java">
+<error line="51" column="38" severity="warning" message="Parameter errorMessage should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="55" column="38" severity="warning" message="Parameter cause should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="59" column="38" severity="warning" message="Parameter errorMessage should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="59" column="59" severity="warning" message="Parameter cause should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/repository/Paragraph.java">
+<error line="67" column="22" severity="warning" message="Parameter id should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="67" column="33" severity="warning" message="Parameter title should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="67" column="47" severity="warning" message="Parameter script should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="27" severity="warning" message="Variable &apos;builder&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="93" column="27" severity="warning" message="Parameter json should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="94" column="16" severity="warning" message="Variable &apos;jsonId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="95" column="16" severity="warning" message="Variable &apos;jsonTitle&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="96" column="17" severity="warning" message="Variable &apos;isLegacy&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="97" column="16" severity="warning" message="Variable &apos;jsonScript&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="114" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="121" column="19" severity="warning" message="Variable &apos;paragraph&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/repository/Script.java">
+<error line="66" column="19" severity="warning" message="Parameter text should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="24" severity="warning" message="Parameter json should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="75" column="16" severity="warning" message="Variable &apos;jsonText&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="79" column="24" severity="warning" message="Parameter jsonText should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="84" column="27" severity="warning" message="Variable &apos;builder&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="90" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="97" column="16" severity="warning" message="Variable &apos;script&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/repository/TimestampedZeppelinFile.java">
+<error line="68" column="36" severity="warning" message="Parameter origin should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="83" column="34" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="103" column="30" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="123" column="22" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="128" column="24" severity="warning" message="Parameter name should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="143" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="150" column="33" severity="warning" message="Variable &apos;timestampedZeppelinFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/repository/Directory.java">
+<error line="55" column="21" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - java.nio.file.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="57" column="17" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - java.util.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="69" column="22" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="22" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="33" severity="warning" message="Parameter children should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="79" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="79" column="34" severity="warning" message="Parameter searchedPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="98" column="34" severity="warning" message="Parameter searchedPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="99" column="22" severity="warning" message="Variable &apos;foundFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="108" column="36" severity="warning" message="Parameter searchedPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="109" column="22" severity="warning" message="Variable &apos;foundFile&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="122" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="122" column="29" severity="warning" message="Parameter searchedPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="132" column="22" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="142" column="33" severity="warning" message="Variable &apos;movedChildren&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="145" column="26" severity="warning" message="Variable &apos;movedChild&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="149" column="19" severity="warning" message="Variable &apos;movedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="161" column="27" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="165" column="33" severity="warning" message="Variable &apos;copyChildren&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="168" column="20" severity="warning" message="Variable &apos;childCopyFileName&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="169" column="18" severity="warning" message="Variable &apos;copyChildPath&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="172" column="19" severity="warning" message="Variable &apos;copiedDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="182" column="33" severity="warning" message="Variable &apos;allChildren&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="206" column="24" severity="warning" message="Parameter fileName should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="230" column="28" severity="warning" message="Parameter pathToVisit should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="230" column="46" severity="warning" message="Parameter existingFiles should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="232" column="33" severity="warning" message="Variable &apos;directoryChildren&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="236" column="13" severity="warning" message="Return count is 3 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="236" column="54" severity="warning" message="Parameter dir should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="236" column="64" severity="warning" message="Parameter attrs should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="248" column="55" severity="warning" message="Variable &apos;childrenOfChildDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="252" column="27" severity="warning" message="Variable &apos;childDirectory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="258" column="46" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="258" column="57" severity="warning" message="Parameter attrs should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="266" column="52" severity="warning" message="Parameter file should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="266" column="63" severity="warning" message="Parameter exc should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="271" column="55" severity="warning" message="Parameter dir should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="271" column="65" severity="warning" message="Parameter exc should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="275" column="19" severity="warning" message="Variable &apos;root&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="280" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="287" column="19" severity="warning" message="Variable &apos;directory&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/repository/Notebook.java">
+<error line="48" column="20" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - jakarta.json.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="61" column="17" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - java.util.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="76" column="21" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="82" column="21" severity="warning" message="Parameter title should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="82" column="35" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="82" column="46" severity="warning" message="Parameter paragraphs should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="96" column="34" severity="warning" message="Parameter searchedPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="118" column="27" severity="warning" message="Variable &apos;builder&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="123" column="26" severity="warning" message="Variable &apos;arrayBuilder&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="128" column="19" severity="warning" message="Variable &apos;paragraphJsonArray&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="133" column="26" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="149" column="16" severity="warning" message="Variable &apos;content&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="150" column="22" severity="warning" message="Variable &apos;stringReader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="151" column="20" severity="warning" message="Variable &apos;jsonReader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="152" column="20" severity="warning" message="Variable &apos;object&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="156" column="16" severity="warning" message="Variable &apos;savedName&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="157" column="19" severity="warning" message="Variable &apos;paragraphJsonArray&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="158" column="32" severity="warning" message="Variable &apos;savedParagraphs&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="160" column="23" severity="warning" message="Variable &apos;paragraph&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="171" column="26" severity="warning" message="Parameter copyTitle should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="171" column="44" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="175" column="32" severity="warning" message="Variable &apos;copyParagraphs&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="177" column="20" severity="warning" message="Variable &apos;copyParagraphId&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="178" column="20" severity="warning" message="Variable &apos;copyScript&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="179" column="23" severity="warning" message="Variable &apos;copyParagraph&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="182" column="18" severity="warning" message="Variable &apos;copyNotebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="189" column="26" severity="warning" message="Variable &apos;stringWriter&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="204" column="24" severity="warning" message="Parameter fileName should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="208" column="22" severity="warning" message="Parameter destinationPath should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="212" column="18" severity="warning" message="Variable &apos;movedNotebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="217" column="26" severity="warning" message="Parameter parentDirectory should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="221" column="26" severity="warning" message="Parameter parentDirectory should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="221" column="53" severity="warning" message="Parameter fileName should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="222" column="18" severity="warning" message="Variable &apos;movedNotebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="229" column="22" severity="warning" message="Variable &apos;lines&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="230" column="16" severity="warning" message="Variable &apos;concatenatedLines&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="235" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="242" column="18" severity="warning" message="Variable &apos;notebook&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/repository/ZeppelinFile.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/requests/JsonRequest.java">
+<error line="49" column="20" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - jakarta.json.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="61" column="24" severity="warning" message="Parameter body should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="65" column="24" severity="warning" message="Parameter body should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="65" column="37" severity="warning" message="Parameter path should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="78" column="5" severity="warning" message="Return count is 2 (max allowed for non-void methods/lambdas is 1)." source="com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck"/>
+<error line="83" column="24" severity="warning" message="Variable &apos;jsonReader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="84" column="24" severity="warning" message="Variable &apos;parameters&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="91" column="6" severity="warning" message="Unnecessary semicolon." source="com.puppycrawl.tools.checkstyle.checks.coding.UnnecessarySemicolonAfterTypeMemberDeclarationCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/requests/Request.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/responses/ExceptionResponse.java">
+<error line="64" column="30" severity="warning" message="Parameter status should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="64" column="42" severity="warning" message="Parameter throwable should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="68" column="30" severity="warning" message="Parameter status should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="68" column="42" severity="warning" message="Parameter throwable should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="68" column="63" severity="warning" message="Parameter eventId should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="88" column="27" severity="warning" message="Variable &apos;jsonObjectBuilder&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="95" column="20" severity="warning" message="Variable &apos;json&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/responses/JsonResponse.java">
+<error line="57" column="25" severity="warning" message="Parameter status should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="57" column="37" severity="warning" message="Parameter body should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="61" column="25" severity="warning" message="Parameter status should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="61" column="37" severity="warning" message="Parameter body should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/responses/Response.java">
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/servlets/FileSystemServlet.java">
+<error line="77" column="13" severity="warning" message="Parameter getEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="78" column="13" severity="warning" message="Parameter postEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="79" column="13" severity="warning" message="Parameter putEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="80" column="13" severity="warning" message="Parameter deleteEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="86" column="13" severity="warning" message="Parameter getEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="87" column="13" severity="warning" message="Parameter postEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="88" column="13" severity="warning" message="Parameter putEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="89" column="13" severity="warning" message="Parameter deleteEndPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="90" column="13" severity="warning" message="Parameter charset should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="92" column="9" severity="warning" message="Unnecessary call to superclass constructor with no arguments." source="com.puppycrawl.tools.checkstyle.checks.coding.AvoidNoArgumentSuperConstructorCallCheck"/>
+<error line="100" column="26" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="100" column="50" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="102" column="16" severity="warning" message="Variable &apos;pathString&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="103" column="14" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="104" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="107" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="111" column="21" severity="warning" message="Variable &apos;printWriter&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="117" column="27" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="117" column="51" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="119" column="16" severity="warning" message="Variable &apos;pathString&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="120" column="14" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="123" column="24" severity="warning" message="Variable &apos;reader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="124" column="16" severity="warning" message="Variable &apos;body&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="126" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="129" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="134" column="21" severity="warning" message="Variable &apos;writer&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="140" column="26" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="140" column="50" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="142" column="16" severity="warning" message="Variable &apos;pathString&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="143" column="14" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="146" column="24" severity="warning" message="Variable &apos;reader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="147" column="16" severity="warning" message="Variable &apos;body&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="152" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="155" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="159" column="21" severity="warning" message="Variable &apos;writer&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="165" column="29" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="165" column="53" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="168" column="16" severity="warning" message="Variable &apos;pathString&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="169" column="14" severity="warning" message="Variable &apos;path&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="170" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="173" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="177" column="21" severity="warning" message="Variable &apos;writer&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="184" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="191" column="27" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/servlets/HttpServlet.java">
+<error line="69" column="24" severity="warning" message="Parameter endPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="24" severity="warning" message="Parameter endPoint should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="73" column="43" severity="warning" message="Parameter charset should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="74" column="9" severity="warning" message="Unnecessary call to superclass constructor with no arguments." source="com.puppycrawl.tools.checkstyle.checks.coding.AvoidNoArgumentSuperConstructorCallCheck"/>
+<error line="79" column="26" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="79" column="50" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="81" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="84" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="88" column="21" severity="warning" message="Variable &apos;printWriter&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="96" column="27" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="96" column="51" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="98" column="24" severity="warning" message="Variable &apos;reader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="99" column="16" severity="warning" message="Variable &apos;body&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="103" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="106" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="110" column="21" severity="warning" message="Variable &apos;writer&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="118" column="26" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="118" column="50" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="121" column="24" severity="warning" message="Variable &apos;reader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="122" column="16" severity="warning" message="Variable &apos;body&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="126" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="129" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="133" column="21" severity="warning" message="Variable &apos;writer&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="141" column="29" severity="warning" message="Parameter req should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="141" column="53" severity="warning" message="Parameter resp should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="144" column="24" severity="warning" message="Variable &apos;reader&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="145" column="16" severity="warning" message="Variable &apos;body&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="149" column="17" severity="warning" message="Variable &apos;endPointRequest&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="152" column="18" severity="warning" message="Variable &apos;endPointResponse&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="156" column="21" severity="warning" message="Variable &apos;writer&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="165" column="27" severity="warning" message="Parameter o should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="172" column="21" severity="warning" message="Variable &apos;that&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+<file name="/home/p000052u/Code/nbs_01/src/main/java/com/teragrep/nbs_01/NotebookServer.java">
+<error line="48" column="37" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - com.teragrep.nbs_01.endpoints.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="52" column="46" severity="warning" message="Using the &apos;.*&apos; form of import should be avoided - com.teragrep.nbs_01.endpoints.notebook.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
+<error line="78" column="27" severity="warning" message="Parameter configuration should be final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="81" column="19" severity="warning" message="Variable &apos;connector&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="90" column="23" severity="warning" message="Variable &apos;root&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="93" column="35" severity="warning" message="Variable &apos;notebookContextHandler&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="97" column="31" severity="warning" message="Variable &apos;notebookServlet&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="105" column="35" severity="warning" message="Variable &apos;directoryContextHandler&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="109" column="31" severity="warning" message="Variable &apos;directoryServlet&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="117" column="35" severity="warning" message="Variable &apos;paragraphContextHandler&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="120" column="31" severity="warning" message="Variable &apos;paragraphServlet&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="128" column="25" severity="warning" message="Variable &apos;pingServlet&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+<error line="134" column="38" severity="warning" message="Variable &apos;collection&apos; should be declared final." source="com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck"/>
+</file>
+</checkstyle>

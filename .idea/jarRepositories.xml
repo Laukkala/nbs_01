@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="scrapyard.xnet.fi-teragrep-releases" />
+      <option name="name" value="releases-deployment repo" />
+      <option name="url" value="https://scrapyard.xnet.fi/repository/teragrep-releases/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://scrapyard.xnet.fi/repository/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="scrapyard.xnet.fi-public" />
+      <option name="name" value="Nexus Public Mirror" />
+      <option name="url" value="https://scrapyard.xnet.fi/repository/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="scrapyard.xnet.fi-external" />
+      <option name="name" value="External" />
+      <option name="url" value="https://scrapyard.xnet.fi/repository/external/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="scrapyard.xnet.fi-thirdparty" />
+      <option name="name" value="Thirdparty" />
+      <option name="url" value="https://scrapyard.xnet.fi/repository/thirdparty/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="scrapyard.xnet.fi-releases" />
+      <option name="name" value="releases-deployment repo" />
+      <option name="url" value="https://scrapyard.xnet.fi/repository/releases/" />
+    </remote-repository>
+  </component>
+</project>

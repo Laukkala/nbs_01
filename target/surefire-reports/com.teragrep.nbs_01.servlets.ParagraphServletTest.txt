@@ -1,0 +1,70 @@
+-------------------------------------------------------------------------------
+Test set: com.teragrep.nbs_01.servlets.ParagraphServletTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 0.197 s <<< FAILURE! -- in com.teragrep.nbs_01.servlets.ParagraphServletTest
+com.teragrep.nbs_01.servlets.ParagraphServletTest.httpFindParagraphTest -- Time elapsed: 0.034 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: jakarta.json.stream.JsonParsingException: Unexpected char 60 at (line no=1, column no=1, offset=0)
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at com.teragrep.nbs_01.servlets.ParagraphServletTest.httpFindParagraphTest(ParagraphServletTest.java:96)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: jakarta.json.stream.JsonParsingException: Unexpected char 60 at (line no=1, column no=1, offset=0)
+	at org.eclipse.parsson.JsonTokenizer.unexpectedChar(JsonTokenizer.java:593)
+	at org.eclipse.parsson.JsonTokenizer.nextToken(JsonTokenizer.java:395)
+	at org.eclipse.parsson.JsonParserImpl$NoneContext.getNextEvent(JsonParserImpl.java:443)
+	at org.eclipse.parsson.JsonParserImpl.next(JsonParserImpl.java:360)
+	at org.eclipse.parsson.JsonReaderImpl.readObject(JsonReaderImpl.java:84)
+	at com.teragrep.nbs_01.AbstractNotebookServerTest.makeHttpGETRequest(AbstractNotebookServerTest.java:219)
+	at com.teragrep.nbs_01.servlets.ParagraphServletTest.lambda$httpFindParagraphTest$0(ParagraphServletTest.java:97)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
+com.teragrep.nbs_01.servlets.ParagraphServletTest.httpCopyParagraphTest -- Time elapsed: 0.013 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: jakarta.json.stream.JsonParsingException: Unexpected char 60 at (line no=1, column no=1, offset=0)
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at com.teragrep.nbs_01.servlets.ParagraphServletTest.httpCopyParagraphTest(ParagraphServletTest.java:334)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: jakarta.json.stream.JsonParsingException: Unexpected char 60 at (line no=1, column no=1, offset=0)
+	at org.eclipse.parsson.JsonTokenizer.unexpectedChar(JsonTokenizer.java:593)
+	at org.eclipse.parsson.JsonTokenizer.nextToken(JsonTokenizer.java:395)
+	at org.eclipse.parsson.JsonParserImpl$NoneContext.getNextEvent(JsonParserImpl.java:443)
+	at org.eclipse.parsson.JsonParserImpl.next(JsonParserImpl.java:360)
+	at org.eclipse.parsson.JsonReaderImpl.readObject(JsonReaderImpl.java:84)
+	at com.teragrep.nbs_01.AbstractNotebookServerTest.makeHttpGETRequest(AbstractNotebookServerTest.java:219)
+	at com.teragrep.nbs_01.servlets.ParagraphServletTest.lambda$httpCopyParagraphTest$15(ParagraphServletTest.java:335)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
+com.teragrep.nbs_01.servlets.ParagraphServletTest.httpFindNonexistentParagraphTest -- Time elapsed: 0.015 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: jakarta.json.stream.JsonParsingException: Unexpected char 60 at (line no=1, column no=1, offset=0)
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at com.teragrep.nbs_01.servlets.ParagraphServletTest.httpFindNonexistentParagraphTest(ParagraphServletTest.java:113)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: jakarta.json.stream.JsonParsingException: Unexpected char 60 at (line no=1, column no=1, offset=0)
+	at org.eclipse.parsson.JsonTokenizer.unexpectedChar(JsonTokenizer.java:593)
+	at org.eclipse.parsson.JsonTokenizer.nextToken(JsonTokenizer.java:395)
+	at org.eclipse.parsson.JsonParserImpl$NoneContext.getNextEvent(JsonParserImpl.java:443)
+	at org.eclipse.parsson.JsonParserImpl.next(JsonParserImpl.java:360)
+	at org.eclipse.parsson.JsonReaderImpl.readObject(JsonReaderImpl.java:84)
+	at com.teragrep.nbs_01.AbstractNotebookServerTest.makeHttpGETRequest(AbstractNotebookServerTest.java:219)
+	at com.teragrep.nbs_01.servlets.ParagraphServletTest.lambda$httpFindNonexistentParagraphTest$1(ParagraphServletTest.java:114)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
