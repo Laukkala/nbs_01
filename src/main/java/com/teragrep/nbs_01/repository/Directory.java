@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 // Represents a single Directory that can contain Filesystem objects.
 // Is identified by a Path, and corresponds to a directory file on the filesystem.
 
+// spotless:off
 /**
  * @class Directory
  * @brief Represents a single Directory that can contain Filesystem objects.
@@ -89,6 +90,7 @@ import java.util.stream.Collectors;
  *
  * @enduml
  */
+// spotless:on
 
 public final class Directory implements ZeppelinFile {
 

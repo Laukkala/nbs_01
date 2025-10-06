@@ -54,7 +54,7 @@ import java.util.Map;
 
 // An interface for Filesystem objects, such as Notebooks and Directories.
 
-
+// spotless:off
 /**
  * @interface ZeppelinFile
  * @brief Represents a single file on disk
@@ -80,6 +80,7 @@ import java.util.Map;
  *
  * @enduml
  */
+// spotless:on
 
 public interface ZeppelinFile {
 
