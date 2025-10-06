@@ -60,6 +60,36 @@ import java.util.stream.Collectors;
 
 // Represents a single Directory that can contain Filesystem objects.
 // Is identified by a Path, and corresponds to a directory file on the filesystem.
+
+/**
+ * @class Directory
+ * @brief Represents a single Directory that can contain Filesystem objects.
+ *
+ * @responsibilities
+ * - Contains ZeppelinFiles
+ *
+ *
+ * @collaborators
+ * - ZeppelinFile
+ *
+ * @startuml
+ * class Directory {
+ *   + findFile()
+ * }
+ *
+ * Directory --> ZeppelinFile : contains
+ *
+ * note right of Directory
+ * Responsibilities:
+ * - Contains ZeppelinFiles
+ *
+ * Collaborators:
+ * - ZeppelinFile
+ * end note
+ *
+ * @enduml
+ */
+
 public final class Directory implements ZeppelinFile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Directory.class);

@@ -53,6 +53,34 @@ import java.util.List;
 import java.util.Map;
 
 // An interface for Filesystem objects, such as Notebooks and Directories.
+
+
+/**
+ * @interface ZeppelinFile
+ * @brief Represents a single file on disk
+ *
+ * @responsibilities
+ * - Represents a file on disk
+ *
+ *
+ * @collaborators
+ *
+ *
+ * @startuml
+ * class ZeppelinFile {
+ *   + path()
+ * }
+ *
+ * note right of ZeppelinFile
+ * Responsibilities:
+ * - Represents a file on disk
+ *
+ * Collaborators:
+ * end note
+ *
+ * @enduml
+ */
+
 public interface ZeppelinFile {
 
     public abstract void delete() throws IOException;
