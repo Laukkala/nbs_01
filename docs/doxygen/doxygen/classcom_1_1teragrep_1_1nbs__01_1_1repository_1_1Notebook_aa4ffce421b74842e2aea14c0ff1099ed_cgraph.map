@@ -1,0 +1,17 @@
+<map id="com.teragrep.nbs_01.repository.Notebook.load" name="com.teragrep.nbs_01.repository.Notebook.load">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,125,236,165"/>
+<area shape="rect" id="Node000002" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Paragraph.html#ac883a8f1bd1358b863a1e4208fcecedc" title=" " alt="" coords="284,93,515,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,129,270,125,271,131,237,135"/>
+<area shape="rect" id="Node000007" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Notebook.html#ac5edd5f8c8eb03e1e0a02d219a6c8311" title=" " alt="" coords="284,157,515,197"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="237,156,271,160,270,165,236,161"/>
+<area shape="rect" id="Node000003" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Paragraph.html#a3e021d94df0df5bb1d1f8612afc8a734" title=" " alt="" coords="563,5,793,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="455,91,562,55,589,47,590,52,563,60,457,96"/>
+<area shape="rect" id="Node000005" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Script.html#a020c668328f74a269a4d8c981d1a5ffe" title=" " alt="" coords="563,93,793,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="515,111,549,111,549,116,515,116"/>
+<area shape="rect" id="Node000006" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Paragraph.html#aad03232992c95195fee8af838577f954" title=" " alt="" coords="563,157,793,197"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="488,131,578,152,576,157,487,136"/>
+<area shape="rect" id="Node000004" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Script.html#a54844218338d37249e1289e9bb0dde5b" title=" " alt="" coords="841,49,1072,89"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="794,41,828,46,827,52,793,46"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="793,92,827,87,828,92,794,98"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="627,94,624,84,632,74,650,69,678,67,710,69,728,77,726,82,709,75,678,72,651,74,635,79,629,85,632,92"/>
+</map>

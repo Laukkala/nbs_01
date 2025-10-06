@@ -1,0 +1,13 @@
+<map id="com.teragrep.nbs_01.repository.Paragraph.load" name="com.teragrep.nbs_01.repository.Paragraph.load">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,236,133"/>
+<area shape="rect" id="Node000002" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Paragraph.html#a3e021d94df0df5bb1d1f8612afc8a734" title=" " alt="" coords="284,5,515,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,91,283,55,310,47,312,52,285,60,178,96"/>
+<area shape="rect" id="Node000004" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Script.html#a020c668328f74a269a4d8c981d1a5ffe" title=" " alt="" coords="284,93,515,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="236,111,270,111,270,116,236,116"/>
+<area shape="rect" id="Node000005" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Paragraph.html#aad03232992c95195fee8af838577f954" title=" " alt="" coords="284,157,515,197"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="209,131,299,152,298,157,208,136"/>
+<area shape="rect" id="Node000003" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Script.html#a54844218338d37249e1289e9bb0dde5b" title=" " alt="" coords="563,49,793,89"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="515,41,550,46,549,52,514,46"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="514,92,549,87,550,92,515,98"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="348,94,345,84,353,74,371,69,399,67,431,69,449,77,447,82,430,75,399,72,372,74,356,79,350,85,353,92"/>
+</map>

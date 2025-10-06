@@ -1,0 +1,7 @@
+<map id="com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint" name="com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,181,307,221"/>
+<area shape="rect" id="Node000002" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1endpoints_1_1FileSystemEndPoint.html" title=" " alt="" coords="41,93,271,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,147,159,181,153,181,153,147"/>
+<area shape="rect" id="Node000003" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1endpoints_1_1EndPoint.html" title=" " alt="" coords="41,5,271,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="159,59,159,93,153,93,153,59"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="com.teragrep.nbs_01.repository.Notebook" name="com.teragrep.nbs_01.repository.Notebook">
+<area shape="rect" id="Node000001" title="Represents a single Notebook that can be added to a Directory." alt="" coords="5,93,236,133"/>
+<area shape="rect" id="Node000002" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1repository_1_1ZeppelinFile.html" title="Represents a single file on disk." alt="" coords="5,5,236,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,59,123,93,118,93,118,59"/>
+</map>

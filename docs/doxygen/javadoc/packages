@@ -1,0 +1,10 @@
+com.teragrep.nbs_01.exceptions
+com.teragrep.nbs_01.endpoints
+com.teragrep.nbs_01.endpoints.notebook
+com.teragrep.nbs_01.endpoints.directory
+com.teragrep.nbs_01.endpoints.paragraph
+com.teragrep.nbs_01.responses
+com.teragrep.nbs_01
+com.teragrep.nbs_01.requests
+com.teragrep.nbs_01.repository
+com.teragrep.nbs_01.servlets

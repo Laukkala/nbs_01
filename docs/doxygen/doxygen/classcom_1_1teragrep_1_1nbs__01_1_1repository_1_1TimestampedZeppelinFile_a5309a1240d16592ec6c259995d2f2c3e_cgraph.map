@@ -1,0 +1,9 @@
+<map id="com.teragrep.nbs_01.repository.TimestampedZeppelinFile.move" name="com.teragrep.nbs_01.repository.TimestampedZeppelinFile.move">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,37,239,77"/>
+<area shape="rect" id="Node000002" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1repository_1_1ZeppelinFile.html#a156875524ea23a678419758afdb3e287" title=" " alt="" coords="287,5,517,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,41,273,37,274,43,239,47"/>
+<area shape="rect" id="Node000003" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1TimestampedZeppelinFile.html#afb21045f158bea8c77ec2bdf2b31c82e" title=" " alt="" coords="287,69,517,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,68,274,72,273,77,239,73"/>
+<area shape="rect" id="Node000004" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1repository_1_1ZeppelinFile.html#a3d5fb571b232b1c3ff4d96e934dd7c5e" title=" " alt="" coords="565,69,796,109"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="518,87,552,87,552,92,518,92"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="com.teragrep.nbs_01.repository.TimestampedZeppelinFile" name="com.teragrep.nbs_01.repository.TimestampedZeppelinFile">
+<area shape="rect" id="Node000001" title="Decorator that stores the last modified date of the underlying File at the time of decorator creation..." alt="" coords="5,108,236,148"/>
+<area shape="rect" id="Node000002" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1repository_1_1ZeppelinFile.html" title="Represents a single file on disk." alt="" coords="5,5,236,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,59,121,84,122,108,117,108,115,84,116,59"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="123,59,123,108,118,108,118,59"/>
+</map>

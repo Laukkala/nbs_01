@@ -1,0 +1,8 @@
+<map id="com.teragrep.nbs_01.endpoints.DelegatingEndpoint" name="com.teragrep.nbs_01.endpoints.DelegatingEndpoint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="49,123,280,163"/>
+<area shape="rect" id="Node000002" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1endpoints_1_1EndPoint.html" title=" " alt="" coords="5,5,236,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,58,142,98,154,121,150,124,137,100,124,60"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="135,57,160,121,155,123,130,59"/>
+<area shape="rect" id="Node000003" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1Delegate.html" title=" " alt="" coords="260,13,483,38"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="342,47,249,101,203,125,201,120,246,96,339,43"/>
+</map>

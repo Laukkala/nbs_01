@@ -1,0 +1,8 @@
+<map id="com.teragrep.nbs_01.endpoints.CachingFileSystemEndPoint" name="com.teragrep.nbs_01.endpoints.CachingFileSystemEndPoint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,197,236,237"/>
+<area shape="rect" id="Node000002" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1endpoints_1_1FileSystemEndPoint.html" title=" " alt="" coords="5,95,236,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,149,121,173,122,197,117,197,115,173,116,149"/>
+<area shape="poly" id="edge3_Node000001_Node000002" title=" " alt="" coords="123,149,123,197,118,197,118,149"/>
+<area shape="rect" id="Node000003" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1endpoints_1_1EndPoint.html" title=" " alt="" coords="5,5,236,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,59,123,95,118,95,118,59"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$interfacecom_1_1teragrep_1_1nbs__01_1_1repository_1_1ZeppelinFile.html" title="Represents a single file on disk." alt="" coords="5,69,236,109"/>
+<area shape="rect" id="Node000001" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Directory.html" title="Represents a single Directory that can contain Filesystem objects." alt="" coords="284,5,515,45"/>
+<area shape="poly" id="edge21_Node000000_Node000001" title=" " alt="" coords="221,64,311,43,312,48,222,69"/>
+<area shape="rect" id="Node000002" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Notebook.html" title="Represents a single Notebook that can be added to a Directory." alt="" coords="284,69,515,109"/>
+<area shape="poly" id="edge22_Node000000_Node000002" title=" " alt="" coords="250,87,284,87,284,92,250,92"/>
+<area shape="rect" id="Node000003" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1TimestampedZeppelinFile.html" title="Decorator that stores the last modified date of the underlying File at the time of decorator creation..." alt="" coords="284,133,515,173"/>
+<area shape="poly" id="edge23_Node000000_Node000003" title=" " alt="" coords="222,110,312,131,311,136,221,115"/>
+</map>

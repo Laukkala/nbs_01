@@ -1,0 +1,27 @@
+@startuml inline_umlgraph_1.svg
+class Directory {
+  + findFile()
+}
+
+Directory --> ZeppelinFile : contains
+
+note right of Directory
+Responsibilities:
+- Contains ZeppelinFiles
+
+Collaborators:
+- ZeppelinFile
+end note
+@enduml
+@startuml inline_umlgraph_2.svg
+class ZeppelinFile {
+  + path()
+}
+
+note right of ZeppelinFile
+Responsibilities:
+- Represents a file on disk
+
+Collaborators:
+end note
+@enduml

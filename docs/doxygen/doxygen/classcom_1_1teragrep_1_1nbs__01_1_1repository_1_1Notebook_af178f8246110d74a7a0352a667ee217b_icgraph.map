@@ -1,0 +1,12 @@
+<map id="com.teragrep.nbs_01.repository.Notebook.copy" name="com.teragrep.nbs_01.repository.Notebook.copy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="563,37,793,77"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="726,26,709,19,678,16,651,18,635,23,629,29,632,36,627,38,624,28,632,18,650,13,678,11,710,13,728,21"/>
+<area shape="rect" id="Node000002" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Notebook.html#a1473774891c4459d9709be090028be00" title=" " alt="" coords="284,5,515,45"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="549,45,515,41,515,36,549,40"/>
+<area shape="rect" id="Node000003" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Notebook.html#a2f6d3e85a84da9ddeec959e09d21f697" title=" " alt="" coords="284,69,515,109"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="549,75,515,79,515,73,549,69"/>
+<area shape="rect" id="Node000004" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Notebook.html#adf06384780e935fb2d7771824b27ae57" title=" " alt="" coords="5,37,236,77"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="270,77,236,73,236,68,271,72"/>
+<area shape="rect" id="Node000005" href="$classcom_1_1teragrep_1_1nbs__01_1_1repository_1_1Notebook.html#a78e9b3912e6daf7beb9c16643c306c8b" title=" " alt="" coords="5,101,236,141"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="271,107,236,111,236,105,270,101"/>
+</map>
