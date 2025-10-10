@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -82,7 +82,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedNotebookPath));
-        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory(notebookDirectory()));
+        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedNotebookName)));
         // Assert that we receive the proper response.
@@ -96,7 +96,7 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteDirectoryTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedDirectoryPath));
-        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new Directory(notebookDirectory()));
+        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedDirectoryName)));
         // Assert that we receive the proper response.

@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -82,7 +82,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory(notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, notebookPath));
         Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
@@ -93,14 +93,14 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         String nonExistentNotebookName = "nonExistentNotebook";
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         // Start server and wait for it to initialize.
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new Directory(notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(nonExistentNotebookName)));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
         Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
         Response expectedResponse = new ExceptionResponse(
-                HttpStatus.BAD_REQUEST_400,
+                HttpStatus.NOT_FOUND_404,
                 new FileNotFoundException("Notebook or directory with path " + nonExistentNotebookPath + " not found!")
         );
         Assertions

@@ -45,11 +45,10 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -60,33 +59,33 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 // Creates a new Notebook. Should be provided with a path of the File
-public final class CreateNotebookEndpoint implements FileSystemEndPoint {
+public final class CreateNotebookEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public CreateNotebookEndpoint(Directory root) {
+    public CreateNotebookEndpoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.load();
+            List<Path> currentFiles = root.list();
             JsonObject parameters = request.parameters();
             String title = parameters.containsKey("title") ? parameters.getString("title") : "";
-            Path path = updatedDirectory.path().resolve(request.path());
-
-            if (Files.exists(path)) {
+            Path path = root.path().resolve(request.path());
+            if (currentFiles.contains(path)) {
                 throw new FileAlreadyExistsException("Path at " + path + " is already in use!");
             }
 
-            Notebook newFile = createNotebook(title, path);
-            return createResponse(newFile, parameters);
+            Notebook newFile = new Notebook(title, path);
+            newFile.save();
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.path());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -104,22 +103,6 @@ public final class CreateNotebookEndpoint implements FileSystemEndPoint {
 
     private Notebook createNotebook(String title, Path path) {
         return new Notebook(title, path, new HashMap<>());
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            file.save();
-            return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + file.path());
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

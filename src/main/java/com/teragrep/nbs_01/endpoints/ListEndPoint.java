@@ -45,72 +45,39 @@
  */
 package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
 // Endpoint that lists all the paths of saved notebooks in a given Directory.
 public final class ListEndPoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public ListEndPoint(Directory root) {
+    public ListEndPoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         // Find all notebooks from Directory structure
-        StringBuilder sb = new StringBuilder();
-        ZeppelinFile foundFile;
-        ZeppelinFile directoryToSearch;
         try {
-            directoryToSearch = root.load();
-            JsonObject parameters = request.parameters();
-            if (parameters.containsKey("directoryPath")) {
-                try {
-                    foundFile = directoryToSearch.findFile(Paths.get(parameters.getString("directoryPath")));
-                    if (foundFile.isDirectory()) {
-                        directoryToSearch = foundFile;
-                    }
-                    else {
-                        return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Not a directory!");
-                    }
-                }
-                catch (FileNotFoundException fileNotFoundException) {
-                    return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Directory not found!");
-                }
-            }
-            else {
-                directoryToSearch = root;
-            }
-        }
-        catch (MalformedRequestException | IOException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
-        }
-        try {
-            ZeppelinFile updatedDirectory = directoryToSearch.load();
-            List<ZeppelinFile> files = updatedDirectory.listAllChildren();
-            for (ZeppelinFile file : files) {
-                if (!file.isDirectory()) {
-                    sb.append(file.path());
-                    sb.append("\n");
-                }
+            List<Path> currentFiles = root.list();
+            StringBuilder sb = new StringBuilder();
+            for (Path file : currentFiles) {
+                sb.append(file.getFileName());
             }
             return new JsonResponse(HttpStatus.OK_200, sb.toString());
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to list notebooks");
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 

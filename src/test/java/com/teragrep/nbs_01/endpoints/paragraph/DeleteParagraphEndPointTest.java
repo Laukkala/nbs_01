@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -87,8 +88,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteParagraphTest() {
         // Assert that the file we are deleting from exists.
         Assertions.assertTrue(Files.exists(notebookPath));
-        Directory root = new Directory(notebookDirectory());
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{}", requestPath);
@@ -116,7 +116,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookPath));
         String nonExistentParagraphId = "nonExistentParagraphId";
         Directory root = new Directory(notebookDirectory());
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
 
@@ -145,7 +145,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
         Directory root = new Directory(notebookDirectory());
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(root);
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{}", requestPath);

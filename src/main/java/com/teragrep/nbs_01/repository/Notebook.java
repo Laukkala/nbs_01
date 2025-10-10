@@ -54,7 +54,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,6 +75,12 @@ public final class Notebook implements ZeppelinFile {
     public Notebook(Path path) {
         this.path = path;
         this.title = "";
+        this.paragraphs = new LinkedHashMap<>();
+    }
+
+    public Notebook(String title, Path path) {
+        this.path = path;
+        this.title = title;
         this.paragraphs = new LinkedHashMap<>();
     }
 
@@ -169,18 +174,12 @@ public final class Notebook implements ZeppelinFile {
     }
 
     public Notebook copy(String copyTitle, Path destinationPath) throws IOException {
-        if (Files.exists(destinationPath)) {
-            throw new FileAlreadyExistsException("Path at " + destinationPath + " is already in use!");
-        }
         Map<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
         for (Paragraph paragraph : paragraphs.values()) {
-            String copyParagraphId = UUID.randomUUID().toString();
-            Script copyScript = new Script(paragraph.script().text());
-            Paragraph copyParagraph = new Paragraph(copyParagraphId, paragraph.title(), copyScript);
+            Paragraph copyParagraph = paragraph.copy();
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
         }
         Notebook copyNotebook = new Notebook(copyTitle, destinationPath, copyParagraphs);
-        copyNotebook.save();
         return copyNotebook;
     }
 
@@ -191,7 +190,7 @@ public final class Notebook implements ZeppelinFile {
             Files.write(path(), json().toString().getBytes());
             stringWriter.close();
         }
-        catch (IOException exception) {
+        catch (IOException exception) { // This hides the reason why saving failed. (eg. we cant catch a FileNotFoundException if we rethrow it as an IOException)
             throw new IOException("Failed to save notebook to path" + path() + "!", exception);
         }
     }

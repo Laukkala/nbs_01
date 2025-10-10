@@ -46,17 +46,24 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
-import com.teragrep.nbs_01.endpoints.directory.CopyDirectoryEndpoint;
+//import com.teragrep.nbs_01.endpoints.directory.CopyDirectoryEndpoint;
+//import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
+//import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
+//import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
+//import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
+//import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
+//import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
+//import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
 import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.servlets.HttpServlet;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
+import com.teragrep.nbs_01.servlets.HttpServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -74,9 +81,11 @@ public class NotebookServer implements Callable {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotebookServer.class);
     private final Configuration configuration;
     private final Server server;
+    private final FileTree root;
 
     public NotebookServer(Configuration configuration) {
         this.configuration = configuration;
+        root = new FileTree(configuration.notebookDirectory());
         server = new Server(configuration.serverPort());
         Connector connector = new ServerConnector(server);
         server.addConnector(connector);
@@ -85,19 +94,15 @@ public class NotebookServer implements Callable {
     public Object call() throws Exception {
         // Start jetty server
         try {
-
-            // Initialize filesystem
-            Directory root = new Directory(configuration.notebookDirectory()).load();
-
             // Jetty setup
             ServletContextHandler notebookContextHandler = new ServletContextHandler();
             notebookContextHandler.setContextPath("/notebook");
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
             FileSystemServlet notebookServlet = new FileSystemServlet(
-                    new CachingFileSystemEndPoint(new FindNotebookEndPoint(root)), // Endpoint to call on a GET Request
+                    new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
+                    new CreateNotebookEndpoint(root), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
@@ -109,7 +114,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet directoryServlet = new FileSystemServlet(
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
+                    new CreateDirectoryEndpoint(root), // Endpoint to call on a PUT Request
                     new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
@@ -127,9 +132,9 @@ public class NotebookServer implements Callable {
 
             HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
             notebookContextHandler.addServlet(pingServlet, "/ping");
-            //
-            //HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
-            //notebookContextHandler.addServlet(listServlet, "/list");
+
+            HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
+            notebookContextHandler.addServlet(listServlet, "/list");
 
             ContextHandlerCollection collection = new ContextHandlerCollection();
             collection.addHandler(paragraphContextHandler);

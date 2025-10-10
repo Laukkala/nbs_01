@@ -45,11 +45,10 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -61,14 +60,15 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 // Deletes a Paragraph from a given Notebook. Should be provided with a path of the Notebook
-public final class DeleteParagraphEndpoint implements FileSystemEndPoint {
+public final class DeleteParagraphEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public DeleteParagraphEndpoint(Directory root) {
+    public DeleteParagraphEndpoint(FileTree root) {
         this.root = root;
     }
 
@@ -87,11 +87,21 @@ public final class DeleteParagraphEndpoint implements FileSystemEndPoint {
                     .add("paragraphId", paragraphId)
                     .build();
 
-            Directory updatedDirectory = root.load();
-            Path path = updatedDirectory.path().resolve(notebookPath);
+            List<Path> currentFiles = root.list();
+            Path path = root.path().resolve(notebookPath);
+            if (!currentFiles.contains(path)) {
+                throw new FileNotFoundException("No such notebook: " + path + "!");
+            }
 
-            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
-            return createResponse(notebook, parameters);
+            Notebook notebook = new Notebook(path).load();
+            if (notebook.paragraphs().containsKey(paragraphId)) {
+                notebook.paragraphs().remove(paragraphId);
+                notebook.save();
+                return new JsonResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
+            }
+            else {
+                throw new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!");
+            }
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -116,41 +126,6 @@ public final class DeleteParagraphEndpoint implements FileSystemEndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            if (file instanceof Notebook) {
-                Notebook notebook = (Notebook) file;
-                String paragraphId = parameters.getString("paragraphId");
-                if (notebook.paragraphs().containsKey(paragraphId)) {
-                    notebook.paragraphs().remove(paragraphId);
-                    notebook.save();
-                    return new JsonResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
-                }
-                else {
-                    return new ExceptionResponse(
-                            HttpStatus.BAD_REQUEST_400,
-                            new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!")
-                    );
-                }
-            }
-            else {
-                return new ExceptionResponse(
-                        HttpStatus.BAD_REQUEST_400,
-                        new MalformedRequestException("Not a Notebook!")
-                );
-            }
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

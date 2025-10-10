@@ -45,11 +45,9 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -61,28 +59,37 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Objects;
+import java.nio.file.Paths;
+import java.util.*;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public final class CopyNotebookEndpoint implements FileSystemEndPoint {
+public final class CopyNotebookEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public CopyNotebookEndpoint(Directory root) {
+    public CopyNotebookEndpoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.parameters();
-            String sourcePath = parameters.getString("sourcePath");
+            String sourcePathString = parameters.getString("sourcePath");
+            Path sourcePath = root.path().resolve(Paths.get(sourcePathString));
+            Path destinationPath = root.path().resolve(request.path());
+            List<Path> currentFiles = root.list();
 
-            Directory updatedDirectory = root.load();
-            Path path = updatedDirectory.path().resolve(request.path());
+            if (currentFiles.contains(destinationPath)) {
+                throw new MalformedRequestException("File at " + destinationPath + " already exists !");
+            }
 
-            ZeppelinFile newFile = copyNotebook(updatedDirectory, updatedDirectory.path().resolve(sourcePath), path);
-            return createResponse(newFile, parameters);
+            if (!currentFiles.contains(sourcePath)) {
+                throw new MalformedRequestException("No such file:" + sourcePath + " !");
+            }
+            Notebook source = new Notebook(sourcePath).load();
+            Notebook copy = source.copy(destinationPath);
+            copy.save();
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + copy.path());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -96,40 +103,6 @@ public final class CopyNotebookEndpoint implements FileSystemEndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
-    }
-
-    private Directory createDirectory(Path path) {
-        return new Directory(path);
-    }
-
-    private Notebook createNotebook(String title, Path path) {
-        return new Notebook(title, path, new HashMap<>());
-    }
-
-    private Notebook copyNotebook(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
-        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
-        if (!file.isDirectory()) {
-            return (Notebook) file.copy(destinationPath);
-        }
-        else {
-            throw new IOException("File at " + sourcePath + " is not a notebook!");
-        }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            file.save();
-            return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + file.path());
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

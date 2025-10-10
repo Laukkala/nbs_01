@@ -225,6 +225,17 @@ public class FileSystemServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
+    // Assert that a HTTP GET request to /notebook/{path/to/directory} endpoint with a path corresponding to a directory results in a response with the expected contents
+    public void httpFindNotebookWithDirectoryNameTest() {
+        // Assert that the path we are looking for exists, even though it's not a notebook.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
+        Response response = Assertions
+                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + directoryName));
+        String expectedJson = "{\"message\":\"An error occurred while processing your Request. See event id ";
+        Assertions.assertTrue(response.body().toString().contains(expectedJson));
+    }
+
+    @Test
     public void testContract() {
         EqualsVerifier
                 .forClass(FileSystemServlet.class)

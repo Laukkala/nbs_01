@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -82,17 +82,17 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), directoryPath.toString())));
 
-        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory(notebookDirectory()));
+        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, directoryPath));
         Assertions.assertEquals(expectedFileContent, response.body().toString());
     }
 
     @Test
-    public void httpNotebookNotFoundTest() {
+    public void httpDirectoryNotFoundTest() {
         // Start server and wait for it to initialize.
         Path nonExistentPath = Paths.get("nonExistentPath");
-        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new Directory(notebookDirectory()));
+        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, nonExistentPath));
 

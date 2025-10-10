@@ -45,67 +45,46 @@
  */
 package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 // Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
-public final class DeleteFileEndpoint implements FileSystemEndPoint {
+public final class DeleteFileEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public DeleteFileEndpoint(Directory root) {
+    public DeleteFileEndpoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.load();
-            JsonObject parameters = request.parameters();
-            Path path = updatedDirectory.path().resolve(request.path());
-
-            ZeppelinFile deletedFile = updatedDirectory.findFile(path);
-            return createResponse(deletedFile, parameters);
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "Directory doesn't exist!");
-        }
-
-        catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
-        }
-        catch (IOException ioException) {
-            return new JsonResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    "Failed to read files from notebook directory:\n" + ioException
-            );
-        }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            file.delete();
+            Path path = root.path().resolve(request.path());
+            // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
+            if (Files.isDirectory(path)) {
+                Stream<Path> files = Files.walk(path);
+                files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            }
+            else {
+                Files.delete(path);
+            }
             return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to delete file:\n" + ioException);
+            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

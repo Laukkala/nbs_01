@@ -45,28 +45,27 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 // Creates a new Paragraph into a given Notebook. Should be provided with a path of the Notebook
-public final class CreateParagraphEndpoint implements FileSystemEndPoint {
+public final class CreateParagraphEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public CreateParagraphEndpoint(Directory root) {
+    public CreateParagraphEndpoint(FileTree root) {
         this.root = root;
     }
 
@@ -78,16 +77,26 @@ public final class CreateParagraphEndpoint implements FileSystemEndPoint {
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
+            List<Path> currentFiles = root.list();
+            Path path = root.path().resolve(notebookPath);
+            if (!currentFiles.contains(path)) {
+                throw new FileNotFoundException("No such notebook: " + path + " !");
+            }
 
-            JsonObject parameters = Json
-                    .createObjectBuilder(request.parameters())
-                    .add("paragraphId", paragraphId)
-                    .build();
-            Directory updatedDirectory = root.load();
-            Path path = updatedDirectory.path().resolve(notebookPath);
+            Notebook notebook = new Notebook(path).load();
+            if (!notebook.paragraphs().containsKey(paragraphId)) {
+                Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
+                notebook.paragraphs().put(paragraphId, newParagraph);
+                notebook.save();
 
-            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
-            return createResponse(notebook, parameters);
+                return new JsonResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
+            }
+            else {
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException("Paragraph " + paragraphId + " already exists!")
+                );
+            }
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -112,44 +121,6 @@ public final class CreateParagraphEndpoint implements FileSystemEndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            if (file instanceof Notebook) {
-                String paragraphId = parameters.getString("paragraphId");
-
-                Notebook notebook = (Notebook) file;
-                if (!notebook.paragraphs().containsKey(paragraphId)) {
-                    Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
-                    notebook.paragraphs().put(paragraphId, newParagraph);
-                    notebook.save();
-
-                    return new JsonResponse(HttpStatus.CREATED_201, "Created new paragraph " + paragraphId);
-                }
-                else {
-                    return new ExceptionResponse(
-                            HttpStatus.BAD_REQUEST_400,
-                            new MalformedRequestException("Paragraph " + paragraphId + " already exists!")
-                    );
-                }
-            }
-            else {
-                return new ExceptionResponse(
-                        HttpStatus.BAD_REQUEST_400,
-                        new MalformedRequestException("Not a Notebook")
-                );
-            }
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

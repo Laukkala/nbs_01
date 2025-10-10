@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -92,7 +92,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(originalFileContent, fileContent);
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with a path.
-        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new Directory(notebookDirectory()));
+        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
         Response response = endpoint
                 .createResponse(
                         new JsonRequest(
@@ -120,7 +120,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Make sure the file doesn't exist
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
 
-        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new Directory(notebookDirectory()));
+        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
         Response response = endpoint
                 .createResponse(
                         new JsonRequest(

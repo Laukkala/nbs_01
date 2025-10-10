@@ -50,6 +50,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
 import java.util.Objects;
+import java.util.UUID;
 
 // Represents a Paragraph that can be added to a Notebook.
 public final class Paragraph {
@@ -108,6 +109,11 @@ public final class Paragraph {
         }
         //Script script = json.containsKey("script") ? this.script.load(json.getJsonObject("script")) : this.script.load(json.containsKey("text") ? json.getJsonObject("text").asJsonObject() : JsonObject.EMPTY_JSON_OBJECT);
         return new Paragraph(jsonId, jsonTitle, jsonScript);
+    }
+
+    public Paragraph copy() {
+        Paragraph copy = new Paragraph(UUID.randomUUID().toString(), title, new Script(script().text()));
+        return copy;
     }
 
     @Override

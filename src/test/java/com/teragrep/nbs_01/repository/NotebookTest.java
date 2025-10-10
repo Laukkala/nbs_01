@@ -143,6 +143,7 @@ class NotebookTest {
         Assertions.assertTrue(Files.exists(notebook.path()));
         Notebook copy = Assertions
                 .assertDoesNotThrow(() -> notebook.copy(Paths.get(root.path().toString(), "newName_copyId")));
+        Assertions.assertDoesNotThrow(() -> copy.save());
         Assertions.assertTrue(Files.exists(notebook.path()));
         Assertions.assertTrue(Files.exists(copy.path()));
     }

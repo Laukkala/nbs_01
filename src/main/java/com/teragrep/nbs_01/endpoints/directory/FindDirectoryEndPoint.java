@@ -45,61 +45,51 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 // Finds a given Directory and returns the names of its children in JSON format.
-public final class FindDirectoryEndPoint implements FileSystemEndPoint {
+public final class FindDirectoryEndPoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public FindDirectoryEndPoint(Directory root) {
+    public FindDirectoryEndPoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
-            JsonObject parameters = request.parameters();
             Path path = root.path().resolve(request.path());
-            Directory updatedDirectory = root.load();
-            ZeppelinFile directory = updatedDirectory.findFile(path);
-            return createResponse(directory, parameters);
+            List<Path> currentFiles = root.list();
+            if (!currentFiles.contains(path)) {
+                return new ExceptionResponse(HttpStatus.NOT_FOUND_404, new FileNotFoundException("No such directory!"));
+            }
+            if (!path.toFile().isDirectory()) {
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException("File at path " + path + " is not a directory!")
+                );
+            }
+            Directory directory = new Directory(path).load();
+            return new JsonResponse(HttpStatus.OK_200, directory.json());
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
-        }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        if (file instanceof Directory) {
-            return new JsonResponse(HttpStatus.OK_200, file.json());
-        }
-        else {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, new FileNotFoundException("Not a directory!"));
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

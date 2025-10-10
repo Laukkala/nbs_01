@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -80,7 +80,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(copiedDirectoryPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
-        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
+        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
@@ -95,7 +95,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
     public void httpCopyNonExistentDirectoryTest() {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(faultyEndpointParameter));
-        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
+        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
 
@@ -120,7 +120,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
-        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new Directory(notebookDirectory()));
+        CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
 

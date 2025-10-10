@@ -43,59 +43,56 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.repository;
 
-import com.teragrep.nbs_01.Delegate;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
-import org.eclipse.jetty.http.HttpStatus;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.Objects;
+//
+public class FileTree {
 
-// Delegates between trueFileEndpoint and falseEndpoint based on whether the passed Delegate returns a true or false.
-public final class DelegatingEndpoint implements EndPoint {
+    private final Path root;
 
-    private final EndPoint trueEndpoint;
-    private final EndPoint falseEndpoint;
-    private final Delegate delegationFunction;
-
-    public DelegatingEndpoint(EndPoint trueEndpoint, EndPoint falseEndpoint, Delegate delegationFunction) {
-        this.trueEndpoint = trueEndpoint;
-        this.falseEndpoint = falseEndpoint;
-        this.delegationFunction = delegationFunction;
+    public FileTree(Path root) {
+        this.root = root;
     }
 
-    public Response createResponse(Request request) {
-        try {
-            if (delegationFunction.resolve(request)) {
-                return trueEndpoint.createResponse(request);
+    public List<Path> list() throws IOException {
+        ArrayList<Path> files = new ArrayList<>();
+        FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
+
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                if (dir.equals(root)) {
+                    return FileVisitResult.CONTINUE;
+                }
+                files.add(dir);
+                return FileVisitResult.CONTINUE;
             }
-            else {
-                return falseEndpoint.createResponse(request);
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                files.add(file);
+                return FileVisitResult.CONTINUE;
             }
-        }
-        catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, "Malformed request:\n" + malformedRequestException);
-        }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                return super.visitFileFailed(file, exc);
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                return super.postVisitDirectory(dir, exc);
+            }
+        };
+        Files.walkFileTree(root, fileVisitor);
+        return files;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        DelegatingEndpoint that = (DelegatingEndpoint) o;
-        return Objects.equals(trueEndpoint, that.trueEndpoint) && Objects.equals(falseEndpoint, that.falseEndpoint)
-                && Objects.equals(delegationFunction, that.delegationFunction);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(trueEndpoint, falseEndpoint, delegationFunction);
+    public Path path() {
+        return root;
     }
 }

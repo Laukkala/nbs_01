@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -92,7 +92,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
@@ -107,7 +107,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCopyNonExistentNotebookTest() {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + nonExistentNotebookPath + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
 
@@ -132,7 +132,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new Directory(notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
 

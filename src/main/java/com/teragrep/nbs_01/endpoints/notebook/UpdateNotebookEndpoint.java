@@ -45,12 +45,9 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -60,18 +57,18 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 // Updates the title of a Notebook.
-public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
+public final class UpdateNotebookEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public UpdateNotebookEndpoint(Directory root) {
+    public UpdateNotebookEndpoint(FileTree root) {
         this.root = root;
     }
 
@@ -84,12 +81,11 @@ public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
                 throw new MalformedRequestException("Request does not contain a title!");
             }
 
-            if (!Files.exists(path)) {
+            List<Path> currentFiles = root.list();
+            if (!currentFiles.contains(path)) {
                 throw new FileNotFoundException("Notebook at path " + path + " does not exist!");
             }
-
-            Directory updatedDirectory = root.load();
-            Notebook notebook = (Notebook) updatedDirectory.findFile(path).load();
+            Notebook notebook = new Notebook(path).load();
 
             // Create a copy of the current paragraphs
             Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
@@ -97,7 +93,8 @@ public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
             // Add a modified title
             String title = parameters.getString("title");
             Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
-            return createResponse(newNotebook, parameters);
+            newNotebook.save();
+            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -108,22 +105,6 @@ public final class UpdateNotebookEndpoint implements FileSystemEndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            file.save();
-            return new JsonResponse(HttpStatus.OK_200, "Notebook edited successfully");
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

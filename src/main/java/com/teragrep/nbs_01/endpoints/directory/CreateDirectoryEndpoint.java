@@ -45,46 +45,42 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 // Creates a new Notebook. Should be provided with a path of the File
-public final class CreateDirectoryEndpoint implements FileSystemEndPoint {
+public final class CreateDirectoryEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public CreateDirectoryEndpoint(Directory root) {
+    public CreateDirectoryEndpoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Directory updatedDirectory = root.load();
-            JsonObject parameters = request.parameters();
+            List<Path> currentFiles = root.list();
+            Path path = root.path().resolve(request.path());
 
-            Path path = updatedDirectory.path().resolve(request.path());
-
-            if (Files.exists(path)) {
+            if (currentFiles.contains(path)) {
                 throw new FileAlreadyExistsException("Path at " + path + " is already in use!");
             }
-
-            Directory newDirectory = createDirectory(path);
-            return createResponse(newDirectory, parameters);
+            Directory newDirectory = new Directory(path);
+            newDirectory.save();
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newDirectory.path());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -95,29 +91,6 @@ public final class CreateDirectoryEndpoint implements FileSystemEndPoint {
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
-        }
-    }
-
-    private Directory createDirectory(Path path) {
-        return new Directory(path);
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            file.save();
-            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + file.path());
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override

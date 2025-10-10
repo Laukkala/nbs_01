@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -84,7 +84,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
@@ -99,7 +99,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateNotebookIntoUnavailablePathTest() {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingNotebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, existingNotebookName));
 
@@ -126,7 +126,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName.toString());
         // Assert that the file we are creating already exists.
         Assertions.assertFalse(Files.exists(notebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new Directory(notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"path\":\"" + notebookName + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, notebookName));
         // Assert that we receive the proper response.

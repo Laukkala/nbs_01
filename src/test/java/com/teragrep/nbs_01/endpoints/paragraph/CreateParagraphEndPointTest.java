@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -87,8 +87,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpCreateParagraphTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookPath));
-        Directory root = new Directory(notebookDirectory());
-        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
+        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{}", requestPath);
@@ -116,8 +115,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Path nonexistentFilePath = Paths.get(notebookDirectory().toString(), nonexistentFileName);
         // Assert that the file we are trying to add a paragraph to doesn't exist.
         Assertions.assertFalse(Files.exists(nonexistentFilePath));
-        Directory root = new Directory(notebookDirectory());
-        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(root);
+        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{\"paragraphId\":\"" + paragraphId + "\"}", requestPath);

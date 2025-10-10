@@ -45,10 +45,10 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.FileSystemEndPoint;
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.ZeppelinFile;
+import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -60,14 +60,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
+public final class CopyDirectoryEndpoint implements EndPoint {
 
-    private final Directory root;
+    private final FileTree root;
 
-    public CopyDirectoryEndpoint(Directory root) {
+    public CopyDirectoryEndpoint(FileTree root) {
         this.root = root;
     }
 
@@ -77,15 +79,23 @@ public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
             if (!parameters.containsKey("sourcePath")) {
                 throw new MalformedRequestException("Request must contain a sourcePath!");
             }
-            String sourcePath = parameters.getString("sourcePath");
+            List<Path> currentFiles = root.list();
+            String sourcePathString = parameters.getString("sourcePath");
+            Path sourcePath = root.path().resolve(Paths.get(sourcePathString));
+            Path destinationPath = root.path().resolve(request.path());
 
-            Directory updatedDirectory = root.load();
-            Path path = updatedDirectory.path().resolve(request.path());
+            if (!currentFiles.contains(sourcePath)) {
+                throw new MalformedRequestException("No such directory: " + sourcePath + " !");
+            }
+            if (currentFiles.contains(destinationPath)) {
+                throw new MalformedRequestException("Destination " + sourcePath + " is already in use !");
+            }
 
-            ZeppelinFile newDirectory = copyDirectory(
-                    updatedDirectory, updatedDirectory.path().resolve(sourcePath), path
-            );
-            return createResponse(newDirectory, parameters);
+            Directory source = new Directory(sourcePath).load();
+            Directory copy = source.copy(destinationPath);
+            copy.save();
+            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + copy.path());
+
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -99,32 +109,6 @@ public final class CopyDirectoryEndpoint implements FileSystemEndPoint {
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
-    }
-
-    private ZeppelinFile copyDirectory(Directory sourceDir, Path sourcePath, Path destinationPath) throws IOException {
-        ZeppelinFile file = sourceDir.findFile(sourcePath).load();
-        if (file.isDirectory()) {
-            return file.copy(destinationPath);
-        }
-        else {
-            throw new FileNotFoundException("File at " + sourcePath + " is not a directory!");
-        }
-    }
-
-    @Override
-    public Response createResponse(ZeppelinFile file, JsonObject parameters) {
-        try {
-            file.save();
-            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + file.path());
-        }
-        catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-    }
-
-    @Override
-    public Directory root() {
-        return root;
     }
 
     @Override
