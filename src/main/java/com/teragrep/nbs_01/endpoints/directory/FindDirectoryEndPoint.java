@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
@@ -79,9 +78,9 @@ public final class FindDirectoryEndPoint implements EndPoint {
                 return new ExceptionResponse(HttpStatus.NOT_FOUND_404, new FileNotFoundException("No such directory!"));
             }
             if (!path.toFile().isDirectory()) {
-                return new ExceptionResponse(
+                return new JsonResponse(
                         HttpStatus.BAD_REQUEST_400,
-                        new MalformedRequestException("File at path " + path + " is not a directory!")
+                        "File at path " + request.path() + " is not a directory!"
                 );
             }
             Directory directory = new Directory(path).load();

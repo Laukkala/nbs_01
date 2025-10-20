@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.endpoints.*;
 //import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
 //import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
+import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
 //import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
@@ -103,7 +104,7 @@ public class NotebookServer implements Callable {
                     new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
                     new CreateNotebookEndpoint(root), // Endpoint to call on a PUT Request
-                    new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
+                    new DeleteNotebookEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
 
@@ -115,7 +116,7 @@ public class NotebookServer implements Callable {
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
                     new CreateDirectoryEndpoint(root), // Endpoint to call on a PUT Request
-                    new DeleteFileEndpoint(root) // Endpoint to call on a DELETE Request
+                    new DeleteDirectoryEndpoint(root) // Endpoint to call on a DELETE Request
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
 

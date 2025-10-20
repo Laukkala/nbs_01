@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
@@ -57,14 +57,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
+public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
 
-    private String deletedNotebookName = "my_note3_2A94M5J3Z.zpln";
     private String deletedDirectoryName = "my_folder_2A94M5J1D/";
-    private Path deletedNotebookPath = Paths.get(notebookDirectory().toString(), deletedNotebookName);
     private Path deletedDirectoryPath = Paths.get(notebookDirectory().toString(), deletedDirectoryName);
 
-    public DeleteFileEndPointTest() {
+    public DeleteDirectoryEndPointTest() {
     }
 
     @BeforeEach
@@ -78,25 +76,11 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
-    public void httpDeleteNotebookTest() {
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertTrue(Files.exists(deletedNotebookPath));
-        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedNotebookName)));
-        // Assert that we receive the proper response.
-        Assertions.assertEquals(204, response.status());
-        // Assert that the file was created.
-        Assertions.assertFalse(Files.exists(deletedNotebookPath));
-    }
-
-    @Test
     // Assert that a HTTP request to /notebook/new endpoint results in new directory being saved on disk.
     public void httpDeleteDirectoryTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedDirectoryPath));
-        DeleteFileEndpoint endPoint = new DeleteFileEndpoint(new FileTree(notebookDirectory()));
+        DeleteDirectoryEndpoint endPoint = new DeleteDirectoryEndpoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedDirectoryName)));
         // Assert that we receive the proper response.
@@ -107,6 +91,6 @@ public class DeleteFileEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     public void testContract() {
-        EqualsVerifier.forClass(DeleteFileEndpoint.class).verify();
+        EqualsVerifier.forClass(DeleteDirectoryEndpoint.class).verify();
     }
 }

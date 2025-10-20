@@ -163,27 +163,6 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP DELETE request to /notebook/{path/to/notebook} endpoint results in a notebook being deleted
-    public void httpDeleteDirectoryTest() {
-
-        // Assert that the correct number of files exist
-        Assertions
-                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
-        // Assert that the file to be deleted exists.
-        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        Response response = Assertions
-                .assertDoesNotThrow(
-                        () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryName, "{}")
-                );
-        Assertions.assertEquals(204, response.status());
-        // Assert that a file was deleted.
-        Assertions
-                .assertEquals(3, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
-        // Assert that the correct file was deleted.
-        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
-    }
-
-    @Test
     // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint results in a response with the expected file contents
     public void httpFindNotebookTest() {
         String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
@@ -232,8 +211,24 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + directoryName));
-        String expectedJson = "{\"message\":\"An error occurred while processing your Request. See event id ";
-        Assertions.assertTrue(response.body().toString().contains(expectedJson));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions
+                .assertEquals(
+                        "File at path " + directoryName + " is not a notebook!", response.body().getString("message")
+                );
+    }
+
+    @Test
+    // Assert that a HTTP GET request to /notebook/{path/to/directory} endpoint with a path corresponding to a directory results in a response with the expected contents
+    public void httpDeleteNotebookWithDirectoryNameTest() {
+        // Assert that the path we are looking for exists, even though it's not a directory.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryName)));
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryName, "{}")
+                );
+        Assertions.assertEquals(directoryName + " is not a Notebook!", response.body().getString("message"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
     @Test

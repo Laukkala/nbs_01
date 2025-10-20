@@ -43,29 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.directory;
+package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.eclipse.jetty.http.HttpStatus;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
 
-    private String newDirectoryName = "testNotebookName";
-    private Path newDirectoryPath = Paths.get(notebookDirectory().toString(), newDirectoryName);
-    private String existingDirectoryName = "my_folder_2A94M5J1D";
-    private Path existingDirectoryPath = Paths.get(notebookDirectory().toString(), existingDirectoryName);
+    private String deletedNotebookName = "my_note3_2A94M5J3Z.zpln";
+    private Path deletedNotebookPath = Paths.get(notebookDirectory().toString(), deletedNotebookName);
+
+    public DeleteNotebookEndPointTest() {
+    }
 
     @BeforeEach
     private void setUp() {
@@ -78,36 +77,21 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a proper request to CreateDirectoryEndpoint results in a correct response and a file being saved to disk.
-    public void httpCreateDirectoryTest() {
+    // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
+    public void httpDeleteNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
-        Assertions.assertFalse(Files.exists(newDirectoryPath));
-        CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
+        Assertions.assertTrue(Files.exists(deletedNotebookPath));
+        DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
+        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedNotebookName)));
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
+        Assertions.assertEquals(204, response.status());
         // Assert that the file was created.
-        Assertions.assertTrue(Files.exists(newDirectoryPath));
-    }
-
-    @Test
-    // Assert that a request to CreateDirectoryEndpoint to a path that already contains a file results in an error
-    public void httpCreateDirectoryIntoUnavailablePathTest() {
-        // Assert that the file we are creating already exists.
-        Assertions.assertTrue(Files.exists(existingDirectoryPath));
-        CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(existingDirectoryName)));
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals("Path at " + notebookDirectory().relativize(existingDirectoryPath) + " is already in use!", response.body().getString("message"));
+        Assertions.assertFalse(Files.exists(deletedNotebookPath));
     }
 
     @Test
     public void testContract() {
-        EqualsVerifier.forClass(CreateDirectoryEndpoint.class).verify();
+        EqualsVerifier.forClass(DeleteDirectoryEndpoint.class).verify();
     }
 }

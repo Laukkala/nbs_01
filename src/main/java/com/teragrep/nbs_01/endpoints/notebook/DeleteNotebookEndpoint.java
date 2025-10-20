@@ -46,52 +46,45 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.JsonResponse;
+import com.teragrep.nbs_01.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
-// Finds a given Notebook and returns its contents in JSON format.
-public final class FindNotebookEndPoint implements EndPoint {
+// Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
+public final class DeleteNotebookEndpoint implements EndPoint {
 
     private final FileTree root;
 
-    public FindNotebookEndPoint(FileTree root) {
+    public DeleteNotebookEndpoint(FileTree root) {
         this.root = root;
     }
 
-    @Override
     public Response createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given Path
         try {
             Path path = root.path().resolve(request.path());
-            List<Path> currentFiles = root.list();
-            if (!currentFiles.contains(path)) {
-                throw new FileNotFoundException("No such file " + request.path() + " !");
+            // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
+            if (Files.isDirectory(path)) {
+                return new JsonResponse(HttpStatus.BAD_REQUEST_400, request.path() + " is not a Notebook!");
             }
-            if (path.toFile().isDirectory()) {
-                throw new MalformedRequestException("File at path " + request.path() + " is not a notebook!");
+            else {
+                Files.delete(path);
             }
-            Notebook notebook = new Notebook(path).load();
-            return new JsonResponse(HttpStatus.OK_200, notebook.json().toString());
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
         }
-
-        catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException.getMessage());
+        // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
+        catch (NoSuchFileException noSuchFileException) {
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, "No such file: " + request.path());
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
-        }
+        // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
@@ -105,7 +98,7 @@ public final class FindNotebookEndPoint implements EndPoint {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FindNotebookEndPoint that = (FindNotebookEndPoint) o;
+        DeleteNotebookEndpoint that = (DeleteNotebookEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

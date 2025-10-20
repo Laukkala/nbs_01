@@ -43,8 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.endpoints.directory;
 
+import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
@@ -62,24 +63,27 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 // Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
-public final class DeleteFileEndpoint implements EndPoint {
+public final class DeleteDirectoryEndpoint implements EndPoint {
 
     private final FileTree root;
 
-    public DeleteFileEndpoint(FileTree root) {
+    public DeleteDirectoryEndpoint(FileTree root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
             Path path = root.path().resolve(request.path());
+            if (!Files.exists(path)) {
+                throw new NoSuchFileException(request.path().toString());
+            }
             // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
-            if (Files.isDirectory(path)) {
-                Stream<Path> files = Files.walk(path);
-                files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            if (!Files.isDirectory(path)) {
+                return new JsonResponse(HttpStatus.BAD_REQUEST_400, request.path() + " is not a directory!");
             }
             else {
-                Files.delete(path);
+                Stream<Path> files = Files.walk(path);
+                files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             }
             return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
         }
@@ -101,7 +105,7 @@ public final class DeleteFileEndpoint implements EndPoint {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DeleteFileEndpoint that = (DeleteFileEndpoint) o;
+        DeleteDirectoryEndpoint that = (DeleteDirectoryEndpoint) o;
         return Objects.equals(root, that.root);
     }
 
