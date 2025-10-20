@@ -49,14 +49,12 @@ import jakarta.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,7 +62,7 @@ import java.util.stream.Collectors;
  * Represents a single Notebook that can be added to a Directory. Is identified by a Path, and corresponds to a file
  * saved on the filesystem.
  */
-public final class Notebook implements ZeppelinFile {
+public final class Notebook implements Saveable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Notebook.class);
     private final Map<String, Paragraph> paragraphs;
@@ -88,23 +86,6 @@ public final class Notebook implements ZeppelinFile {
         this.path = path;
         this.title = title;
         this.paragraphs = paragraphs;
-    }
-
-    // Remove file from disk
-    @Override
-    public void delete() throws IOException {
-        Files.delete(path());
-    }
-
-    // Checks if searched path matches with this Notebooks path.
-    @Override
-    public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
-        if (path().equals(searchedPath)) {
-            return this;
-        }
-        else {
-            throw new FileNotFoundException("Searched path " + searchedPath + " does not match with" + path());
-        }
     }
 
     public Path path() {
@@ -140,16 +121,6 @@ public final class Notebook implements ZeppelinFile {
     }
 
     @Override
-    public Map<Path, ZeppelinFile> children() {
-        return new HashMap<>();
-    }
-
-    @Override
-    public void printTree() {
-        LOGGER.debug("File, Path: {}", path());
-    }
-
-    @Override
     public Notebook load() throws IOException {
         String content = readFile().toString();
         StringReader stringReader = new StringReader(content);
@@ -166,11 +137,6 @@ public final class Notebook implements ZeppelinFile {
             savedParagraphs.put(paragraph.id(), paragraph);
         }
         return new Notebook(savedName, path(), savedParagraphs);
-    }
-
-    @Override
-    public List<ZeppelinFile> listAllChildren() {
-        return new ArrayList<>();
     }
 
     public Notebook copy(String copyTitle, Path destinationPath) throws IOException {
@@ -193,35 +159,6 @@ public final class Notebook implements ZeppelinFile {
         catch (IOException exception) { // This hides the reason why saving failed. (eg. we cant catch a FileNotFoundException if we rethrow it as an IOException)
             throw new IOException("Failed to save notebook to path" + path() + "!", exception);
         }
-    }
-
-    @Override
-    public boolean isDirectory() {
-        return false;
-    }
-
-    public void rename(String fileName) throws IOException {
-        move(Paths.get(path().getParent().toString(), fileName));
-    }
-
-    public void move(Path destinationPath) throws IOException {
-        if (Files.exists(destinationPath)) {
-            throw new IOException("Path at " + destinationPath + " is already in use!");
-        }
-        Notebook movedNotebook = copy(destinationPath);
-        movedNotebook.save();
-        delete();
-    }
-
-    public Notebook move(Directory parentDirectory) throws IOException {
-        return move(parentDirectory, path().getFileName().toString());
-    }
-
-    public Notebook move(Directory parentDirectory, String fileName) throws IOException {
-        Notebook movedNotebook = copy(Paths.get(parentDirectory.path().toString(), fileName));
-        movedNotebook.save();
-        delete();
-        return movedNotebook;
     }
 
     private String readFile() throws IOException {

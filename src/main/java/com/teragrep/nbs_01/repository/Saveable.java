@@ -45,39 +45,17 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import jakarta.json.JsonObject;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
 // An interface for Filesystem objects, such as Notebooks and Directories.
-public interface ZeppelinFile {
-
-    public abstract void delete() throws IOException;
-
-    public abstract ZeppelinFile findFile(Path path) throws FileNotFoundException;
+public interface Saveable {
 
     public abstract Path path();
 
     public abstract void save() throws IOException;
 
-    public abstract boolean isDirectory();
+    public abstract Saveable load() throws IOException;
 
-    public abstract ZeppelinFile copy(Path path) throws IOException;
-
-    public abstract Map<Path, ZeppelinFile> children();
-
-    public abstract void printTree();
-
-    public abstract ZeppelinFile load() throws IOException;
-
-    public abstract void move(Path path) throws IOException;
-
-    public abstract void rename(String name) throws IOException;
-
-    public abstract List<ZeppelinFile> listAllChildren();
-
-    public abstract JsonObject json();
+    public abstract Saveable copy(Path destinationPath) throws IOException;
 }

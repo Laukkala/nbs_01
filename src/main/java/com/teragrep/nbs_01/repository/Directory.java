@@ -47,170 +47,76 @@ package com.teragrep.nbs_01.repository;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 // Represents a single Directory that can contain Filesystem objects.
 // Is identified by a Path, and corresponds to a directory file on the filesystem.
-public final class Directory implements ZeppelinFile {
+public final class Directory implements Saveable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
-    private final Map<Path, ZeppelinFile> children;
+    private final Map<Path, Saveable> children;
     private final Path path;
 
     public Directory(Path path) {
         this(path, new HashMap<>());
     }
 
-    public Directory(Path path, Map<Path, ZeppelinFile> children) {
+    public Directory(Path path, Map<Path, Saveable> children) {
         this.path = path;
-        this.children = Collections.unmodifiableMap(children);
-    }
-
-    // Find a matching ZeppelinFile by Path
-    public ZeppelinFile findFile(Path searchedPath) throws FileNotFoundException {
-        if (path().equals(searchedPath)) {
-            return this;
-        }
-        else {
-            for (ZeppelinFile child : children.values()) {
-                try {
-                    return (child.findFile(searchedPath));
-                }
-                catch (FileNotFoundException exception) {
-                    continue;
-                }
-            }
-            throw new FileNotFoundException(
-                    "Notebook or directory with path " + searchedPath.toString() + " not found!"
-            );
-        }
+        this.children = children;
     }
 
     public Path path() {
         return path;
     }
 
-    public boolean contains(Path searchedPath) {
-        try {
-            findFile(searchedPath);
-            return true;
-        }
-        catch (IOException ioException) {
-            return false;
-        }
-    }
-
-    public void move(Path destinationPath) throws IOException {
-        if (Files.exists(destinationPath)) {
-            throw new IOException("Path at " + destinationPath + " is already in use!");
-        }
-        if (destinationPath.toAbsolutePath().startsWith(path().toAbsolutePath())) {
-            if (destinationPath.toAbsolutePath().equals(path().toAbsolutePath())) {
-                throw new IOException("Directory is already located in the given destination!");
-            }
-            throw new IOException("Cannot move a directory into one of its own children!");
-        }
-        Map<Path, ZeppelinFile> movedChildren = new HashMap<>();
-        for (ZeppelinFile child : children.values()) {
-            child = child.load();
-            ZeppelinFile movedChild = child.copy(destinationPath.resolve(child.path().getFileName()));
-            movedChildren.put(movedChild.path(), movedChild);
-        }
-
-        Directory movedDirectory = new Directory(destinationPath, movedChildren);
-        movedDirectory.save();
-        delete();
-    }
-
-    public void delete() throws IOException {
-        for (ZeppelinFile child : children.values()) {
-            child.delete();
-        }
-        Files.delete(path());
-    }
-
     public Directory copy(Path destinationPath) throws IOException {
         if (Files.exists(destinationPath)) {
-            throw new FileAlreadyExistsException("Path at " + destinationPath + " is already in use!");
+            throw new FileAlreadyExistsException("File at " + destinationPath + " already exists!");
         }
-        Map<Path, ZeppelinFile> copyChildren = new HashMap<>();
-        for (ZeppelinFile child : children.values()) {
-            child = child.load();
-            String childCopyFileName = child.path().getFileName().toString();
-            Path copyChildPath = destinationPath.resolve(childCopyFileName);
-            copyChildren.put(copyChildPath, child.copy(copyChildPath));
+        Map<Path, Saveable> copiedChildren = new HashMap<>();
+        for (Saveable child : children.values()) {
+            Saveable copy = child.copy(destinationPath.resolve(child.path().getFileName()));
+            copiedChildren.put(copy.path(), copy);
         }
-        Directory copiedDirectory = new Directory(destinationPath, copyChildren);
-        copiedDirectory.save();
-        return copiedDirectory;
-    }
-
-    public Map<Path, ZeppelinFile> children() {
-        return children;
-    }
-
-    public List<ZeppelinFile> listAllChildren() {
-        ArrayList<ZeppelinFile> allChildren = new ArrayList<ZeppelinFile>();
-        for (ZeppelinFile child : children.values()) {
-            allChildren.add(child);
-            allChildren.addAll(child.listAllChildren());
-        }
-        return allChildren;
+        return new Directory(destinationPath, copiedChildren);
     }
 
     public JsonObject json() {
         return Json
                 .createObjectBuilder()
                 .add("name", path.getFileName().toString())
-                .add("children", children.keySet().stream().map((childPath) -> childPath.getFileName()).collect(Collectors.toList()).toString()).build();
+                .add("children", children.values().stream().map((saveable) -> saveable.path().getFileName()).collect(Collectors.toList()).toString()).build();
     }
 
     public void save() throws IOException {
         if (!Files.exists(path())) {
             Files.createDirectory(path());
         }
-        for (ZeppelinFile child : children.values()) {
+        for (Saveable child : children.values()) {
             child.save();
         }
     }
 
-    public void rename(String fileName) throws IOException {
-        move(path.getParent().resolve(fileName));
-    }
-
-    public boolean isDirectory() {
-        return true;
-    }
-
-    public void printTree() {
-        LOGGER.debug("Dir, Path: {}", path());
-        for (Map.Entry<Path, ZeppelinFile> child : children.entrySet()) {
-            child.getValue().printTree();
-        }
-    }
-
-    public boolean isStub() {
-        return false;
+    public Map<Path, Saveable> children() {
+        return children;
     }
 
     public Directory load() throws IOException {
-        return load(path, children);
+        return load(path);
     }
 
     // This method traverses the file tree recursively and depth first, and creates a Directory object with a complete map of child Directories and Notebooks.
-    private Directory load(Path pathToVisit, Map<Path, ZeppelinFile> existingFiles) throws IOException {
-        // Create a copy of existingFiles so that we don't make any direct edits to it.
-        Map<Path, ZeppelinFile> directoryChildren = new HashMap<>();
-        directoryChildren.putAll(existingFiles);
+    private Directory load(Path pathToVisit) throws IOException {
+        Map<Path, Saveable> currentChildren = new HashMap<>();
         Files.walkFileTree(pathToVisit, new SimpleFileVisitor<Path>() {
 
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
@@ -223,23 +129,22 @@ public final class Directory implements ZeppelinFile {
                 if (dir.startsWith(pathToVisit + "/.git")) {
                     return FileVisitResult.SKIP_SUBTREE;
                 }
-                // Here we create any child Directories by calling this function recursively.
-                // First we will check if we already have the files of the child Directory in existingFiles, and pass them to the recursive call so that we don't do any unnecessary operations in later recursions.
-                ConcurrentHashMap<Path, ZeppelinFile> childrenOfChildDirectory = new ConcurrentHashMap<>();
-                if (directoryChildren.containsKey(dir)) {
-                    childrenOfChildDirectory.putAll(directoryChildren.get(dir).children());
-                }
-                Directory childDirectory = load(dir, childrenOfChildDirectory);
-                directoryChildren.put(childDirectory.path(), childDirectory);
+                Directory childDirectory = new Directory(dir).load();
+                currentChildren.put(childDirectory.path(), childDirectory);
                 return FileVisitResult.SKIP_SUBTREE;
             }
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                if (!directoryChildren.containsKey(file)) {
-                    directoryChildren.put(file, new Notebook(file));
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                try {
+                    Notebook childNotebook = new Notebook(file).load();
+                    currentChildren.put(childNotebook.path(), childNotebook);
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
+                catch (JsonParsingException jsonParsingException) {
+                    LOGGER.warn("Encountered a corrupted file: ", file);
+                    return FileVisitResult.CONTINUE;
+                }
             }
 
             @Override
@@ -252,8 +157,8 @@ public final class Directory implements ZeppelinFile {
                 return super.postVisitDirectory(dir, exc);
             }
         });
-        Directory root = new Directory(pathToVisit, directoryChildren);
-        return root;
+        Directory loadedDirectory = new Directory(pathToVisit, currentChildren);
+        return loadedDirectory;
     }
 
     @Override
