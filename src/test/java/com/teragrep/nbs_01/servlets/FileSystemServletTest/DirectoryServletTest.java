@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.servlets;
+package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
@@ -163,6 +163,30 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(childNotebookPath)));
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(childDirectoryPath)));
+    }
+
+    @Test
+    // Assert that a HTTP DELETE request to /directory/{path/to/nonexistent_directory} endpoint results in a 404 NOT FOUND response, as the directory to be deleted does not exist.
+    public void httpDeleteNonexistentDirectoryTest() {
+        Path nonexistentDirectoryPath = Paths.get("thisAintItChief");
+
+        // Assert that the correct number of files exist
+        Assertions
+                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
+
+        // Assert that the file to be deleted does not exist.
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonexistentDirectoryPath)));
+
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest(
+                                "http://" + serverAddress() + "/directory/" + nonexistentDirectoryPath, "{}"
+                        )
+                );
+        Assertions.assertEquals(404, response.status());
+        // Assert that no files were deleted.
+        Assertions
+                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
     }
 
     @Test

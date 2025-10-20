@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.servlets;
+package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
@@ -228,9 +228,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpDeleteNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
         String requestBody = Json.createObjectBuilder().build().toString();
-        String expectedResponseMessage = "com.teragrep.nbs_01.exceptions.MalformedRequestException: Paragraph "
-                + nonexistentParagraphId + " doesn't exist!";
-
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
@@ -240,8 +237,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that a faulty DELETE request is responded to with the response code 404 NOT FOUND
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains(expectedErrorResponseMessage));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
 
         // Assert that the created paragraph is not contained within the saved file of the notebook
         String fileContents = Assertions

@@ -115,7 +115,6 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookPath));
         String nonExistentParagraphId = "nonExistentParagraphId";
-        Directory root = new Directory(notebookDirectory());
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
@@ -123,18 +122,12 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.BAD_REQUEST_400,
-                new FileNotFoundException("Paragraph " + nonExistentParagraphId + " doesn't exist!")
-        );
+        // The endpoint should return a Response with the correct status and specified cause.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
                 .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
+                        "Paragraph " + nonExistentParagraphId + " doesn't exist!", response.body().getString("message")
                 );
-        Assertions.assertEquals(expectedResponse.status(), response.status());
     }
 
     @Test

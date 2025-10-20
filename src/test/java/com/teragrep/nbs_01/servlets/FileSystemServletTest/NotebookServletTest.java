@@ -43,10 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.servlets;
+package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import jakarta.json.Json;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
@@ -58,7 +59,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class FileSystemServletTest extends AbstractNotebookServerTest {
+public class NotebookServletTest extends AbstractNotebookServerTest {
 
     private final String directoryName = "my_folder_2A94M5J1D";
     private final Path directoryPath = Paths.get(directoryName);
@@ -66,7 +67,7 @@ public class FileSystemServletTest extends AbstractNotebookServerTest {
     private final String notebookName = "my_note2_2A94M5J2Z.zpln";
     private final Path notebookPath = Paths.get(directoryPath.toString(), notebookName);
 
-    public FileSystemServletTest() {
+    public NotebookServletTest() {
     }
 
     @Test

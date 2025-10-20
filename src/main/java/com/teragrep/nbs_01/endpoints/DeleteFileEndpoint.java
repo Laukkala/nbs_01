@@ -55,6 +55,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Objects;
@@ -82,6 +83,11 @@ public final class DeleteFileEndpoint implements EndPoint {
             }
             return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
         }
+        // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
+        catch (NoSuchFileException noSuchFileException) {
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, "No such file: " + request.path());
+        }
+        // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }

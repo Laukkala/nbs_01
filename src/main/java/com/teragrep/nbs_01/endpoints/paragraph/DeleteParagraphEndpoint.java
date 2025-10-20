@@ -53,8 +53,6 @@ import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -82,11 +80,6 @@ public final class DeleteParagraphEndpoint implements EndPoint {
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
 
-            JsonObject parameters = Json
-                    .createObjectBuilder(request.parameters())
-                    .add("paragraphId", paragraphId)
-                    .build();
-
             List<Path> currentFiles = root.list();
             Path path = root.path().resolve(notebookPath);
             if (!currentFiles.contains(path)) {
@@ -100,7 +93,7 @@ public final class DeleteParagraphEndpoint implements EndPoint {
                 return new JsonResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
             }
             else {
-                throw new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!");
+                return new JsonResponse(HttpStatus.NOT_FOUND_404, "Paragraph " + paragraphId + " doesn't exist!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
