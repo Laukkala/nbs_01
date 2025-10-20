@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -86,9 +87,33 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newDirectoryPath)));
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /directory/{path/to/existing/directory} endpoint results in an error.
+    public void httpCreateDirectoryToExistingPathTest() {
+
+        Path existingDirectoryPath = Paths.get(directoryName);
+        String requestBody = Json.createObjectBuilder().build().toString();
+
+        // Assert that the existing directory path already has a saved file.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(existingDirectoryPath)));
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/directory/" + existingDirectoryPath, requestBody
+                        )
+                );
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions
+                .assertEquals(
+                        "Path at " + existingDirectoryPath + " is already in use!", response.body().getString("message")
+                );
     }
 
     @Test

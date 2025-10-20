@@ -76,7 +76,7 @@ public final class CreateDirectoryEndpoint implements EndPoint {
             Path path = root.path().resolve(request.path());
 
             if (currentFiles.contains(path)) {
-                throw new FileAlreadyExistsException("Path at " + path + " is already in use!");
+                throw new FileAlreadyExistsException("Path at " + request.path() + " is already in use!");
             }
             Directory newDirectory = new Directory(path);
             newDirectory.save();
@@ -86,7 +86,7 @@ public final class CreateDirectoryEndpoint implements EndPoint {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
