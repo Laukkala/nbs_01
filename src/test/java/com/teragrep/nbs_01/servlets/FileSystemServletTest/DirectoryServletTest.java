@@ -102,9 +102,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
-                .assertEquals(
-                        "Path at " + directoryPath + " is already in use!", response.body().getString("message")
-                );
+                .assertEquals("Path at " + directoryPath + " is already in use!", response.body().getString("message"));
     }
 
     @Test
@@ -112,7 +110,11 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
     public void httpCopyDirectoryTest() {
         Path directoryPath = Paths.get("testCopyFolderName/");
         Path sourceDirectoryPath = directory1();
-        String requestBody = Json.createObjectBuilder().add("sourcePath", sourceDirectoryPath.toString()).build().toString();
+        String requestBody = Json
+                .createObjectBuilder()
+                .add("sourcePath", sourceDirectoryPath.toString())
+                .build()
+                .toString();
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
@@ -129,7 +131,6 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         // Assert that the original file still exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
     }
-
 
     @Test
     // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint with a path to a nonexistent source directory results in an error.
@@ -158,11 +159,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
     // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint where something already exists in the path results in an error.
     public void httpCopyDirectoryToExistingPathTest() {
         Path directoryPath = directory1();
-        String requestBody = Json
-                .createObjectBuilder()
-                .add("sourcePath", directory2().toString())
-                .build()
-                .toString();
+        String requestBody = Json.createObjectBuilder().add("sourcePath", directory2().toString()).build().toString();
 
         // Assert that there is a file in the path where we plan to copy our directory to.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
@@ -264,10 +261,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         // Assert that the file does not exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
         Response response = Assertions
-                .assertDoesNotThrow(
-                        () -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath)
-                );
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404,response.status());
+                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
     }
 
     @Test
