@@ -69,14 +69,13 @@ public class AbstractNotebookServerTest {
     private final String serverAddress = "localhost:" + serverPort;
     private final Path notebookResources = Paths.get("src/test/resources");
     private final Path notebookDirectory = Paths.get("target/notebooks");
-    private final Path notebook1 = Paths
-            .get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
-    private final Path notebook2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_note2_2A94M5J2Z.zpln");
-    private final Path notebook3 = Paths.get("target/notebooks/my_note3_2A94M5J3Z.zpln");
-    private final Path notebook4 = Paths.get("target/notebooks/my_note4_2A94M5J4Z.zpln");
-    private final Path directory1 = Paths.get("target/notebooks/my_folder_2A94M5J1D");
-    private final Path directory2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
-    private final Path junkfile = Paths.get("target/notebooks/junkfile");
+    private final Path notebook1 = Paths.get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
+    private final Path notebook2 = Paths.get("my_folder_2A94M5J1D/my_note2_2A94M5J2Z.zpln");
+    private final Path notebook3 = Paths.get("my_note3_2A94M5J3Z.zpln");
+    private final Path notebook4 = Paths.get("my_note4_2A94M5J4Z.zpln");
+    private final Path directory1 = Paths.get("my_folder_2A94M5J1D");
+    private final Path directory2 = Paths.get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
+    private final Path junkfile = Paths.get("junkfile");
 
     private final Configuration testConfiguration = new Configuration(notebookDirectory, serverPort);
     private final NotebookServer server = new NotebookServer(testConfiguration);

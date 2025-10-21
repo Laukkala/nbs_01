@@ -57,6 +57,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,6 +77,10 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         try {
             JsonObject parameters = request.parameters();
             Path path = root.path().resolve(request.path());
+
+            if (Files.isDirectory(path)) {
+                return new JsonResponse(HttpStatus.BAD_REQUEST_400, request.path() + " is not a Notebook!");
+            }
 
             if (!parameters.containsKey("title")) {
                 throw new MalformedRequestException("Request does not contain a title!");

@@ -80,7 +80,7 @@ public final class CreateNotebookEndpoint implements EndPoint {
             String title = parameters.containsKey("title") ? parameters.getString("title") : "";
             Path path = root.path().resolve(request.path());
             if (currentFiles.contains(path)) {
-                throw new FileAlreadyExistsException("Path at " + path + " is already in use!");
+                throw new FileAlreadyExistsException("Path at " + request.path() + " is already in use!");
             }
 
             Notebook newFile = new Notebook(title, path);
@@ -91,7 +91,7 @@ public final class CreateNotebookEndpoint implements EndPoint {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
