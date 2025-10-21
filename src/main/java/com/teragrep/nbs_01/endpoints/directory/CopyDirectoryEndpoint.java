@@ -98,16 +98,16 @@ public final class CopyDirectoryEndpoint implements EndPoint {
 
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException.getMessage());
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException.getMessage());
         }
     }
 
