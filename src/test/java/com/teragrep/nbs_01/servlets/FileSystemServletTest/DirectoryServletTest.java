@@ -171,8 +171,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        String expectedJson = "Path at " + directoryPath + " is already in use!";
-        Assertions.assertEquals(response.body().getString("message"), expectedJson);
+        String expectedJson = "Destination " + directoryPath + " is already in use!";
+        Assertions.assertEquals(expectedJson, response.body().getString("message"));
     }
 
     @Test

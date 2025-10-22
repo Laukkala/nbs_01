@@ -80,11 +80,11 @@ public final class CopyNotebookEndpoint implements EndPoint {
             List<Path> currentFiles = root.list();
 
             if (currentFiles.contains(destinationPath)) {
-                throw new MalformedRequestException("File at " + destinationPath + " already exists !");
+                throw new FileAlreadyExistsException("File at " + request.path() + " already exists!");
             }
 
             if (!currentFiles.contains(sourcePath)) {
-                throw new MalformedRequestException("No such file:" + sourcePath + " !");
+                throw new FileNotFoundException("No such file:" + parameters.getString("sourcePath") + "!");
             }
             Notebook source = new Notebook(sourcePath).load();
             Notebook copy = source.copy(destinationPath);
@@ -92,16 +92,16 @@ public final class CopyNotebookEndpoint implements EndPoint {
             return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + copy.path());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException.getMessage());
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
         }
         catch (IOException ioException) {
             return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException.getMessage());
         }
     }
 

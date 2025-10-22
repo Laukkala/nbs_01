@@ -172,7 +172,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions
-                .assertEquals("Path at " + newNotebookPath + " is already in use!", response.body().getString("message"));
+                .assertEquals("File at " + newNotebookPath + " already exists!", response.body().getString("message"));
         // Assert that the original file still exists
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
     }
@@ -197,7 +197,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
-                .assertEquals("Path at " + newNotebookPath + " is already in use!", response.body().getString("message"));
+                .assertEquals("File at " + newNotebookPath + " already exists!", response.body().getString("message"));
         // Assert that the original file still exists
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
     }

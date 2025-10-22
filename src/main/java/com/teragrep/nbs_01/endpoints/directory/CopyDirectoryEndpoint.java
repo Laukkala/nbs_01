@@ -85,10 +85,10 @@ public final class CopyDirectoryEndpoint implements EndPoint {
             Path destinationPath = root.path().resolve(request.path());
 
             if (!currentFiles.contains(sourcePath)) {
-                throw new MalformedRequestException("No such directory: " + sourcePath + " !");
+                throw new FileNotFoundException("No such directory: " + request.path() + " !");
             }
             if (currentFiles.contains(destinationPath)) {
-                throw new MalformedRequestException("Destination " + sourcePath + " is already in use !");
+                throw new FileAlreadyExistsException("Destination " + request.path() + " is already in use!");
             }
 
             Directory source = new Directory(sourcePath).load();

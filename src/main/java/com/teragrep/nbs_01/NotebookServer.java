@@ -46,18 +46,11 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.endpoints.*;
-//import com.teragrep.nbs_01.endpoints.directory.CopyDirectoryEndpoint;
-//import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
-//import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
+import com.teragrep.nbs_01.endpoints.directory.CopyDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
-//import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
-//import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
-//import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
-//import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
-//import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
 import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
@@ -103,7 +96,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet notebookServlet = new FileSystemServlet(
                     new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
-                    new CreateNotebookEndpoint(root), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteNotebookEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
@@ -115,7 +108,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet directoryServlet = new FileSystemServlet(
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
-                    new CreateDirectoryEndpoint(root), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteDirectoryEndpoint(root) // Endpoint to call on a DELETE Request
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
@@ -126,7 +119,8 @@ public class NotebookServer implements Callable {
             FileSystemServlet paragraphServlet = new FileSystemServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
-                    new CreateParagraphEndpoint(root), // Endpoint to call on a PUT Request
+                    new CreateParagraphEndpoint(root),
+                    //new DelegatingEndpoint(new CreateParagraphEndpoint(root),new CopyParagraphEndpoint(root),new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteParagraphEndpoint(root) // Endpoint to call on a DELETE Request
             );
             paragraphContextHandler.addServlet(paragraphServlet, "/");

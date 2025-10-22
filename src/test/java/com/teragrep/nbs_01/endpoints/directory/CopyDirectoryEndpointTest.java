@@ -95,7 +95,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
 
         // Assert that the file was not created.
         Assertions.assertFalse(Files.exists(copiedDirectoryPath));

@@ -48,7 +48,6 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
@@ -57,8 +56,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -112,16 +109,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.NOT_FOUND_404,
-                new FileNotFoundException("Path at " + existingPath + " is already in use")
-        );
-        Assertions
-                .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
-                );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the file was not created.
         Assertions.assertFalse(Files.exists(newNotebookPath));
     }
@@ -137,16 +125,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.BAD_REQUEST_400,
-                new FileAlreadyExistsException("Path at " + existingPath + " is already in use")
-        );
-        Assertions
-                .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
-                );
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
     @Test
