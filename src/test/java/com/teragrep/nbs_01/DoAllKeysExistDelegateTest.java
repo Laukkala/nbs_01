@@ -53,17 +53,31 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.ArrayList;
+import java.util.List;
 
-class DoesKeyExistDelegateTest {
+class DoAllKeysExistDelegateTest {
 
-    private final String testKey = "test";
+    private final String testKey1 = "testKey1";
+
+    private final String testKey2 = "testKey2";
+    private final String testKey3 = "testKey3";
 
     @Test
-    public void resolvePresentKey() {
+    public void resolvePresentKeys() {
         Assertions.assertDoesNotThrow(() -> {
-            DoesKeyExistDelegate delegate = new DoesKeyExistDelegate(testKey);
-            JsonObject body = Json.createObjectBuilder().add(testKey, "testValue").build();
+            List<String> testKeys = new ArrayList<>();
+            testKeys.add(testKey1);
+            testKeys.add(testKey2);
+            testKeys.add(testKey3);
+            DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
+
+            JsonObject body = Json
+                    .createObjectBuilder()
+                    .add(testKey1, "testValue1")
+                    .add(testKey2, "testValue2")
+                    .add(testKey3, "testValue3")
+                    .build();
             Request testRequest = new JsonRequest(body.toString());
             Assertions.assertTrue(delegate.resolve(testRequest));
         });
@@ -72,15 +86,34 @@ class DoesKeyExistDelegateTest {
     @Test
     public void resolveMissingKey() {
         Assertions.assertDoesNotThrow(() -> {
-            DoesKeyExistDelegate delegate = new DoesKeyExistDelegate(testKey);
-            JsonObject body = Json.createObjectBuilder().add("some other key", "testValue").build();
+            List<String> testKeys = new ArrayList<>();
+            testKeys.add(testKey1);
+            testKeys.add(testKey2);
+            testKeys.add(testKey3);
+            DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
+            JsonObject body = Json
+                    .createObjectBuilder()
+                    .add(testKey1, "testValue1")
+                    .add(testKey2, "testValue2")
+                    .build();
             Request testRequest = new JsonRequest(body.toString());
             Assertions.assertFalse(delegate.resolve(testRequest));
         });
     }
 
     @Test
+    public void resolveEmptyKeys() {
+        Assertions.assertDoesNotThrow(() -> {
+            List<String> testKeys = new ArrayList<>();
+            DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
+            JsonObject body = Json.createObjectBuilder().add(testKey1, "testValue1").build();
+            Request testRequest = new JsonRequest(body.toString());
+            Assertions.assertTrue(delegate.resolve(testRequest));
+        });
+    }
+
+    @Test
     public void testContract() {
-        EqualsVerifier.forClass(DoesKeyExistDelegate.class).verify();
+        EqualsVerifier.forClass(DoAllKeysExistDelegate.class).verify();
     }
 }

@@ -96,7 +96,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet notebookServlet = new FileSystemServlet(
                     new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoAllKeysExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteNotebookEndpoint(root) // Endpoint to call on a DELETE Request
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
@@ -108,7 +108,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet directoryServlet = new FileSystemServlet(
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoAllKeysExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteDirectoryEndpoint(root) // Endpoint to call on a DELETE Request
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
@@ -120,7 +120,7 @@ public class NotebookServer implements Callable {
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
                     new CreateParagraphEndpoint(root),
-                    //new DelegatingEndpoint(new CreateParagraphEndpoint(root),new CopyParagraphEndpoint(root),new DoesKeyExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
+                    //new DelegatingEndpoint(new CreateParagraphEndpoint(root),new CopyParagraphEndpoint(root),new DoAllKeysExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
                     new DeleteParagraphEndpoint(root) // Endpoint to call on a DELETE Request
             );
             paragraphContextHandler.addServlet(paragraphServlet, "/");

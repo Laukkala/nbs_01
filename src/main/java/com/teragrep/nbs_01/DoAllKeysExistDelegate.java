@@ -47,20 +47,33 @@ package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.requests.Request;
+import jakarta.json.JsonObject;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 // Delegate that checks if a key is present in a Request, and returns either true or false based on the keys existence.
-public final class DoesKeyExistDelegate implements Delegate {
+public final class DoAllKeysExistDelegate implements Delegate {
 
-    private final String key;
+    private final List<String> keys;
 
-    DoesKeyExistDelegate(String key) {
-        this.key = key;
+    DoAllKeysExistDelegate(String key) {
+        this.keys = Arrays.asList(key);
+    }
+
+    DoAllKeysExistDelegate(List<String> keys) {
+        this.keys = keys;
     }
 
     public boolean resolve(Request request) throws MalformedRequestException {
-        return request.parameters().containsKey(key);
+        JsonObject parameters = request.parameters();
+        for (String key : keys) {
+            if (!parameters.containsKey(key)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -71,12 +84,12 @@ public final class DoesKeyExistDelegate implements Delegate {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DoesKeyExistDelegate delegate = (DoesKeyExistDelegate) o;
-        return Objects.equals(key, delegate.key);
+        DoAllKeysExistDelegate delegate = (DoAllKeysExistDelegate) o;
+        return Objects.equals(keys, delegate.keys);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key);
+        return Objects.hash(keys);
     }
 }
