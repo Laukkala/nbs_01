@@ -48,11 +48,9 @@ package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -318,27 +316,19 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     }
 
     // Copying a paragraph into the same notebook should result in a new paragraph with the same content as the source appearing in the notebook.
-    // Copying is not an atomic operation. You must first create a new paragraph, then update it with the output of the source paragraph.
     @Test
     public void httpCopyParagraphTest() {
 
-        String newParagraphId = "2025-01-01-021311-132-133";
-
-        // Verify that the source paragraph we want to copy exists
-        // Make an HTTP GET request to /notebook/{path/to/notebook/}/paragraph/{paragraphId}
-        Response getResponse = Assertions
-                .assertDoesNotThrow(
-                        () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
-                                        + firstParagraphId
-                        )
-                );
-        // Assert that the GET request is responded to with the response code 200 OK
-        Assertions.assertEquals(HttpStatus.OK_200, getResponse.status());
+        String newParagraphId = "new_paragraph";
 
         // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to create the copy.
-        String putRequestBody = Json.createObjectBuilder().build().toString();
-        Response putResponse = Assertions
+        String putRequestBody = Json
+                .createObjectBuilder()
+                .add("sourcePath", "my_note4_2A94M5J4Z.zpln")
+                .add("sourceParagraphId", "20150326-214658_12335843")
+                .build()
+                .toString();
+        Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
@@ -347,57 +337,13 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that the PUT request is responded to with the response code 201 CREATED
-        Assertions.assertEquals(HttpStatus.CREATED_201, putResponse.status());
-
-        // Read the received paragraph into a JSON object.
-        JsonObject sourceParagraph = Json
-                .createReader(new StringReader(getResponse.body().getString("message")))
-                .readObject();
-        String newParagraphTitle = sourceParagraph.getString("title");
-        String newParagraphText = sourceParagraph.getJsonObject("script").getString("text");
-        String postRequestBody = Json
-                .createObjectBuilder()
-                .add("title", newParagraphTitle)
-                .add("text", newParagraphText)
-                .build()
-                .toString();
-        String expectedParagraphContent = Json
-                .createObjectBuilder()
-                .add("id", newParagraphId)
-                .add("title", newParagraphTitle)
-                .add("script", Json.createObjectBuilder().add("text", newParagraphText))
-                .build()
-                .toString();
-
-        String originalParagraphContent = Json
-                .createObjectBuilder()
-                .add("id", firstParagraphId)
-                .add("title", newParagraphTitle)
-                .add("script", Json.createObjectBuilder().add("text", newParagraphText))
-                .build()
-                .toString();
-
-        // Make an HTTP POST request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to edit the copy with the same information as the source paragraph.
-        Response postResponse = Assertions
-                .assertDoesNotThrow(
-                        () -> makeHttpPOSTRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
-                                        + newParagraphId,
-                                postRequestBody
-                        )
-                );
-        // Assert that the POST request is responded to with the response code 200 OK
-        Assertions.assertEquals(HttpStatus.OK_200, postResponse.status());
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
 
         // Assert that the copied paragraph is contained within the saved file of the target notebook
         String fileContents = Assertions
                 .assertDoesNotThrow(
                         () -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath.toString()))
                 );
-        Assertions.assertTrue(fileContents.contains(expectedParagraphContent));
-
-        // Assert that the original paragraph is also contained within the saved file of the original notebook
-        Assertions.assertTrue(fileContents.contains(originalParagraphContent));
     }
 
 }

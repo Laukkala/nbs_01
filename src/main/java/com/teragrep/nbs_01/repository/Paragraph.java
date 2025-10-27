@@ -112,7 +112,12 @@ public final class Paragraph {
     }
 
     public Paragraph copy() {
-        Paragraph copy = new Paragraph(UUID.randomUUID().toString(), title, new Script(script().text()));
+        String copyId = UUID.randomUUID().toString();
+        return copy(copyId);
+    }
+
+    public Paragraph copy(String copyId) {
+        Paragraph copy = new Paragraph(copyId, title, new Script(script().text()));
         return copy;
     }
 

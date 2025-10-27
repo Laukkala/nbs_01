@@ -51,10 +51,7 @@ import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
-import com.teragrep.nbs_01.endpoints.paragraph.CreateParagraphEndpoint;
-import com.teragrep.nbs_01.endpoints.paragraph.DeleteParagraphEndpoint;
-import com.teragrep.nbs_01.endpoints.paragraph.FindParagraphEndPoint;
-import com.teragrep.nbs_01.endpoints.paragraph.UpdateParagraphEndpoint;
+import com.teragrep.nbs_01.endpoints.paragraph.*;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import com.teragrep.nbs_01.servlets.HttpServlet;
@@ -67,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 // A thread that registers all endpoints users can connect to and starts the Jetty server.
@@ -119,8 +117,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet paragraphServlet = new FileSystemServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
-                    new CreateParagraphEndpoint(root),
-                    //new DelegatingEndpoint(new CreateParagraphEndpoint(root),new CopyParagraphEndpoint(root),new DoAllKeysExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyParagraphEndpoint(root), new CreateParagraphEndpoint(root), new DoAllKeysExistDelegate(Arrays.asList("sourcePath", "sourceParagraph"))), // Endpoint to call on a PUT Request
                     new DeleteParagraphEndpoint(root) // Endpoint to call on a DELETE Request
             );
             paragraphContextHandler.addServlet(paragraphServlet, "/");
