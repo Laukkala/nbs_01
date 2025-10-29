@@ -53,14 +53,14 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-class ExceptionResponseTest {
+class ErrorResponseTest {
 
-    private final String throwable1message = "No such notebook!";
+    private final String throwable1message = "Failed to open notebook!";
     private final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
 
-    // An ExceptionResponse should generate an EventId on creation, and provide the message of the Exception, but no stack traces.
+    // An ErrorResponse should generate an EventId on creation, and provide a prompt to check technical logs with the matching ID for details.
     @Test
     void testBodyGeneration() {
         Throwable throwable4 = new FileNotFoundException(throwable4message);
@@ -68,12 +68,13 @@ class ExceptionResponseTest {
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        ExceptionResponse response = new ExceptionResponse(400, throwable1);
+        ErrorResponse response = new ErrorResponse(500, throwable1);
         JsonObject expectedBody = Json
                 .createObjectBuilder()
                 .add(
                         "message",
-                        throwable1message
+                        "An error occurred while processing your Request. See event id " + response.eventId()
+                                + " in the technical log for details."
                 )
                 .build();
         Assertions.assertTrue(response.exception().equals(throwable1));
