@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -93,7 +94,7 @@ public final class FindParagraphEndPoint implements EndPoint {
             }
             Notebook notebook = new Notebook(notebookPath).load();
             if (notebook.paragraphs().containsKey(paragraphId)) {
-                return new JsonResponse(HttpStatus.OK_200, notebook.paragraphs().get(paragraphId).json().toString());
+                return new JsonResponse(HttpStatus.OK_200, notebook.paragraphs().get(paragraphId).json());
             }
             else {
                 throw new MalformedRequestException("Paragraph not found!");
@@ -103,7 +104,7 @@ public final class FindParagraphEndPoint implements EndPoint {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);

@@ -47,9 +47,10 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -71,13 +72,16 @@ public final class ListEndPoint implements EndPoint {
         try {
             List<Path> currentFiles = root.list();
             StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (Path file : currentFiles) {
                 sb.append(file.getFileName());
+                arrayBuilder.add(file.getFileName().toString());
             }
-            return new JsonResponse(HttpStatus.OK_200, sb.toString());
+            JsonArray array = arrayBuilder.build();
+            return new JsonResponse(HttpStatus.OK_200, array);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 

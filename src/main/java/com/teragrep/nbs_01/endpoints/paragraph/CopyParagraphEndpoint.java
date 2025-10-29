@@ -51,6 +51,7 @@ import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -114,24 +115,26 @@ public final class CopyParagraphEndpoint implements EndPoint {
             }
             destinationParagraphs.put(copyParagraph.id(), copyParagraph);
 
-            new Notebook(destinationNotebook.title(), destinationNotebook.path(), destinationParagraphs).save();
-
-            return new JsonResponse(
-                    HttpStatus.CREATED_201,
-                    "Created new paragraph within notebook " + destinationNotebook.path()
+            Notebook editedNotebook = new Notebook(
+                    destinationNotebook.title(),
+                    destinationNotebook.path(),
+                    destinationParagraphs
             );
+            editedNotebook.save();
+
+            return new JsonResponse(HttpStatus.CREATED_201, copyParagraph.json());
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException.getMessage());
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException.getMessage());
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
     }
 

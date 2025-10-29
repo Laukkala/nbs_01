@@ -48,6 +48,8 @@ package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -78,8 +80,17 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we receive the proper response.
+
+        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", directoryPath.toString())
+                .add("children", expectedChildren)
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
+
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new directory "));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
     }
@@ -101,8 +112,11 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals("Path at " + directoryPath + " is already in use!", response.body().getString("message"));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Path at " + directoryPath + " is already in use!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -125,7 +139,15 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions.assertTrue((response.body().getString("message").contains("Created new directory ")));
+        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
+        expectedChildren.add(directory2().getFileName().toString());
+        expectedChildren.add(notebook2().getFileName().toString());
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", directoryPath.toString())
+                .add("children", expectedChildren)
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         // Assert that the original file still exists.
@@ -171,8 +193,11 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        String expectedJson = "Destination " + directoryPath + " is already in use!";
-        Assertions.assertEquals(expectedJson, response.body().getString("message"));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Destination " + directoryPath + " is already in use!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -237,21 +262,32 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + directoryPath, "{}")
                 );
-        Assertions.assertEquals(directoryPath + " is not a directory!", response.body().getString("message"));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", directoryPath + " is not a directory!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
     // Assert that a HTTP GET request to /directory/{path/to/directory} endpoint results in a response with the expected contents
     public void httpFindDirectoryTest() {
         Path directoryPath = directory1();
-        String expectedJson = "{\"name\":\"my_folder_2A94M5J1D\",\"children\":\"[" + directory2().getFileName() + ", "
-                + notebook2().getFileName() + "]\"}";
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
-        Assertions.assertEquals(expectedJson, response.body().toString());
+
+        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
+        expectedChildren.add(directory2().getFileName().toString());
+        expectedChildren.add(notebook2().getFileName().toString());
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", directoryPath.toString())
+                .add("children", expectedChildren)
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -276,9 +312,10 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals(
-                        "File at path " + directoryPath + " is not a directory!", response.body().getString("message")
-                );
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "File at path " + directoryPath + " is not a directory!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 }

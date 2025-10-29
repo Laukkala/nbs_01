@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -80,16 +81,16 @@ public final class CreateDirectoryEndpoint implements EndPoint {
             }
             Directory newDirectory = new Directory(path);
             newDirectory.save();
-            return new JsonResponse(HttpStatus.CREATED_201, "Created new directory " + newDirectory.path());
+            return new JsonResponse(HttpStatus.CREATED_201, newDirectory.json());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 

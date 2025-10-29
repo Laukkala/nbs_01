@@ -48,13 +48,13 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,8 +93,16 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("id", paragraphId)
+                .add("title", "")
+                .add("script", Json.createObjectBuilder().add("text", "").build())
+                .build();
+
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new paragraph"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookPath));
         Assertions
@@ -120,18 +128,15 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
         JsonRequest request = new JsonRequest("{\"paragraphId\":\"" + paragraphId + "\"}", requestPath);
         Response response = endPoint.createResponse(request);
+
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.NOT_FOUND_404,
-                new FileNotFoundException("Notebook or directory with path " + nonexistentFilePath + " not found!")
-        );
-        Assertions
-                .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
-                );
-        Assertions.assertEquals(expectedResponse.status(), response.status());
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such notebook: " + nonexistentFileName + " !")
+                .build();
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test

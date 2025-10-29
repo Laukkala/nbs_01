@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
@@ -81,7 +82,14 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", newNotebookTitle)
+                .add("config", Json.createObjectBuilder().build())
+                .add("paragraphs", Json.createArrayBuilder())
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
     }
@@ -103,8 +111,11 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals("Path at " + newNotebookPath + " is already in use!", response.body().getString("message"));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Path at " + newNotebookPath + " is already in use!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the original file still exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
     }
@@ -125,7 +136,13 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", "")
+                .add("config", Json.createObjectBuilder().build())
+                .add("paragraphs", Json.createArrayBuilder())
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
     }
@@ -146,8 +163,55 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                                 "{\"sourcePath\":\"" + sourceNotebookPath + "\",\"title\":\"copyNotebook\"}"
                         )
                 );
-        // Assert that we receive the proper response.
-        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook "));
+        // Assert that the response contains all paragraphs thet were present in the source notebook
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                )
+                );
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}"
+                                )
+                );
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test \\nselect age, count(1) value\\nfrom bank \\nwhere age < 30 \\ngroup by age \\norder by age\"}"
+                                )
+                );
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test \\nselect age, count(1) value \\nfrom bank \\nwhere marital=\\\"${marital=single,single|divorced|married}\\\" \\ngroup by age \\norder by age\"}"
+                                )
+                );
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                )
+                );
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}"
+                                )
+                );
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
         // Assert that the original file also exists
@@ -171,8 +235,11 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions
-                .assertEquals("File at " + newNotebookPath + " already exists!", response.body().getString("message"));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "File at " + newNotebookPath + " already exists!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the original file still exists
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
     }
@@ -196,8 +263,11 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals("File at " + newNotebookPath + " already exists!", response.body().getString("message"));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "File at " + newNotebookPath + " already exists!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the original file still exists
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
     }
@@ -239,7 +309,11 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryPath, "{}")
                 );
-        Assertions.assertEquals(directoryPath + " is not a Notebook!", response.body().getString("message"));
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", directoryPath + " is not a Notebook!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
@@ -272,7 +346,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + notebookPath));
-        Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
+        Assertions.assertEquals(expectedFileContent, response.body().strip().toString());
     }
 
     @Test
@@ -284,10 +358,11 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + directoryPath));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals(
-                        "File at path " + directoryPath + " is not a notebook!", response.body().getString("message")
-                );
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "File at path " + directoryPath + " is not a notebook!")
+                .build();
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -307,7 +382,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         // Assert that the file content is the same as in the resource files before edits.
         String title = "editedTitle";
         String originalFileContent = "{  \"paragraphs\": [    {      \"text\": \"%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!\",      \"config\": {        \"colWidth\": 12.0,        \"graph\": {          \"mode\": \"table\",          \"height\": 300.0,          \"optionOpen\": false,          \"keys\": [],          \"values\": [],          \"groups\": [],          \"scatter\": {}        },        \"editorHide\": true      },      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1423836268492_216498320\",      \"id\": \"20150213-230428_1231780373\",      \"results\": {        \"code\": \"SUCCESS\",        \"msg\": [          {            \"type\": \"HTML\",            \"data\": \"\\u003ch2\\u003eCongratulations, it\\u0027s done.\\u003c/h2\\u003e\\n\\u003ch5\\u003eYou can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!\\u003c/h5\\u003e\\n\"          }        ]      },      \"dateCreated\": \"Feb 13, 2015 11:04:28 PM\",      \"dateStarted\": \"Apr 1, 2015 9:12:18 PM\",      \"dateFinished\": \"Apr 1, 2015 9:12:18 PM\",      \"status\": \"FINISHED\",      \"progressUpdateIntervalMs\": 500    },    {      \"text\": \"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\",      \"config\": {        \"colWidth\": 12.0,        \"graph\": {          \"mode\": \"table\",          \"height\": 300.0,          \"optionOpen\": false,          \"keys\": [],          \"values\": [],          \"groups\": [],          \"scatter\": {}        },        \"editorHide\": true      },      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1427420818407_872443482\",      \"id\": \"20150326-214658_12335843\",      \"results\": {        \"code\": \"SUCCESS\",        \"msg\": [          {            \"type\": \"HTML\",            \"data\": \"\\u003cp\\u003eAbout bank data\\u003c/p\\u003e\\n\\u003cpre\\u003e\\u003ccode\\u003eCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n\\u003c/code\\u003e\\u003c/pre\\u003e\\n\"          }        ]      },      \"dateCreated\": \"Mar 26, 2015 9:46:58 PM\",      \"dateStarted\": \"Jul 3, 2015 1:44:56 PM\",      \"dateFinished\": \"Jul 3, 2015 1:44:56 PM\",      \"status\": \"FINISHED\",      \"progressUpdateIntervalMs\": 500    },    {      \"config\": {},      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1435955447812_-158639899\",      \"id\": \"20150703-133047_853701097\",      \"dateCreated\": \"Jul 3, 2015 1:30:47 PM\",      \"status\": \"READY\",      \"progressUpdateIntervalMs\": 500    }  ],  \"id\": \"2A94M5J2Z\",  \"name\": \"my_note2\",  \"angularObjects\": {},  \"config\": {    \"looknfeel\": \"default\"  },  \"info\": {}}";
-        String expectedFileContent = "{\"name\":\"editedTitle\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+        String expectedFileContent = "{\"name\":\"" + title
+                + "\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         Path notebookPath = notebook2();
         Assertions
@@ -324,7 +400,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
-        Assertions.assertTrue(response.body().getString("message").strip().contains("Notebook edited successfully"));
+        Assertions.assertTrue(response.body().contains(title));
         // Assert that the file content has the edited paragraph saved to file in the correct place.
         Assertions
                 .assertEquals(

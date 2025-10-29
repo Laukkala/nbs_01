@@ -50,9 +50,11 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -83,24 +85,24 @@ public final class DeleteParagraphEndpoint implements EndPoint {
             List<Path> currentFiles = root.list();
             Path path = root.path().resolve(notebookPath);
             if (!currentFiles.contains(path)) {
-                throw new FileNotFoundException("No such notebook: " + path + "!");
+                throw new FileNotFoundException("No such notebook: " + notebookPath + "!");
             }
 
             Notebook notebook = new Notebook(path).load();
             if (notebook.paragraphs().containsKey(paragraphId)) {
                 notebook.paragraphs().remove(paragraphId);
                 notebook.save();
-                return new JsonResponse(HttpStatus.NO_CONTENT_204, "Deleted paragraph " + paragraphId);
+                return new JsonResponse(HttpStatus.NO_CONTENT_204, Json.createObjectBuilder().build()); // Need no content response
             }
             else {
-                return new JsonResponse(HttpStatus.NOT_FOUND_404, "Paragraph " + paragraphId + " doesn't exist!");
+                throw new MalformedRequestException("Paragraph " + paragraphId + " doesn't exist!");
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);

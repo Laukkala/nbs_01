@@ -48,13 +48,13 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,30 +85,25 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, notebookPath));
-        Assertions.assertEquals(expectedFileContent, response.body().getString("message").strip().toString());
+        Assertions.assertEquals(expectedFileContent, response.body().strip().toString());
     }
 
     @Test
     public void httpNotebookNotFoundTest() {
         String nonExistentNotebookName = "nonExistentNotebook";
-        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(nonExistentNotebookName)));
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.NOT_FOUND_404,
-                new FileNotFoundException("Notebook or directory with path " + nonExistentNotebookPath + " not found!")
-        );
-        Assertions
-                .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
-                );
-        Assertions.assertEquals(expectedResponse.status(), response.status());
+        // The endpoint should return the correct status and message.
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such file " + nonExistentNotebookName + " !")
+                .build();
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test

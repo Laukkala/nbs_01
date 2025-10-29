@@ -48,13 +48,13 @@ package com.teragrep.nbs_01.endpoints.directory;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,8 +63,8 @@ import java.nio.file.Paths;
 public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
 
     private final Path directoryPath = Paths.get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/");
-    private final String expectedFileContent = "{\"name\":\"my_second_folder_2A94M5J2D\",\"children\":\"["
-            + notebook1().getFileName() + "]\"}";
+    private final String expectedFileContent = "{\"name\":\"my_second_folder_2A94M5J2D\",\"children\":[\""
+            + notebook1().getFileName() + "\"]}";
 
     @BeforeEach
     private void setUp() {
@@ -96,19 +96,12 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, nonExistentPath));
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.NOT_FOUND_404,
-                new FileNotFoundException(
-                        "Notebook or directory with path " + notebookDirectory() + "/" + nonExistentPath + " not found!"
-                )
-        );
-        Assertions
-                .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
-                );
+        // The endpoint should return a response with the correct status and message
+
+        JsonObject expectedResponse = Json.createObjectBuilder().add("message", "No such directory!").build();
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedResponse.toString(), response.body());
     }
 
     @Test

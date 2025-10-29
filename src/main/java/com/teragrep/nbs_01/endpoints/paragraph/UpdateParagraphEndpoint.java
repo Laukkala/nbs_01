@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -84,7 +85,9 @@ public final class UpdateParagraphEndpoint implements EndPoint {
                     .build();
             List<Path> currentFiles = root.list();
             if (!currentFiles.contains(notebookPath)) {
-                throw new FileNotFoundException("Notebook with path " + notebookPath + " not found!");
+                throw new FileNotFoundException(
+                        "Notebook with path " + root.path().relativize(notebookPath) + " not found!"
+                );
             }
             Notebook notebook = new Notebook(notebookPath).load();
 
@@ -93,10 +96,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
             // Find the paragraph to be edited
             if (!paragraphs.containsKey(paragraphId)) {
-                return new ExceptionResponse(
-                        HttpStatus.BAD_REQUEST_400,
-                        new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!")
-                );
+                throw new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!");
             }
             Paragraph originalParagraph = paragraphs.get(paragraphId);
             String scriptText = parameters.containsKey("text") ? parameters
@@ -108,7 +108,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             paragraphs.put(newParagraph.id(), newParagraph);
             Notebook newNotebook = new Notebook(notebook.title(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, "Paragraph edited successfully");
+            return new JsonResponse(HttpStatus.OK_200, newParagraph.json());
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
@@ -117,7 +117,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
 
     }

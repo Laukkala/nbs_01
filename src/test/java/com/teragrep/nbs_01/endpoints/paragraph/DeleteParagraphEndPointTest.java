@@ -49,13 +49,13 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,8 +95,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Deleted paragraph"));
-        // Assert that the file was created.
+        // Assert that the file was changed.
         Assertions.assertTrue(Files.exists(notebookPath));
         Assertions
                 .assertEquals(
@@ -112,7 +111,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a request to DeleteParagraphEndpoint with an invalid paragraphId results in an error.
     public void httpDeleteNonexistentParagraphTest() {
-        // Assert that the file we are creating doesn't already exist.
+        // Assert that the file we are deleting already exists.
         Assertions.assertTrue(Files.exists(notebookPath));
         String nonExistentParagraphId = "nonExistentParagraphId";
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
@@ -122,12 +121,15 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         JsonRequest request = new JsonRequest("{}", requestPath);
         Response response = endPoint.createResponse(request);
 
-        // The endpoint should return a Response with the correct status and specified cause.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions
-                .assertEquals(
-                        "Paragraph " + nonExistentParagraphId + " doesn't exist!", response.body().getString("message")
-                );
+        // The endpoint should return a Response with the correct status and message.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Paragraph " + nonExistentParagraphId + " doesn't exist!")
+                .build();
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -145,17 +147,13 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
-        Assertions.assertTrue(response.getClass().equals(ExceptionResponse.class));
-        Response expectedResponse = new ExceptionResponse(
-                HttpStatus.NOT_FOUND_404,
-                new FileNotFoundException("Notebook or directory with path " + nonExistentNotebookPath + " not found!")
-        );
-        Assertions
-                .assertEquals(
-                        ((ExceptionResponse) expectedResponse).exception().getCause(),
-                        ((ExceptionResponse) response).exception().getCause()
-                );
-        Assertions.assertEquals(expectedResponse.status(), response.status());
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such notebook: " + nonExistentNotebookName + "!")
+                .build();
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test

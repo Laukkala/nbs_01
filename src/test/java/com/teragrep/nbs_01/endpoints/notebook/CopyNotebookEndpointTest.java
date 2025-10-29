@@ -92,9 +92,25 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
-        // Assert that we receive the proper response.
+        // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                )
+                );
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}"
+                                )
+                );
+        Assertions.assertTrue(response.body().contains("\"script\":{\"text\":\"\"}"));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newNotebookPath));
     }

@@ -78,7 +78,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         ListEndPoint listEndPoint = new ListEndPoint(new FileTree(notebookDirectory()));
         Response response = listEndPoint.createResponse(new JsonRequest("{}"));
         for (String filename : allFileIds) {
-            Assertions.assertTrue(response.body().getString("message").contains(filename));
+            Assertions.assertTrue(response.body().contains(filename));
         }
     }
 
@@ -89,7 +89,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
         Response response = listEndPoint
                 .createResponse(new JsonRequest("{\"directoryPath\":\"" + directory1() + "\"}"));
         for (String filename : allFileIdsWithinDirectory) {
-            Assertions.assertTrue(response.body().getString("message").contains(filename));
+            Assertions.assertTrue(response.body().contains(filename));
         }
     }
 

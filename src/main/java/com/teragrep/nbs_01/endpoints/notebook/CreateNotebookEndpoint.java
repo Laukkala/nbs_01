@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
@@ -82,19 +83,18 @@ public final class CreateNotebookEndpoint implements EndPoint {
             if (currentFiles.contains(path)) {
                 throw new FileAlreadyExistsException("Path at " + request.path() + " is already in use!");
             }
-
             Notebook newFile = new Notebook(title, path);
             newFile.save();
-            return new JsonResponse(HttpStatus.CREATED_201, "Created new notebook " + newFile.path());
+            return new JsonResponse(HttpStatus.CREATED_201, newFile.json());
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException.getMessage());
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);

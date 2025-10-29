@@ -49,6 +49,8 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
@@ -86,8 +88,16 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", "")
+                .add("config", Json.createObjectBuilder().build())
+                .add("paragraphs", Json.createArrayBuilder())
+                .build();
+
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newNotebookPath));
     }
@@ -101,25 +111,6 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, existingNotebookName));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-    }
-
-    @Test
-    // Assert that a request to CreateNotebookEndpoint to a path that already contains a file results in an error
-    public void httpCreateNotebookIntoUnavailableDirectoryPathTest() {
-
-        String parentDirectoryName = "newDirectory_123123";
-        Path notebookName = Paths.get(parentDirectoryName, newNotebookName);
-        Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName.toString());
-        // Assert that the file we are creating already exists.
-        Assertions.assertFalse(Files.exists(notebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"path\":\"" + notebookName + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, notebookName));
-        // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new notebook"));
-        Assertions.assertTrue(Files.exists(notebookPath));
-        Assertions.assertEquals(parentDirectoryName, notebookPath.getParent().getFileName().toString());
     }
 
     @Test

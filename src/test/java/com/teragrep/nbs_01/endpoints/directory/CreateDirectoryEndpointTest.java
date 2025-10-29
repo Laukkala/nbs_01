@@ -49,6 +49,9 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
@@ -86,8 +89,16 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
+
+        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", newDirectoryName)
+                .add("children", expectedChildren)
+                .build();
+
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newDirectoryPath));
     }
@@ -101,9 +112,12 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(existingDirectoryName)));
 
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Path at " + notebookDirectory().relativize(existingDirectoryPath) + " is already in use!").build();
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertEquals("Path at " + notebookDirectory().relativize(existingDirectoryPath) + " is already in use!", response.body().getString("message"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test

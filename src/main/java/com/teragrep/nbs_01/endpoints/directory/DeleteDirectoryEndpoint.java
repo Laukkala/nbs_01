@@ -46,11 +46,14 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.File;
@@ -79,21 +82,24 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
             }
             // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
             if (!Files.isDirectory(path)) {
-                return new JsonResponse(HttpStatus.BAD_REQUEST_400, request.path() + " is not a directory!");
+                throw new MalformedRequestException(request.path() + " is not a directory!");
             }
             else {
                 Stream<Path> files = Files.walk(path);
                 files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             }
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, Json.createObjectBuilder().build());
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "No such file: " + request.path());
+            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, noSuchFileException);
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 

@@ -171,8 +171,8 @@ class DirectoryTest {
         Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
         Assertions
                 .assertEquals(
-                        "{\"name\":\"notebooks\",\"children\":\"[" + notebook3.getFileName() + ", "
-                                + directory1.getFileName() + ", " + notebook4.getFileName() + "]\"}",
+                        "{\"name\":\"notebooks\",\"children\":[\"" + notebook3.getFileName() + "\",\""
+                                + directory1.getFileName() + "\",\"" + notebook4.getFileName() + "\"]}",
                         root.json().toString()
                 );
     }

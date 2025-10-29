@@ -48,27 +48,17 @@ package com.teragrep.nbs_01.responses;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
-// Response object that takes a Throwable and generates a message body based on the causes of the throwable.
+// Response object that takes a Throwable and returns a given response back to the user.
+// Should be used when a Request cannot be fulfilled, but the error is not unrecoverable (such as a malformed request being received)
 public final class ExceptionResponse implements Response {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionResponse.class);
-    private final UUID eventId;
     private final int status;
     private final Throwable throwable;
 
     public ExceptionResponse(int status, Throwable throwable) {
-        this(status, throwable, UUID.randomUUID());
-    }
-
-    public ExceptionResponse(int status, Throwable throwable, UUID eventId) {
         this.status = status;
         this.throwable = throwable;
-        this.eventId = eventId;
     }
 
     public int status() {
@@ -79,21 +69,11 @@ public final class ExceptionResponse implements Response {
         return throwable;
     }
 
-    public UUID eventId() {
-        return eventId;
-    }
-
-    public JsonObject body() {
-        LOGGER.error("Event_" + eventId, throwable);
+    public String body() {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder
-                .add(
-                        "message",
-                        "An error occurred while processing your Request. See event id " + eventId
-                                + " in the technical log for details."
-                );
+        jsonObjectBuilder.add("message", throwable.getMessage());
         JsonObject json = jsonObjectBuilder.build();
-        return json;
+        return json.toString();
     }
 
     public String contentType() {

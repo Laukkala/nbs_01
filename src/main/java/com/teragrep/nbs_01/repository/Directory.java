@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.repository;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
@@ -55,7 +56,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-import java.util.stream.Collectors;
 
 // Represents a single Directory that can contain Filesystem objects.
 // Is identified by a Path, and corresponds to a directory file on the filesystem.
@@ -91,10 +91,15 @@ public final class Directory implements Saveable {
     }
 
     public JsonObject json() {
+        JsonArrayBuilder childArray = Json.createArrayBuilder();
+        for (Saveable child : children().values()) {
+            childArray.add(child.path().getFileName().toString());
+        }
         return Json
                 .createObjectBuilder()
                 .add("name", path.getFileName().toString())
-                .add("children", children.values().stream().map((saveable) -> saveable.path().getFileName()).collect(Collectors.toList()).toString()).build();
+                .add("children", childArray)
+                .build();
     }
 
     public void save() throws IOException {

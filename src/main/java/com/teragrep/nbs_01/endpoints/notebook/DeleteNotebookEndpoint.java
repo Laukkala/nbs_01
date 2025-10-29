@@ -46,13 +46,17 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -73,20 +77,26 @@ public final class DeleteNotebookEndpoint implements EndPoint {
             Path path = root.path().resolve(request.path());
             // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
             if (Files.isDirectory(path)) {
-                return new JsonResponse(HttpStatus.BAD_REQUEST_400, request.path() + " is not a Notebook!");
+                return new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST_400,
+                        new MalformedRequestException(request.path() + " is not a Notebook!")
+                );
             }
             else {
                 Files.delete(path);
             }
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, "");
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, Json.createObjectBuilder().build()); // Need a body less response
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, "No such file: " + request.path());
+            return new ExceptionResponse(
+                    HttpStatus.NOT_FOUND_404,
+                    new FileNotFoundException("No such file: " + request.path())
+            );
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 

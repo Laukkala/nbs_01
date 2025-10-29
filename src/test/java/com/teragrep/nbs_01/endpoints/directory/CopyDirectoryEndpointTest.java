@@ -49,6 +49,9 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
@@ -81,8 +84,15 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
+        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
+        expectedChildren.add(notebook1().getFileName().toString());
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", newDirectoryName.substring(0, newDirectoryName.length() - 1))
+                .add("children", expectedChildren)
+                .build();
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new directory"));
+        Assertions.assertEquals(response.body(), expectedJson.toString());
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(copiedDirectoryPath));
     }

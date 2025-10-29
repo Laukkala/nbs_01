@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.Response;
 import com.teragrep.nbs_01.responses.JsonResponse;
@@ -83,17 +84,17 @@ public final class FindNotebookEndPoint implements EndPoint {
                 throw new MalformedRequestException("File at path " + request.path() + " is not a notebook!");
             }
             Notebook notebook = new Notebook(path).load();
-            return new JsonResponse(HttpStatus.OK_200, notebook.json().toString());
+            return new JsonResponse(HttpStatus.OK_200, notebook.json());
         }
 
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException.getMessage());
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
         catch (IOException ioException) {
-            return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
     }
 

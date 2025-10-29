@@ -95,7 +95,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertTrue(response.body().getString("message").contains("Created new paragraph"));
+        Assertions
+                .assertTrue(
+                        response
+                                .body()
+                                .contains(
+                                        "\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                )
+                );
 
         // Assert that the paragraph content exists in the destination file after the operation is complete.
         JsonObject destinationFileObject = readFileContents(destinationNotebookPath);
@@ -133,8 +140,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such paragraph: " + sourceParagraphId + "!")
+                .build();
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals("No such paragraph: " + sourceParagraphId + "!", response.body().getString("message"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
 
         // Assert that the paragraph content does not exist in the destination file after the operation is complete.
         JsonObject destinationFileObject = readFileContents(destinationNotebookPath);
@@ -160,8 +173,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Request does not contain a source paragraph id")
+                .build();
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals("Request does not contain a source paragraph id", response.body().getString("message"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -183,8 +202,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such file: " + sourceNotebookName + "!")
+                .build();
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals("No such file: " + sourceNotebookName + "!", response.body().getString("message"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -199,8 +224,13 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Request does not contain a source path!")
+                .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals("Request does not contain a source path!", response.body().getString("message"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -228,9 +258,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Paragraph " + destinationParagraphId + " already exists!")
+                .build();
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertTrue(response.body().getString("message").contains("Paragraph " + destinationParagraphId + " already exists!"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     @Test
@@ -253,8 +288,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such file: " + destinationNotebookPath + "!")
+                .build();
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals("No such file: " + destinationNotebookPath + "!", response.body().getString("message"));
+        Assertions.assertEquals(expectedJson.toString(), response.body());
     }
 
     private JsonObject readFileContents(Path filePath) {

@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.endpoints;
 import com.teragrep.nbs_01.requests.Request;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 
 // Endpoint that returns a "pong" response to any request. Can be used as a heartbeat function.
@@ -58,6 +59,6 @@ public final class PingEndpoint implements EndPoint {
     }
 
     public Response createResponse(Request request) {
-        return new JsonResponse(HttpStatus.OK_200, "pong");
+        return new JsonResponse(HttpStatus.OK_200, Json.createObjectBuilder().add("message", "pong").build());
     }
 }
