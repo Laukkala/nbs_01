@@ -51,20 +51,20 @@ import jakarta.json.JsonStructure;
 import org.apache.http.Header;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 // Response object that contains a JsonObject as its body
 public final class JsonResponse implements Response {
 
     private final int status;
     private final JsonStructure body;
-    private final Collection<Header> headers;
+    private final List<Header> headers;
 
     public JsonResponse(int status) {
         this(status, new StubJsonStructure(), new ArrayList<>());
     }
 
-    public JsonResponse(int status, Collection<Header> headers) {
+    public JsonResponse(int status, List<Header> headers) {
         this(status, new StubJsonStructure(), headers);
     }
 
@@ -72,7 +72,7 @@ public final class JsonResponse implements Response {
         this(status, body, new ArrayList<>());
     }
 
-    public JsonResponse(int status, JsonStructure body, Collection<Header> headers) {
+    public JsonResponse(int status, JsonStructure body, List<Header> headers) {
         this.status = status;
         this.body = body;
         this.headers = headers;
@@ -94,7 +94,7 @@ public final class JsonResponse implements Response {
     }
 
     @Override
-    public Collection<Header> headers() {
+    public List<Header> headers() {
         return headers;
     }
 }

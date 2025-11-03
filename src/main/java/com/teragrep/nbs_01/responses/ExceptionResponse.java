@@ -51,7 +51,7 @@ import jakarta.json.JsonObjectBuilder;
 import org.apache.http.Header;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 // Response object that takes a Throwable and returns a given response back to the user.
 // Should be used when a Request cannot be fulfilled, but the error is not unrecoverable (such as a malformed request being received)
@@ -59,13 +59,13 @@ public final class ExceptionResponse implements Response {
 
     private final int status;
     private final Throwable throwable;
-    private final Collection<Header> headers;
+    private final List<Header> headers;
 
     public ExceptionResponse(int status, Throwable throwable) {
         this(status, throwable, new ArrayList<>());
     }
 
-    public ExceptionResponse(int status, Throwable throwable, Collection<Header> headers) {
+    public ExceptionResponse(int status, Throwable throwable, List<Header> headers) {
         this.status = status;
         this.throwable = throwable;
         this.headers = headers;
@@ -87,7 +87,7 @@ public final class ExceptionResponse implements Response {
     }
 
     @Override
-    public Collection<Header> headers() {
+    public List<Header> headers() {
         return headers;
     }
 }

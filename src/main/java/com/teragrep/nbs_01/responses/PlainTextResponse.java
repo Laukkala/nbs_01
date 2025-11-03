@@ -48,20 +48,20 @@ package com.teragrep.nbs_01.responses;
 import org.apache.http.Header;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 // Response object that contains a String
 public final class PlainTextResponse implements Response {
 
     private final int status;
     private final String body;
-    private final Collection<Header> headers;
+    private final List<Header> headers;
 
     public PlainTextResponse(int status, String body) {
         this(status, body, new ArrayList<Header>());
     }
 
-    public PlainTextResponse(int status, String body, Collection<Header> headers) {
+    public PlainTextResponse(int status, String body, List<Header> headers) {
         this.status = status;
         this.body = body;
         this.headers = headers;
@@ -76,7 +76,7 @@ public final class PlainTextResponse implements Response {
     }
 
     @Override
-    public Collection<Header> headers() {
+    public List<Header> headers() {
         return headers;
     }
 }

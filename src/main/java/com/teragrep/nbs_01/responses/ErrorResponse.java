@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 // Response object that represents an unrecoverable server-side error (Such as failure to write a file). Logs a Throwable with an event ID and generates a message body that prompts the user to check technical logs for error details.
@@ -64,13 +64,13 @@ public final class ErrorResponse implements Response {
     private final UUID eventId;
     private final int status;
     private final Throwable throwable;
-    private final Collection<Header> headers;
+    private final List<Header> headers;
 
     public ErrorResponse(int status, Throwable throwable) {
         this(status, throwable, UUID.randomUUID(), new ArrayList<Header>());
     }
 
-    public ErrorResponse(int status, Throwable throwable, Collection<Header> headers) {
+    public ErrorResponse(int status, Throwable throwable, List<Header> headers) {
         this(status, throwable, UUID.randomUUID(), headers);
     }
 
@@ -78,7 +78,7 @@ public final class ErrorResponse implements Response {
         this(status, throwable, eventId, new ArrayList<Header>());
     }
 
-    public ErrorResponse(int status, Throwable throwable, UUID eventId, Collection<Header> headers) {
+    public ErrorResponse(int status, Throwable throwable, UUID eventId, List<Header> headers) {
         this.status = status;
         this.throwable = throwable;
         this.eventId = eventId;
@@ -111,7 +111,7 @@ public final class ErrorResponse implements Response {
     }
 
     @Override
-    public Collection<Header> headers() {
+    public List<Header> headers() {
         return headers;
     }
 
