@@ -96,11 +96,14 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                                )
                                 )
                 );
 
@@ -147,7 +150,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
 
         // Assert that the paragraph content does not exist in the destination file after the operation is complete.
         JsonObject destinationFileObject = readFileContents(destinationNotebookPath);
@@ -180,7 +183,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -209,7 +212,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -230,7 +233,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Request does not contain a source path!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -265,7 +268,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -295,7 +298,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     private JsonObject readFileContents(Path filePath) {

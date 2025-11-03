@@ -96,8 +96,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
                 .createResponse(new JsonRequest("{\"title\":\"" + editedTitle + "\"}", notebookPath));
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        Assertions.assertTrue(response.body().contains(editedTitle));
-        ;
+        Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().contains(editedTitle)));
 
         List<String> updatedLines = Assertions
                 .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
@@ -127,7 +126,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
 
         List<String> lines = Assertions
                 .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));

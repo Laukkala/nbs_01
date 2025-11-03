@@ -43,40 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.responses;
+package com.teragrep.nbs_01.exceptions;
 
-import org.apache.http.Header;
+// Exception to be thrown when  indicating a user error.
+public final class BodyNotFoundException extends Exception {
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-// Response object that contains a String
-public final class PlainTextResponse implements Response {
-
-    private final int status;
-    private final String body;
-    private final Collection<Header> headers;
-
-    public PlainTextResponse(int status, String body) {
-        this(status, body, new ArrayList<Header>());
+    public BodyNotFoundException(String errorMessage) {
+        super(errorMessage);
     }
 
-    public PlainTextResponse(int status, String body, Collection<Header> headers) {
-        this.status = status;
-        this.body = body;
-        this.headers = headers;
+    public BodyNotFoundException(Throwable cause) {
+        super(cause);
     }
 
-    public int status() {
-        return status;
-    }
-
-    public String body() {
-        return body;
-    }
-
-    @Override
-    public Collection<Header> headers() {
-        return headers;
+    public BodyNotFoundException(String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
     }
 }

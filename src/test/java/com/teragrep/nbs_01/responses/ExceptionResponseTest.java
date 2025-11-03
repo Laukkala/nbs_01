@@ -69,13 +69,7 @@ class ExceptionResponseTest {
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
         ExceptionResponse response = new ExceptionResponse(400, throwable1);
-        JsonObject expectedBody = Json
-                .createObjectBuilder()
-                .add(
-                        "message",
-                        throwable1message
-                )
-                .build();
+        JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
         Assertions.assertTrue(response.exception().equals(throwable1));
         Assertions.assertEquals(expectedBody.toString(), response.body());
     }

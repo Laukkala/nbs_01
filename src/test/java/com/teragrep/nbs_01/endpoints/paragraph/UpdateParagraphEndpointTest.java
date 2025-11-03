@@ -129,7 +129,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("script", Json.createObjectBuilder().add("text", editedParagraphText))
                 .build();
 
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file content has the edited paragraph saved to file in the correct place.
         Assertions
                 .assertEquals(
@@ -194,7 +194,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("script", Json.createObjectBuilder().add("text", editedParagraphText))
                 .build();
 
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file content has the edited paragraph saved to file in the correct place.
         Assertions
                 .assertEquals(
@@ -267,7 +267,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 )
                 .build();
 
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file content has the edited paragraph saved to file in the correct place.
         Assertions
                 .assertEquals(
@@ -313,7 +313,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Notebook with path " + nonExistentNotebookName + " not found!")
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -340,7 +340,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Paragraph with Id " + nonexistentParagraphId + " not found!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -361,7 +361,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -378,7 +378,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Request does not contain either a text or a title field!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test

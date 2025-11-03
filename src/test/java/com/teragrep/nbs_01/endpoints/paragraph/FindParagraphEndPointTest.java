@@ -87,7 +87,10 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
-        Assertions.assertEquals(expectedFileContent, response.body().strip().toString());
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions.assertEquals(expectedFileContent, response.body().strip().toString())
+                );
     }
 
     @Test
@@ -103,7 +106,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         // The endpoint should return a Response with the correct status and messagsse.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such notebook !").build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -119,7 +122,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -141,7 +144,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
                 .add("message", "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test

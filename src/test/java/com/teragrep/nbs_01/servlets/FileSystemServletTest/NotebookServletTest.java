@@ -89,7 +89,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .add("config", Json.createObjectBuilder().build())
                 .add("paragraphs", Json.createArrayBuilder())
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
     }
@@ -115,7 +115,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "Path at " + newNotebookPath + " is already in use!")
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the original file still exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
     }
@@ -142,7 +142,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .add("config", Json.createObjectBuilder().build())
                 .add("paragraphs", Json.createArrayBuilder())
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
     }
@@ -165,51 +165,69 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that the response contains all paragraphs thet were present in the source notebook
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                                )
                                 )
                 );
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}"
+                                                )
                                 )
                 );
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test \\nselect age, count(1) value\\nfrom bank \\nwhere age < 30 \\ngroup by age \\norder by age\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test \\nselect age, count(1) value\\nfrom bank \\nwhere age < 30 \\ngroup by age \\norder by age\"}"
+                                                )
                                 )
                 );
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test \\nselect age, count(1) value \\nfrom bank \\nwhere marital=\\\"${marital=single,single|divorced|married}\\\" \\ngroup by age \\norder by age\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test \\nselect age, count(1) value \\nfrom bank \\nwhere marital=\\\"${marital=single,single|divorced|married}\\\" \\ngroup by age \\norder by age\"}"
+                                                )
                                 )
                 );
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                                )
                                 )
                 );
         Assertions
-                .assertTrue(
-                        response
-                                .body()
-                                .contains(
-                                        "\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}"
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}"
+                                                )
                                 )
                 );
         // Assert that the file was created.
@@ -239,7 +257,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "File at " + newNotebookPath + " already exists!")
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the original file still exists
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
     }
@@ -267,7 +285,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "File at " + newNotebookPath + " already exists!")
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the original file still exists
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
     }
@@ -313,7 +331,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", directoryPath + " is not a Notebook!")
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
@@ -346,7 +364,10 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + notebookPath));
-        Assertions.assertEquals(expectedFileContent, response.body().strip().toString());
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions.assertEquals(expectedFileContent, response.body().strip().toString())
+                );
     }
 
     @Test
@@ -362,7 +383,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "File at path " + directoryPath + " is not a notebook!")
                 .build();
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -400,7 +421,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
-        Assertions.assertTrue(response.body().contains(title));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().contains(title)));
         // Assert that the file content has the edited paragraph saved to file in the correct place.
         Assertions
                 .assertEquals(

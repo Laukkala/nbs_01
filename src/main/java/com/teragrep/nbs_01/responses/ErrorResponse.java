@@ -48,9 +48,12 @@ package com.teragrep.nbs_01.responses;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 // Response object that represents an unrecoverable server-side error (Such as failure to write a file). Logs a Throwable with an event ID and generates a message body that prompts the user to check technical logs for error details.
@@ -61,15 +64,25 @@ public final class ErrorResponse implements Response {
     private final UUID eventId;
     private final int status;
     private final Throwable throwable;
+    private final Collection<Header> headers;
 
     public ErrorResponse(int status, Throwable throwable) {
-        this(status, throwable, UUID.randomUUID());
+        this(status, throwable, UUID.randomUUID(), new ArrayList<Header>());
+    }
+
+    public ErrorResponse(int status, Throwable throwable, Collection<Header> headers) {
+        this(status, throwable, UUID.randomUUID(), headers);
     }
 
     public ErrorResponse(int status, Throwable throwable, UUID eventId) {
+        this(status, throwable, eventId, new ArrayList<Header>());
+    }
+
+    public ErrorResponse(int status, Throwable throwable, UUID eventId, Collection<Header> headers) {
         this.status = status;
         this.throwable = throwable;
         this.eventId = eventId;
+        this.headers = headers;
     }
 
     public int status() {
@@ -97,8 +110,9 @@ public final class ErrorResponse implements Response {
         return json.toString();
     }
 
-    public String contentType() {
-        return "application-json";
+    @Override
+    public Collection<Header> headers() {
+        return headers;
     }
 
 }

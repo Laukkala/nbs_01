@@ -85,7 +85,10 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, notebookPath));
-        Assertions.assertEquals(expectedFileContent, response.body().strip().toString());
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions.assertEquals(expectedFileContent, response.body().strip().toString())
+                );
     }
 
     @Test
@@ -103,7 +106,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test

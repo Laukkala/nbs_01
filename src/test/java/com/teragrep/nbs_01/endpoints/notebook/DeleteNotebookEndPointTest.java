@@ -47,10 +47,13 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -85,7 +88,11 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedNotebookName)));
         // Assert that we receive the proper response.
+        Header expectedLocationHeader = new BasicHeader("Location", deletedNotebookName);
         Assertions.assertEquals(204, response.status());
+        Assertions.assertEquals(1, response.headers().size());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
+        Assertions.assertThrows(BodyNotFoundException.class, () -> response.body());
         // Assert that the file was created.
         Assertions.assertFalse(Files.exists(deletedNotebookPath));
     }

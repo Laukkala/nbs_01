@@ -53,7 +53,8 @@ import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.Json;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -61,6 +62,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Objects;
 
 // Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
@@ -85,7 +87,9 @@ public final class DeleteNotebookEndpoint implements EndPoint {
             else {
                 Files.delete(path);
             }
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, Json.createObjectBuilder().build()); // Need a body less response
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, headers);
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {

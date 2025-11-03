@@ -45,28 +45,56 @@
  */
 package com.teragrep.nbs_01.responses;
 
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.requests.StubJsonStructure;
 import jakarta.json.JsonStructure;
+import org.apache.http.Header;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 // Response object that contains a JsonObject as its body
 public final class JsonResponse implements Response {
 
     private final int status;
-    private final JsonStructure json;
+    private final JsonStructure body;
+    private final Collection<Header> headers;
 
-    public JsonResponse(int status, JsonStructure body) {
-        this.status = status;
-        this.json = body;
+    public JsonResponse(int status) {
+        this(status, new StubJsonStructure(), new ArrayList<>());
     }
 
+    public JsonResponse(int status, Collection<Header> headers) {
+        this(status, new StubJsonStructure(), headers);
+    }
+
+    public JsonResponse(int status, JsonStructure body) {
+        this(status, body, new ArrayList<>());
+    }
+
+    public JsonResponse(int status, JsonStructure body, Collection<Header> headers) {
+        this.status = status;
+        this.body = body;
+        this.headers = headers;
+    }
+
+    @Override
     public int status() {
         return status;
     }
 
-    public String body() {
-        return json.toString();
+    @Override
+    public String body() throws BodyNotFoundException {
+        try {
+            return body.toString();
+        }
+        catch (IllegalStateException illegalStateException) {
+            throw new BodyNotFoundException("Request does not have a body!");
+        }
     }
 
-    public String contentType() {
-        return "application/json";
+    @Override
+    public Collection<Header> headers() {
+        return headers;
     }
 }

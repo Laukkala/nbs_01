@@ -98,7 +98,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newDirectoryPath));
     }
@@ -117,7 +117,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Path at " + notebookDirectory().relativize(existingDirectoryPath) + " is already in use!").build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test

@@ -92,7 +92,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
                 .add("children", expectedChildren)
                 .build();
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertEquals(response.body(), expectedJson.toString());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(response.body(), expectedJson.toString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(copiedDirectoryPath));
     }

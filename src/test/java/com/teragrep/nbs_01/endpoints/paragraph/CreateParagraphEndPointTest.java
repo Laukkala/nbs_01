@@ -102,7 +102,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookPath));
         Assertions
@@ -136,7 +136,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
                 .add("message", "No such notebook: " + nonexistentFileName + " !")
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test

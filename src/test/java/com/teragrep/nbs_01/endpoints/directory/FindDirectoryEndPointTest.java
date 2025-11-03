@@ -85,7 +85,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, directoryPath));
-        Assertions.assertEquals(expectedFileContent, response.body().toString());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedFileContent, response.body().toString()));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         JsonObject expectedResponse = Json.createObjectBuilder().add("message", "No such directory!").build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedResponse.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedResponse.toString(), response.body()));
     }
 
     @Test

@@ -129,7 +129,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
                 .add("message", "No such notebook: " + nonExistentNotebookName + "!")
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test

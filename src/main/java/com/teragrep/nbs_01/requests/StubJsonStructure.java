@@ -43,40 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.responses;
+package com.teragrep.nbs_01.requests;
 
-import org.apache.http.Header;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
 
-import java.util.ArrayList;
-import java.util.Collection;
+public class StubJsonStructure implements JsonStructure {
 
-// Response object that contains a String
-public final class PlainTextResponse implements Response {
-
-    private final int status;
-    private final String body;
-    private final Collection<Header> headers;
-
-    public PlainTextResponse(int status, String body) {
-        this(status, body, new ArrayList<Header>());
-    }
-
-    public PlainTextResponse(int status, String body, Collection<Header> headers) {
-        this.status = status;
-        this.body = body;
-        this.headers = headers;
-    }
-
-    public int status() {
-        return status;
-    }
-
-    public String body() {
-        return body;
+    @Override
+    public ValueType getValueType() {
+        throw new IllegalStateException("StubJsonStructure does not have a ValueType!");
     }
 
     @Override
-    public Collection<Header> headers() {
-        return headers;
+    public JsonObject asJsonObject() {
+        throw new IllegalStateException("StubJsonStructure cannot be turned into a JsonObject!");
+    }
+
+    @Override
+    public JsonArray asJsonArray() {
+        throw new IllegalStateException("StubJsonStructure cannot be turned into a JsonArray!");
+    }
+
+    @Override
+    public JsonValue getValue(String jsonPointer) {
+        throw new IllegalStateException("Cannot get a value from a StubJsonStructure!");
+    }
+
+    @Override
+    public String toString() {
+        throw new IllegalStateException("StubJsonStructure cannot be turned into a String!");
     }
 }
