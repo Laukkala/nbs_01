@@ -56,11 +56,14 @@ import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -94,7 +97,10 @@ public final class FindParagraphEndPoint implements EndPoint {
             }
             Notebook notebook = new Notebook(notebookPath).load();
             if (notebook.paragraphs().containsKey(paragraphId)) {
-                return new JsonResponse(HttpStatus.OK_200, notebook.paragraphs().get(paragraphId).json());
+                ArrayList<Header> headers = new ArrayList<>();
+                headers.add(new BasicHeader("Location", request.path().toString()));
+                headers.add(new BasicHeader("Content-Type", "application/json"));
+                return new JsonResponse(HttpStatus.OK_200, notebook.paragraphs().get(paragraphId).json(), headers);
             }
             else {
                 throw new MalformedRequestException("Paragraph not found!");

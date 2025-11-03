@@ -54,11 +54,14 @@ import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -86,7 +89,10 @@ public final class FindDirectoryEndPoint implements EndPoint {
                 );
             }
             Directory directory = new Directory(path).load();
-            return new JsonResponse(HttpStatus.OK_200, directory.json());
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
+            return new JsonResponse(HttpStatus.OK_200, directory.json(), headers);
         }
         catch (IOException ioException) {
             return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);

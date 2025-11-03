@@ -52,6 +52,8 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -87,6 +89,11 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
+        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
                 .assertDoesNotThrow(
                         () -> Assertions.assertEquals(expectedFileContent, response.body().strip().toString())

@@ -52,6 +52,8 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -85,6 +87,12 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new FileTree(notebookDirectory()));
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, directoryPath));
+        Assertions.assertEquals(HttpStatus.OK_200, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", directoryPath.toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedFileContent, response.body().toString()));
     }
 
