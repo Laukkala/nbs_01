@@ -60,6 +60,6 @@ public final class StubEndpoint implements EndPoint {
     }
 
     public Response createResponse(Request request) {
-        return new JsonResponse(HttpStatus.METHOD_NOT_ALLOWED_405, Json.createObjectBuilder().build()); // Need no content response
+        return new JsonResponse(HttpStatus.METHOD_NOT_ALLOWED_405, Json.createObjectBuilder().build());
     }
 }

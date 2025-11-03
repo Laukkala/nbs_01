@@ -54,6 +54,8 @@ import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.File;
@@ -61,6 +63,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -88,7 +91,9 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
                 Stream<Path> files = Files.walk(path);
                 files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             }
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, Json.createObjectBuilder().build());
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            return new JsonResponse(HttpStatus.NO_CONTENT_204, Json.createObjectBuilder().build(), headers);
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);

@@ -53,6 +53,8 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -95,6 +97,9 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
+
         // Assert that the file was changed.
         Assertions.assertTrue(Files.exists(notebookPath));
         Assertions

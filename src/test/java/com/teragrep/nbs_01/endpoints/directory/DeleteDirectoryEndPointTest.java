@@ -50,6 +50,8 @@ import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
@@ -59,7 +61,7 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
 
-    private String deletedDirectoryName = "my_folder_2A94M5J1D/";
+    private String deletedDirectoryName = "my_folder_2A94M5J1D";
     private Path deletedDirectoryPath = Paths.get(notebookDirectory().toString(), deletedDirectoryName);
 
     public DeleteDirectoryEndPointTest() {
@@ -85,6 +87,8 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(deletedDirectoryName)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryName);
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
         // Assert that the file was created.
         Assertions.assertFalse(Files.exists(deletedDirectoryPath));
     }
