@@ -50,6 +50,8 @@ import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.requests.JsonRequest;
 import com.teragrep.nbs_01.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -94,6 +96,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", newNotebookName);
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions
                 .assertDoesNotThrow(
                         () -> Assertions

@@ -54,6 +54,8 @@ import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -90,7 +92,9 @@ public final class CopyNotebookEndpoint implements EndPoint {
             Notebook source = new Notebook(sourcePath).load();
             Notebook copy = source.copy(destinationPath);
             copy.save();
-            return new JsonResponse(HttpStatus.CREATED_201, copy.json());
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            return new JsonResponse(HttpStatus.CREATED_201, copy.json(), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);

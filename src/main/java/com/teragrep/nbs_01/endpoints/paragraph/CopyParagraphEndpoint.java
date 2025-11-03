@@ -56,6 +56,8 @@ import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -64,6 +66,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -121,8 +124,9 @@ public final class CopyParagraphEndpoint implements EndPoint {
                     destinationParagraphs
             );
             editedNotebook.save();
-
-            return new JsonResponse(HttpStatus.CREATED_201, copyParagraph.json());
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            return new JsonResponse(HttpStatus.CREATED_201, copyParagraph.json(), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);

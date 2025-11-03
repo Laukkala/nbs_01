@@ -53,6 +53,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -67,7 +69,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
     private Path sourceDirectoryPath = Paths
             .get(notebookDirectory().toString(), "my_folder_2A94M5J1D", sourceDirectoryName);
     private Path sourceDirectoryParameter = Paths.get("my_folder_2A94M5J1D", sourceDirectoryName);
-    private String newDirectoryName = "testDirectoryName/";
+    private String newDirectoryName = "testDirectoryName";
     private Path copiedDirectoryPath = Paths.get(notebookDirectory().toString(), newDirectoryName);
     private Path faultyEndpointParameter = Paths.get("tillintallin", "tallintillin");
     private Path nonExistentSourcePath = Paths.get(notebookDirectory().toString(), "tillintallin", "tallintillin");
@@ -88,10 +90,12 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         expectedChildren.add(notebook1().getFileName().toString());
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("name", newDirectoryName.substring(0, newDirectoryName.length() - 1))
+                .add("name", newDirectoryName)
                 .add("children", expectedChildren)
                 .build();
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", newDirectoryName);
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(response.body(), expectedJson.toString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(copiedDirectoryPath));

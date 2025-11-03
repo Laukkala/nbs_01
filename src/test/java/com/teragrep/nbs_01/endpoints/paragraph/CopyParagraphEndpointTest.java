@@ -53,6 +53,8 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -95,6 +97,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions
                 .assertDoesNotThrow(
                         () -> Assertions
