@@ -53,6 +53,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -98,6 +100,8 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", newDirectoryName);
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newDirectoryPath));

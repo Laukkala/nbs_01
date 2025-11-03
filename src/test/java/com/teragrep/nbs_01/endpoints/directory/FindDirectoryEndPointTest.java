@@ -89,7 +89,6 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(new JsonRequest(body, directoryPath));
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", directoryPath.toString());
-        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());

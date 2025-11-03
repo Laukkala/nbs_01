@@ -88,7 +88,7 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryName);
-        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         // Assert that the file was created.
         Assertions.assertFalse(Files.exists(deletedDirectoryPath));
     }

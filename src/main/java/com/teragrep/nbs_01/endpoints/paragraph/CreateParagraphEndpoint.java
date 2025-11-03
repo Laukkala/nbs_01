@@ -53,11 +53,14 @@ import com.teragrep.nbs_01.responses.ErrorResponse;
 import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -89,8 +92,9 @@ public final class CreateParagraphEndpoint implements EndPoint {
                 Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
                 notebook.paragraphs().put(paragraphId, newParagraph);
                 notebook.save();
-
-                return new JsonResponse(HttpStatus.CREATED_201, newParagraph.json());
+                ArrayList<Header> headers = new ArrayList<>();
+                headers.add(new BasicHeader("Location", request.path().toString()));
+                return new JsonResponse(HttpStatus.CREATED_201, newParagraph.json(), headers);
             }
             else {
                 throw new MalformedRequestException("Paragraph " + paragraphId + " already exists!");

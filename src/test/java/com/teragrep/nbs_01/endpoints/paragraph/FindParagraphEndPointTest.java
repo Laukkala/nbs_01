@@ -90,7 +90,6 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         String body = "{}";
         Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
         Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
-        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());

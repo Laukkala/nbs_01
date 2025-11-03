@@ -91,7 +91,7 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
         Header expectedLocationHeader = new BasicHeader("Location", deletedNotebookName);
         Assertions.assertEquals(204, response.status());
         Assertions.assertEquals(1, response.headers().size());
-        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().iterator().next().toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertThrows(BodyNotFoundException.class, () -> response.body());
         // Assert that the file was created.
         Assertions.assertFalse(Files.exists(deletedNotebookPath));
