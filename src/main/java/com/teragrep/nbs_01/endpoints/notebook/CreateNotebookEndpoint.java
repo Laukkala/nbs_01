@@ -90,6 +90,7 @@ public final class CreateNotebookEndpoint implements EndPoint {
             newFile.save();
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
             return new JsonResponse(HttpStatus.CREATED_201, newFile.json(), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {

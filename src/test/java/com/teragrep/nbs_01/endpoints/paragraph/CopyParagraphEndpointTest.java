@@ -98,7 +98,9 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
                 .assertDoesNotThrow(
                         () -> Assertions

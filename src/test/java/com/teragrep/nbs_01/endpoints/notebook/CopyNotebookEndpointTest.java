@@ -97,6 +97,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", newNotebookName);
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions
                 .assertDoesNotThrow(

@@ -126,6 +126,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
             editedNotebook.save();
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
             return new JsonResponse(HttpStatus.CREATED_201, copyParagraph.json(), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {

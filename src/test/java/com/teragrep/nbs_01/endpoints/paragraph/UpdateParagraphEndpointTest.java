@@ -53,6 +53,8 @@ import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -121,6 +123,11 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.OK_200, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()

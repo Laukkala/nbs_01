@@ -54,16 +54,15 @@ import com.teragrep.nbs_01.responses.ExceptionResponse;
 import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.JsonObject;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 // Updates the title of a Notebook.
 public final class UpdateNotebookEndpoint implements EndPoint {
@@ -100,7 +99,10 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             String title = parameters.getString("title");
             Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
             newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, newNotebook.json());
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
+            return new JsonResponse(HttpStatus.OK_200, newNotebook.json(), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);

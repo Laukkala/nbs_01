@@ -55,6 +55,8 @@ import com.teragrep.nbs_01.responses.JsonResponse;
 import com.teragrep.nbs_01.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
@@ -108,7 +110,10 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             paragraphs.put(newParagraph.id(), newParagraph);
             Notebook newNotebook = new Notebook(notebook.title(), notebook.path(), paragraphs);
             newNotebook.save();
-            return new JsonResponse(HttpStatus.OK_200, newParagraph.json());
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
+            return new JsonResponse(HttpStatus.OK_200, newParagraph.json(), headers);
         }
         catch (MalformedRequestException malformedRequestException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
