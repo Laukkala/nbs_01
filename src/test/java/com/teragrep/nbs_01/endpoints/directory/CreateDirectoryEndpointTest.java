@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
@@ -88,8 +88,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
 
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
@@ -104,7 +103,8 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newDirectoryPath));
     }
@@ -115,15 +115,15 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(existingDirectoryName)));
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(existingDirectoryName)));
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Path at " + notebookDirectory().relativize(existingDirectoryPath) + " is already in use!").build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test

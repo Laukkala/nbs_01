@@ -46,10 +46,15 @@
 package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.Body;
+import com.teragrep.nbs_01.http.JSONBody;
+import com.teragrep.nbs_01.http.StubBody;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,6 +63,7 @@ import org.apache.http.Header;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -79,35 +85,19 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // GET requests shouldn't have a body, so we generate a JsonRequest with an Empty JSON Object, and ignore any body that might be present.
-        Request endPointRequest = new JsonRequest("");
-
-        // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
-        resp.setStatus(endPointResponse.status());
-        resp.setCharacterEncoding(charset.name());
-        for (Header header : endPointResponse.headers()) {
-            resp.setHeader(header.getName(), header.getValue());
-        }
-        // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
-        try {
-            PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().toString());
-            writer.flush();
-            writer.close();
-        }
-        catch (BodyNotFoundException bodyNotFoundException) {
-            // Request does not have a body.
-        }
-    }
-
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Read the body of the POST request
+        // GET requests should not have a body, but it is possible to send one.
         BufferedReader reader = req.getReader();
-        String body = reader.lines().collect(Collectors.joining());
-        // Close the reader to avoid resource leaks.
+        String bodyString = reader.lines().collect(Collectors.joining());
         reader.close();
-        // Create an endPointRequest based on the body.
+        Body body;
+        if (!bodyString.isEmpty()) {
+            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
+            JsonObject bodyJson = jsonReader.readObject();
+            body = new JSONBody(bodyJson);
+        }
+        else {
+            body = new StubBody();
+        }
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
@@ -120,11 +110,46 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
         try {
             PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().toString());
+            writer.write(endPointResponse.body().asString());
             writer.flush();
             writer.close();
         }
-        catch (BodyNotFoundException bodyNotFoundException) {
+        catch (IllegalStateException malformedBodyException) {
+            // Request does not have a body.
+        }
+    }
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Read the body of the POST request
+        BufferedReader reader = req.getReader();
+        String bodyString = reader.lines().collect(Collectors.joining());
+        reader.close();
+        Body body;
+        if (!bodyString.isEmpty()) {
+            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
+            JsonObject bodyJson = jsonReader.readObject();
+            body = new JSONBody(bodyJson);
+        }
+        else {
+            body = new StubBody();
+        }
+        Request endPointRequest = new JsonRequest(body);
+
+        // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
+        Response endPointResponse = endPoint.createResponse(endPointRequest);
+        resp.setStatus(endPointResponse.status());
+        resp.setCharacterEncoding(charset.name());
+        for (Header header : endPointResponse.headers()) {
+            resp.setHeader(header.getName(), header.getValue());
+        }
+        // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
+        try {
+            PrintWriter writer = resp.getWriter();
+            writer.write(endPointResponse.body().asString());
+            writer.flush();
+            writer.close();
+        }
+        catch (IllegalStateException malformedBodyException) {
             // Request does not have a body.
         }
     }
@@ -133,10 +158,17 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
 
         // Read the body of the PUT request
         BufferedReader reader = req.getReader();
-        String body = reader.lines().collect(Collectors.joining());
-        // Close the reader to avoid resource leaks.
+        String bodyString = reader.lines().collect(Collectors.joining());
         reader.close();
-        // Create an endPointRequest based on the body.
+        Body body;
+        if (!bodyString.isEmpty()) {
+            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
+            JsonObject bodyJson = jsonReader.readObject();
+            body = new JSONBody(bodyJson);
+        }
+        else {
+            body = new StubBody();
+        }
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
@@ -149,11 +181,11 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
         try {
             PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().toString());
+            writer.write(endPointResponse.body().asString());
             writer.flush();
             writer.close();
         }
-        catch (BodyNotFoundException bodyNotFoundException) {
+        catch (IllegalStateException malformedBodyException) {
             // Request does not have a body.
         }
     }
@@ -162,10 +194,17 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
 
         // Read the body of the DELETE request
         BufferedReader reader = req.getReader();
-        String body = reader.lines().collect(Collectors.joining());
-        // Close the reader to avoid resource leaks.
+        String bodyString = reader.lines().collect(Collectors.joining());
         reader.close();
-        // Create an endPointRequest based on the body.
+        Body body;
+        if (!bodyString.isEmpty()) {
+            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
+            JsonObject bodyJson = jsonReader.readObject();
+            body = new JSONBody(bodyJson);
+        }
+        else {
+            body = new StubBody();
+        }
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
@@ -178,11 +217,11 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
         try {
             PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().toString());
+            writer.write(endPointResponse.body().asString());
             writer.flush();
             writer.close();
         }
-        catch (BodyNotFoundException bodyNotFoundException) {
+        catch (IllegalStateException malformedBodyException) {
             // Request does not have a body.
         }
     }

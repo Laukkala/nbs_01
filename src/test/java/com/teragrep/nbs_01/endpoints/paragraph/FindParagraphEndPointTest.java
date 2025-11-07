@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -87,15 +87,14 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookPath.toString(), "/paragraph/" + paragraphId);
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
+        Response response = endPoint.createResponse(new JsonRequest(requestPath));
         Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertEquals(expectedFileContent, response.body().strip().toString())
+                        () -> Assertions.assertEquals(expectedFileContent, response.body().asString().strip().toString())
                 );
     }
 
@@ -106,13 +105,13 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
+        Response response = endPoint.createResponse(new JsonRequest(requestPath));
 
         // The endpoint should return a Response with the correct status and messagsse.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such notebook !").build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -122,13 +121,13 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, requestPath));
+        Response response = endPoint.createResponse(new JsonRequest(requestPath));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -141,7 +140,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
-        Response response = endpoint.createResponse(new JsonRequest("{}", queryPath));
+        Response response = endpoint.createResponse(new JsonRequest(queryPath));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
 
@@ -150,7 +149,8 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
                 .add("message", "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test

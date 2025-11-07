@@ -47,15 +47,14 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.ErrorResponse;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.ErrorResponse;
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.Response;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -86,10 +85,6 @@ public final class FindParagraphEndPoint implements EndPoint {
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
-            JsonObject parameters = Json
-                    .createObjectBuilder(request.parameters())
-                    .add("paragraphId", paragraphId)
-                    .build();
 
             List<Path> files = root.list();
             if (!files.contains(notebookPath)) {
@@ -100,7 +95,11 @@ public final class FindParagraphEndPoint implements EndPoint {
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));
                 headers.add(new BasicHeader("Content-Type", "application/json"));
-                return new JsonResponse(HttpStatus.OK_200, notebook.paragraphs().get(paragraphId).json(), headers);
+                return new JsonResponse(
+                        HttpStatus.OK_200,
+                        new JSONBody(notebook.paragraphs().get(paragraphId).json()),
+                        headers
+                );
             }
             else {
                 throw new MalformedRequestException("Paragraph not found!");

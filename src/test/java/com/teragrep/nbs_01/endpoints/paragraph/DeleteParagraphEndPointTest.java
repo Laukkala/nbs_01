@@ -48,8 +48,8 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -93,7 +93,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{}", requestPath);
+        JsonRequest request = new JsonRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
@@ -123,7 +123,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
 
-        JsonRequest request = new JsonRequest("{}", requestPath);
+        JsonRequest request = new JsonRequest(requestPath);
         Response response = endPoint.createResponse(request);
 
         // The endpoint should return a Response with the correct status and message.
@@ -134,7 +134,8 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -148,7 +149,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{}", requestPath);
+        JsonRequest request = new JsonRequest(requestPath);
         Response response = endPoint.createResponse(request);
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
@@ -158,7 +159,8 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
                 .add("message", "No such notebook: " + nonExistentNotebookName + "!")
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test

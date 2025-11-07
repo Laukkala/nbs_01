@@ -46,9 +46,10 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -94,8 +95,8 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with a path.
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
-        Response response = endpoint
-                .createResponse(new JsonRequest("{\"title\":\"" + editedTitle + "\"}", notebookPath));
+        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
+        Response response = endpoint.createResponse(new JsonRequest(notebookPath, new JSONBody(body)));
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
@@ -103,7 +104,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
 
-        Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().contains(editedTitle)));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(editedTitle)));
 
         List<String> updatedLines = Assertions
                 .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
@@ -121,8 +122,9 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
 
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
+        JsonObject body = Json.createObjectBuilder().add("title", editedTitle.toString()).build();
         Response response = endpoint
-                .createResponse(new JsonRequest("{\"title\":\"" + editedTitle + "\"}", Paths.get(nonExistentNotebookName)));
+                .createResponse(new JsonRequest(Paths.get(nonExistentNotebookName), new JSONBody(body)));
         // Assert that we got the proper response.
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
@@ -133,7 +135,8 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         List<String> lines = Assertions
                 .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));

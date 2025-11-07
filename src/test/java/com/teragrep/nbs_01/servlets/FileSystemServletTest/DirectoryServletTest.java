@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
@@ -87,10 +87,12 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .add("name", directoryPath.toString())
                 .add("children", expectedChildren)
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
     }
@@ -116,7 +118,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "Path at " + directoryPath + " is already in use!")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -147,7 +150,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .add("name", directoryPath.toString())
                 .add("children", expectedChildren)
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         // Assert that the original file still exists.
@@ -197,7 +201,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "Destination " + directoryPath + " is already in use!")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -267,7 +272,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", directoryPath + " is not a directory!")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -287,7 +293,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .add("name", directoryPath.toString())
                 .add("children", expectedChildren)
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -316,6 +323,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "File at path " + directoryPath + " is not a directory!")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 }

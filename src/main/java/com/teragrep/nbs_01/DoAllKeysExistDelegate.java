@@ -45,8 +45,9 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.exceptions.MalformedBodyException;
+import com.teragrep.nbs_01.http.requests.Request;
 import jakarta.json.JsonObject;
 
 import java.util.Arrays;
@@ -66,14 +67,19 @@ public final class DoAllKeysExistDelegate implements Delegate {
         this.keys = keys;
     }
 
-    public boolean resolve(Request request) throws MalformedRequestException {
-        JsonObject parameters = request.parameters();
-        for (String key : keys) {
-            if (!parameters.containsKey(key)) {
-                return false;
+    public boolean resolve(Request request) throws MalformedBodyException {
+        try {
+            JsonObject parameters = request.body().asJson().asJsonObject();
+            for (String key : keys) {
+                if (!parameters.containsKey(key)) {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
+        catch (BodyNotFoundException bodyNotFoundException) {
+            return false;
+        }
     }
 
     @Override

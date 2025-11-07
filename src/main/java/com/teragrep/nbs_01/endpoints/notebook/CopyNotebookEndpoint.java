@@ -46,13 +46,14 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.ErrorResponse;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.ErrorResponse;
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -76,8 +77,8 @@ public final class CopyNotebookEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            JsonObject parameters = request.parameters();
-            String sourcePathString = parameters.getString("sourcePath");
+            JsonObject body = request.body().asJson().asJsonObject();
+            String sourcePathString = body.getString("sourcePath");
             Path sourcePath = root.path().resolve(Paths.get(sourcePathString));
             Path destinationPath = root.path().resolve(request.path());
             List<Path> currentFiles = root.list();
@@ -87,7 +88,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
             }
 
             if (!currentFiles.contains(sourcePath)) {
-                throw new FileNotFoundException("No such file:" + parameters.getString("sourcePath") + "!");
+                throw new FileNotFoundException("No such file:" + body.getString("sourcePath") + "!");
             }
             Notebook source = new Notebook(sourcePath).load();
             Notebook copy = source.copy(destinationPath);
@@ -95,7 +96,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new JsonResponse(HttpStatus.CREATED_201, copy.json(), headers);
+            return new JsonResponse(HttpStatus.CREATED_201, new JSONBody(copy.json()), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -103,11 +104,11 @@ public final class CopyNotebookEndpoint implements EndPoint {
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
             return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
         }
+        catch (BodyNotFoundException bodyNotFoundException) {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, bodyNotFoundException);
+        }
         catch (IOException ioException) {
             return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
-        }
-        catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
         }
     }
 

@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -101,7 +101,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a GET request is responded to with the response code 200 OK
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         // Assert that the body of the response matches with the paragraph's text saved on file
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedparagraphContent, response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedparagraphContent, response.body().asString()));
     }
 
     // Searching for a nonexistent paragraph should result in an error
@@ -119,7 +120,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         // Assert that the body of the response contains a message mentioning that the paragraph was not found
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     // Searching for a paragraph from a notebook that doesn't exist should result in an error.
@@ -137,7 +139,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the body of the response contains a message mentioning that the notebook was not found
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such notebook !").build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     // Creating a paragraph should result in an existing notebook being saved to disk containing an additional paragraph.
@@ -166,7 +169,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("title", "")
                 .add("script", Json.createObjectBuilder().add("text", "").build())
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         // Assert that the created paragraph is contained within the saved file of the notebook
         String fileContents = Assertions
@@ -201,7 +205,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "No such notebook: " + nonexistentNotebookId + " !")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         // Assert that the paragraph id is not contained within the saved file of the notebook
         String fileContents = Assertions
@@ -214,7 +219,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     // Deleting a specific paragraph from a specific notebook should result in the notebook being saved to disk without the specified paragraph.
     @Test
     public void httpDeleteParagraphTest() {
-        String requestBody = Json.createObjectBuilder().build().toString();
+        String requestBody = "";
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
@@ -253,7 +258,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "Paragraph " + nonexistentParagraphId + " doesn't exist!")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         // Assert that the created paragraph is not contained within the saved file of the notebook
         String fileContents = Assertions
@@ -287,7 +293,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .createObjectBuilder()
                 .add("message", "No such notebook: " + nonexistentNotebookId + "!")
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         // Assert that the created paragraph is not contained within the saved file of the notebook
         String fileContents = Assertions
@@ -333,7 +340,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("title", newParagraphTitle)
                 .add("script", Json.createObjectBuilder().add("text", newParagraphText).build())
                 .build();
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         // Assert that the edited paragraph is contained within the saved file of the notebook
         String fileContents = Assertions

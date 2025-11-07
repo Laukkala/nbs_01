@@ -46,15 +46,16 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.ErrorResponse;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.ErrorResponse;
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.JsonStructure;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -64,7 +65,6 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,20 +78,31 @@ public final class CreateNotebookEndpoint implements EndPoint {
     }
 
     public Response createResponse(Request request) {
+        Path path = request.path();
+        String title;
+        try {
+            JsonStructure json = request.body().asJson();
+            title = json.asJsonObject().getString("title");
+        }
+        catch (BodyNotFoundException bodyNotFoundException) {
+            title = "";
+        }
+        return createResponse(path, title);
+    }
+
+    private Response createResponse(Path path, String title) {
         try {
             List<Path> currentFiles = root.list();
-            JsonObject parameters = request.parameters();
-            String title = parameters.containsKey("title") ? parameters.getString("title") : "";
-            Path path = root.path().resolve(request.path());
-            if (currentFiles.contains(path)) {
-                throw new FileAlreadyExistsException("Path at " + request.path() + " is already in use!");
+            Path filePath = root.path().resolve(path);
+            if (currentFiles.contains(filePath)) {
+                throw new FileAlreadyExistsException("Path at " + path + " is already in use!");
             }
-            Notebook newFile = new Notebook(title, path);
+            Notebook newFile = new Notebook(title, filePath);
             newFile.save();
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", path.toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new JsonResponse(HttpStatus.CREATED_201, newFile.json(), headers);
+            return new JsonResponse(HttpStatus.CREATED_201, new JSONBody(newFile.json()), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
@@ -102,13 +113,6 @@ public final class CreateNotebookEndpoint implements EndPoint {
         catch (IOException ioException) {
             return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
-        }
-    }
-
-    private Notebook createNotebook(String title, Path path) {
-        return new Notebook(title, path, new HashMap<>());
     }
 
     @Override

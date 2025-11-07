@@ -43,76 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.responses;
+package com.teragrep.nbs_01.http.responses;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import com.teragrep.nbs_01.http.ExceptionBody;
 import org.apache.http.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-// Response object that represents an unrecoverable server-side error (Such as failure to write a file). Logs a Throwable with an event ID and generates a message body that prompts the user to check technical logs for error details.
-// Should be used when an internal server error is encountered during a request
-public final class ErrorResponse implements Response {
+// Response object that takes a Throwable and returns a given response back to the user.
+// Should be used when a Request cannot be fulfilled, but the error is not unrecoverable (such as a malformed request being received)
+public final class ExceptionResponse implements Response {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorResponse.class);
-    private final UUID eventId;
     private final int status;
-    private final Throwable throwable;
     private final List<Header> headers;
+    private final ExceptionBody body;
 
-    public ErrorResponse(int status, Throwable throwable) {
-        this(status, throwable, UUID.randomUUID(), new ArrayList<Header>());
+    public ExceptionResponse(int status, Throwable throwable) {
+        this(status, new ArrayList<>(), new ExceptionBody(throwable));
     }
 
-    public ErrorResponse(int status, Throwable throwable, List<Header> headers) {
-        this(status, throwable, UUID.randomUUID(), headers);
-    }
-
-    public ErrorResponse(int status, Throwable throwable, UUID eventId) {
-        this(status, throwable, eventId, new ArrayList<Header>());
-    }
-
-    public ErrorResponse(int status, Throwable throwable, UUID eventId, List<Header> headers) {
+    public ExceptionResponse(int status, List<Header> headers, ExceptionBody body) {
         this.status = status;
-        this.throwable = throwable;
-        this.eventId = eventId;
         this.headers = headers;
+        this.body = body;
     }
 
     public int status() {
         return status;
     }
 
-    public Throwable exception() {
-        return throwable;
-    }
-
-    public UUID eventId() {
-        return eventId;
-    }
-
-    public String body() {
-        LOGGER.error("Event_" + eventId, throwable);
-        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder
-                .add(
-                        "message",
-                        "An error occurred while processing your Request. See event id " + eventId
-                                + " in the technical log for details."
-                );
-        JsonObject json = jsonObjectBuilder.build();
-        return json.toString();
+    public ExceptionBody body() {
+        return body;
     }
 
     @Override
     public List<Header> headers() {
         return headers;
     }
-
 }

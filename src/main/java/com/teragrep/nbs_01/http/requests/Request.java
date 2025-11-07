@@ -43,51 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.responses;
+package com.teragrep.nbs_01.http.requests;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.http.Body;
 import org.apache.http.Header;
 
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.List;
 
-// Response object that takes a Throwable and returns a given response back to the user.
-// Should be used when a Request cannot be fulfilled, but the error is not unrecoverable (such as a malformed request being received)
-public final class ExceptionResponse implements Response {
+// Request object contains parameters that the user wants to send to NBS_01.
+// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
+public interface Request {
 
-    private final int status;
-    private final Throwable throwable;
-    private final List<Header> headers;
+    public abstract Body body() throws BodyNotFoundException;
 
-    public ExceptionResponse(int status, Throwable throwable) {
-        this(status, throwable, new ArrayList<>());
-    }
+    public abstract Path path();
 
-    public ExceptionResponse(int status, Throwable throwable, List<Header> headers) {
-        this.status = status;
-        this.throwable = throwable;
-        this.headers = headers;
-    }
-
-    public int status() {
-        return status;
-    }
-
-    public Throwable exception() {
-        return throwable;
-    }
-
-    public String body() {
-        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder.add("message", throwable.getMessage());
-        JsonObject json = jsonObjectBuilder.build();
-        return json.toString();
-    }
-
-    @Override
-    public List<Header> headers() {
-        return headers;
-    }
+    public abstract List<Header> headers();
 }

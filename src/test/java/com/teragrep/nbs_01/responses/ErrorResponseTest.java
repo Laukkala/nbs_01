@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.responses;
 
+import com.teragrep.nbs_01.http.responses.ErrorResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -77,7 +78,7 @@ class ErrorResponseTest {
                                 + " in the technical log for details."
                 )
                 .build();
-        Assertions.assertTrue(response.exception().equals(throwable1));
-        Assertions.assertEquals(expectedBody.toString(), response.body());
+        Assertions.assertTrue(response.body().error().equals(throwable1));
+        Assertions.assertEquals(expectedBody.toString(), response.body().asString());
     }
 }

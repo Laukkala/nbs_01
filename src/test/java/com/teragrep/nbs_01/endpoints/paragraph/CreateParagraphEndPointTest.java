@@ -46,9 +46,10 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -92,7 +93,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{}", requestPath);
+        JsonRequest request = new JsonRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
 
@@ -108,7 +109,8 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookPath));
         Assertions
@@ -132,7 +134,8 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest("{\"paragraphId\":\"" + paragraphId + "\"}", requestPath);
+        JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
@@ -142,7 +145,8 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
                 .add("message", "No such notebook: " + nonexistentFileName + " !")
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test

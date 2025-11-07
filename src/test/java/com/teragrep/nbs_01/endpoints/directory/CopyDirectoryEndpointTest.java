@@ -46,9 +46,10 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
@@ -83,8 +84,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(copiedDirectoryPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectoryParameter.toString()).build();
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newDirectoryName), new JSONBody(body)));
         // Assert that we receive the proper response.
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
         expectedChildren.add(notebook1().getFileName().toString());
@@ -98,7 +99,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(response.body(), expectedJson.toString()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(response.body().asString(), expectedJson.toString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(copiedDirectoryPath));
     }
@@ -109,8 +111,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(faultyEndpointParameter));
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"sourcePath\":\"" + faultyEndpointParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newDirectoryName)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", faultyEndpointParameter.toString()).build();
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newDirectoryName), new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
 
         // Assert that the file was not created.
@@ -124,8 +126,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceDirectoryPath));
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"sourcePath\":\"" + sourceDirectoryParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectoryParameter.toString()).build();
+        Response response = endPoint.createResponse(new JsonRequest(existingPathEndpointParameter, new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

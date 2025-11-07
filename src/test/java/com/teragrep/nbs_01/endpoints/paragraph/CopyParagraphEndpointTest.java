@@ -47,9 +47,10 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.google.common.base.Charsets;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
@@ -63,8 +64,6 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
@@ -89,10 +88,13 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest(
-                "{\"sourcePath\":\"" + notebook3() + "\",\"sourceParagraphId\":\"" + sourceParagraphId + "\"}",
-                requestPath
-        );
+
+        JsonObject body = Json
+                .createObjectBuilder()
+                .add("sourcePath", notebook3().toString())
+                .add("sourceParagraphId", sourceParagraphId)
+                .build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -107,6 +109,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                                 .assertTrue(
                                         response
                                                 .body()
+                                                .asString()
                                                 .contains(
                                                         "\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
                                                 )
@@ -142,10 +145,12 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest(
-                "{\"sourcePath\":\"" + notebook3() + "\",\"sourceParagraphId\":\"" + sourceParagraphId + "\"}",
-                requestPath
-        );
+        JsonObject body = Json
+                .createObjectBuilder()
+                .add("sourcePath", notebook3().toString())
+                .add("sourceParagraphId", sourceParagraphId)
+                .build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -156,7 +161,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
         // Assert that the paragraph content does not exist in the destination file after the operation is complete.
         JsonObject destinationFileObject = readFileContents(destinationNotebookPath);
@@ -178,7 +184,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest("{\"sourcePath\":\"" + notebook3() + "\"}", requestPath);
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook3().toString()).build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -189,7 +196,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -204,10 +212,12 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest(
-                "{\"sourcePath\":\"" + sourceNotebookName + "\",\"sourceParagraphId\":\"" + sourceParagraphId + "\"}",
-                requestPath
-        );
+        JsonObject body = Json
+                .createObjectBuilder()
+                .add("sourcePath", sourceNotebookName)
+                .add("sourceParagraphId", sourceParagraphId)
+                .build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -218,7 +228,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -229,7 +240,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest("{\"sourceParagraphId\":\"" + sourceParagraphId + "\"}", requestPath);
+        JsonObject body = Json.createObjectBuilder().add("sourceParagraphId", sourceParagraphId).build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -239,7 +251,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("message", "Request does not contain a source path!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -260,10 +273,12 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest(
-                "{\"sourcePath\":\"" + notebook3() + "\",\"sourceParagraphId\":\"" + sourceParagraphId + "\"}",
-                requestPath
-        );
+        JsonObject body = Json
+                .createObjectBuilder()
+                .add("sourcePath", notebook3().toString())
+                .add("sourceParagraphId", sourceParagraphId)
+                .build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -274,7 +289,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     @Test
@@ -290,10 +306,12 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(destinationNotebookPath.toString(), "/paragraph/" + destinationParagraphId);
-        JsonRequest request = new JsonRequest(
-                "{\"sourcePath\":\"" + notebook3() + "\",\"sourceParagraphId\":\"" + sourceParagraphId + "\"}",
-                requestPath
-        );
+        JsonObject body = Json
+                .createObjectBuilder()
+                .add("sourcePath", notebook3().toString())
+                .add("sourceParagraphId", sourceParagraphId)
+                .build();
+        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -304,7 +322,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
 
     private JsonObject readFileContents(Path filePath) {

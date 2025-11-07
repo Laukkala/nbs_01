@@ -43,37 +43,73 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.requests;
+package com.teragrep.nbs_01.http.requests;
 
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
-import jakarta.json.JsonValue;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.http.Body;
+import com.teragrep.nbs_01.http.StubBody;
+import org.apache.http.Header;
 
-public class StubJsonStructure implements JsonStructure {
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
-    @Override
-    public ValueType getValueType() {
-        throw new IllegalStateException("StubJsonStructure does not have a ValueType!");
+// A Request that accepts a String, and parses it into a JSON object.
+public final class JsonRequest implements Request {
+
+    private final Body body;
+    private final Path path;
+    private final List<Header> headers;
+
+    public JsonRequest() {
+        this(new StubBody(), FileSystems.getDefault().getPath(""), new ArrayList<>());
     }
 
-    @Override
-    public JsonObject asJsonObject() {
-        throw new IllegalStateException("StubJsonStructure cannot be turned into a JsonObject!");
+    public JsonRequest(Body body) {
+        this(body, FileSystems.getDefault().getPath(""), new ArrayList<>());
     }
 
-    @Override
-    public JsonArray asJsonArray() {
-        throw new IllegalStateException("StubJsonStructure cannot be turned into a JsonArray!");
+    public JsonRequest(List<Header> headers) {
+        this(new StubBody(), FileSystems.getDefault().getPath(""), headers);
     }
 
-    @Override
-    public JsonValue getValue(String jsonPointer) {
-        throw new IllegalStateException("Cannot get a value from a StubJsonStructure!");
+    public JsonRequest(Path path) {
+        this(new StubBody(), path, new ArrayList<>());
     }
 
-    @Override
-    public String toString() {
-        throw new IllegalStateException("StubJsonStructure cannot be turned into a String!");
+    public JsonRequest(Body body, List<Header> headers) {
+        this(body, FileSystems.getDefault().getPath(""), headers);
+    }
+
+    public JsonRequest(Path path, List<Header> headers) {
+        this(new StubBody(), path, headers);
+    }
+
+    public JsonRequest(Path path, Body body) {
+        this(body, path, new ArrayList<>());
+    }
+
+    public JsonRequest(Body body, Path path, List<Header> headers) {
+        this.body = body;
+        this.path = path;
+        this.headers = headers;
+    }
+
+    public Body body() throws BodyNotFoundException {
+        if (body instanceof StubBody) {
+            throw new BodyNotFoundException("Request does not have a body!");
+        }
+        else {
+            return body;
+        }
+    }
+
+    public Path path() {
+        return path;
+    }
+
+    public List<Header> headers() {
+        return headers;
     }
 }

@@ -43,58 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.responses;
+package com.teragrep.nbs_01.http;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.requests.StubJsonStructure;
-import jakarta.json.JsonStructure;
-import org.apache.http.Header;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+public class ExceptionBody implements Body {
 
-// Response object that contains a JsonObject as its body
-public final class JsonResponse implements Response {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionBody.class);
+    private final JsonObject json;
+    private final Throwable exception;
+    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
-    private final int status;
-    private final JsonStructure body;
-    private final List<Header> headers;
-
-    public JsonResponse(int status) {
-        this(status, new StubJsonStructure(), new ArrayList<>());
+    public ExceptionBody(Throwable exception) {
+        this.exception = exception;
+        jsonObjectBuilder.add("message", exception.getMessage());
+        this.json = jsonObjectBuilder.build();
     }
 
-    public JsonResponse(int status, List<Header> headers) {
-        this(status, new StubJsonStructure(), headers);
+    public Throwable exception() {
+        return exception;
     }
 
-    public JsonResponse(int status, JsonStructure body) {
-        this(status, body, new ArrayList<>());
-    }
-
-    public JsonResponse(int status, JsonStructure body, List<Header> headers) {
-        this.status = status;
-        this.body = body;
-        this.headers = headers;
+    public JsonObject asJson() {
+        return json;
     }
 
     @Override
-    public int status() {
-        return status;
-    }
-
-    @Override
-    public String body() throws BodyNotFoundException {
-        try {
-            return body.toString();
-        }
-        catch (IllegalStateException illegalStateException) {
-            throw new BodyNotFoundException("Request does not have a body!");
-        }
-    }
-
-    @Override
-    public List<Header> headers() {
-        return headers;
+    public String asString() {
+        return json.toString();
     }
 }

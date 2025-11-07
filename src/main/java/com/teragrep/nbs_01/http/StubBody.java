@@ -43,14 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01;
+package com.teragrep.nbs_01.http;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
-import com.teragrep.nbs_01.http.requests.Request;
+import jakarta.json.JsonObject;
 
-// Interface for a Delegate, that inspects a Request object, and returns either a true or a false value according to implementation details.
-public abstract interface Delegate {
+public class StubBody implements Body {
 
-    public abstract boolean resolve(Request request) throws MalformedBodyException, BodyNotFoundException;
+    public StubBody() {
+    }
+
+    public JsonObject asJson() {
+        throw new IllegalStateException("Body is a stub!");
+    }
+
+    @Override
+    public String asString() {
+        throw new IllegalStateException("Body is a stub!");
+    }
 }

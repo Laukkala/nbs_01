@@ -45,8 +45,9 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.requests.Request;
+import com.teragrep.nbs_01.http.JSONBody;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.Request;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -78,7 +79,7 @@ class DoAllKeysExistDelegateTest {
                     .add(testKey2, "testValue2")
                     .add(testKey3, "testValue3")
                     .build();
-            Request testRequest = new JsonRequest(body.toString());
+            Request testRequest = new JsonRequest(new JSONBody(body));
             Assertions.assertTrue(delegate.resolve(testRequest));
         });
     }
@@ -96,7 +97,7 @@ class DoAllKeysExistDelegateTest {
                     .add(testKey1, "testValue1")
                     .add(testKey2, "testValue2")
                     .build();
-            Request testRequest = new JsonRequest(body.toString());
+            Request testRequest = new JsonRequest(new JSONBody(body));
             Assertions.assertFalse(delegate.resolve(testRequest));
         });
     }
@@ -107,7 +108,7 @@ class DoAllKeysExistDelegateTest {
             List<String> testKeys = new ArrayList<>();
             DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
             JsonObject body = Json.createObjectBuilder().add(testKey1, "testValue1").build();
-            Request testRequest = new JsonRequest(body.toString());
+            Request testRequest = new JsonRequest(new JSONBody(body));
             Assertions.assertTrue(delegate.resolve(testRequest));
         });
     }

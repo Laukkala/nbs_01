@@ -45,9 +45,10 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.JSONBody;
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -190,7 +191,7 @@ public class AbstractNotebookServerTest {
         }
         JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
         connection.disconnect();
-        return new JsonResponse(status, message);
+        return new JsonResponse(status, new JSONBody(message));
     }
 
     public Response makeHttpGETRequest(String urlString) throws IOException {
@@ -218,7 +219,7 @@ public class AbstractNotebookServerTest {
         }
         JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
         connection.disconnect();
-        return new JsonResponse(status, message);
+        return new JsonResponse(status, new JSONBody(message));
     }
 
     public Response makeHttpPUTRequest(String urlString, String requestBody) throws IOException {
@@ -253,7 +254,7 @@ public class AbstractNotebookServerTest {
         }
         JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
         connection.disconnect();
-        return new JsonResponse(status, message);
+        return new JsonResponse(status, new JSONBody(message));
     }
 
     public Response makeHttpDELETERequest(String urlString, String requestBody) throws IOException {
@@ -262,9 +263,8 @@ public class AbstractNotebookServerTest {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("DELETE");
-        connection.setDoOutput(true);
-
         byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
+        connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
         OutputStream output = connection.getOutputStream();
@@ -277,7 +277,7 @@ public class AbstractNotebookServerTest {
                 // Successful responses to DELETE requests should have no content.
                 JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
                 connection.disconnect();
-                return new JsonResponse(status, message);
+                return new JsonResponse(status, new JSONBody(message));
             }
             else {
                 InputStreamReader connectionInputStreamReader;
@@ -298,7 +298,7 @@ public class AbstractNotebookServerTest {
                     messages.append(line + "\n");
                 }
                 JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-                return new JsonResponse(status, message);
+                return new JsonResponse(status, new JSONBody(message));
             }
 
         }

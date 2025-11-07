@@ -45,8 +45,8 @@
  */
 package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.Response;
 
 // EndPoints are objects that can be assigned to Jetty Handler objects, which define what procedures are executed when that endpoint is called by a client.
 public interface EndPoint {

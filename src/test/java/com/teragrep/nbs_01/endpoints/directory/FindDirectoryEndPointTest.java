@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -85,14 +85,13 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), directoryPath.toString())));
 
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, directoryPath));
+        Response response = endPoint.createResponse(new JsonRequest(directoryPath));
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", directoryPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedFileContent, response.body().toString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedFileContent, response.body().asString()));
     }
 
     @Test
@@ -100,15 +99,17 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Start server and wait for it to initialize.
         Path nonExistentPath = Paths.get("nonExistentPath");
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, nonExistentPath));
+        Response response = endPoint.createResponse(new JsonRequest(nonExistentPath));
 
         // The endpoint should return a response with the correct status and message
 
         JsonObject expectedResponse = Json.createObjectBuilder().add("message", "No such directory!").build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedResponse.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions.assertEquals(expectedResponse.toString(), response.body().asString())
+                );
     }
 
     @Test

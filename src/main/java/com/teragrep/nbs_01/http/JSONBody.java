@@ -43,50 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.requests;
+package com.teragrep.nbs_01.http;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import jakarta.json.*;
+import jakarta.json.JsonStructure;
 
-import java.io.StringReader;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
+public class JSONBody implements Body {
 
-// A Request that accepts a String, and parses it into a JSON object.
-public final class JsonRequest implements Request {
+    private final JsonStructure json;
 
-    private final String body;
-    private final Path path;
-
-    public JsonRequest(String body) {
-        this(body, FileSystems.getDefault().getPath(""));
+    public JSONBody(JsonStructure json) {
+        this.json = json;
     }
 
-    public JsonRequest(String body, Path path) {
-        this.body = body;
-        this.path = path;
+    public JsonStructure asJson() {
+        return json;
     }
 
-    public String body() {
-        return body;
+    @Override
+    public String asString() {
+        return json.toString();
     }
-
-    public Path path() {
-        return path;
-    }
-
-    public JsonObject parameters() throws MalformedRequestException {
-        try {
-            if (body.isEmpty()) {
-                return JsonValue.EMPTY_JSON_OBJECT;
-            }
-            JsonReader jsonReader = Json.createReader(new StringReader(body));
-            JsonObject parameters = jsonReader.readObject();
-            jsonReader.close();
-            return parameters;
-        }
-        catch (JsonException exception) {
-            throw new MalformedRequestException("Request is not valid JSON!", exception);
-        }
-    };
 }

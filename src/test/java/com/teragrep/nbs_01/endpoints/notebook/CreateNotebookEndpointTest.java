@@ -46,9 +46,10 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -87,8 +88,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
 
         JsonObject expectedJson = Json
@@ -103,7 +103,37 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        // Assert that the file was created.
+        Assertions.assertTrue(Files.exists(newNotebookPath));
+    }
+
+    @Test
+    // Assert that a proper request to CreateNotebookEndpoint with a specified title in request body results in a correct response and a file being saved to disk.
+    public void httpCreateNotebookWithTitleTest() {
+        // Assert that the file we are creating doesn't already exist.
+        Assertions.assertFalse(Files.exists(newNotebookPath));
+        String title = "newNotebook";
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
+        JsonObject body = Json.createObjectBuilder().add("title", title).build();
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
+        // Assert that we receive the proper response.
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("name", title)
+                .add("config", Json.createObjectBuilder().build())
+                .add("paragraphs", Json.createArrayBuilder())
+                .build();
+
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", newNotebookName);
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newNotebookPath));
     }
@@ -114,8 +144,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
-        String body = "{}";
-        Response response = endPoint.createResponse(new JsonRequest(body, existingNotebookName));
+        Response response = endPoint.createResponse(new JsonRequest(existingNotebookName));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

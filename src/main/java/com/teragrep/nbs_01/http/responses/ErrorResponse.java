@@ -43,14 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01;
+package com.teragrep.nbs_01.http.responses;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
-import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.ErrorBody;
+import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-// Interface for a Delegate, that inspects a Request object, and returns either a true or a false value according to implementation details.
-public abstract interface Delegate {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-    public abstract boolean resolve(Request request) throws MalformedBodyException, BodyNotFoundException;
+// Response object that represents an unrecoverable server-side error (Such as failure to write a file). Logs a Throwable with an event ID and generates a message body that prompts the user to check technical logs for error details.
+// Should be used when an internal server error is encountered during a request
+public final class ErrorResponse implements Response {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorResponse.class);
+    private final UUID eventId;
+    private final int status;
+    private final ErrorBody body;
+    private final List<Header> headers;
+
+    public ErrorResponse(int status, Throwable throwable) {
+        this(status, UUID.randomUUID(), new ArrayList<Header>(), throwable);
+    }
+
+    public ErrorResponse(int status, UUID eventId, List<Header> headers, Throwable throwable) {
+        this(status, eventId, headers, new ErrorBody(throwable, eventId));
+    }
+
+    public ErrorResponse(int status, Throwable throwable, List<Header> headers) {
+        this(status, UUID.randomUUID(), headers, throwable);
+    }
+
+    public ErrorResponse(int status, Throwable throwable, UUID eventId) {
+        this(status, eventId, new ArrayList<Header>(), new ErrorBody(throwable, eventId));
+    }
+
+    public ErrorResponse(int status, UUID eventId, List<Header> headers, ErrorBody body) {
+        this.status = status;
+        this.eventId = eventId;
+        this.headers = headers;
+        this.body = body;
+    }
+
+    public int status() {
+        return status;
+    }
+
+    public UUID eventId() {
+        return eventId;
+    }
+
+    public ErrorBody body() {
+        return body;
+    }
+
+    @Override
+    public List<Header> headers() {
+        return headers;
+    }
+
 }

@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.responses;
 
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -70,7 +71,7 @@ class ExceptionResponseTest {
 
         ExceptionResponse response = new ExceptionResponse(400, throwable1);
         JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
-        Assertions.assertTrue(response.exception().equals(throwable1));
-        Assertions.assertEquals(expectedBody.toString(), response.body());
+        Assertions.assertTrue(response.body().exception().equals(throwable1));
+        Assertions.assertEquals(expectedBody.toString(), response.body().asString());
     }
 }

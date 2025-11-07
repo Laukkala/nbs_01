@@ -46,13 +46,15 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.exceptions.MalformedBodyException;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.requests.Request;
-import com.teragrep.nbs_01.responses.ErrorResponse;
-import com.teragrep.nbs_01.responses.ExceptionResponse;
-import com.teragrep.nbs_01.responses.JsonResponse;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.ErrorResponse;
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -75,15 +77,15 @@ public final class UpdateNotebookEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            JsonObject parameters = request.parameters();
+            JsonObject parameters = request.body().asJson().asJsonObject();
             Path path = root.path().resolve(request.path());
 
             if (Files.isDirectory(path)) {
-                throw new MalformedRequestException(request.path() + " is not a Notebook!");
+                throw new MalformedBodyException(request.path() + " is not a Notebook!");
             }
 
             if (!parameters.containsKey("title")) {
-                throw new MalformedRequestException("Request does not contain a title!");
+                throw new MalformedBodyException("Request does not contain a title!");
             }
 
             List<Path> currentFiles = root.list();
@@ -102,16 +104,19 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new JsonResponse(HttpStatus.OK_200, newNotebook.json(), headers);
+            return new JsonResponse(HttpStatus.OK_200, new JSONBody(newNotebook.json()), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
         }
+        catch (BodyNotFoundException bodyNotFoundException) {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, bodyNotFoundException);
+        }
         catch (IOException ioException) {
             return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+        catch (MalformedBodyException malformedBodyException) {
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedBodyException);
         }
     }
 

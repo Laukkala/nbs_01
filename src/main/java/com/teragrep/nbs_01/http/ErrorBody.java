@@ -43,20 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.requests;
+package com.teragrep.nbs_01.http;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
+import java.util.UUID;
 
-// Request object contains parameters that the user wants to send to NBS_01.
-// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
-public interface Request {
+public class ErrorBody implements Body {
 
-    public abstract String body();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorBody.class);
+    private final JsonObject json;
+    private final Throwable error;
+    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
-    public abstract Path path();
+    public ErrorBody(Throwable error) {
+        this(error, UUID.randomUUID());
+    }
 
-    public abstract JsonObject parameters() throws MalformedRequestException;
+    public ErrorBody(Throwable error, UUID eventId) {
+        this.error = error;
+        LOGGER.error("Event_" + eventId, error);
+        jsonObjectBuilder
+                .add(
+                        "message",
+                        "An error occurred while processing your Request. See event id " + eventId
+                                + " in the technical log for details."
+                );
+        this.json = jsonObjectBuilder.build();
+    }
+
+    public Throwable error() {
+        return error;
+    }
+
+    public JsonObject asJson() {
+        return json;
+    }
+
+    @Override
+    public String asString() {
+        return json.toString();
+    }
 }

@@ -46,9 +46,12 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.requests.JsonRequest;
-import com.teragrep.nbs_01.responses.Response;
+import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -92,8 +95,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(newNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookParameter.toString()).build();
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", newNotebookName);
@@ -106,6 +109,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
                                 .assertTrue(
                                         response
                                                 .body()
+                                                .asString()
                                                 .contains(
                                                         "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
                                                 )
@@ -117,13 +121,16 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
                                 .assertTrue(
                                         response
                                                 .body()
+                                                .asString()
                                                 .contains(
                                                         "\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}"
                                                 )
                                 )
                 );
         Assertions
-                .assertDoesNotThrow(() -> Assertions.assertTrue(response.body().contains("\"script\":{\"text\":\"\"}")));
+                .assertDoesNotThrow(
+                        () -> Assertions.assertTrue(response.body().asString().contains("\"script\":{\"text\":\"\"}"))
+                );
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(newNotebookPath));
     }
@@ -134,8 +141,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"sourcePath\":\"" + nonExistentNotebookPath + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, Paths.get(newNotebookName)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", nonExistentNotebookPath.toString()).build();
+        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
@@ -150,8 +157,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(existingPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
-        String body = "{\"sourcePath\":\"" + sourceNotebookParameter + "\"}";
-        Response response = endPoint.createResponse(new JsonRequest(body, existingPathEndpointParameter));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookPath.toString()).build();
+        Response response = endPoint.createResponse(new JsonRequest(existingPathEndpointParameter, new JSONBody(body)));
 
         // The endpoint should return an ExceptionResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());

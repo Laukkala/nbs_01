@@ -43,14 +43,41 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01;
+package com.teragrep.nbs_01.http.responses;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
-import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.Body;
+import org.apache.http.Header;
 
-// Interface for a Delegate, that inspects a Request object, and returns either a true or a false value according to implementation details.
-public abstract interface Delegate {
+import java.util.ArrayList;
+import java.util.List;
 
-    public abstract boolean resolve(Request request) throws MalformedBodyException, BodyNotFoundException;
+// Response object that contains a String
+public final class PlainTextResponse implements Response {
+
+    private final int status;
+    private final Body body;
+    private final List<Header> headers;
+
+    public PlainTextResponse(int status, Body body) {
+        this(status, body, new ArrayList<Header>());
+    }
+
+    public PlainTextResponse(int status, Body body, List<Header> headers) {
+        this.status = status;
+        this.body = body;
+        this.headers = headers;
+    }
+
+    public int status() {
+        return status;
+    }
+
+    public Body body() {
+        return body;
+    }
+
+    @Override
+    public List<Header> headers() {
+        return headers;
+    }
 }
