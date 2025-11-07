@@ -85,114 +85,24 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // GET requests should not have a body, but it is possible to send one.
-        BufferedReader reader = req.getReader();
-        String bodyString = reader.lines().collect(Collectors.joining());
-        reader.close();
-        Body body;
-        if (!bodyString.isEmpty()) {
-            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
-            JsonObject bodyJson = jsonReader.readObject();
-            body = new JSONBody(bodyJson);
-        }
-        else {
-            body = new StubBody();
-        }
-        Request endPointRequest = new JsonRequest(body);
-
-        // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
-        resp.setStatus(endPointResponse.status());
-        resp.setCharacterEncoding(charset.name());
-        for (Header header : endPointResponse.headers()) {
-            resp.setHeader(header.getName(), header.getValue());
-        }
-        // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
-        try {
-            PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().asString());
-            writer.flush();
-            writer.close();
-        }
-        catch (IllegalStateException malformedBodyException) {
-            // Request does not have a body.
-        }
+        handleHttpRequest(req, resp, endPoint);
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Read the body of the POST request
-        BufferedReader reader = req.getReader();
-        String bodyString = reader.lines().collect(Collectors.joining());
-        reader.close();
-        Body body;
-        if (!bodyString.isEmpty()) {
-            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
-            JsonObject bodyJson = jsonReader.readObject();
-            body = new JSONBody(bodyJson);
-        }
-        else {
-            body = new StubBody();
-        }
-        Request endPointRequest = new JsonRequest(body);
-
-        // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
-        resp.setStatus(endPointResponse.status());
-        resp.setCharacterEncoding(charset.name());
-        for (Header header : endPointResponse.headers()) {
-            resp.setHeader(header.getName(), header.getValue());
-        }
-        // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
-        try {
-            PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().asString());
-            writer.flush();
-            writer.close();
-        }
-        catch (IllegalStateException malformedBodyException) {
-            // Request does not have a body.
-        }
+        handleHttpRequest(req, resp, endPoint);
     }
 
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        // Read the body of the PUT request
-        BufferedReader reader = req.getReader();
-        String bodyString = reader.lines().collect(Collectors.joining());
-        reader.close();
-        Body body;
-        if (!bodyString.isEmpty()) {
-            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
-            JsonObject bodyJson = jsonReader.readObject();
-            body = new JSONBody(bodyJson);
-        }
-        else {
-            body = new StubBody();
-        }
-        Request endPointRequest = new JsonRequest(body);
-
-        // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
-        resp.setStatus(endPointResponse.status());
-        resp.setCharacterEncoding(charset.name());
-        for (Header header : endPointResponse.headers()) {
-            resp.setHeader(header.getName(), header.getValue());
-        }
-        // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
-        try {
-            PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().asString());
-            writer.flush();
-            writer.close();
-        }
-        catch (IllegalStateException malformedBodyException) {
-            // Request does not have a body.
-        }
+        handleHttpRequest(req, resp, endPoint);
     }
 
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handleHttpRequest(req, resp, endPoint);
+    }
 
-        // Read the body of the DELETE request
+    private void handleHttpRequest(HttpServletRequest req, HttpServletResponse resp, EndPoint requestEndPoint)
+            throws IOException {
+        // Read body of request
         BufferedReader reader = req.getReader();
         String bodyString = reader.lines().collect(Collectors.joining());
         reader.close();
@@ -208,7 +118,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         Request endPointRequest = new JsonRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = endPoint.createResponse(endPointRequest);
+        Response endPointResponse = requestEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setCharacterEncoding(charset.name());
         for (Header header : endPointResponse.headers()) {
