@@ -47,12 +47,13 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.ErrorResponse;
-import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.JsonStructure;
@@ -105,10 +106,10 @@ public final class CreateNotebookEndpoint implements EndPoint {
             return new JsonResponse(HttpStatus.CREATED_201, new JSONBody(newFile.json()), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, fileAlreadyExistsException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(fileAlreadyExistsException));
         }
         catch (IOException ioException) {
             return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);

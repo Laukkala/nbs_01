@@ -52,7 +52,9 @@ import org.apache.http.Header;
 import java.util.ArrayList;
 import java.util.List;
 
-// Response object that contains a JsonObject as its body
+/**
+ * Basic Response implementation
+ */
 public final class JsonResponse implements Response {
 
     private final int status;

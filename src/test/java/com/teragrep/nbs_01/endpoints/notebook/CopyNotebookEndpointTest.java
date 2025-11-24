@@ -144,7 +144,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         JsonObject body = Json.createObjectBuilder().add("sourcePath", nonExistentNotebookPath.toString()).build();
         Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the file was not created.
         Assertions.assertFalse(Files.exists(newNotebookPath));
@@ -160,7 +160,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookPath.toString()).build();
         Response response = endPoint.createResponse(new JsonRequest(existingPathEndpointParameter, new JSONBody(body)));
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

@@ -47,10 +47,11 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.ErrorResponse;
-import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import org.apache.http.Header;
@@ -79,9 +80,9 @@ public final class DeleteNotebookEndpoint implements EndPoint {
             Path path = root.path().resolve(request.path());
             // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
             if (Files.isDirectory(path)) {
-                return new ExceptionResponse(
+                return new JsonResponse(
                         HttpStatus.BAD_REQUEST_400,
-                        new MalformedRequestException(request.path() + " is not a Notebook!")
+                        new ExceptionBody(new MalformedRequestException(request.path() + " is not a Notebook!"))
                 );
             }
             else {
@@ -93,9 +94,9 @@ public final class DeleteNotebookEndpoint implements EndPoint {
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {
-            return new ExceptionResponse(
+            return new JsonResponse(
                     HttpStatus.NOT_FOUND_404,
-                    new FileNotFoundException("No such file: " + request.path())
+                    new ExceptionBody(new FileNotFoundException("No such file: " + request.path()))
             );
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.

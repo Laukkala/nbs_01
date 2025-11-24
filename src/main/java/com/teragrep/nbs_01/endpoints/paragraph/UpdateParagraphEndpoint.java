@@ -48,11 +48,12 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
+import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.ErrorResponse;
-import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -119,13 +120,13 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             return new JsonResponse(HttpStatus.OK_200, new JSONBody(newParagraph.json()), headers);
         }
         catch (BodyNotFoundException bodyNotFoundException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, bodyNotFoundException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
         }
         catch (MalformedBodyException malformedBodyException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedBodyException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedBodyException));
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, fileNotFoundException);
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
         catch (IOException ioException) {
             return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);

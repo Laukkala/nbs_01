@@ -55,8 +55,8 @@ import java.util.UUID;
 
 /**
  * A Body that takes a Throwable, and logs it at the time of its creation, adding either a given or a generated EventID
- * to the logs. Provides access to the Throwable
- * Generates a generic message body that does not expose the inner workings of the program to the end user.
+ * to the logs. Provides access to the Throwable Generates a generic message body that does not expose the inner
+ * workings of the program to the end user.
  */
 public class ErrorBody implements Body {
 

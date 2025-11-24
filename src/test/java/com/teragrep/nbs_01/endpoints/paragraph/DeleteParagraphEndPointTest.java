@@ -152,7 +152,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         JsonRequest request = new JsonRequest(requestPath);
         Response response = endPoint.createResponse(request);
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        // The endpoint should return an JsonResponse with the correct status and specified cause.
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()

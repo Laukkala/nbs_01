@@ -45,7 +45,8 @@
  */
 package com.teragrep.nbs_01.responses;
 
-import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.ExceptionBody;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -54,14 +55,14 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-class ExceptionResponseTest {
+class JsonResponseTest {
 
     private final String throwable1message = "No such notebook!";
     private final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
     private final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
 
-    // An ExceptionResponse should generate an EventId on creation, and provide the message of the Exception, but no stack traces.
+    // An JsonResponse should generate an EventId on creation, and provide the message of the Exception, but no stack traces.
     @Test
     void testBodyGeneration() {
         Throwable throwable4 = new FileNotFoundException(throwable4message);
@@ -69,9 +70,8 @@ class ExceptionResponseTest {
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        ExceptionResponse response = new ExceptionResponse(400, throwable1);
+        JsonResponse response = new JsonResponse(400, new ExceptionBody(throwable1));
         JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
-        Assertions.assertTrue(response.body().exception().equals(throwable1));
         Assertions.assertEquals(expectedBody.toString(), response.body().asString());
     }
 }

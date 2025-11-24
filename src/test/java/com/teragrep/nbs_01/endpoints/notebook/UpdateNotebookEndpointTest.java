@@ -127,7 +127,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
                 .createResponse(new JsonRequest(Paths.get(nonExistentNotebookName), new JSONBody(body)));
         // Assert that we got the proper response.
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        // The endpoint should return an JsonResponse with the correct status and specified cause.
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()

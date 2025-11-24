@@ -123,7 +123,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
         Response response = endPoint.createResponse(new JsonRequest(requestPath));
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        // The endpoint should return an JsonResponse with the correct status and specified cause.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
@@ -142,7 +142,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
         Response response = endpoint.createResponse(new JsonRequest(queryPath));
 
-        // The endpoint should return an ExceptionResponse with the correct status and specified cause.
+        // The endpoint should return an JsonResponse with the correct status and specified cause.
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()

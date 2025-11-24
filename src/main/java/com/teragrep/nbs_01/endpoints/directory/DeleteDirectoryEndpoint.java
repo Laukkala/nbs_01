@@ -47,11 +47,12 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.ErrorResponse;
-import com.teragrep.nbs_01.http.responses.ExceptionResponse;
+import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -101,11 +102,11 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
             );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedRequestException);
+            return new JsonResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {
-            return new ExceptionResponse(HttpStatus.NOT_FOUND_404, noSuchFileException);
+            return new JsonResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(noSuchFileException));
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
