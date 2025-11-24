@@ -47,6 +47,11 @@ package com.teragrep.nbs_01.http;
 
 import jakarta.json.JsonObject;
 
+/**
+ * An object representing the absence of a Body
+ * Should be used when a Request or a response does not contain a Body at all.
+ */
+
 public class StubBody implements Body {
 
     public StubBody() {

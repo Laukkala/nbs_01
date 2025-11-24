@@ -47,6 +47,10 @@ package com.teragrep.nbs_01.http;
 
 import jakarta.json.JsonStructure;
 
+/**
+ * A Body that encapsulates a JsonStructure
+ */
+
 public class JSONBody implements Body {
 
     private final JsonStructure json;

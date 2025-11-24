@@ -51,6 +51,12 @@ import jakarta.json.JsonObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A Body that takes a Throwable and provides access to it.
+ * Generates message body that contains only the highest level Exception message to be shown to the end user.
+ * Should be used in cases where user has made a mistake, such as providing incorrect data.
+ */
+
 public class ExceptionBody implements Body {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionBody.class);
