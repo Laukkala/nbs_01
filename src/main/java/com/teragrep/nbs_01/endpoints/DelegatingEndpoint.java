@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.Delegate;
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.ErrorResponse;
+import com.teragrep.nbs_01.http.responses.ExceptionResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -76,10 +76,10 @@ public class DelegatingEndpoint implements EndPoint {
             }
         }
         catch (MalformedBodyException malformedBodyException) {
-            return new ErrorResponse(HttpStatus.BAD_REQUEST_400, malformedBodyException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, malformedBodyException);
         }
         catch (BodyNotFoundException bodyNotFoundException) {
-            return new ErrorResponse(HttpStatus.BAD_REQUEST_400, bodyNotFoundException);
+            return new ExceptionResponse(HttpStatus.BAD_REQUEST_400, bodyNotFoundException);
         }
     }
 }
