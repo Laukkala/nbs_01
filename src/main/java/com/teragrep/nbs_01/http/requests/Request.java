@@ -52,6 +52,11 @@ import org.apache.http.Header;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Representation of an HTTP request.
+ * Composed of a collection of Headers, a Body, and a Path
+ * Provides access to its components.
+ */
 // Request object contains parameters that the user wants to send to NBS_01.
 // Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
 public interface Request {

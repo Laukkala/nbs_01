@@ -55,7 +55,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-// A Request that accepts a String, and parses it into a JSON object.
+/**
+ * Basic Request implementation
+ */
 public final class JsonRequest implements Request {
 
     private final Body body;
