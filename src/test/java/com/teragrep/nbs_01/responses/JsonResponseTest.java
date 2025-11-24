@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.responses;
 
+import com.teragrep.nbs_01.http.ErrorBody;
 import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.responses.JsonResponse;
 import jakarta.json.Json;
@@ -54,17 +55,18 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.UUID;
 
 class JsonResponseTest {
 
-    private final String throwable1message = "No such notebook!";
-    private final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-    private final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-    private final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
-
     // An JsonResponse should generate an EventId on creation, and provide the message of the Exception, but no stack traces.
     @Test
-    void testBodyGeneration() {
+    void testExceptionBodyGeneration() {
+        final String throwable1message = "No such notebook!";
+        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
+
         Throwable throwable4 = new FileNotFoundException(throwable4message);
         Throwable throwable3 = new IOException(throwable3message, throwable4);
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
@@ -72,6 +74,33 @@ class JsonResponseTest {
 
         JsonResponse response = new JsonResponse(400, new ExceptionBody(throwable1));
         JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
+        Assertions.assertEquals(expectedBody.toString(), response.body().asString());
+    }
+
+    // An ErrorResponse should generate an EventId on creation, and provide a prompt to check technical logs with the matching ID for details.
+    @Test
+    void testErrorBodyGeneration() {
+
+        final String throwable1message = "Failed to open notebook!";
+        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
+        final UUID eventId = UUID.randomUUID();
+
+        Throwable throwable4 = new FileNotFoundException(throwable4message);
+        Throwable throwable3 = new IOException(throwable3message, throwable4);
+        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
+        Throwable throwable1 = new Exception(throwable1message, throwable2);
+
+        JsonResponse response = new JsonResponse(500, new ErrorBody(throwable1, eventId));
+        JsonObject expectedBody = Json
+                .createObjectBuilder()
+                .add(
+                        "message",
+                        "An error occurred while processing your Request. See event id " + eventId
+                                + " in the technical log for details."
+                )
+                .build();
         Assertions.assertEquals(expectedBody.toString(), response.body().asString());
     }
 }

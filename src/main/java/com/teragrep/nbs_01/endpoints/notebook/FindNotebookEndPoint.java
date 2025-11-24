@@ -47,15 +47,14 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.http.ErrorBody;
 import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.ErrorResponse;
 import com.teragrep.nbs_01.http.responses.JsonResponse;
 import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -102,7 +101,7 @@ public final class FindNotebookEndPoint implements EndPoint {
             return new JsonResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
         catch (IOException ioException) {
-            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, ioException);
+            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
         }
     }
 
