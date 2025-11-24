@@ -51,7 +51,7 @@ import com.teragrep.nbs_01.http.ErrorBody;
 import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -79,7 +79,7 @@ public final class DeleteNotebookEndpoint implements EndPoint {
             Path path = root.path().resolve(request.path());
             // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
             if (Files.isDirectory(path)) {
-                return new JsonResponse(
+                return new BasicResponse(
                         HttpStatus.BAD_REQUEST_400,
                         new ExceptionBody(new MalformedRequestException(request.path() + " is not a Notebook!"))
                 );
@@ -89,18 +89,18 @@ public final class DeleteNotebookEndpoint implements EndPoint {
             }
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
-            return new JsonResponse(HttpStatus.NO_CONTENT_204, headers);
+            return new BasicResponse(HttpStatus.NO_CONTENT_204, headers);
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {
-            return new JsonResponse(
+            return new BasicResponse(
                     HttpStatus.NOT_FOUND_404,
                     new ExceptionBody(new FileNotFoundException("No such file: " + request.path()))
             );
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
         }
     }
 

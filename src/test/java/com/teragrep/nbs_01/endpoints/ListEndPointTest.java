@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -79,7 +79,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpListAllTest() {
         ListEndPoint listEndPoint = new ListEndPoint(new FileTree(notebookDirectory()));
-        Response response = listEndPoint.createResponse(new JsonRequest());
+        Response response = listEndPoint.createResponse(new BasicRequest());
         for (String filename : allFileIds) {
             Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(filename)));
         }
@@ -90,7 +90,7 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     public void httpListWithinFolderTest() {
         ListEndPoint listEndPoint = new ListEndPoint(new FileTree(notebookDirectory()));
         JsonObject requestBody = Json.createObjectBuilder().add("directoryPath", directory1().toString()).build();
-        Response response = listEndPoint.createResponse(new JsonRequest(new JSONBody(requestBody)));
+        Response response = listEndPoint.createResponse(new BasicRequest(new JSONBody(requestBody)));
         for (String filename : allFileIdsWithinDirectory) {
             Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(filename)));
         }

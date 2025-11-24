@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -88,7 +88,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
 
         JsonObject expectedJson = Json
@@ -117,7 +117,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         String title = "newNotebook";
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", title).build();
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
         // Assert that we receive the proper response.
 
         JsonObject expectedJson = Json
@@ -144,7 +144,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingNotebookPath));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(existingNotebookName));
+        Response response = endPoint.createResponse(new BasicRequest(existingNotebookName));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

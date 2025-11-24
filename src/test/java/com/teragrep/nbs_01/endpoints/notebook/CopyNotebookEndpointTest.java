@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -96,7 +96,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookParameter.toString()).build();
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", newNotebookName);
@@ -142,7 +142,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", nonExistentNotebookPath.toString()).build();
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newNotebookName), new JSONBody(body)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
@@ -158,7 +158,8 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookPath.toString()).build();
-        Response response = endPoint.createResponse(new JsonRequest(existingPathEndpointParameter, new JSONBody(body)));
+        Response response = endPoint
+                .createResponse(new BasicRequest(existingPathEndpointParameter, new JSONBody(body)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());

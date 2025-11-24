@@ -53,7 +53,7 @@ import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -95,7 +95,7 @@ public final class FindParagraphEndPoint implements EndPoint {
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));
                 headers.add(new BasicHeader("Content-Type", "application/json"));
-                return new JsonResponse(
+                return new BasicResponse(
                         HttpStatus.OK_200,
                         new JSONBody(notebook.paragraphs().get(paragraphId).json()),
                         headers
@@ -106,13 +106,13 @@ public final class FindParagraphEndPoint implements EndPoint {
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
         }
     }
 

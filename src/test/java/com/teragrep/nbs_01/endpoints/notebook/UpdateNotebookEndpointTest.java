@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -96,7 +96,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with a path.
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
-        Response response = endpoint.createResponse(new JsonRequest(notebookPath, new JSONBody(body)));
+        Response response = endpoint.createResponse(new BasicRequest(notebookPath, new JSONBody(body)));
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
@@ -124,7 +124,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle.toString()).build();
         Response response = endpoint
-                .createResponse(new JsonRequest(Paths.get(nonExistentNotebookName), new JSONBody(body)));
+                .createResponse(new BasicRequest(Paths.get(nonExistentNotebookName), new JSONBody(body)));
         // Assert that we got the proper response.
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.

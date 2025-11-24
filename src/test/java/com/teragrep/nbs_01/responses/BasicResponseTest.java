@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.responses;
 
 import com.teragrep.nbs_01.http.ErrorBody;
 import com.teragrep.nbs_01.http.ExceptionBody;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -57,7 +57,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
 
-class JsonResponseTest {
+class BasicResponseTest {
 
     // An JsonResponse should generate an EventId on creation, and provide the message of the Exception, but no stack traces.
     @Test
@@ -72,7 +72,7 @@ class JsonResponseTest {
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        JsonResponse response = new JsonResponse(400, new ExceptionBody(throwable1));
+        BasicResponse response = new BasicResponse(400, new ExceptionBody(throwable1));
         JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
         Assertions.assertEquals(expectedBody.toString(), response.body().asString());
     }
@@ -92,7 +92,7 @@ class JsonResponseTest {
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        JsonResponse response = new JsonResponse(500, new ErrorBody(throwable1, eventId));
+        BasicResponse response = new BasicResponse(500, new ErrorBody(throwable1, eventId));
         JsonObject expectedBody = Json
                 .createObjectBuilder()
                 .add(

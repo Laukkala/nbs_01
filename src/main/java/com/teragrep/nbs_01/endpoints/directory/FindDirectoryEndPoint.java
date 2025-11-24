@@ -53,7 +53,7 @@ import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -81,13 +81,13 @@ public final class FindDirectoryEndPoint implements EndPoint {
             Path path = root.path().resolve(request.path());
             List<Path> currentFiles = root.list();
             if (!currentFiles.contains(path)) {
-                return new JsonResponse(
+                return new BasicResponse(
                         HttpStatus.NOT_FOUND_404,
                         new ExceptionBody(new FileNotFoundException("No such directory!"))
                 );
             }
             if (!path.toFile().isDirectory()) {
-                return new JsonResponse(
+                return new BasicResponse(
                         HttpStatus.BAD_REQUEST_400,
                         new ExceptionBody(
                                 new MalformedRequestException("File at path " + request.path() + " is not a directory!")
@@ -98,10 +98,10 @@ public final class FindDirectoryEndPoint implements EndPoint {
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new JsonResponse(HttpStatus.OK_200, new JSONBody(directory.json()), headers);
+            return new BasicResponse(HttpStatus.OK_200, new JSONBody(directory.json()), headers);
         }
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
         }
     }
 

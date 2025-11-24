@@ -52,7 +52,7 @@ import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import org.apache.http.Header;
@@ -94,22 +94,22 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
             }
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
-            return new JsonResponse(
+            return new BasicResponse(
                     HttpStatus.NO_CONTENT_204,
                     new JSONBody(Json.createObjectBuilder().build()),
                     headers
             );
         }
         catch (MalformedRequestException malformedRequestException) {
-            return new JsonResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {
-            return new JsonResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(noSuchFileException));
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(noSuchFileException));
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
-            return new JsonResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
         }
     }
 

@@ -49,7 +49,7 @@ import com.google.common.base.Charsets;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -94,7 +94,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -150,7 +150,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -185,7 +185,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook3().toString()).build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -217,7 +217,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", sourceNotebookName)
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -241,7 +241,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourceParagraphId", sourceParagraphId).build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -278,7 +278,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -311,7 +311,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        JsonRequest request = new JsonRequest(requestPath, new JSONBody(body));
+        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.

@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -87,7 +87,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookPath.toString(), "/paragraph/" + paragraphId);
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(requestPath));
+        Response response = endPoint.createResponse(new BasicRequest(requestPath));
         Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
@@ -105,7 +105,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
-        Response response = endPoint.createResponse(new JsonRequest(requestPath));
+        Response response = endPoint.createResponse(new BasicRequest(requestPath));
 
         // The endpoint should return a Response with the correct status and messagsse.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such notebook !").build();
@@ -121,7 +121,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
-        Response response = endPoint.createResponse(new JsonRequest(requestPath));
+        Response response = endPoint.createResponse(new BasicRequest(requestPath));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
@@ -140,7 +140,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
-        Response response = endpoint.createResponse(new JsonRequest(queryPath));
+        Response response = endpoint.createResponse(new BasicRequest(queryPath));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 

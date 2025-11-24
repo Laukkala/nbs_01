@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -85,7 +85,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(notebookPath));
+        Response response = endPoint.createResponse(new BasicRequest(notebookPath));
         Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
@@ -101,7 +101,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         String nonExistentNotebookName = "nonExistentNotebook";
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(nonExistentNotebookName)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(nonExistentNotebookName)));
 
         // The endpoint should return the correct status and message.
         JsonObject expectedJson = Json

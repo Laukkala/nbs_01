@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Directory;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -93,7 +93,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest(requestPath);
+        BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
@@ -123,7 +123,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
 
-        JsonRequest request = new JsonRequest(requestPath);
+        BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
 
         // The endpoint should return a Response with the correct status and message.
@@ -149,7 +149,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
-        JsonRequest request = new JsonRequest(requestPath);
+        BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.

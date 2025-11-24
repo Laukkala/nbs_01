@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -88,7 +88,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(newDirectoryName)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
 
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
@@ -115,7 +115,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingDirectoryPath));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
-        Response response = endPoint.createResponse(new JsonRequest(Paths.get(existingDirectoryName)));
+        Response response = endPoint.createResponse(new BasicRequest(Paths.get(existingDirectoryName)));
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()

@@ -58,41 +58,41 @@ import java.util.List;
 /**
  * Basic Request implementation
  */
-public final class JsonRequest implements Request {
+public final class BasicRequest implements Request {
 
     private final Body body;
     private final Path path;
     private final List<Header> headers;
 
-    public JsonRequest() {
+    public BasicRequest() {
         this(new StubBody(), FileSystems.getDefault().getPath(""), new ArrayList<>());
     }
 
-    public JsonRequest(Body body) {
+    public BasicRequest(Body body) {
         this(body, FileSystems.getDefault().getPath(""), new ArrayList<>());
     }
 
-    public JsonRequest(List<Header> headers) {
+    public BasicRequest(List<Header> headers) {
         this(new StubBody(), FileSystems.getDefault().getPath(""), headers);
     }
 
-    public JsonRequest(Path path) {
+    public BasicRequest(Path path) {
         this(new StubBody(), path, new ArrayList<>());
     }
 
-    public JsonRequest(Body body, List<Header> headers) {
+    public BasicRequest(Body body, List<Header> headers) {
         this(body, FileSystems.getDefault().getPath(""), headers);
     }
 
-    public JsonRequest(Path path, List<Header> headers) {
+    public BasicRequest(Path path, List<Header> headers) {
         this(new StubBody(), path, headers);
     }
 
-    public JsonRequest(Path path, Body body) {
+    public BasicRequest(Path path, Body body) {
         this(body, path, new ArrayList<>());
     }
 
-    public JsonRequest(Body body, Path path, List<Header> headers) {
+    public BasicRequest(Body body, Path path, List<Header> headers) {
         this.body = body;
         this.path = path;
         this.headers = headers;

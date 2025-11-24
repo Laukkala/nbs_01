@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints;
 
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.JsonResponse;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
@@ -60,7 +60,7 @@ public final class PingEndpoint implements EndPoint {
     }
 
     public Response createResponse(Request request) {
-        return new JsonResponse(
+        return new BasicResponse(
                 HttpStatus.OK_200,
                 new JSONBody(Json.createObjectBuilder().add("message", "pong").build())
         );

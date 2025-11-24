@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.http.Body;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.http.StubBody;
-import com.teragrep.nbs_01.http.requests.JsonRequest;
+import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -115,7 +115,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         else {
             body = new StubBody();
         }
-        Request endPointRequest = new JsonRequest(body);
+        Request endPointRequest = new BasicRequest(body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
         Response endPointResponse = requestEndPoint.createResponse(endPointRequest);

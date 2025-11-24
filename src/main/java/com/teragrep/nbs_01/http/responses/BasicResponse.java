@@ -55,25 +55,25 @@ import java.util.List;
 /**
  * Basic Response implementation
  */
-public final class JsonResponse implements Response {
+public final class BasicResponse implements Response {
 
     private final int status;
     private final Body body;
     private final List<Header> headers;
 
-    public JsonResponse(int status) {
+    public BasicResponse(int status) {
         this(status, new StubBody(), new ArrayList<>());
     }
 
-    public JsonResponse(int status, List<Header> headers) {
+    public BasicResponse(int status, List<Header> headers) {
         this(status, new StubBody(), headers);
     }
 
-    public JsonResponse(int status, Body body) {
+    public BasicResponse(int status, Body body) {
         this(status, body, new ArrayList<>());
     }
 
-    public JsonResponse(int status, Body body, List<Header> headers) {
+    public BasicResponse(int status, Body body, List<Header> headers) {
         this.status = status;
         this.body = body;
         this.headers = headers;
