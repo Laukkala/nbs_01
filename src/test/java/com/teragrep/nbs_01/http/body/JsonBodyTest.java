@@ -46,33 +46,40 @@
 package com.teragrep.nbs_01.http.body;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-/**
- * A Body that takes a Throwable. Generates message body that contains only the highest level Exception message to be
- * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
- */
+public class JsonBodyTest {
 
-public class ExceptionBody implements Body {
+    // JsonBody should be able to represent itself as both a JsonStructure (a JsonObject or a JsonArray) and a String
+    @Test
+    void testJsonBodyAsString() {
 
-    private final JsonObject json;
-    private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
 
-    public ExceptionBody(Throwable exception) {
-        this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
+        JSONBody body = new JSONBody(expectedBody);
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 
-    @Override
-    public JsonObject asJson() {
-        return json;
+    @Test
+    void testJsonBodyAsJsonObject() {
+
+        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
+
+        JSONBody body = new JSONBody(expectedBody);
+        Assertions.assertEquals(expectedBody, body.asJson());
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 
-    @Override
-    public String asString() {
-        return json.toString();
+    @Test
+    void testJsonBodyAsJsonArray() {
+
+        JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
+
+        JSONBody body = new JSONBody(expectedBody);
+        Assertions.assertEquals(expectedBody, body.asJson());
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 }

@@ -45,12 +45,12 @@
  */
 package com.teragrep.nbs_01.http.requests;
 
+import com.teragrep.nbs_01.StubPath;
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.http.body.Body;
 import com.teragrep.nbs_01.http.body.StubBody;
 import org.apache.http.Header;
 
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,23 +65,15 @@ public final class BasicRequest implements Request {
     private final List<Header> headers;
 
     public BasicRequest() {
-        this(new StubBody(), FileSystems.getDefault().getPath(""), new ArrayList<>());
+        this(new StubBody(), new StubPath(), new ArrayList<>());
     }
 
     public BasicRequest(Body body) {
-        this(body, FileSystems.getDefault().getPath(""), new ArrayList<>());
-    }
-
-    public BasicRequest(List<Header> headers) {
-        this(new StubBody(), FileSystems.getDefault().getPath(""), headers);
+        this(body, new StubPath(), new ArrayList<>());
     }
 
     public BasicRequest(Path path) {
         this(new StubBody(), path, new ArrayList<>());
-    }
-
-    public BasicRequest(Body body, List<Header> headers) {
-        this(body, FileSystems.getDefault().getPath(""), headers);
     }
 
     public BasicRequest(Path path, List<Header> headers) {

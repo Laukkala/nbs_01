@@ -43,36 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.body;
+package com.teragrep.nbs_01.http.responses;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-
-/**
- * A Body that takes a Throwable. Generates message body that contains only the highest level Exception message to be
- * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
- */
-
-public class ExceptionBody implements Body {
-
-    private final JsonObject json;
-    private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-
-    public ExceptionBody(Throwable exception) {
-        this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
-    }
-
-    @Override
-    public JsonObject asJson() {
-        return json;
-    }
-
-    @Override
-    public String asString() {
-        return json.toString();
-    }
+public class BasicResponseTest {
 }

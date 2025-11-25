@@ -43,12 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.responses;
+package com.teragrep.nbs_01.http.body;
 
-import com.teragrep.nbs_01.http.body.ErrorBody;
-import com.teragrep.nbs_01.ErrorEvent;
-import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -56,11 +52,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.UUID;
 
-class BasicResponseTest {
+public class ExceptionBodyTest {
 
-    // An JsonResponse should generate an EventId on creation, and provide the message of the Exception, but no stack traces.
+    // ExceptionBody should contain a message with the top reason in the stack, but not deeper
     @Test
     void testExceptionBodyGeneration() {
         final String throwable1message = "No such notebook!";
@@ -73,35 +68,8 @@ class BasicResponseTest {
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        BasicResponse response = new BasicResponse(400, new ExceptionBody(throwable1));
+        ExceptionBody body = new ExceptionBody(throwable1);
         JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
-        Assertions.assertEquals(expectedBody.toString(), response.body().asString());
-    }
-
-    // An ErrorResponse should generate an EventId on creation, and provide a prompt to check technical logs with the matching ID for details.
-    @Test
-    void testErrorBodyGeneration() {
-
-        final String throwable1message = "Failed to open notebook!";
-        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
-        final UUID eventId = UUID.randomUUID();
-
-        Throwable throwable4 = new FileNotFoundException(throwable4message);
-        Throwable throwable3 = new IOException(throwable3message, throwable4);
-        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
-        Throwable throwable1 = new Exception(throwable1message, throwable2);
-
-        BasicResponse response = new BasicResponse(500, new ErrorBody(new ErrorEvent(throwable1, eventId)));
-        JsonObject expectedBody = Json
-                .createObjectBuilder()
-                .add(
-                        "message",
-                        "An error occurred while processing your Request. See event id " + eventId
-                                + " in the technical log for details."
-                )
-                .build();
-        Assertions.assertEquals(expectedBody.toString(), response.body().asString());
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 }

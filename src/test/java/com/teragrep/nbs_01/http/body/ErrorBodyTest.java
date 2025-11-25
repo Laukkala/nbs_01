@@ -45,34 +45,42 @@
  */
 package com.teragrep.nbs_01.http.body;
 
+import com.teragrep.nbs_01.ErrorEvent;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-/**
- * A Body that takes a Throwable. Generates message body that contains only the highest level Exception message to be
- * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
- */
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.UUID;
 
-public class ExceptionBody implements Body {
+public class ErrorBodyTest {
 
-    private final JsonObject json;
-    private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+    // An ErrorBody should generate a specific message on creation, containing an event Id.
+    @Test
+    void testErrorBodyGeneration() {
 
-    public ExceptionBody(Throwable exception) {
-        this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
-    }
+        final String throwable1message = "Failed to open notebook!";
+        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
+        final UUID eventId = UUID.randomUUID();
 
-    @Override
-    public JsonObject asJson() {
-        return json;
-    }
+        Throwable throwable4 = new FileNotFoundException(throwable4message);
+        Throwable throwable3 = new IOException(throwable3message, throwable4);
+        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
+        Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-    @Override
-    public String asString() {
-        return json.toString();
+        ErrorBody body = new ErrorBody(new ErrorEvent(throwable1, eventId));
+        JsonObject expectedBody = Json
+                .createObjectBuilder()
+                .add(
+                        "message",
+                        "An error occurred while processing your Request. See event id " + eventId
+                                + " in the technical log for details."
+                )
+                .build();
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 }
