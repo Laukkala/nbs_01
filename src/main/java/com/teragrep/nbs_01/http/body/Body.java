@@ -43,64 +43,16 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.http.body;
 
-import com.teragrep.nbs_01.http.ErrorBody;
-import com.teragrep.nbs_01.http.ErrorEvent;
-import com.teragrep.nbs_01.http.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
-import jakarta.json.*;
-import org.eclipse.jetty.http.HttpStatus;
+import jakarta.json.JsonStructure;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
+/**
+ * Represents the body of a HTML request or a response. Can represent itself as a String.
+ */
+public interface Body {
 
-// Endpoint that lists all the paths of saved notebooks in a given Directory.
-public final class ListEndPoint implements EndPoint {
+    public abstract String asString();
 
-    private final FileTree root;
-
-    public ListEndPoint(FileTree root) {
-        this.root = root;
-    }
-
-    public Response createResponse(Request request) {
-        // Find all notebooks from Directory structure
-        try {
-            List<Path> currentFiles = root.list();
-            StringBuilder sb = new StringBuilder();
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            for (Path file : currentFiles) {
-                sb.append(file.getFileName());
-                arrayBuilder.add(file.getFileName().toString());
-            }
-            JsonArray array = arrayBuilder.build();
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(array));
-        }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ListEndPoint that = (ListEndPoint) o;
-        return Objects.equals(root, that.root);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(root);
-    }
+    public abstract JsonStructure asJson();
 }

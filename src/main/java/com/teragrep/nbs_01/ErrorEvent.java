@@ -43,36 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http;
+package com.teragrep.nbs_01;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 /**
- * A Body that takes a Throwable. Generates message body that contains only the highest level
- * Exception message to be shown to the end user. Should be used in cases where user has made a mistake, such as
- * providing incorrect data.
+ * Generates an unique ID for a Throwable and logs it. Provides access to the event ID and the Throwable encapsulated.
  */
+public class ErrorEvent {
 
-public class ExceptionBody implements Body {
-
-    private final JsonObject json;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorEvent.class);
     private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+    private final UUID eventId;
 
-    public ExceptionBody(Throwable exception) {
+    public ErrorEvent(Throwable exception) {
+        this(exception, UUID.randomUUID());
+    }
+
+    public ErrorEvent(Throwable exception, UUID eventId) {
+        LOGGER.error("Event_" + eventId, exception);
         this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
+        this.eventId = eventId;
     }
 
-    public JsonObject asJson() {
-        return json;
+    public UUID id() {
+        return eventId;
     }
 
-    @Override
-    public String asString() {
-        return json.toString();
+    public Throwable exception() {
+        return exception;
     }
 }

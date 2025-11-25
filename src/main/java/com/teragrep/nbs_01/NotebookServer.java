@@ -45,11 +45,14 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.endpoints.*;
 import com.teragrep.nbs_01.endpoints.directory.CopyDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.CreateDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
 import com.teragrep.nbs_01.endpoints.directory.FindDirectoryEndPoint;
+import com.teragrep.nbs_01.endpoints.general.DelegatingEndpoint;
+import com.teragrep.nbs_01.endpoints.general.ListEndPoint;
+import com.teragrep.nbs_01.endpoints.general.PingEndpoint;
+import com.teragrep.nbs_01.endpoints.general.StubEndpoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
 import com.teragrep.nbs_01.endpoints.paragraph.*;
 import com.teragrep.nbs_01.repository.FileTree;

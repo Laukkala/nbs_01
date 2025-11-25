@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.http.responses;
 
-import com.teragrep.nbs_01.http.Body;
+import com.teragrep.nbs_01.http.body.Body;
 import org.apache.http.Header;
 
 import java.util.List;

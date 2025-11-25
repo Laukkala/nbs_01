@@ -47,9 +47,9 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.http.ErrorBody;
-import com.teragrep.nbs_01.http.ErrorEvent;
-import com.teragrep.nbs_01.http.ExceptionBody;
+import com.teragrep.nbs_01.http.body.ErrorBody;
+import com.teragrep.nbs_01.ErrorEvent;
+import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;

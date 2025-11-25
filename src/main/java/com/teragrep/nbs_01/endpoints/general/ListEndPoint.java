@@ -43,50 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http;
+package com.teragrep.nbs_01.endpoints.general;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.http.body.ErrorBody;
+import com.teragrep.nbs_01.ErrorEvent;
+import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
+import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.*;
+import org.eclipse.jetty.http.HttpStatus;
 
-/**
- * A Body that takes an ErrorEvent. Provides access to the ErrorEvent and Generates a preset message body that does not expose the inner
- * workings of the program to the end user.
- */
-public class ErrorBody implements Body {
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
 
-    private final JsonObject message;
-    private final ErrorEvent event;
+// Endpoint that lists all the paths of saved notebooks in a given Directory.
+public final class ListEndPoint implements EndPoint {
 
-    public ErrorBody(ErrorEvent event) {
-        this(
-                event,
-                Json
-                        .createObjectBuilder()
-                        .add(
-                                "message",
-                                "An error occurred while processing your Request. See event id " + event.id()
-                                        + " in the technical log for details."
-                        )
-                        .build()
-        );
+    private final FileTree root;
+
+    public ListEndPoint(FileTree root) {
+        this.root = root;
     }
 
-    public ErrorBody(ErrorEvent event, JsonObject message) {
-        this.event = event;
-        this.message = message;
-    }
-
-    public ErrorEvent event() {
-        return event;
+    public Response createResponse(Request request) {
+        // Find all notebooks from Directory structure
+        try {
+            List<Path> currentFiles = root.list();
+            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (Path file : currentFiles) {
+                sb.append(file.getFileName());
+                arrayBuilder.add(file.getFileName().toString());
+            }
+            JsonArray array = arrayBuilder.build();
+            return new BasicResponse(HttpStatus.OK_200, new JSONBody(array));
+        }
+        catch (IOException ioException) {
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        }
     }
 
     @Override
-    public JsonObject asJson() {
-        return message;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ListEndPoint that = (ListEndPoint) o;
+        return Objects.equals(root, that.root);
     }
 
     @Override
-    public String asString() {
-        return message.toString();
+    public int hashCode() {
+        return Objects.hash(root);
     }
 }

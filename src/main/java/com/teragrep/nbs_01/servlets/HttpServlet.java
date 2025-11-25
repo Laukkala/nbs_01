@@ -46,9 +46,9 @@
 package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.http.Body;
-import com.teragrep.nbs_01.http.JSONBody;
-import com.teragrep.nbs_01.http.StubBody;
+import com.teragrep.nbs_01.http.body.Body;
+import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StubBody;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.Response;

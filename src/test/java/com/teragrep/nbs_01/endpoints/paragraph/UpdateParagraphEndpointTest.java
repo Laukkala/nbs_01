@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.http.JSONBody;
+import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;

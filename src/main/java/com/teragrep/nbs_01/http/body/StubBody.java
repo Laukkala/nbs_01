@@ -43,16 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http;
+package com.teragrep.nbs_01.http.body;
 
-import jakarta.json.JsonStructure;
+import jakarta.json.JsonObject;
 
 /**
- * Represents the body of a HTML request or a response. Can represent itself as a String.
+ * An object representing the absence of a Body Should be used when a Request or a response does not contain a Body at
+ * all.
  */
-public interface Body {
 
-    public abstract String asString();
+public class StubBody implements Body {
 
-    public abstract JsonStructure asJson();
+    public StubBody() {
+    }
+
+    @Override
+    public JsonObject asJson() {
+        throw new IllegalStateException("Body is a stub!");
+    }
+
+    @Override
+    public String asString() {
+        throw new IllegalStateException("Body is a stub!");
+    }
 }

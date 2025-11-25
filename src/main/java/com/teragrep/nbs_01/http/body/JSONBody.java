@@ -43,37 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http;
+package com.teragrep.nbs_01.http.body;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.UUID;
+import jakarta.json.JsonStructure;
 
 /**
- * Generates an unique ID for a Throwable and logs it. Provides access to the event ID and the Throwable encapsulated.
+ * A Body that encapsulates a JsonStructure
  */
-public class ErrorEvent {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorEvent.class);
-    private final Throwable exception;
-    private final UUID eventId;
+public class JSONBody implements Body {
 
-    public ErrorEvent(Throwable exception) {
-        this(exception, UUID.randomUUID());
+    private final JsonStructure json;
+
+    public JSONBody(JsonStructure json) {
+        this.json = json;
     }
 
-    public ErrorEvent(Throwable exception, UUID eventId) {
-        LOGGER.error("Event_" + eventId, exception);
-        this.exception = exception;
-        this.eventId = eventId;
+    @Override
+    public JsonStructure asJson() {
+        return json;
     }
 
-    public UUID id() {
-        return eventId;
-    }
-
-    public Throwable exception() {
-        return exception;
+    @Override
+    public String asString() {
+        return json.toString();
     }
 }

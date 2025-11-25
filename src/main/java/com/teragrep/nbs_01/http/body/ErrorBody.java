@@ -43,44 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.http.body;
 
-import com.teragrep.nbs_01.Delegate;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
-import com.teragrep.nbs_01.http.ExceptionBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
-import org.eclipse.jetty.http.HttpStatus;
+import com.teragrep.nbs_01.ErrorEvent;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
-// Endpoint that delegates the request to one of a collection of Endpoints based on the result of a Delegate
-public class DelegatingEndpoint implements EndPoint {
+/**
+ * A Body that takes an ErrorEvent. Provides access to the ErrorEvent and Generates a preset message body that does not
+ * expose the inner workings of the program to the end user.
+ */
+public class ErrorBody implements Body {
 
-    private final Delegate delegate;
-    private final EndPoint trueEndPoint;
-    private final EndPoint falseEndPoint;
+    private final JsonObject message;
+    private final ErrorEvent event;
 
-    public DelegatingEndpoint(EndPoint trueEndPoint, EndPoint falseEndPoint, Delegate delegate) {
-        this.trueEndPoint = trueEndPoint;
-        this.falseEndPoint = falseEndPoint;
-        this.delegate = delegate;
+    public ErrorBody(ErrorEvent event) {
+        this(
+                event,
+                Json
+                        .createObjectBuilder()
+                        .add(
+                                "message",
+                                "An error occurred while processing your Request. See event id " + event.id()
+                                        + " in the technical log for details."
+                        )
+                        .build()
+        );
     }
 
-    public Response createResponse(Request request) {
-        try {
-            if (delegate.resolve(request)) {
-                return trueEndPoint.createResponse(request);
-            }
-            else {
-                return falseEndPoint.createResponse(request);
-            }
-        }
-        catch (MalformedBodyException malformedBodyException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedBodyException));
-        }
-        catch (BodyNotFoundException bodyNotFoundException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
-        }
+    public ErrorBody(ErrorEvent event, JsonObject message) {
+        this.event = event;
+        this.message = message;
+    }
+
+    public ErrorEvent event() {
+        return event;
+    }
+
+    @Override
+    public JsonObject asJson() {
+        return message;
+    }
+
+    @Override
+    public String asString() {
+        return message.toString();
     }
 }

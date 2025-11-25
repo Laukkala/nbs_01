@@ -43,27 +43,45 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http;
+package com.teragrep.nbs_01.endpoints.general;
 
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.Delegate;
+import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.exceptions.MalformedBodyException;
+import com.teragrep.nbs_01.http.body.ExceptionBody;
+import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.responses.BasicResponse;
+import com.teragrep.nbs_01.http.responses.Response;
+import org.eclipse.jetty.http.HttpStatus;
 
-/**
- * An object representing the absence of a Body Should be used when a Request or a response does not contain a Body at
- * all.
- */
+// Endpoint that delegates the request to one of a collection of Endpoints based on the result of a Delegate
+public class DelegatingEndpoint implements EndPoint {
 
-public class StubBody implements Body {
+    private final Delegate delegate;
+    private final EndPoint trueEndPoint;
+    private final EndPoint falseEndPoint;
 
-    public StubBody() {
+    public DelegatingEndpoint(EndPoint trueEndPoint, EndPoint falseEndPoint, Delegate delegate) {
+        this.trueEndPoint = trueEndPoint;
+        this.falseEndPoint = falseEndPoint;
+        this.delegate = delegate;
     }
 
-    @Override
-    public JsonObject asJson() {
-        throw new IllegalStateException("Body is a stub!");
-    }
-
-    @Override
-    public String asString() {
-        throw new IllegalStateException("Body is a stub!");
+    public Response createResponse(Request request) {
+        try {
+            if (delegate.resolve(request)) {
+                return trueEndPoint.createResponse(request);
+            }
+            else {
+                return falseEndPoint.createResponse(request);
+            }
+        }
+        catch (MalformedBodyException malformedBodyException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedBodyException));
+        }
+        catch (BodyNotFoundException bodyNotFoundException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
+        }
     }
 }

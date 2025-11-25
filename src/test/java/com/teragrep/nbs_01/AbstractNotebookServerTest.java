@@ -45,9 +45,8 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.ErrorBody;
-import com.teragrep.nbs_01.http.ErrorEvent;
-import com.teragrep.nbs_01.http.JSONBody;
+import com.teragrep.nbs_01.http.body.ErrorBody;
+import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;

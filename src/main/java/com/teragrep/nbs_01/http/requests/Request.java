@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.http.requests;
 
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.http.Body;
+import com.teragrep.nbs_01.http.body.Body;
 import org.apache.http.Header;
 
 import java.nio.file.Path;
