@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.responses;
 
 import com.teragrep.nbs_01.http.ErrorBody;
+import com.teragrep.nbs_01.http.ErrorEvent;
 import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import jakarta.json.Json;
@@ -92,7 +93,7 @@ class BasicResponseTest {
         Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
         Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        BasicResponse response = new BasicResponse(500, new ErrorBody(throwable1, eventId));
+        BasicResponse response = new BasicResponse(500, new ErrorBody(new ErrorEvent(throwable1, eventId)));
         JsonObject expectedBody = Json
                 .createObjectBuilder()
                 .add(

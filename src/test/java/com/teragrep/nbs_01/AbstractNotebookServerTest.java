@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.http.ErrorBody;
+import com.teragrep.nbs_01.http.ErrorEvent;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
@@ -303,7 +304,7 @@ public class AbstractNotebookServerTest {
 
         }
         catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
         }
     }
 }

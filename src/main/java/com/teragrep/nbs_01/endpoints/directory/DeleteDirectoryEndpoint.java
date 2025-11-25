@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.endpoints.directory;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.ErrorBody;
+import com.teragrep.nbs_01.http.ErrorEvent;
 import com.teragrep.nbs_01.http.ExceptionBody;
 import com.teragrep.nbs_01.http.JSONBody;
 import com.teragrep.nbs_01.repository.FileTree;
@@ -109,7 +110,7 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(ioException));
+            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
         }
     }
 

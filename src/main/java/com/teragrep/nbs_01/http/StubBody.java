@@ -57,6 +57,7 @@ public class StubBody implements Body {
     public StubBody() {
     }
 
+    @Override
     public JsonObject asJson() {
         throw new IllegalStateException("Body is a stub!");
     }

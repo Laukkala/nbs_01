@@ -45,48 +45,35 @@
  */
 package com.teragrep.nbs_01.http;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 /**
- * A Body that takes an ErrorEvent. Provides access to the ErrorEvent and Generates a preset message body that does not expose the inner
- * workings of the program to the end user.
+ * Generates an unique ID for a Throwable and logs it. Provides access to the event ID and the Throwable encapsulated.
  */
-public class ErrorBody implements Body {
+public class ErrorEvent {
 
-    private final JsonObject message;
-    private final ErrorEvent event;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorEvent.class);
+    private final Throwable exception;
+    private final UUID eventId;
 
-    public ErrorBody(ErrorEvent event) {
-        this(
-                event,
-                Json
-                        .createObjectBuilder()
-                        .add(
-                                "message",
-                                "An error occurred while processing your Request. See event id " + event.id()
-                                        + " in the technical log for details."
-                        )
-                        .build()
-        );
+    public ErrorEvent(Throwable exception) {
+        this(exception, UUID.randomUUID());
     }
 
-    public ErrorBody(ErrorEvent event, JsonObject message) {
-        this.event = event;
-        this.message = message;
+    public ErrorEvent(Throwable exception, UUID eventId) {
+        LOGGER.error("Event_" + eventId, exception);
+        this.exception = exception;
+        this.eventId = eventId;
     }
 
-    public ErrorEvent event() {
-        return event;
+    public UUID id() {
+        return eventId;
     }
 
-    @Override
-    public JsonObject asJson() {
-        return message;
-    }
-
-    @Override
-    public String asString() {
-        return message.toString();
+    public Throwable exception() {
+        return exception;
     }
 }

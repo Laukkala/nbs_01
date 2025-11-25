@@ -48,18 +48,15 @@ package com.teragrep.nbs_01.http;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * A Body that takes a Throwable and provides access to it. Generates message body that contains only the highest level
+ * A Body that takes a Throwable. Generates message body that contains only the highest level
  * Exception message to be shown to the end user. Should be used in cases where user has made a mistake, such as
  * providing incorrect data.
  */
 
 public class ExceptionBody implements Body {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionBody.class);
     private final JsonObject json;
     private final Throwable exception;
     private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
@@ -68,10 +65,6 @@ public class ExceptionBody implements Body {
         this.exception = exception;
         jsonObjectBuilder.add("message", exception.getMessage());
         this.json = jsonObjectBuilder.build();
-    }
-
-    public Throwable exception() {
-        return exception;
     }
 
     public JsonObject asJson() {
