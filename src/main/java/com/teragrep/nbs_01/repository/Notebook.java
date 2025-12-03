@@ -68,8 +68,8 @@ public final class Notebook implements FilesystemEntity {
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String title) {
-        this.name = title;
+    public Notebook(String name) {
+        this.name = name;
         this.paragraphs = new LinkedHashMap<>();
     }
 
@@ -103,8 +103,7 @@ public final class Notebook implements FilesystemEntity {
     }
 
     public Notebook load(JsonObject json) {
-        String loadedTitle = json.containsKey("title") ? json
-                .getString("title") : json.containsKey("name") ? json.getString("name") : "";
+        String loadedTitle = json.containsKey("name") ? json.getString("name") : "";
         Map<String, Paragraph> loadedParagraphs = new HashMap<>();
         JsonArray paragraphArray = json.getJsonArray("paragraphs");
         for (JsonValue value : paragraphArray) {
