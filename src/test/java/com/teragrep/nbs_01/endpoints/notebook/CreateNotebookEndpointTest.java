@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -87,7 +87,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName)));
         // Assert that we receive the proper response.
 
@@ -115,7 +115,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         String title = "newNotebook";
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", title).build();
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
         // Assert that we receive the proper response.
@@ -143,7 +143,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateNotebookIntoUnavailablePathTest() {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingNotebookPath));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new FileTree(notebookDirectory()));
+        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(existingNotebookName));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }

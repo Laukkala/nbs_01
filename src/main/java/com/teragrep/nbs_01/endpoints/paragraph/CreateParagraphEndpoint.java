@@ -55,23 +55,25 @@ import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // Creates a new Paragraph into a given Notebook. Should be provided with a path of the Notebook
 public final class CreateParagraphEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public CreateParagraphEndpoint(FileTree root) {
+    public CreateParagraphEndpoint(Storage root) {
         this.root = root;
     }
 
@@ -83,17 +85,14 @@ public final class CreateParagraphEndpoint implements EndPoint {
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
-            List<Path> currentFiles = root.list();
-            Path path = root.path().resolve(notebookPath);
-            if (!currentFiles.contains(path)) {
-                throw new FileNotFoundException("No such notebook: " + notebookPath + " !");
-            }
+            Path path = root.root().resolve(notebookPath);
 
-            Notebook notebook = new Notebook(path).load();
+            JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
+            Notebook notebook = new Notebook().load(json);
             if (!notebook.paragraphs().containsKey(paragraphId)) {
                 Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
                 notebook.paragraphs().put(paragraphId, newParagraph);
-                notebook.save();
+                root.write(path, notebook.json().toString());
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));
                 headers.add(new BasicHeader("Content-Type", "application/json"));

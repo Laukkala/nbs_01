@@ -55,7 +55,7 @@ import com.teragrep.nbs_01.endpoints.general.PingEndpoint;
 import com.teragrep.nbs_01.endpoints.general.StubEndpoint;
 import com.teragrep.nbs_01.endpoints.notebook.*;
 import com.teragrep.nbs_01.endpoints.paragraph.*;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import com.teragrep.nbs_01.servlets.HttpServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
@@ -76,11 +76,11 @@ public class NotebookServer implements Callable {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotebookServer.class);
     private final Configuration configuration;
     private final Server server;
-    private final FileTree root;
+    private final Storage root;
 
     public NotebookServer(Configuration configuration) {
         this.configuration = configuration;
-        root = new FileTree(configuration.notebookDirectory());
+        root = configuration.storage();
         server = new Server(configuration.serverPort());
         Connector connector = new ServerConnector(server);
         server.addConnector(connector);

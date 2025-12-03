@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
@@ -55,6 +56,7 @@ import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -62,6 +64,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,9 +73,9 @@ import java.util.*;
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
 public final class CopyNotebookEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public CopyNotebookEndpoint(FileTree root) {
+    public CopyNotebookEndpoint(Storage root) {
         this.root = root;
     }
 
@@ -80,20 +83,12 @@ public final class CopyNotebookEndpoint implements EndPoint {
         try {
             JsonObject body = request.body().asJson().asJsonObject();
             String sourcePathString = body.getString("sourcePath");
-            Path sourcePath = root.path().resolve(Paths.get(sourcePathString));
-            Path destinationPath = root.path().resolve(request.path());
-            List<Path> currentFiles = root.list();
-
-            if (currentFiles.contains(destinationPath)) {
-                throw new FileAlreadyExistsException("File at " + request.path() + " already exists!");
-            }
-
-            if (!currentFiles.contains(sourcePath)) {
-                throw new FileNotFoundException("No such file:" + body.getString("sourcePath") + "!");
-            }
-            Notebook source = new Notebook(sourcePath).load();
-            Notebook copy = source.copy(destinationPath);
-            copy.save();
+            Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
+            Path destinationPath = root.root().resolve(request.path());
+            JsonObject json = Json.createReader(new StringReader(root.read(sourcePath))).readObject();
+            Notebook source = new Notebook().load(json);
+            Notebook copy = source.copy();
+            root.write(destinationPath, copy.json().toString());
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
@@ -105,7 +100,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(fileAlreadyExistsException));
         }
-        catch (BodyNotFoundException bodyNotFoundException) {
+        catch (BodyNotFoundException | MalformedRequestException bodyNotFoundException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
         }
         catch (IOException ioException) {

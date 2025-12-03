@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.File;
@@ -60,7 +61,10 @@ public class TestServer {
 
     public static void main(String[] args) throws Exception {
         setUp();
-        Configuration configuration = new Configuration(Paths.get("target/notebooks"), 8080);
+        Configuration configuration = new Configuration(
+                new LocalFilesystemStorage(Paths.get("target/notebooks")),
+                8080
+        );
         NotebookServer server = new NotebookServer(configuration);
         server.call();
     }

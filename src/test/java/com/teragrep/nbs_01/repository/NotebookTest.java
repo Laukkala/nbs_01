@@ -45,6 +45,8 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -52,10 +54,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 class NotebookTest {
@@ -107,7 +109,10 @@ class NotebookTest {
     // Notebooks should have the correct number of paragraphs
     @Test
     void testParagraphs() {
-        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook(notebook1).load());
+        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
+        JsonObject json = Assertions
+                .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook1))).readObject());
+        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook().load(json));
         Map<String, Paragraph> paragraphs = notebook.paragraphs();
         Assertions.assertEquals(8, paragraphs.size());
     }
@@ -115,7 +120,10 @@ class NotebookTest {
     // Calling json() should have the same content as in the test file.
     @Test
     void testJson() {
-        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook(notebook3).load());
+        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
+        JsonObject json = Assertions
+                .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook3))).readObject());
+        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook().load(json));
         Assertions
                 .assertEquals(
                         "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}}]}",
@@ -126,24 +134,16 @@ class NotebookTest {
     // After copying a Notebook, both the original and the copied notebook should exist.
     @Test
     void testCopy() {
-        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook(notebook4).load());
-        Assertions.assertTrue(Files.exists(notebook.path()));
-        Notebook copy = Assertions
-                .assertDoesNotThrow(() -> notebook.copy(Paths.get(notebookDirectory.toString(), "newName_copyId")));
-        Assertions.assertDoesNotThrow(() -> copy.save());
-        Assertions.assertTrue(Files.exists(notebook.path()));
-        Assertions.assertTrue(Files.exists(copy.path()));
-    }
-
-    // Creating a new notebook and saving it should result in a new file being created.
-    @Test
-    void testSave() {
-        Path notebookPath = Paths.get(notebookDirectory.toString(), "createdNotebook_newNotebookId");
-        Notebook notebook = new Notebook("title", notebookPath, new LinkedHashMap<>());
-
-        Assertions.assertFalse(Files.exists(notebook.path()));
-        Assertions.assertDoesNotThrow(() -> notebook.save());
-        Assertions.assertTrue(Files.exists(notebook.path()));
+        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
+        JsonObject json = Assertions
+                .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook4))).readObject());
+        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook().load(json));
+        Assertions.assertTrue(Files.exists(notebook4));
+        Path destinationPath = Paths.get(notebookDirectory.toString(), "newName_copyId");
+        Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
+        Assertions.assertDoesNotThrow(() -> root.write(destinationPath, copy.json().toString()));
+        Assertions.assertTrue(Files.exists(notebook4));
+        Assertions.assertTrue(Files.exists(destinationPath));
     }
 
     @Test

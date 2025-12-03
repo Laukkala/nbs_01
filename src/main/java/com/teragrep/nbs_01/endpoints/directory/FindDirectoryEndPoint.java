@@ -51,11 +51,13 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -70,36 +72,37 @@ import java.util.Objects;
 // Finds a given Directory and returns the names of its children in JSON format.
 public final class FindDirectoryEndPoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public FindDirectoryEndPoint(FileTree root) {
+    public FindDirectoryEndPoint(Storage root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
-            Path path = root.path().resolve(request.path());
-            List<Path> currentFiles = root.list();
-            if (!currentFiles.contains(path)) {
-                return new BasicResponse(
-                        HttpStatus.NOT_FOUND_404,
-                        new ExceptionBody(new FileNotFoundException("No such directory!"))
-                );
+            Path path = root.root().resolve(request.path());
+            List<Path> currentFiles = root.immediateChildren(path);
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (Path currentFile : currentFiles) {
+                arrayBuilder.add(currentFile.getFileName().toString());
             }
-            if (!path.toFile().isDirectory()) {
-                return new BasicResponse(
-                        HttpStatus.BAD_REQUEST_400,
-                        new ExceptionBody(
-                                new MalformedRequestException("File at path " + request.path() + " is not a directory!")
-                        )
-                );
-            }
-            Directory directory = new Directory(path).load();
+            JsonObject json = Json
+                    .createObjectBuilder()
+                    .add("name", path.getFileName().toString())
+                    .add("children", arrayBuilder.build())
+                    .build();
+
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(directory.json()), headers);
+            return new BasicResponse(HttpStatus.OK_200, new JSONBody(json), headers);
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
         catch (IOException ioException) {
             return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));

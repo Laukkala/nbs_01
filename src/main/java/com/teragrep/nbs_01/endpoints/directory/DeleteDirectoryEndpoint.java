@@ -51,48 +51,34 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 // Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
 public final class DeleteDirectoryEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public DeleteDirectoryEndpoint(FileTree root) {
+    public DeleteDirectoryEndpoint(Storage root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Path path = root.path().resolve(request.path());
-            if (!Files.exists(path)) {
-                throw new NoSuchFileException(request.path().toString());
-            }
-            // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
-            if (!Files.isDirectory(path)) {
-                throw new MalformedRequestException(request.path() + " is not a directory!");
-            }
-            else {
-                Stream<Path> files = Files.walk(path);
-                files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-            }
+            Path path = root.root().resolve(request.path());
+            root.deleteDirectory(path);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             return new BasicResponse(

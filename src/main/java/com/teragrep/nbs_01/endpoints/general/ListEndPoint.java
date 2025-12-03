@@ -46,13 +46,15 @@
 package com.teragrep.nbs_01.endpoints.general;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
+import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -64,16 +66,16 @@ import java.util.Objects;
 // Endpoint that lists all the paths of saved notebooks in a given Directory.
 public final class ListEndPoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public ListEndPoint(FileTree root) {
+    public ListEndPoint(Storage root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         // Find all notebooks from Directory structure
         try {
-            List<Path> currentFiles = root.list();
+            List<Path> currentFiles = root.children(root.root());
             StringBuilder sb = new StringBuilder();
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (Path file : currentFiles) {
@@ -82,6 +84,9 @@ public final class ListEndPoint implements EndPoint {
             }
             JsonArray array = arrayBuilder.build();
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(array));
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
         }
         catch (IOException ioException) {
             return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));

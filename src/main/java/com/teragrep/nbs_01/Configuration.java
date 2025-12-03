@@ -45,26 +45,27 @@
  */
 package com.teragrep.nbs_01;
 
-import java.nio.file.Path;
+import com.teragrep.nbs_01.repository.Storage;
+
 import java.util.Objects;
 
 // Configuration object for any settings the NotebookServer might need.
 public final class Configuration {
 
-    private final Path notebookDirectory;
+    private final Storage storage;
     private final int serverPort;
 
-    public Configuration(Path notebookDirectory, int serverPort) {
-        this.notebookDirectory = notebookDirectory;
+    public Configuration(Storage storage, int serverPort) {
         this.serverPort = serverPort;
+        this.storage = storage;
+    }
+
+    public Storage storage() {
+        return storage;
     }
 
     public int serverPort() {
         return serverPort;
-    }
-
-    public Path notebookDirectory() {
-        return notebookDirectory;
     }
 
     @Override
@@ -76,11 +77,11 @@ public final class Configuration {
             return false;
         }
         Configuration that = (Configuration) o;
-        return serverPort == that.serverPort && Objects.equals(notebookDirectory, that.notebookDirectory);
+        return serverPort == that.serverPort && Objects.equals(storage, that.storage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(notebookDirectory, serverPort);
+        return Objects.hash(storage, serverPort);
     }
 }

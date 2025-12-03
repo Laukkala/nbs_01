@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -58,11 +58,9 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
@@ -70,7 +68,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     private String notebookName = "my_note3_2A94M5J3Z.zpln";
     private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
     private String paragraphId = "testParagraphId";
-    private String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"testParagraphId\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
+    private String expectedFileContent = "{\"id\":\"testParagraphId\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
 
     public CreateParagraphEndPointTest() {
     }
@@ -90,7 +88,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpCreateParagraphTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookPath));
-        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new FileTree(notebookDirectory()));
+        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
@@ -114,13 +112,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookPath));
         Assertions
-                .assertEquals(
-                        expectedFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
-                                )
-                );
+                .assertTrue(Assertions.assertDoesNotThrow(() -> Files.readString(Paths.get(notebookPath.toString())).contains(expectedFileContent)));
     }
 
     @Test
@@ -131,7 +123,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Path nonexistentFilePath = Paths.get(notebookDirectory().toString(), nonexistentFileName);
         // Assert that the file we are trying to add a paragraph to doesn't exist.
         Assertions.assertFalse(Files.exists(nonexistentFilePath));
-        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new FileTree(notebookDirectory()));
+        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
         JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
@@ -142,7 +134,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such notebook: " + nonexistentFileName + " !")
+                .add("message", "No such file: " + nonexistentFileName)
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions

@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -83,7 +83,7 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(deletedNotebookPath));
-        DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new FileTree(notebookDirectory()));
+        DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(deletedNotebookName)));
         // Assert that we receive the proper response.
         Header expectedLocationHeader = new BasicHeader("Location", deletedNotebookName);

@@ -138,7 +138,10 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the body of the response contains a message mentioning that the notebook was not found
-        JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such notebook !").build();
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such file: " + nonexistentNotebookName)
+                .build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
@@ -203,7 +206,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the body of the response contains a message mentioning that the notebook doesn't exist
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such notebook: " + nonexistentNotebookId + " !")
+                .add("message", "No such file: " + nonexistentNotebookId)
                 .build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
@@ -276,9 +279,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Path nonexistentNotebookPath = Paths.get(notebookDirectory().toString(), nonexistentNotebookId);
         Assertions.assertFalse(Files.exists(nonexistentNotebookPath));
         String requestBody = Json.createObjectBuilder().build().toString();
-        String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
-                + nonexistentNotebookPath + " not found!";
-
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
@@ -291,7 +291,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such notebook: " + nonexistentNotebookId + "!")
+                .add("message", "No such file: " + nonexistentNotebookId)
                 .build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));

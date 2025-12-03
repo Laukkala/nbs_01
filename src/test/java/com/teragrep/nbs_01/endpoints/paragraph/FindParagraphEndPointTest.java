@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -86,7 +86,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
         Path requestPath = Paths.get(notebookPath.toString(), "/paragraph/" + paragraphId);
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(requestPath));
         Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
@@ -102,13 +102,16 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent Notebook results in an error
     public void httpFindParagraphFromNonExistentNotebookTest() {
         String nonExistentNotebookName = "NonExistentNotebook";
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
         Response response = endPoint.createResponse(new BasicRequest(requestPath));
 
         // The endpoint should return a Response with the correct status and messagsse.
-        JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such notebook !").build();
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "No such file: " + nonExistentNotebookName)
+                .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
@@ -118,7 +121,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent paragraphId results in an error
     public void httpFindNonexistentParagraph() {
         String nonExistentParagraphId = "nonExistentParagraphId";
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
+        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath + "/paragraph/" + nonExistentParagraphId);
         Response response = endPoint.createResponse(new BasicRequest(requestPath));
@@ -139,7 +142,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Path queryPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new FileTree(notebookDirectory()));
+        FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endpoint.createResponse(new BasicRequest(queryPath));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.

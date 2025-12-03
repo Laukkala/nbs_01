@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -94,7 +94,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookParameter.toString()).build();
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
@@ -140,7 +140,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCopyNonExistentNotebookTest() {
         // Assert that there is no file saved in the source path we are using
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", nonExistentNotebookPath.toString()).build();
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
 
@@ -151,18 +151,25 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a request to CopyNotebookEndpoint to a path that already contains a file results in an error
+    // Assert that a request to CopyNotebookEndpoint to a path that contains a directory results in an error
     public void httpCopyNotebookIntoUnavailablePathTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(existingPath));
+        Assertions.assertTrue(Files.isDirectory(existingPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new FileTree(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookPath.toString()).build();
-        Response response = endPoint
-                .createResponse(new BasicRequest(existingPathEndpointParameter, new JSONBody(body)));
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookParameter.toString()).build();
+        Path existingNotebookPath = notebookDirectory().relativize(existingPath);
+        Response response = endPoint.createResponse(new BasicRequest(existingNotebookPath, new JSONBody(body)));
+
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "File at path: " + existingNotebookPath + " is a Directory!")
+                .build();
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(expectedJson, response.body().asJson());
     }
 
     @Test

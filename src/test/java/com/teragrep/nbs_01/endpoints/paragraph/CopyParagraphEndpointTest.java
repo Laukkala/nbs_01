@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.google.common.base.Charsets;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -86,7 +86,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(sourceFileObject.toString().contains(expectedParagraphContent));
         Assertions.assertFalse(originalDestinationFileObject.toString().contains(expectedParagraphContent));
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
 
         JsonObject body = Json
@@ -143,7 +143,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         JsonObject sourceFileObject = readFileContents(sourceNotebookPath);
         Assertions.assertFalse(sourceFileObject.toString().contains(expectedParagraphContent));
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
@@ -182,7 +182,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are copying from exists.
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook3().toString()).build();
         BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
@@ -210,7 +210,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that the file we are copying a paragraph from doesn't exist
         Assertions.assertFalse(Files.exists(sourceNotebookPath));
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
@@ -224,7 +224,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such file: " + sourceNotebookName + "!")
+                .add("message", "No such file: " + sourceNotebookName)
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
@@ -238,7 +238,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String destinationParagraphId = "copyParagraph";
         String sourceParagraphId = "20150213-230428_1231780373";
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourceParagraphId", sourceParagraphId).build();
         BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
@@ -271,7 +271,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         JsonObject originalDestinationFileObject = readFileContents(destinationNotebookPath);
         Assertions.assertTrue(originalDestinationFileObject.toString().contains(destinationParagraphId));
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
@@ -304,7 +304,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(destinationNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
-        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new FileTree(notebookDirectory()));
+        CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(destinationNotebookPath.toString(), "/paragraph/" + destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
@@ -318,7 +318,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such file: " + destinationNotebookPath + "!")
+                .add("message", "No such file: " + destinationNotebookPath)
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());

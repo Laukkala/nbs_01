@@ -50,50 +50,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Represents a single Notebook that can be added to a Directory. Is identified by a Path, and corresponds to a file
  * saved on the filesystem.
  */
-public final class Notebook implements Saveable {
+public final class Notebook implements FilesystemEntity {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Notebook.class);
     private final Map<String, Paragraph> paragraphs;
-    private final String title;
-    private final Path path;
+    private final String name;
 
     // Constructor for a stub notebook that can be loaded from file.
-    public Notebook(Path path) {
-        this.path = path;
-        this.title = "";
+    public Notebook() {
+        this.name = "";
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String title, Path path) {
-        this.path = path;
-        this.title = title;
+    public Notebook(String title) {
+        this.name = title;
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String title, Path path, Map<String, Paragraph> paragraphs) {
-        this.path = path;
-        this.title = title;
+    public Notebook(String name, Map<String, Paragraph> paragraphs) {
+        this.name = name;
         this.paragraphs = paragraphs;
     }
 
-    public Path path() {
-        return path;
-    }
-
-    public String title() {
-        return title;
+    public String name() {
+        return name;
     }
 
     public Map<String, Paragraph> paragraphs() {
@@ -102,7 +88,7 @@ public final class Notebook implements Saveable {
 
     public JsonObject json() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("name", title);
+        builder.add("name", name);
         //compatibility fields//
         builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
         // end //
@@ -116,55 +102,42 @@ public final class Notebook implements Saveable {
         return builder.build();
     }
 
-    public Notebook copy(Path destinationPath) throws IOException {
-        return copy(title, destinationPath);
-    }
-
-    @Override
-    public Notebook load() throws IOException {
-        String content = readFile().toString();
-        StringReader stringReader = new StringReader(content);
-        JsonReader jsonReader = Json.createReader(stringReader);
-        JsonObject object = jsonReader.readObject();
-        jsonReader.close();
-        stringReader.close();
-
-        String savedName = object.getString("name");
-        JsonArray paragraphJsonArray = object.getJsonArray("paragraphs");
-        Map<String, Paragraph> savedParagraphs = new LinkedHashMap<>();
-        for (JsonObject paragraphJson : paragraphJsonArray.getValuesAs(JsonObject.class)) {
-            Paragraph paragraph = new Paragraph().load(paragraphJson);
-            savedParagraphs.put(paragraph.id(), paragraph);
+    public Notebook load(JsonObject json) {
+        String loadedTitle = json.containsKey("title") ? json
+                .getString("title") : json.containsKey("name") ? json.getString("name") : "";
+        Map<String, Paragraph> loadedParagraphs = new HashMap<>();
+        JsonArray paragraphArray = json.getJsonArray("paragraphs");
+        for (JsonValue value : paragraphArray) {
+            JsonObject paragraphJson = value.asJsonObject();
+            String paragraphId = paragraphJson.getString("id");
+            String paragraphTitle = paragraphJson.containsKey("title") ? paragraphJson.getString("title") : "";
+            String text;
+            if (paragraphJson.containsKey("script")) {
+                JsonObject scriptJson = paragraphJson.getJsonObject("script");
+                text = scriptJson.getString("text");
+            }
+            else {
+                text = paragraphJson.containsKey("text") ? paragraphJson.getString("text") : "";
+            }
+            Script script = new Script(text);
+            Paragraph paragraph = new Paragraph(paragraphId, paragraphTitle, script);
+            loadedParagraphs.put(paragraph.id(), paragraph);
         }
-        return new Notebook(savedName, path(), savedParagraphs);
+        return new Notebook(loadedTitle, loadedParagraphs);
     }
 
-    public Notebook copy(String copyTitle, Path destinationPath) throws IOException {
+    public Notebook copy() throws IOException {
+        return copy(name);
+    }
+
+    public Notebook copy(String copyTitle) throws IOException {
         Map<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
         for (Paragraph paragraph : paragraphs.values()) {
             Paragraph copyParagraph = paragraph.copy();
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
         }
-        Notebook copyNotebook = new Notebook(copyTitle, destinationPath, copyParagraphs);
+        Notebook copyNotebook = new Notebook(copyTitle, copyParagraphs);
         return copyNotebook;
-    }
-
-    public void save() throws IOException {
-        try {
-            StringWriter stringWriter = new StringWriter();
-            Files.createDirectories(path().getParent());
-            Files.write(path(), json().toString().getBytes());
-            stringWriter.close();
-        }
-        catch (IOException exception) { // This hides the reason why saving failed. (eg. we cant catch a FileNotFoundException if we rethrow it as an IOException)
-            throw new IOException("Failed to save notebook to path" + path() + "!", exception);
-        }
-    }
-
-    private String readFile() throws IOException {
-        List<String> lines = Files.readAllLines(path(), Charset.defaultCharset());
-        String concatenatedLines = lines.stream().map(n -> String.valueOf(n)).collect(Collectors.joining("\n"));
-        return concatenatedLines;
     }
 
     @Override
@@ -176,12 +149,11 @@ public final class Notebook implements Saveable {
             return false;
         }
         Notebook notebook = (Notebook) o;
-        return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(title, notebook.title)
-                && Objects.equals(path, notebook.path);
+        return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(name, notebook.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(paragraphs, title, path);
+        return Objects.hash(paragraphs, name);
     }
 }

@@ -46,33 +46,34 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // Finds a given Notebook and returns its contents in JSON format.
 public final class FindNotebookEndPoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public FindNotebookEndPoint(FileTree root) {
+    public FindNotebookEndPoint(Storage root) {
         this.root = root;
     }
 
@@ -80,23 +81,13 @@ public final class FindNotebookEndPoint implements EndPoint {
     public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given Path
         try {
-            Path path = root.path().resolve(request.path());
-            List<Path> currentFiles = root.list();
-            if (!currentFiles.contains(path)) {
-                throw new FileNotFoundException("No such file " + request.path() + " !");
-            }
-            if (path.toFile().isDirectory()) {
-                throw new MalformedRequestException("File at path " + request.path() + " is not a notebook!");
-            }
-            Notebook notebook = new Notebook(path).load();
+            Path path = root.root().resolve(request.path());
+            JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
+            Notebook notebook = new Notebook().load(json);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
-        }
-
-        catch (MalformedRequestException malformedRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));

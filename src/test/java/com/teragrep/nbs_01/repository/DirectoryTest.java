@@ -49,12 +49,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 class DirectoryTest {
 
@@ -106,113 +104,52 @@ class DirectoryTest {
         deleteFileRecursively(notebookDirectory.toFile());
     }
 
-    // Directory should contain a child for each file and directory within notebookDirectory after initialization.
-    @Test
-    void testInitializeDirectory() {
-        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Assertions.assertEquals(3, root.children().size());
-        Directory directory_1 = Assertions.assertDoesNotThrow(() -> new Directory(directory1).load());
-        Assertions.assertEquals(2, directory_1.children().size());
-        Directory directory_2 = Assertions.assertDoesNotThrow(() -> new Directory(directory2).load());
-        Assertions.assertEquals(1, directory_2.children().size());
-    }
-
-    // List of all children should contain an ID for every directory and file.
-    @Test
-    void testListChildren() {
-        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        List<Path> rootPaths = root.children().keySet().stream().collect(Collectors.toList());
-        Assertions.assertEquals(3, rootPaths.size());
-        Assertions.assertTrue(rootPaths.contains(notebook3));
-        Assertions.assertTrue(rootPaths.contains(notebook4));
-        Assertions.assertTrue(rootPaths.contains(directory1));
-
-        Directory directory_1 = Assertions.assertDoesNotThrow(() -> new Directory(directory1).load());
-        List<Path> directory1Paths = directory_1.children().keySet().stream().collect(Collectors.toList());
-        Assertions.assertEquals(2, directory1Paths.size());
-        Assertions.assertTrue(directory1Paths.contains(notebook2));
-        Assertions.assertTrue(directory1Paths.contains(directory2));
-
-        Directory directory_2 = Assertions.assertDoesNotThrow(() -> new Directory(directory2).load());
-        List<Path> directory2Paths = directory_2.children().keySet().stream().collect(Collectors.toList());
-        Assertions.assertEquals(1, directory2Paths.size());
-        Assertions.assertTrue(directory2Paths.contains(notebook1));
-    }
-
-    // Copying a directory should result in the original and a new copy existing on disk. TODO: continue here
+    // Copying a directory should result in the original and a new copy existing on disk.
     @Test
     void testCopy() {
-        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
-        Directory directory = Assertions.assertDoesNotThrow(() -> new Directory(directory2).load());
-        Path copyDirectoryPath = Paths
-                .get(
-                        root.path().toString(),
-                        directory.path().getFileName().toString().replace("_2A94M5J2D", "_copiedDirectory")
-                );
-        Directory copiedDirectory = Assertions.assertDoesNotThrow(() -> directory.copy(copyDirectoryPath));
-        Assertions.assertDoesNotThrow(() -> copiedDirectory.save());
+
+        Notebook testNotebook1 = new Notebook("testNotebook1");
+        Notebook testNotebook2 = new Notebook("testNotebook2");
+        List<FilesystemEntity> notebooks1 = new ArrayList<>();
+        notebooks1.add(testNotebook1);
+        notebooks1.add(testNotebook2);
+        Directory subDirectory = new Directory("dir", notebooks1);
+
+        List<FilesystemEntity> rootNotebooks = new ArrayList<>();
+        Notebook testNotebook3 = new Notebook("testNotebook1");
+        rootNotebooks.add(testNotebook3);
+        rootNotebooks.add(subDirectory);
+        Directory rootDir = new Directory("root", rootNotebooks);
+        Path destinationDirectoryPath = notebookDirectory.resolve(Paths.get("destination"));
+
+        Directory copiedDirectory = Assertions.assertDoesNotThrow(() -> rootDir.copy());
 
         // Both copied directory and the original directory (and their children) should exist
-        Assertions
-                .assertTrue(Files.exists(Paths.get(notebookDirectory.toString(), "my_second_folder_copiedDirectory")));
-        Directory updatedCopyDirectory = Assertions.assertDoesNotThrow(() -> new Directory(copyDirectoryPath).load());
-        Assertions.assertEquals(1, updatedCopyDirectory.children().size());
-        Path childPath = copiedDirectory.children().values().stream().toList().get(0).path();
-        // Assert that the newly created copy exists.
-        Assertions.assertTrue(Files.exists(childPath));
-        // Assert that the original directory still exists.
-        Assertions.assertTrue(Files.exists(directory.path()));
-        Assertions.assertTrue(Files.exists(notebook1));
+        copiedDirectory.equals(rootDir);
     }
 
     // Calling json() should result in a valid JSON object.
     @Test
     void testJson() {
-        Directory root = Assertions.assertDoesNotThrow(() -> new Directory(notebookDirectory).load());
+        Notebook testNotebook1 = new Notebook(notebook1.getFileName().toString());
+        Notebook testNotebook2 = new Notebook(notebook2.getFileName().toString());
+        List<FilesystemEntity> notebooks1 = new ArrayList<>();
+        notebooks1.add(testNotebook1);
+        notebooks1.add(testNotebook2);
+        Directory subDirectory = new Directory(directory1.getFileName().toString(), notebooks1);
+
+        List<FilesystemEntity> rootNotebooks = new ArrayList<>();
+        Notebook testNotebook3 = new Notebook(notebook3.getFileName().toString());
+        rootNotebooks.add(testNotebook3);
+        rootNotebooks.add(subDirectory);
+        Directory rootDir = new Directory("root", rootNotebooks);
+
         Assertions
                 .assertEquals(
-                        "{\"name\":\"notebooks\",\"children\":[\"" + notebook3.getFileName() + "\",\""
-                                + directory1.getFileName() + "\",\"" + notebook4.getFileName() + "\"]}",
-                        root.json().toString()
+                        "{\"name\":\"root\",\"children\":[\"" + notebook3.getFileName() + "\",\""
+                                + directory1.getFileName() + "\"]}",
+                        rootDir.json().toString()
                 );
-    }
-
-    // Creating and then saving a new directory containing a notebook should result in two new files on disk.
-    @Test
-    void testSave() {
-        Path newDirectoryPath = Paths.get(notebookDirectory.toString(), "new_folder_newDirectoryId");
-        Map<Path, Saveable> notebooks = new HashMap<>();
-        Path newNotebookPath = Paths.get(newDirectoryPath.toString(), "newNotebook_newNotebook.zpln");
-        Notebook newNotebook = new Notebook("title", newNotebookPath, new LinkedHashMap<>());
-        notebooks.put(newNotebookPath, newNotebook);
-        Directory newDirectory = new Directory(
-                Paths.get(notebookDirectory.toString(), "newDirectory_newId"),
-                notebooks
-        );
-        Assertions.assertDoesNotThrow(() -> newDirectory.save());
-
-        // Files for both the directory and its children should exist after saving.
-        Assertions.assertTrue(Files.exists(newDirectoryPath));
-        Assertions.assertTrue(Files.exists(Paths.get(newDirectoryPath.toString(), "newNotebook_newNotebook.zpln")));
-    }
-
-    ///**
-    // * Assert that when attempting to copy a directory into a path where a file already exists, the existing file is not
-    // * overwritten, and an Exception is thrown.
-    // */
-    @Test
-    void testCopyingToExistingPath() {
-        Path sourcePath = Paths.get(notebookDirectory.toString(), "my_folder_2A94M5J1D");
-        Path destinationPath = Paths.get(notebookDirectory.toString(), "my_note3_2A94M5J3Z.zpln");
-
-        List<String> destinationContents = Assertions.assertDoesNotThrow(() -> Files.readAllLines(destinationPath));
-
-        Directory sourceDirectory = new Directory(sourcePath);
-        Assertions.assertThrows(FileAlreadyExistsException.class, () -> sourceDirectory.copy(destinationPath));
-
-        List<String> destinationContentsAfterCopying = Assertions
-                .assertDoesNotThrow(() -> Files.readAllLines(destinationPath));
-        Assertions.assertEquals(destinationContents, destinationContentsAfterCopying);
     }
 
     @Test

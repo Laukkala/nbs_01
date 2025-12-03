@@ -50,49 +50,38 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
+import jakarta.json.Json;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // Creates a new Notebook. Should be provided with a path of the File
 public final class CreateDirectoryEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public CreateDirectoryEndpoint(FileTree root) {
+    public CreateDirectoryEndpoint(Storage root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            List<Path> currentFiles = root.list();
-            Path path = root.path().resolve(request.path());
-
-            if (currentFiles.contains(path)) {
-                throw new FileAlreadyExistsException("Path at " + request.path() + " is already in use!");
-            }
-            Directory newDirectory = new Directory(path);
-            newDirectory.save();
+            Path path = root.root().resolve(request.path());
+            root.createDirectory(path);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(newDirectory.json()), headers);
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(Json.createObjectBuilder().build()), headers);
         }
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(fileAlreadyExistsException));

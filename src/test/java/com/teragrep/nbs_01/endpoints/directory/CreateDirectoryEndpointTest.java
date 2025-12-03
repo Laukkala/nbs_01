@@ -46,11 +46,10 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.http.Header;
@@ -87,16 +86,10 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateDirectoryTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(newDirectoryPath));
-        CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
+        CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(newDirectoryName)));
         // Assert that we receive the proper response.
-
-        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("name", newDirectoryName)
-                .add("children", expectedChildren)
-                .build();
+        JsonObject expectedJson = Json.createObjectBuilder().build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", newDirectoryName);
@@ -114,7 +107,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateDirectoryIntoUnavailablePathTest() {
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(existingDirectoryPath));
-        CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new FileTree(notebookDirectory()));
+        CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(existingDirectoryName)));
 
         JsonObject expectedJson = Json

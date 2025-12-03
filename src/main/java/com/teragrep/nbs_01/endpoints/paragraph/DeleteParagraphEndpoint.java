@@ -50,28 +50,30 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // Deletes a Paragraph from a given Notebook. Should be provided with a path of the Notebook
 public final class DeleteParagraphEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public DeleteParagraphEndpoint(FileTree root) {
+    public DeleteParagraphEndpoint(Storage root) {
         this.root = root;
     }
 
@@ -85,16 +87,13 @@ public final class DeleteParagraphEndpoint implements EndPoint {
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
 
-            List<Path> currentFiles = root.list();
-            Path path = root.path().resolve(notebookPath);
-            if (!currentFiles.contains(path)) {
-                throw new FileNotFoundException("No such notebook: " + notebookPath + "!");
-            }
+            Path path = root.root().resolve(notebookPath);
 
-            Notebook notebook = new Notebook(path).load();
+            JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
+            Notebook notebook = new Notebook().load(json);
             if (notebook.paragraphs().containsKey(paragraphId)) {
                 notebook.paragraphs().remove(paragraphId);
-                notebook.save();
+                root.write(path, notebook.json().toString());
 
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));

@@ -48,6 +48,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
@@ -56,6 +57,7 @@ import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -63,45 +65,39 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.*;
 
 // Updates the title of a Notebook.
 public final class UpdateNotebookEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public UpdateNotebookEndpoint(FileTree root) {
+    public UpdateNotebookEndpoint(Storage root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
             JsonObject parameters = request.body().asJson().asJsonObject();
-            Path path = root.path().resolve(request.path());
-
-            if (Files.isDirectory(path)) {
-                throw new MalformedBodyException(request.path() + " is not a Notebook!");
-            }
-
             if (!parameters.containsKey("title")) {
                 throw new MalformedBodyException("Request does not contain a title!");
             }
 
-            List<Path> currentFiles = root.list();
-            if (!currentFiles.contains(path)) {
-                throw new FileNotFoundException("Notebook at path " + request.path() + " does not exist!");
-            }
-            Notebook notebook = new Notebook(path).load();
+            Path path = root.root().resolve(request.path());
+            String fileContent = root.read(path);
+            JsonObject json = Json.createReader(new StringReader(fileContent)).readObject();
+            Notebook notebook = new Notebook().load(json);
 
             // Create a copy of the current paragraphs
             Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
 
             // Add a modified title
             String title = parameters.getString("title");
-            Notebook newNotebook = new Notebook(title, notebook.path(), paragraphs);
-            newNotebook.save();
+            Notebook newNotebook = new Notebook(title, paragraphs);
+            root.write(path, newNotebook.json().toString());
+
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
@@ -110,7 +106,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         catch (FileNotFoundException fileNotFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
-        catch (BodyNotFoundException bodyNotFoundException) {
+        catch (BodyNotFoundException | MalformedRequestException bodyNotFoundException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
         }
         catch (IOException ioException) {

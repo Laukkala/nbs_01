@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -113,7 +113,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 + "\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
@@ -184,7 +184,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 + "\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
@@ -250,7 +250,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 + "\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
@@ -302,7 +302,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         String nonExistentNotebookName = "nonExistentNotebook";
 
         // Make a request editing the title of a notebook that doesn't exist.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName, "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
@@ -311,7 +311,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // The endpoint should return a Response with the correct status and message.
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Notebook with path " + nonExistentNotebookName + " not found!")
+                .add("message", "No such file: " + nonExistentNotebookName)
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
@@ -324,7 +324,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         String nonexistentParagraphId = "nonexistentId";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", nonexistentParagraphId);
         JsonObject body = Json
@@ -352,7 +352,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         String nonexistentNotebookName = "nonexistentNotebookPath";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
@@ -371,7 +371,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpInvalidRequestParametersTest() {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new FileTree(notebookDirectory()));
+        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().build();

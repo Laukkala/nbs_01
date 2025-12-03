@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -62,16 +63,8 @@ class ConfigurationTest {
     @Test
     void serverPortTest() {
         Assertions.assertDoesNotThrow(() -> {
-            Configuration configuration = new Configuration(notebookDir, serverPort);
+            Configuration configuration = new Configuration(new LocalFilesystemStorage(notebookDir), serverPort);
             assertEquals(serverPort, configuration.serverPort());
-        });
-    }
-
-    @Test
-    void notebookDirectoryTest() {
-        Assertions.assertDoesNotThrow(() -> {
-            Configuration configuration = new Configuration(notebookDir, serverPort);
-            assertEquals(notebookDir, configuration.notebookDirectory());
         });
     }
 

@@ -49,6 +49,8 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
+import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -78,8 +80,8 @@ public class AbstractNotebookServerTest {
     private final Path directory1 = Paths.get("my_folder_2A94M5J1D");
     private final Path directory2 = Paths.get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
     private final Path junkfile = Paths.get("junkfile");
-
-    private final Configuration testConfiguration = new Configuration(notebookDirectory, serverPort);
+    private final Storage storage = new LocalFilesystemStorage(notebookDirectory);
+    private final Configuration testConfiguration = new Configuration(storage, serverPort);
     private final NotebookServer server = new NotebookServer(testConfiguration);
 
     @BeforeEach

@@ -81,12 +81,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we receive the proper response.
 
-        JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("name", directoryPath.toString())
-                .add("children", expectedChildren)
-                .build();
+        JsonObject expectedJson = Json.createObjectBuilder().build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
 
@@ -145,11 +140,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
         expectedChildren.add(directory2().getFileName().toString());
         expectedChildren.add(notebook2().getFileName().toString());
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("name", directoryPath.toString())
-                .add("children", expectedChildren)
-                .build();
+        JsonObject expectedJson = Json.createObjectBuilder().build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
@@ -258,7 +249,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP GET request to /directory/{path/to/directory} endpoint with a path corresponding to a notebook results in a response with the expected contents
+    // Assert that a HTTP DELETE request to /directory/{path/to/directory} endpoint with a path corresponding to a notebook results in a response with the expected contents
     public void httpDeleteDirectoryWithNotebookPathTest() {
         Path directoryPath = notebook4();
         // Assert that the path we are looking for exists, even though it's not a directory.
@@ -270,7 +261,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", directoryPath + " is not a directory!")
+                .add("message", directoryPath + " is not a Directory!")
                 .build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
@@ -286,8 +277,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
 
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
-        expectedChildren.add(directory2().getFileName().toString());
         expectedChildren.add(notebook2().getFileName().toString());
+        expectedChildren.add(directory2().getFileName().toString());
         JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("name", directoryPath.toString())

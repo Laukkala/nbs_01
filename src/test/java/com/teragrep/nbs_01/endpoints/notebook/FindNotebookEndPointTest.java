@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -92,7 +92,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
 
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(notebookPath));
         Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
@@ -140,13 +140,13 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpNotebookNotFoundTest() {
         String nonExistentNotebookName = "nonExistentNotebook";
         // Start server and wait for it to initialize.
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new FileTree(notebookDirectory()));
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(Paths.get(nonExistentNotebookName)));
 
         // The endpoint should return the correct status and message.
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such file " + nonExistentNotebookName + " !")
+                .add("message", "No such file: " + nonExistentNotebookName)
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());

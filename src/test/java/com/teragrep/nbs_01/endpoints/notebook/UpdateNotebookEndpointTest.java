@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -94,7 +94,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(originalFileContent, fileContent);
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with a path.
-        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
+        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
         Response response = endpoint.createResponse(new BasicRequest(notebookPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -121,7 +121,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Make sure the file doesn't exist
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
 
-        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new FileTree(notebookDirectory()));
+        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle.toString()).build();
         Response response = endpoint
                 .createResponse(new BasicRequest(Paths.get(nonExistentNotebookName), new JSONBody(body)));
@@ -131,7 +131,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Notebook at path " + nonExistentNotebookName + " does not exist!")
+                .add("message", "No such file: " + nonExistentNotebookName)
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());

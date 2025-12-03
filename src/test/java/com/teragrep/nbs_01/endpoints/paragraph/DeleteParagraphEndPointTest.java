@@ -46,8 +46,7 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.repository.Directory;
-import com.teragrep.nbs_01.repository.FileTree;
+import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
 import jakarta.json.Json;
@@ -90,7 +89,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteParagraphTest() {
         // Assert that the file we are deleting from exists.
         Assertions.assertTrue(Files.exists(notebookPath));
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
@@ -119,7 +118,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are deleting already exists.
         Assertions.assertTrue(Files.exists(notebookPath));
         String nonExistentParagraphId = "nonExistentParagraphId";
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
 
@@ -145,8 +144,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String nonExistentNotebookName = "nonExistentNotebook";
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
-        Directory root = new Directory(notebookDirectory());
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new FileTree(notebookDirectory()));
+        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
@@ -156,7 +154,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such notebook: " + nonExistentNotebookName + "!")
+                .add("message", "No such file: " + nonExistentNotebookName)
                 .build();
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions

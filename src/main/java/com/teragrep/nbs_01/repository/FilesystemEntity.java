@@ -46,16 +46,11 @@
 package com.teragrep.nbs_01.repository;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 // An interface for Filesystem objects, such as Notebooks and Directories.
-public interface Saveable {
+public interface FilesystemEntity {
 
-    public abstract Path path();
+    public abstract FilesystemEntity copy() throws IOException;
 
-    public abstract void save() throws IOException;
-
-    public abstract Saveable load() throws IOException;
-
-    public abstract Saveable copy(Path destinationPath) throws IOException;
+    public abstract String name();
 }

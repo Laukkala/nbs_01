@@ -45,54 +45,38 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.List;
 
-//
-public class FileTree {
+public interface Storage {
 
-    private final Path root;
+    public abstract Path root();
 
-    public FileTree(Path root) {
-        this.root = root;
-    }
+    public abstract void move(Path sourcePath, Path destinationPath) throws IOException;
 
-    public List<Path> list() throws IOException {
-        ArrayList<Path> files = new ArrayList<>();
-        FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
+    public abstract void deleteNotebook(Path path) throws NoSuchFileException, MalformedRequestException, IOException;
 
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if (dir.equals(root)) {
-                    return FileVisitResult.CONTINUE;
-                }
-                files.add(dir);
-                return FileVisitResult.CONTINUE;
-            }
+    public abstract void deleteDirectory(Path path) throws NoSuchFileException, MalformedRequestException, IOException;
 
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                files.add(file);
-                return FileVisitResult.CONTINUE;
-            }
+    public abstract void copy(Path sourcePath, Path destinationPath)
+            throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException;
 
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return super.visitFileFailed(file, exc);
-            }
+    public abstract void createDirectory(Path path) throws FileAlreadyExistsException, IOException;
 
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return super.postVisitDirectory(dir, exc);
-            }
-        };
-        Files.walkFileTree(root, fileVisitor);
-        return files;
-    }
+    public abstract String read(Path path) throws IOException;
 
-    public Path path() {
-        return root;
-    }
+    public abstract void write(Path path, String content) throws MalformedRequestException, IOException;
+
+    public abstract List<Path> children(Path path) throws MalformedRequestException, FileNotFoundException, IOException;
+
+    public abstract List<Path> immediateChildren(Path path)
+            throws MalformedRequestException, FileNotFoundException, IOException;
+
+    public abstract boolean exists(Path path);
 }

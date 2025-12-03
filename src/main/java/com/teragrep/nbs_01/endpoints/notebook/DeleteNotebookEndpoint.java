@@ -50,17 +50,16 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -69,28 +68,22 @@ import java.util.Objects;
 // Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
 public final class DeleteNotebookEndpoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public DeleteNotebookEndpoint(FileTree root) {
+    public DeleteNotebookEndpoint(Storage root) {
         this.root = root;
     }
 
     public Response createResponse(Request request) {
         try {
-            Path path = root.path().resolve(request.path());
-            // Files.delete() throws an exception if trying to delete a non-empty directory, so we must clear the directory first.
-            if (Files.isDirectory(path)) {
-                return new BasicResponse(
-                        HttpStatus.BAD_REQUEST_400,
-                        new ExceptionBody(new MalformedRequestException(request.path() + " is not a Notebook!"))
-                );
-            }
-            else {
-                Files.delete(path);
-            }
+            Path path = root.root().resolve(request.path());
+            root.deleteNotebook(path);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             return new BasicResponse(HttpStatus.NO_CONTENT_204, headers);
+        }
+        catch (MalformedRequestException malformedRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException noSuchFileException) {

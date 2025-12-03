@@ -51,28 +51,30 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.FileTree;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Storage;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // Searches for a paragraph from a given Notebook based on a given ParagraphId, and returns its contents in JSON format.
 public final class FindParagraphEndPoint implements EndPoint {
 
-    private final FileTree root;
+    private final Storage root;
 
-    public FindParagraphEndPoint(FileTree root) {
+    public FindParagraphEndPoint(Storage root) {
         this.root = root;
     }
 
@@ -80,18 +82,15 @@ public final class FindParagraphEndPoint implements EndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             validateRequestParameters(request);
-            Path requestPath = root.path().resolve(request.path());
+            Path requestPath = root.root().resolve(request.path());
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
 
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
 
-            List<Path> files = root.list();
-            if (!files.contains(notebookPath)) {
-                throw new FileNotFoundException("No such notebook !");
-            }
-            Notebook notebook = new Notebook(notebookPath).load();
+            JsonObject json = Json.createReader(new StringReader(root.read(notebookPath))).readObject();
+            Notebook notebook = new Notebook().load(json);
             if (notebook.paragraphs().containsKey(paragraphId)) {
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));

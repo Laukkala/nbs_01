@@ -96,12 +96,14 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/{path/to/existing/notebook} endpoint results in an error.
+    // Assert that a HTTP PUT request to /notebook/{path/to/existing/notebook} endpoint results in a file being overwritten.
     public void httpCreateNotebookIntoExistingPathTest() {
 
         Path newNotebookPath = notebook1();
         String newNotebookTitle = "newTitle";
         String requestBody = Json.createObjectBuilder().add("title", newNotebookTitle).build().toString();
+        String existingFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(newNotebookPath)));
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
         Response response = Assertions
@@ -111,15 +113,13 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("message", "Path at " + newNotebookPath + " is already in use!")
-                .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         // Assert that the original file still exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
+        String overwrittenFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(newNotebookPath)));
+        // Assert that the contents of the file were overwritten
+        Assertions.assertNotEquals(existingFileContent, overwrittenFileContent);
     }
 
     @Test
@@ -261,7 +261,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "File at " + newNotebookPath + " already exists!")
+                .add("message", "File at path: " + newNotebookPath + " is a Directory!")
                 .build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
@@ -270,13 +270,15 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP PUT request to /notebook/{path/to/existing/notebook} endpoint results in an error
+    // Assert that a HTTP PUT request to /notebook/{path/to/existing/notebook} endpoint results in file being overwritten
     public void httpCopyNotebookIntoExistingPathTest() {
 
         Path newNotebookPath = notebook1();
         Path sourceNotebookPath = notebook4();
 
         // Assert that the file we are creating already exists.
+        String existingFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook1())));
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
         Response response = Assertions
                 .assertDoesNotThrow(
@@ -287,15 +289,14 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
 
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("message", "File at " + newNotebookPath + " already exists!")
-                .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
-        // Assert that the original file still exists
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        // Assert that the original and copied file both exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceNotebookPath)));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
+        String overwrittenFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(newNotebookPath)));
+        // Assert that the contents of the file were overwritten
+        Assertions.assertNotEquals(existingFileContent, overwrittenFileContent);
     }
 
     @Test
@@ -387,11 +388,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + directoryPath));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("message", "File at path " + directoryPath + " is not a notebook!")
-                .build();
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such file: " + directoryPath).build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
@@ -456,7 +454,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
     }
 
     @Test
