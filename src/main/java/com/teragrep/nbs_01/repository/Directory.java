@@ -48,122 +48,47 @@ package com.teragrep.nbs_01.repository;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 // Represents a single Directory that can contain Filesystem objects.
-// Is identified by a Path, and corresponds to a directory file on the filesystem.
-public final class Directory implements Saveable {
+public final class Directory implements FilesystemEntity {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
-    private final Map<Path, Saveable> children;
-    private final Path path;
+    private final List<FilesystemEntity> children;
+    private final String name;
 
-    public Directory(Path path) {
-        this(path, new HashMap<>());
-    }
-
-    public Directory(Path path, Map<Path, Saveable> children) {
-        this.path = path;
+    public Directory(String name, List<FilesystemEntity> children) {
+        this.name = name;
         this.children = children;
     }
 
-    public Path path() {
-        return path;
-    }
-
-    public Directory copy(Path destinationPath) throws IOException {
-        if (Files.exists(destinationPath)) {
-            throw new FileAlreadyExistsException("File at " + destinationPath + " already exists!");
+    public Directory copy() throws IOException {
+        List<FilesystemEntity> copiedChildren = new ArrayList<>();
+        for (FilesystemEntity child : children) {
+            FilesystemEntity copy = child.copy();
+            copiedChildren.add(copy);
         }
-        Map<Path, Saveable> copiedChildren = new HashMap<>();
-        for (Saveable child : children.values()) {
-            Saveable copy = child.copy(destinationPath.resolve(child.path().getFileName()));
-            copiedChildren.put(copy.path(), copy);
-        }
-        return new Directory(destinationPath, copiedChildren);
+        return new Directory(name, copiedChildren);
     }
 
     public JsonObject json() {
         JsonArrayBuilder childArray = Json.createArrayBuilder();
-        for (Saveable child : children().values()) {
-            childArray.add(child.path().getFileName().toString());
+        for (FilesystemEntity child : children()) {
+            childArray.add(child.name());
         }
-        return Json
-                .createObjectBuilder()
-                .add("name", path.getFileName().toString())
-                .add("children", childArray)
-                .build();
+        return Json.createObjectBuilder().add("name", name).add("children", childArray).build();
     }
 
-    public void save() throws IOException {
-        if (!Files.exists(path())) {
-            Files.createDirectory(path());
-        }
-        for (Saveable child : children.values()) {
-            child.save();
-        }
+    public String name() {
+        return name;
     }
 
-    public Map<Path, Saveable> children() {
+    public List<FilesystemEntity> children() {
         return children;
-    }
-
-    public Directory load() throws IOException {
-        return load(path);
-    }
-
-    // This method traverses the file tree recursively and depth first, and creates a Directory object with a complete map of child Directories and Notebooks.
-    private Directory load(Path pathToVisit) throws IOException {
-        Map<Path, Saveable> currentChildren = new HashMap<>();
-        Files.walkFileTree(pathToVisit, new SimpleFileVisitor<Path>() {
-
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                // walkFileTree visits the root directory it's called on.
-                // This method operates on the given directory's children so we skip the processing of the root directory here.
-                if (dir.equals(pathToVisit)) {
-                    return FileVisitResult.CONTINUE;
-                }
-                // Ignore .git directory. This could be moved somewhere else.
-                if (dir.startsWith(pathToVisit + "/.git")) {
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-                Directory childDirectory = new Directory(dir).load();
-                currentChildren.put(childDirectory.path(), childDirectory);
-                return FileVisitResult.SKIP_SUBTREE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                try {
-                    Notebook childNotebook = new Notebook(file).load();
-                    currentChildren.put(childNotebook.path(), childNotebook);
-                    return FileVisitResult.CONTINUE;
-                }
-                catch (JsonParsingException jsonParsingException) {
-                    LOGGER.warn("Encountered a corrupted file: ", file);
-                    return FileVisitResult.CONTINUE;
-                }
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return super.visitFileFailed(file, exc);
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return super.postVisitDirectory(dir, exc);
-            }
-        });
-        Directory loadedDirectory = new Directory(pathToVisit, currentChildren);
-        return loadedDirectory;
     }
 
     @Override
@@ -175,11 +100,11 @@ public final class Directory implements Saveable {
             return false;
         }
         Directory directory = (Directory) o;
-        return Objects.equals(children, directory.children) && Objects.equals(path, directory.path);
+        return Objects.equals(children, directory.children) && Objects.equals(name, directory.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(children, path);
+        return Objects.hash(children, name);
     }
 }
