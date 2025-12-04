@@ -67,17 +67,6 @@ import java.nio.file.Paths;
 
 class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
-    private String sourceNotebookName = "my_note2_2A94M5J2Z.zpln";
-    private Path sourceNotebookPath = Paths
-            .get(notebookDirectory().toString(), "my_folder_2A94M5J1D", sourceNotebookName);
-    private Path sourceNotebookParameter = Paths.get("my_folder_2A94M5J1D", sourceNotebookName);
-    private String newNotebookName = "testNotebookName";
-    private Path newNotebookPath = Paths.get(notebookDirectory().toString(), newNotebookName);
-    private Path nonExistentNotebookPath = Paths.get("tillintallin", "tallintillin");
-    private Path nonExistentSourcePath = Paths.get(notebookDirectory().toString(), "tillintallin", "tallintillin");
-    private Path existingPathEndpointParameter = Paths.get("my_folder_2A94M5J1D");
-    private Path existingPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
-
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
@@ -91,15 +80,23 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a proper request to CopyNotebookEndpoint results in a correct response and a file being saved to disk.
     public void httpCopyNotebookTest() {
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertFalse(Files.exists(newNotebookPath));
-        Assertions.assertTrue(Files.exists(sourceNotebookPath));
+        // Destination file must not exist
+        Path destinationFile = Paths.get("testNotebookName");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
+
+        // Source file must exist
+        Path sourceFile = notebook2();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
+        String sourceFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
+
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookParameter.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
+        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new JSONBody(body)));
+
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", newNotebookName);
+        Header expectedLocationHeader = new BasicHeader("Location", destinationFile.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
@@ -131,45 +128,139 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(
                         () -> Assertions.assertTrue(response.body().asString().contains("\"script\":{\"text\":\"\"}"))
                 );
-        // Assert that the file was created.
-        Assertions.assertTrue(Files.exists(newNotebookPath));
+        // Assert that the copied file was created to proper path.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationFile)));
+        // Source file must not have changed
+        Assertions
+                .assertEquals(
+                        sourceFileContent,
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())))
+                );
+    }
+
+    @Test
+    // Assert that a proper request to CopyNotebookEndpoint results in a correct response and a file being overwritten to disk.
+    public void httpCopyAndOverwriteNotebookTest() {
+        // Destination file must exist
+        Path destinationFile = notebook3();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationFile)));
+        String destinationFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(destinationFile)));
+
+        // Source file must exist
+        Path sourceFile = notebook2();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
+        String sourceFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
+
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
+        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new JSONBody(body)));
+
+        // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
+        Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
+        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
+        Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .asString()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}"
+                                                )
+                                )
+                );
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .asString()
+                                                .contains(
+                                                        "\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}"
+                                                )
+                                )
+                );
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions.assertTrue(response.body().asString().contains("\"script\":{\"text\":\"\"}"))
+                );
+        // Assert that the copied file was created to proper path.
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationFile)));
+        // Source file must not have changed
+        Assertions
+                .assertEquals(
+                        sourceFileContent,
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)))
+                );
+        // Destination file must have changed
+        Assertions
+                .assertNotEquals(
+                        destinationFileContent,
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(destinationFile)))
+                );
     }
 
     @Test
     // Assert that a request to CopyNotebookEndpoint with a source path that does not have a file results in an error
-    public void httpCopyNonExistentNotebookTest() {
-        // Assert that there is no file saved in the source path we are using
-        Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
+    public void httpCopyNonExistentSourceNotebookTest() {
+        // Destination file must not exist
+        Path destinationFile = Paths.get("testNotebookName");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
+
+        // Source file must not exist
+        Path sourceFile = Paths.get("I_DONT_EXIST");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(sourceFile)));
+
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", nonExistentNotebookPath.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newNotebookName), new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
+        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new JSONBody(body)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         // Assert that the file was not created.
-        Assertions.assertFalse(Files.exists(newNotebookPath));
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
     }
 
     @Test
     // Assert that a request to CopyNotebookEndpoint to a path that contains a directory results in an error
     public void httpCopyNotebookIntoUnavailablePathTest() {
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertTrue(Files.exists(existingPath));
-        Assertions.assertTrue(Files.isDirectory(existingPath));
-        Assertions.assertTrue(Files.exists(sourceNotebookPath));
+        // Destination file must exist and be a directory
+        Path destinationDirectory = directory1();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationDirectory)));
+        Assertions.assertTrue(Files.isDirectory(notebookDirectory().resolve(destinationDirectory)));
+
+        // Source file must exist
+        Path sourceFile = notebook1();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
+        String sourceFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
+
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceNotebookParameter.toString()).build();
-        Path existingNotebookPath = notebookDirectory().relativize(existingPath);
-        Response response = endPoint.createResponse(new BasicRequest(existingNotebookPath, new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
+        Response response = endPoint.createResponse(new BasicRequest(destinationDirectory, new JSONBody(body)));
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "File at path: " + existingNotebookPath + " is a Directory!")
+                .add("message", "File at path: " + directory1() + " is a Directory!")
                 .build();
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions.assertEquals(expectedJson, response.body().asJson());
+
+        // Source file must not have changed
+        Assertions
+                .assertEquals(
+                        sourceFileContent,
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)))
+                );
     }
 
     @Test

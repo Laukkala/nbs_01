@@ -63,71 +63,89 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
-    private String sourceDirectory1Name = "my_folder_2A94M5J1D";
-    private String sourceDirectory2Name = "my_second_folder_2A94M5J2D/";
-    private Path sourceDirectory1Path = Paths.get(notebookDirectory().toString(), sourceDirectory1Name);
-    private Path getSourceDirectory2Path = Paths
-            .get(notebookDirectory().toString(), sourceDirectory1Name, sourceDirectory2Name);
-    private Path sourceDirectory1Parameter = Paths.get(sourceDirectory1Name);
-    private Path sourceDirectory2Parameter = Paths.get(sourceDirectory1Name, sourceDirectory2Name);
-    private String newDirectoryName = "testDirectoryName";
-    private Path copiedDirectoryPath = Paths.get(notebookDirectory().toString(), newDirectoryName);
-    private Path faultyEndpointParameter = Paths.get("tillintallin", "tallintillin");
-    private Path nonExistentSourcePath = Paths.get(notebookDirectory().toString(), "tillintallin", "tallintillin");
-    private Path existingPathEndpointParameter = Paths.get("my_folder_2A94M5J1D");
-    private Path existingPath = Paths.get(notebookDirectory().toString(), "my_folder_2A94M5J1D");
-
     @Test
-    // Assert that a proper request to CopyDirectoryEndpoint results in a correct response and a file being saved to disk.
+    // Assert that a proper request to CopyDirectoryEndpoint results in a correct response and a directory being saved to disk.
     public void httpCopyDirectoryTest() {
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertFalse(Files.exists(copiedDirectoryPath));
-        Assertions.assertTrue(Files.exists(sourceDirectory1Path));
+        // Source directory must exist
+        Path sourceDirectory = notebookDirectory().resolve(directory1());
+        Assertions.assertTrue(Files.exists(sourceDirectory));
+        List<Path> sourceDirectoryChildren = Assertions
+                .assertDoesNotThrow(() -> Files.list(sourceDirectory))
+                .map(path -> path.getFileName())
+                .collect(Collectors.toList());
+
+        // Destination directory must not exist
+        Path destinationDirectory = Paths.get("testDirectory");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationDirectory)));
+
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectory1Parameter.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newDirectoryName), new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", directory1().toString()).build();
+        Response response = endPoint
+                .createResponse(new BasicRequest(Paths.get(destinationDirectory.toString()), new JSONBody(body)));
+
         // Assert that we receive the proper response.
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
         expectedChildren.add(notebook1().getFileName().toString());
         JsonObject expectedJson = Json.createObjectBuilder().build();
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", newDirectoryName);
+        Header expectedLocationHeader = new BasicHeader("Location", destinationDirectory.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(response.body().asString(), expectedJson.toString()));
-        // Assert that the file was created.
-        Assertions.assertTrue(Files.exists(copiedDirectoryPath));
+
+        // Destination directory must exist
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationDirectory)));
+        // Destination directory must contain same list of files as Source directory
+        List<Path> destinationDirectoryChildren = Assertions
+                .assertDoesNotThrow(() -> Files.list(notebookDirectory().resolve(destinationDirectory)))
+                .map(path -> path.getFileName())
+                .collect(Collectors.toList());
+        Assertions.assertEquals(sourceDirectoryChildren, destinationDirectoryChildren);
+        // Source directory must exist
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
     }
 
     @Test
-    // Assert that a request to CopyDirectoryEndpoint with a source path that does not have a file results in an error
-    public void httpCopyNonExistentDirectoryTest() {
-        // Assert that there is no file saved in the source path we are using
-        Assertions.assertFalse(Files.exists(faultyEndpointParameter));
+    // Assert that a request to CopyDirectoryEndpoint with a source path that does not have any saved file results in an error
+    public void httpCopyNonExistentSourceDirectoryTest() {
+        // Source directory not must exist
+        Path sourceDirectory = Paths.get("I_DONT_EXIST");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(sourceDirectory)));
+
+        // Destination directory must not exist
+        Path destinationDirectory = Paths.get("testDirectory");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationDirectory)));
+
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", faultyEndpointParameter.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newDirectoryName), new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectory.toString()).build();
+        Response response = endPoint.createResponse(new BasicRequest(destinationDirectory, new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
 
         // Assert that the file was not created.
-        Assertions.assertFalse(Files.exists(copiedDirectoryPath));
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationDirectory)));
     }
 
     @Test
-    // Assert that a request to CopyDirectoryEndpoint to a path that already contains a file results in an error
+    // Assert that a request to CopyDirectoryEndpoint to a path that already contains a directory results in an error
     public void httpCopyDirectoryIntoUnavailablePathTest() {
-        // Assert that the file we are creating already exists.
-        Assertions.assertTrue(Files.exists(existingPath));
-        Assertions.assertTrue(Files.exists(sourceDirectory1Path));
+        // Source directory must exist
+        Path sourceDirectory = directory2();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceDirectory)));
+
+        // Destination directory must exist
+        Path destinationDirectoryName = directory1();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationDirectoryName)));
+
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectory2Parameter.toString()).build();
-        Response response = endPoint
-                .createResponse(new BasicRequest(existingPathEndpointParameter, new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("sourcePath", directory2().toString()).build();
+        Response response = endPoint.createResponse(new BasicRequest(directory1(), new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
