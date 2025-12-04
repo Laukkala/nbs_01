@@ -252,7 +252,13 @@ public class LocalFilesystemStorage implements Storage {
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            Files.copy(file, destinationPath.resolve(sourcePath.relativize(file)));
+            Path path = destinationPath.resolve(sourcePath.relativize(file));
+            if (!Files.exists(path)) {
+                Files.copy(file, path);
+            }
+            else {
+                throw new FileAlreadyExistsException("Destination " + root.relativize(path) + " is already in use!");
+            }
             return FileVisitResult.CONTINUE;
         }
 
