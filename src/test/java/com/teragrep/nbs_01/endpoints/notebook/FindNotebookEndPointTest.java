@@ -64,17 +64,7 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
 
-    private final Path notebookPath = Paths
-            .get("my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
     private final String expectedFileContent = "\"name\":\"my_note1\",\"config\":{}";
-    private final String expectedParagraph1 = "{\"id\":\"20150213-231621_168813393\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Welcome to Zeppelin.\\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run)\"}}";
-    private final String expectedParagraph2 = "{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}}";
-    private final String expectedParagraph3 = "{\"id\":\"20150210-015302_1492795503\",\"title\":\"\",\"script\":{\"text\":\"%test \\nselect age, count(1) value\\nfrom bank \\nwhere age < 30 \\ngroup by age \\norder by age\"}}";
-    private final String expectedParagraph4 = "{\"id\":\"20150212-145404_867439529\",\"title\":\"\",\"script\":{\"text\":\"%test \\nselect age, count(1) value \\nfrom bank \\nwhere age < ${maxAge=30} \\ngroup by age \\norder by age\"}}";
-    private final String expectedParagraph5 = "{\"id\":\"20150213-230422_1600658137\",\"title\":\"\",\"script\":{\"text\":\"%test \\nselect age, count(1) value \\nfrom bank \\nwhere marital=\\\"${marital=single,single|divorced|married}\\\" \\ngroup by age \\norder by age\"}}";
-    private final String expectedParagraph6 = "{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}}";
-    private final String expectedParagraph7 = "{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}}";
-    private final String expectedParagraph8 = "{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
 
     @BeforeEach
     private void setUp() {
@@ -89,12 +79,12 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/find endpoint results in a response with the expected file contents
     public void httpFindTest() {
-        // Assert that the file exists.
-        Assertions.assertTrue(Files.exists(Paths.get(notebookDirectory().toString(), notebookPath.toString())));
+        // Destination notebook must exist
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
 
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(notebookPath));
-        Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
+        Response response = endPoint.createResponse(new BasicRequest(notebook1()));
+        Header expectedLocationHeader = new BasicHeader("Location", notebook1().toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
@@ -104,49 +94,49 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph1))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph1()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph2))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph2()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph3))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph3()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph4))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph4()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph5))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph5()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph6))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph6()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph7))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph7()))
                 );
         Assertions
                 .assertDoesNotThrow(
-                        () -> Assertions.assertTrue(response.body().asString().strip().contains(expectedParagraph8))
+                        () -> Assertions.assertTrue(response.body().asString().strip().contains(notebook1Paragraph8()))
                 );
     }
 
     @Test
     public void httpNotebookNotFoundTest() {
-        String nonExistentNotebookName = "nonExistentNotebook";
+        Path nonExistentNotebookPath = Paths.get("nonExistentNotebook");
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(nonExistentNotebookName)));
+        Response response = endPoint.createResponse(new BasicRequest(nonExistentNotebookPath));
 
         // The endpoint should return the correct status and message.
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such file: " + nonExistentNotebookName)
+                .add("message", "No such file: " + nonExistentNotebookPath)
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
