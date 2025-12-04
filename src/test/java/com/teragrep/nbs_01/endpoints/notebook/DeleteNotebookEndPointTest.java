@@ -56,17 +56,9 @@ import org.apache.http.message.BasicHeader;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
-
-    private String deletedNotebookName = "my_note3_2A94M5J3Z.zpln";
-    private Path deletedNotebookPath = Paths.get(notebookDirectory().toString(), deletedNotebookName);
-
-    public DeleteNotebookEndPointTest() {
-    }
 
     @BeforeEach
     private void setUp() {
@@ -82,18 +74,18 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.
     public void httpDeleteNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
-        Assertions.assertTrue(Files.exists(deletedNotebookPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
         DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(deletedNotebookName)));
+        Response response = endPoint.createResponse(new BasicRequest(notebook3()));
         // Assert that we receive the proper response.
-        Header expectedLocationHeader = new BasicHeader("Location", deletedNotebookName);
+        Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
         Assertions.assertEquals(204, response.status());
         Assertions.assertEquals(1, response.headers().size());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         // Assert that Response should not hava a body.
         Assertions.assertThrows(IllegalStateException.class, () -> response.body().asString());
         // Assert that the file was created.
-        Assertions.assertFalse(Files.exists(deletedNotebookPath));
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(notebook3())));
     }
 
     @Test

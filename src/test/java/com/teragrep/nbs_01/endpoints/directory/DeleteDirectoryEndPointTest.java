@@ -56,16 +56,9 @@ import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
-
-    private String deletedDirectoryName = "my_folder_2A94M5J1D";
-    private Path deletedDirectoryPath = Paths.get(notebookDirectory().toString(), deletedDirectoryName);
-
-    public DeleteDirectoryEndPointTest() {
-    }
 
     @BeforeEach
     private void setUp() {
@@ -80,15 +73,16 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in new directory being saved on disk.
     public void httpDeleteDirectoryTest() {
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertTrue(Files.exists(deletedDirectoryPath));
+        Path deletedDirectoryPath = directory2();
+        // Destination directory must exist
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(deletedDirectoryPath)));
         DeleteDirectoryEndpoint endPoint = new DeleteDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(deletedDirectoryName)));
+        Response response = endPoint.createResponse(new BasicRequest(deletedDirectoryPath));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryName);
+        Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryPath.toString());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
-        // Assert that the file was created.
+        // Destination directory must not exist
         Assertions.assertFalse(Files.exists(deletedDirectoryPath));
     }
 
