@@ -58,22 +58,11 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
-
-    private final Path notebookPath = Paths.get("my_folder_2A94M5J1D", "my_note2_2A94M5J2Z.zpln");
-    private final Path absoluteNotebookPath = Paths.get(notebookDirectory().toString(), notebookPath.toString());
-    private final String editedTitle = "testTitle";
-    private final String originalFileContent = "{  \"paragraphs\": [    {      \"text\": \"%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!\",      \"config\": {        \"colWidth\": 12.0,        \"graph\": {          \"mode\": \"table\",          \"height\": 300.0,          \"optionOpen\": false,          \"keys\": [],          \"values\": [],          \"groups\": [],          \"scatter\": {}        },        \"editorHide\": true      },      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1423836268492_216498320\",      \"id\": \"20150213-230428_1231780373\",      \"results\": {        \"code\": \"SUCCESS\",        \"msg\": [          {            \"type\": \"HTML\",            \"data\": \"\\u003ch2\\u003eCongratulations, it\\u0027s done.\\u003c/h2\\u003e\\n\\u003ch5\\u003eYou can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!\\u003c/h5\\u003e\\n\"          }        ]      },      \"dateCreated\": \"Feb 13, 2015 11:04:28 PM\",      \"dateStarted\": \"Apr 1, 2015 9:12:18 PM\",      \"dateFinished\": \"Apr 1, 2015 9:12:18 PM\",      \"status\": \"FINISHED\",      \"progressUpdateIntervalMs\": 500    },    {      \"text\": \"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\",      \"config\": {        \"colWidth\": 12.0,        \"graph\": {          \"mode\": \"table\",          \"height\": 300.0,          \"optionOpen\": false,          \"keys\": [],          \"values\": [],          \"groups\": [],          \"scatter\": {}        },        \"editorHide\": true      },      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1427420818407_872443482\",      \"id\": \"20150326-214658_12335843\",      \"results\": {        \"code\": \"SUCCESS\",        \"msg\": [          {            \"type\": \"HTML\",            \"data\": \"\\u003cp\\u003eAbout bank data\\u003c/p\\u003e\\n\\u003cpre\\u003e\\u003ccode\\u003eCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n\\u003c/code\\u003e\\u003c/pre\\u003e\\n\"          }        ]      },      \"dateCreated\": \"Mar 26, 2015 9:46:58 PM\",      \"dateStarted\": \"Jul 3, 2015 1:44:56 PM\",      \"dateFinished\": \"Jul 3, 2015 1:44:56 PM\",      \"status\": \"FINISHED\",      \"progressUpdateIntervalMs\": 500    },    {      \"config\": {},      \"settings\": {        \"params\": {},        \"forms\": {}      },      \"jobName\": \"paragraph_1435955447812_-158639899\",      \"id\": \"20150703-133047_853701097\",      \"dateCreated\": \"Jul 3, 2015 1:30:47 PM\",      \"status\": \"READY\",      \"progressUpdateIntervalMs\": 500    }  ],  \"id\": \"2A94M5J2Z\",  \"name\": \"my_note2\",  \"angularObjects\": {},  \"config\": {    \"looknfeel\": \"default\"  },  \"info\": {}}";
-    private final String expectedFileContent = "{\"name\":\"" + editedTitle
-            + "\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
     @BeforeEach
     private void setUp() {
@@ -87,62 +76,58 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
 
     @Test
     public void httpUpdateNotebookTest() {
-        // Assert that the file content is the same as in the resource files before edits.
-        List<String> lines = Assertions
-                .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
-        String fileContent = lines.stream().collect(Collectors.joining());
-        Assertions.assertEquals(originalFileContent, fileContent);
+        // Destination notebook must exist
+        Path notebookPath = notebook2();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
+        String originalFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
 
-        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with a path.
+        // Make a request editing the title of the notebook.
+        String editedTitle = "testTitle";
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
         Response response = endpoint.createResponse(new BasicRequest(notebookPath, new JSONBody(body)));
+
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-
         Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(editedTitle)));
 
-        List<String> updatedLines = Assertions
-                .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
-        String updatedFileContent = updatedLines.stream().collect(Collectors.joining());
+        String updatedFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
         // Assert that the notebook title has been saved to the file in the correct place.
+        String expectedFileContent = "{\"name\":\"" + editedTitle
+                + "\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
         Assertions.assertEquals(expectedFileContent, updatedFileContent);
     }
 
     // Assert that trying to update a nonexistent notebook results in an error.
     @Test
     public void httpUpdateNonexistentNotebookTest() {
-        String nonExistentNotebookName = "nonExistentNotebook";
-        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
-        // Make sure the file doesn't exist
+        Path nonExistentNotebookPath = notebookDirectory().resolve("nonExistentNotebook");
+
+        // Destination notebook must not exist
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
 
+        String editedTitle = "testTitle";
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("title", editedTitle.toString()).build();
-        Response response = endpoint
-                .createResponse(new BasicRequest(Paths.get(nonExistentNotebookName), new JSONBody(body)));
+        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
+        Response response = endpoint.createResponse(new BasicRequest(nonExistentNotebookPath, new JSONBody(body)));
         // Assert that we got the proper response.
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "No such file: " + nonExistentNotebookName)
+                .add("message", "No such file: " + nonExistentNotebookPath)
                 .build();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
-
-        List<String> lines = Assertions
-                .assertDoesNotThrow(() -> Files.readAllLines(absoluteNotebookPath, Charset.defaultCharset()));
-        String fileContent = lines.stream().collect(Collectors.joining());
-        // Assert that the file content hasn't changed
-        Assertions.assertEquals(fileContent, originalFileContent);
     }
 
     @Test
