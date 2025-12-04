@@ -66,11 +66,6 @@ import java.nio.file.Paths;
 
 class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
 
-    private String newDirectoryName = "testNotebookName";
-    private Path newDirectoryPath = Paths.get(notebookDirectory().toString(), newDirectoryName);
-    private String existingDirectoryName = "my_folder_2A94M5J1D";
-    private Path existingDirectoryPath = Paths.get(notebookDirectory().toString(), existingDirectoryName);
-
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
@@ -84,35 +79,37 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a proper request to CreateDirectoryEndpoint results in a correct response and a file being saved to disk.
     public void httpCreateDirectoryTest() {
-        // Assert that the file we are creating doesn't already exist.
-        Assertions.assertFalse(Files.exists(newDirectoryPath));
+        Path newDirectoryPath = Paths.get("testDirectory");
+        // Destination directory must not exist
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newDirectoryPath)));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(newDirectoryName)));
+        Response response = endPoint.createResponse(new BasicRequest(newDirectoryPath));
         // Assert that we receive the proper response.
         JsonObject expectedJson = Json.createObjectBuilder().build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", newDirectoryName);
+        Header expectedLocationHeader = new BasicHeader("Location", newDirectoryPath.toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
-        // Assert that the file was created.
-        Assertions.assertTrue(Files.exists(newDirectoryPath));
+        // Destination directory must exist
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newDirectoryPath)));
     }
 
     @Test
     // Assert that a request to CreateDirectoryEndpoint to a path that already contains a file results in an error
     public void httpCreateDirectoryIntoUnavailablePathTest() {
-        // Assert that the file we are creating already exists.
-        Assertions.assertTrue(Files.exists(existingDirectoryPath));
+        // Destination directory must exist
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(Paths.get(existingDirectoryName)));
+        Response response = endPoint.createResponse(new BasicRequest(directory1()));
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Path at " + notebookDirectory().relativize(existingDirectoryPath) + " is already in use!").build();
+                .add("message", "Path at " + directory1() + " is already in use!")
+                .build();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
