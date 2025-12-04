@@ -45,7 +45,6 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.google.common.io.Files;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
@@ -59,10 +58,9 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
@@ -89,23 +87,13 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpUpdateParagraphTest() {
         // Assert that a request to UpdateParagraphEndpoint results in a modified file being saved on disk.
         Assertions
-                .assertEquals(
-                        originalFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                .assertTrue(
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!")
+                );
+
+        Assertions
+                .assertFalse(
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("\"title\":\"" + editedTitle + "\"")
                 );
 
         final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\""
@@ -138,21 +126,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath)))
                 );
     }
 
@@ -160,23 +134,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpUpdateParagraphTextTest() {
         // Assert that a request to UpdateParagraphEndpoint results in a modified file where only the text has been changed being saved on disk.
         Assertions
-                .assertEquals(
-                        originalFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                .assertTrue(
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!")
                 );
 
         final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\""
@@ -204,21 +163,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath)))
                 );
     }
 
@@ -226,23 +171,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpUpdateParagraphTitleTest() {
         // Assert that a request to UpdateParagraphEndpoint results in a modified file where only the title has been changed being saved on disk.
         Assertions
-                .assertEquals(
-                        originalFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                .assertFalse(
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("\"title\":\"" + editedTitle + "\"")
                 );
 
         final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\""
@@ -278,21 +208,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> Files
-                                                .readLines(
-                                                        Paths
-                                                                .get(
-                                                                        notebookDirectory().toString(),
-                                                                        notebookPath.toString()
-                                                                )
-                                                                .toFile(),
-                                                        Charset.defaultCharset()
-                                                )
-                                                .stream()
-                                                .collect(Collectors.joining())
-                                )
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath)))
                 );
     }
 

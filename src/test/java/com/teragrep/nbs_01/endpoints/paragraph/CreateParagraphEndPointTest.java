@@ -65,11 +65,6 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
-    private String notebookName = "my_note3_2A94M5J3Z.zpln";
-    private Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
-    private String paragraphId = "testParagraphId";
-    private String expectedFileContent = "{\"id\":\"testParagraphId\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
-
     public CreateParagraphEndPointTest() {
     }
 
@@ -87,10 +82,11 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to CreateParagraphEndpoint results in a new file being saved on disk.
     public void httpCreateParagraphTest() {
         // Assert that the file we are creating doesn't already exist.
-        Assertions.assertTrue(Files.exists(notebookPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        String paragraphId = "testParagraphId";
 
-        Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(notebook3().toString(), "/paragraph/" + paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
@@ -110,9 +106,10 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
-        Assertions.assertTrue(Files.exists(notebookPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
+        String expectedFileContent = "{\"id\":\"" + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
         Assertions
-                .assertTrue(Assertions.assertDoesNotThrow(() -> Files.readString(Paths.get(notebookPath.toString())).contains(expectedFileContent)));
+                .assertTrue(Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook3())).contains(expectedFileContent)));
     }
 
     @Test
@@ -124,6 +121,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are trying to add a paragraph to doesn't exist.
         Assertions.assertFalse(Files.exists(nonexistentFilePath));
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        String paragraphId = "testParagraphId";
 
         Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
         JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();

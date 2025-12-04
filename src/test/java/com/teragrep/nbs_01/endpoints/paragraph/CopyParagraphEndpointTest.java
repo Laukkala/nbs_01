@@ -74,7 +74,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String destinationParagraphId = "copyParagraph";
         Path sourceNotebookPath = notebookDirectory().resolve(notebook3());
         String sourceParagraphId = "20150213-230428_1231780373";
-        // Assert that the file we are copying a paragraph into and the file we are copying it from both exist.
+        // Source and Destination files should exist.
         Assertions.assertTrue(Files.exists(destinationNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
@@ -133,7 +133,8 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String destinationParagraphId = "copyParagraph";
         Path sourceNotebookPath = notebookDirectory().resolve(notebook3());
         String sourceParagraphId = "I_DON'T_EXIST";
-        // Assert that the file we are copying a paragraph into and the file we are copying it from both exist.
+
+        // Source and Destination files must exist.
         Assertions.assertTrue(Files.exists(destinationNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
@@ -179,7 +180,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpCopyParagraphWithNoSourceParagraphId() {
         String destinationParagraphId = "copyParagraph";
         Path sourceNotebookPath = notebookDirectory().resolve(notebook3());
-        // Assert that the file we are copying from exists.
+        // Source path must exist
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
@@ -207,7 +208,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String sourceNotebookName = "I_DONT_EXIST";
         Path sourceNotebookPath = Paths.get(sourceNotebookName);
         String sourceParagraphId = "20150213-230428_1231780373";
-        // Assert that the file we are copying a paragraph from doesn't exist
+        // Source path must not exist
         Assertions.assertFalse(Files.exists(sourceNotebookPath));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
@@ -221,7 +222,6 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Response response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
-
         JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + sourceNotebookName)
@@ -262,7 +262,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String destinationParagraphId = "20150213-231621_168813393";
         Path sourceNotebookPath = notebookDirectory().resolve(notebook3());
         String sourceParagraphId = "20150213-230428_1231780373";
-        // Assert that the file we are copying a paragraph into and the file we are copying it from both exist.
+        // Source and destination paths must exist
         Assertions.assertTrue(Files.exists(destinationNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
@@ -300,7 +300,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String destinationParagraphId = "copyParagraph";
         Path sourceNotebookPath = notebookDirectory().resolve(notebook3());
         String sourceParagraphId = "20150213-230428_1231780373";
-        // Assert that the destination path does not contain a file.
+        // Source path must exist, but destination past must not
         Assertions.assertFalse(Files.exists(destinationNotebookPath));
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 

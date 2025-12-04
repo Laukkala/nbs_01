@@ -57,22 +57,12 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
-
-    private final String notebookName = "my_note3_2A94M5J3Z.zpln";
-    private final Path notebookPath = Paths.get(notebookDirectory().toString(), notebookName);
-    private final String paragraphId = "20150213-230428_1231780373";
-    private final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
-
-    public DeleteParagraphEndPointTest() {
-    }
 
     @BeforeEach
     private void setUp() {
@@ -88,10 +78,11 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a request to DeleteParagraphEndpoint results in a file with edited content being saved on disk.
     public void httpDeleteParagraphTest() {
         // Assert that the file we are deleting from exists.
-        Assertions.assertTrue(Files.exists(notebookPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        String paragraphId = "20150213-230428_1231780373";
 
-        Path requestPath = Paths.get(notebookName, "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(notebook3().toString(), "/paragraph/" + paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
@@ -100,14 +91,12 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
 
         // Assert that the file was changed.
-        Assertions.assertTrue(Files.exists(notebookPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
+        String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions
-                                .assertDoesNotThrow(
-                                        () -> com.google.common.io.Files.readLines(Paths.get(notebookPath.toString()).toFile(), Charset.defaultCharset()).stream().collect(Collectors.joining())
-                                )
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook3())))
                 );
 
     }
@@ -116,11 +105,11 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a request to DeleteParagraphEndpoint with an invalid paragraphId results in an error.
     public void httpDeleteNonexistentParagraphTest() {
         // Assert that the file we are deleting already exists.
-        Assertions.assertTrue(Files.exists(notebookPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
         String nonExistentParagraphId = "nonExistentParagraphId";
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebookName, "/paragraph/" + nonExistentParagraphId);
+        Path requestPath = Paths.get(notebook3().toString(), "/paragraph/" + nonExistentParagraphId);
 
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
@@ -145,6 +134,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        String paragraphId = "20150213-230428_1231780373";
 
         Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
