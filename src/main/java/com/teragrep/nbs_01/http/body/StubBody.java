@@ -45,8 +45,6 @@
  */
 package com.teragrep.nbs_01.http.body;
 
-import jakarta.json.JsonObject;
-
 /**
  * An object representing the absence of a Body Should be used when a Request or a response does not contain a Body at
  * all.
@@ -55,11 +53,6 @@ import jakarta.json.JsonObject;
 public class StubBody implements Body {
 
     public StubBody() {
-    }
-
-    @Override
-    public JsonObject asJson() {
-        throw new IllegalStateException("Body is a stub!");
     }
 
     @Override

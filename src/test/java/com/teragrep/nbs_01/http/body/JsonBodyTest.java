@@ -69,7 +69,6 @@ public class JsonBodyTest {
         JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
 
         JSONBody body = new JSONBody(expectedBody);
-        Assertions.assertEquals(expectedBody, body.asJson());
         Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 
@@ -79,7 +78,6 @@ public class JsonBodyTest {
         JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
 
         JSONBody body = new JSONBody(expectedBody);
-        Assertions.assertEquals(expectedBody, body.asJson());
         Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 }

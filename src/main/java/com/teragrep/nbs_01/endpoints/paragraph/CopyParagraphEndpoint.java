@@ -62,8 +62,8 @@ import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -90,9 +90,9 @@ public final class CopyParagraphEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             validateRequestParameters(request);
-            JsonObject parameters = request.body().asJson().asJsonObject();
-            String sourcePathString = parameters.getString("sourcePath");
-            String sourceParagraphId = parameters.getString("sourceParagraphId");
+            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
+            String sourcePathString = body.getString("sourcePath");
+            String sourceParagraphId = body.getString("sourceParagraphId");
             Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
 
             Path destinationPath = root
@@ -136,8 +136,8 @@ public final class CopyParagraphEndpoint implements EndPoint {
             return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(copyParagraph.json()), headers);
         }
         catch (
-                MalformedBodyException | BodyNotFoundException | FileAlreadyExistsException
-                | MalformedRequestException badRequestException
+                MalformedBodyException | BodyNotFoundException | FileAlreadyExistsException | MalformedRequestException
+                | JsonException badRequestException
         ) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
@@ -149,9 +149,10 @@ public final class CopyParagraphEndpoint implements EndPoint {
         }
     }
 
-    private void validateRequestParameters(Request request) throws MalformedBodyException, BodyNotFoundException {
+    private void validateRequestParameters(Request request)
+            throws MalformedBodyException, BodyNotFoundException, JsonException {
         Path requestPath = request.path();
-        JsonStructure json = request.body().asJson();
+        JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedBodyException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
@@ -162,10 +163,10 @@ public final class CopyParagraphEndpoint implements EndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
-        if (!json.asJsonObject().containsKey("sourceParagraphId")) {
+        if (!body.containsKey("sourceParagraphId")) {
             throw new MalformedBodyException("Request does not contain a source paragraph id");
         }
-        if (!json.asJsonObject().containsKey("sourcePath")) {
+        if (!body.containsKey("sourcePath")) {
             throw new MalformedBodyException("Request does not contain a source path!");
         }
     }

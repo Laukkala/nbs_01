@@ -45,8 +45,6 @@
  */
 package com.teragrep.nbs_01.http.body;
 
-import jakarta.json.JsonObject;
-
 /**
  * A Body that encapsulates a String
  */
@@ -57,11 +55,6 @@ public class StringBody implements Body {
 
     public StringBody(String text) {
         this.text = text;
-    }
-
-    @Override
-    public JsonObject asJson() {
-        throw new IllegalStateException("StringBody cannot be turned into JSON!");
     }
 
     @Override

@@ -59,8 +59,8 @@ import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -88,10 +88,8 @@ public final class UpdateParagraphEndpoint implements EndPoint {
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
             Path notebookPath = root.root().resolve(requestPath.subpath(0, requestPath.getNameCount() - 2));
-            JsonObject parameters = Json
-                    .createObjectBuilder(request.body().asJson().asJsonObject())
-                    .add("paragraphId", paragraphId)
-                    .build();
+            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
+            JsonObject parameters = Json.createObjectBuilder(body).add("paragraphId", paragraphId).build();
             JsonObject json = Json.createReader(new StringReader(root.read(notebookPath))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
@@ -118,7 +116,10 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(newParagraph.json()), headers);
         }
-        catch (MalformedBodyException | MalformedRequestException | BodyNotFoundException malformedBodyException) {
+        catch (
+                MalformedBodyException | MalformedRequestException | BodyNotFoundException
+                | JsonException malformedBodyException
+        ) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedBodyException));
         }
         catch (FileNotFoundException fileNotFoundException) {
@@ -130,9 +131,10 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     }
 
-    private void validateRequestParameters(Request request) throws MalformedBodyException, BodyNotFoundException {
+    private void validateRequestParameters(Request request)
+            throws MalformedBodyException, BodyNotFoundException, JsonException {
         Path requestPath = request.path();
-        JsonStructure json = request.body().asJson();
+        JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedBodyException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
@@ -143,7 +145,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
-        if (!json.asJsonObject().containsKey("text") && !json.asJsonObject().containsKey("title")) {
+        if (!json.containsKey("text") && !json.containsKey("title")) {
             throw new MalformedBodyException("Request does not contain either a text or a title field!");
         }
     }

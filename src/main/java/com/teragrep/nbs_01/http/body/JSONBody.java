@@ -59,8 +59,7 @@ public class JSONBody implements Body {
         this.json = json;
     }
 
-    @Override
-    public JsonStructure asJson() {
+    public JsonStructure json() {
         return json;
     }
 

@@ -58,6 +58,7 @@ import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -65,6 +66,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,7 +84,7 @@ public final class CopyDirectoryEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            JsonObject body = request.body().asJson().asJsonObject();
+            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             if (!body.containsKey("sourcePath")) {
                 throw new MalformedBodyException("Request must contain a sourcePath!");
             }
@@ -100,8 +102,8 @@ public final class CopyDirectoryEndpoint implements EndPoint {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
         catch (
-                BodyNotFoundException | MalformedBodyException | FileAlreadyExistsException
-                | MalformedRequestException badRequestException
+                BodyNotFoundException | MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
+                | JsonException badRequestException
         ) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }

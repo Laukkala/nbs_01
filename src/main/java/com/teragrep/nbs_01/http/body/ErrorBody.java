@@ -82,11 +82,6 @@ public class ErrorBody implements Body {
     }
 
     @Override
-    public JsonObject asJson() {
-        return message;
-    }
-
-    @Override
     public String asString() {
         return message.toString();
     }

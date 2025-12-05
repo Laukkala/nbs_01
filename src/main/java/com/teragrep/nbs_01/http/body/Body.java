@@ -45,14 +45,10 @@
  */
 package com.teragrep.nbs_01.http.body;
 
-import jakarta.json.JsonStructure;
-
 /**
  * Represents the body of a HTML request or a response. Can represent itself as a String.
  */
 public interface Body {
 
     public abstract String asString();
-
-    public abstract JsonStructure asJson();
 }

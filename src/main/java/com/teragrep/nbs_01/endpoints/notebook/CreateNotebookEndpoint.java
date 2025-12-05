@@ -59,13 +59,16 @@ import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import jakarta.json.JsonStructure;
+import jakarta.json.Json;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -84,11 +87,17 @@ public final class CreateNotebookEndpoint implements EndPoint {
         Path path = request.path();
         String title;
         try {
-            JsonStructure json = request.body().asJson();
-            title = json.asJsonObject().getString("title");
+            JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
+            title = json.getString("title");
         }
         catch (BodyNotFoundException bodyNotFoundException) {
             title = "";
+        }
+        catch (JsonException jsonException) {
+            return new BasicResponse(
+                    HttpStatus.BAD_REQUEST_400,
+                    new ExceptionBody(new MalformedRequestException("Request body must be valid JSON!", jsonException))
+            );
         }
         return createResponse(path, title);
     }

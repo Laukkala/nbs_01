@@ -67,11 +67,6 @@ public class ExceptionBody implements Body {
     }
 
     @Override
-    public JsonObject asJson() {
-        return json;
-    }
-
-    @Override
     public String asString() {
         return json.toString();
     }

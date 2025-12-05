@@ -47,14 +47,11 @@ package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
 import com.teragrep.nbs_01.http.body.Body;
-import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.http.body.StubBody;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.Response;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,7 +60,6 @@ import org.apache.http.Header;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -136,9 +132,7 @@ public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
         reader.close();
         Body body;
         if (!bodyString.isEmpty()) {
-            JsonReader jsonReader = Json.createReader(new StringReader(bodyString));
-            JsonObject bodyJson = jsonReader.readObject();
-            body = new JSONBody(bodyJson);
+            body = new StringBody(bodyString);
         }
         else {
             body = new StubBody();

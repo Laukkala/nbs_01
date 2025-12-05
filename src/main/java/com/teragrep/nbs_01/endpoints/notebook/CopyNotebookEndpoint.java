@@ -59,6 +59,7 @@ import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -84,7 +85,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             // Parse Request parameters
-            JsonObject body = request.body().asJson().asJsonObject();
+            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             String sourcePathString = body.getString("sourcePath");
             Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
             Path destinationPath = root.root().resolve(request.path());
@@ -110,7 +111,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
         catch (FileAlreadyExistsException fileAlreadyExistsException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(fileAlreadyExistsException));
         }
-        catch (BodyNotFoundException | MalformedRequestException bodyNotFoundException) {
+        catch (BodyNotFoundException | MalformedRequestException | JsonException bodyNotFoundException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
         }
         catch (IOException ioException) {

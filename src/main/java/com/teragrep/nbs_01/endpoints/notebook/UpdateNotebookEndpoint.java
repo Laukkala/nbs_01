@@ -60,6 +60,7 @@ import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -82,8 +83,8 @@ public final class UpdateNotebookEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            JsonObject parameters = request.body().asJson().asJsonObject();
-            if (!parameters.containsKey("title")) {
+            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
+            if (!body.containsKey("title")) {
                 throw new MalformedBodyException("Request does not contain a title!");
             }
 
@@ -97,7 +98,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             Map<String, Paragraph> paragraphs = new LinkedHashMap<>(originalNotebook.paragraphs());
 
             // Add a modified title
-            String title = parameters.getString("title");
+            String title = body.getString("title");
             Notebook modifiedNotebook = new Notebook(title, paragraphs);
             SerializedNotebook serializedModifiedNotebook = new JsonNotebook(modifiedNotebook.json());
             String serializedString = serializedModifiedNotebook.serialize();
@@ -111,7 +112,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         catch (FileNotFoundException fileNotFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
         }
-        catch (BodyNotFoundException | MalformedRequestException bodyNotFoundException) {
+        catch (BodyNotFoundException | MalformedRequestException | JsonException bodyNotFoundException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
         }
         catch (IOException ioException) {
