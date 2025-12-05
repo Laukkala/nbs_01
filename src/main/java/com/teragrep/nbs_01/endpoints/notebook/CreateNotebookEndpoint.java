@@ -51,12 +51,14 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.JsonStructure;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -95,11 +97,13 @@ public final class CreateNotebookEndpoint implements EndPoint {
         try {
             Path filePath = root.root().resolve(path);
             Notebook newFile = new Notebook(title);
-            root.write(filePath, newFile.json().toString());
+            SerializedNotebook serializedNewNotebook = new JsonNotebook(newFile.json());
+            String serializedString = serializedNewNotebook.serialize();
+            root.write(filePath, serializedString);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", path.toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(newFile.json()), headers);
+            return new BasicResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));

@@ -43,54 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository;
+package com.teragrep.nbs_01.http.body;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
+/**
+ * A Body that encapsulates a String
+ */
 
-// Represents the text that a user can write into a Paragraph.
-public final class Script {
+public class StringBody implements Body {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Script.class);
     private final String text;
 
-    public Script() {
-        this.text = "";
-    }
-
-    public Script(String text) {
+    public StringBody(String text) {
         this.text = text;
     }
 
-    public String text() {
+    @Override
+    public JsonObject asJson() {
+        throw new IllegalStateException("StringBody cannot be turned into JSON!");
+    }
+
+    @Override
+    public String asString() {
         return text;
-    }
-
-    public JsonObject json() {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("text", text);
-        return builder.build();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Script script = (Script) o;
-        return Objects.equals(text, script.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(text);
     }
 }

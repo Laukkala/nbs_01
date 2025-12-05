@@ -43,54 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository;
+package com.teragrep.nbs_01.repository.serialization;
 
-import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.json.JsonValue;
 
-import java.util.Objects;
+public class JsonScript implements SerializedScript {
 
-// Represents the text that a user can write into a Paragraph.
-public final class Script {
+    private final JsonObject jsonObject;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Script.class);
-    private final String text;
-
-    public Script() {
-        this.text = "";
+    public JsonScript(JsonObject jsonObject) {
+        this.jsonObject = jsonObject;
     }
 
-    public Script(String text) {
-        this.text = text;
-    }
-
-    public String text() {
+    @Override
+    public String text() throws JsonException {
+        String text;
+        if (!jsonObject.containsKey("text")) {
+            text = "";
+        }
+        else {
+            JsonValue.ValueType type = jsonObject.get("text").getValueType();
+            if (type.equals(JsonValue.ValueType.STRING)) {
+                text = jsonObject.getString("text");
+            }
+            else {
+                throw new JsonException(
+                        "Expected key 'text' to be of type " + JsonValue.ValueType.STRING + " but was: " + type
+                );
+            }
+        }
         return text;
     }
 
-    public JsonObject json() {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("text", text);
-        return builder.build();
-    }
-
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Script script = (Script) o;
-        return Objects.equals(text, script.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(text);
+    public String serialize() {
+        return jsonObject.toString();
     }
 }

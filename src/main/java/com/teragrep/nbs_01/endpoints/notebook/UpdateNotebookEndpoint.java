@@ -52,11 +52,13 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
@@ -88,20 +90,23 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             Path path = root.root().resolve(request.path());
             String fileContent = root.read(path);
             JsonObject json = Json.createReader(new StringReader(fileContent)).readObject();
-            Notebook notebook = new Notebook().load(json);
+            SerializedNotebook serializedOriginal = new JsonNotebook(json);
+            Notebook originalNotebook = new Notebook(serializedOriginal.title(), serializedOriginal.paragraphs());
 
             // Create a copy of the current paragraphs
-            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(notebook.paragraphs());
+            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(originalNotebook.paragraphs());
 
             // Add a modified title
             String title = parameters.getString("title");
-            Notebook newNotebook = new Notebook(title, paragraphs);
-            root.write(path, newNotebook.json().toString());
+            Notebook modifiedNotebook = new Notebook(title, paragraphs);
+            SerializedNotebook serializedModifiedNotebook = new JsonNotebook(modifiedNotebook.json());
+            String serializedString = serializedModifiedNotebook.serialize();
+            root.write(path, serializedString);
 
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(newNotebook.json()), headers);
+            return new BasicResponse(HttpStatus.OK_200, new StringBody(serializedString), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));

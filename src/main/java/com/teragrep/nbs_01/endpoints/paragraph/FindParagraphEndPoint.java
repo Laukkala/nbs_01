@@ -51,6 +51,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
@@ -90,7 +91,8 @@ public final class FindParagraphEndPoint implements EndPoint {
                     .toString();
 
             JsonObject json = Json.createReader(new StringReader(root.read(notebookPath))).readObject();
-            Notebook notebook = new Notebook().load(json);
+            JsonNotebook jsonNotebook = new JsonNotebook(json);
+            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
             if (notebook.paragraphs().containsKey(paragraphId)) {
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));

@@ -64,8 +64,6 @@ import java.nio.file.Paths;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
 
-    private final String expectedFileContent = "\"name\":\"my_note1\",\"config\":{}";
-
     @BeforeEach
     private void setUp() {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
@@ -81,6 +79,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpFindTest() {
         // Destination notebook must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
+        String expectedFileContent = "\"name\":\"my_note1\",\"config\":{}";
 
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(notebook1()));

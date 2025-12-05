@@ -102,29 +102,6 @@ public final class Notebook implements FilesystemEntity {
         return builder.build();
     }
 
-    public Notebook load(JsonObject json) {
-        String loadedTitle = json.containsKey("name") ? json.getString("name") : "";
-        Map<String, Paragraph> loadedParagraphs = new HashMap<>();
-        JsonArray paragraphArray = json.getJsonArray("paragraphs");
-        for (JsonValue value : paragraphArray) {
-            JsonObject paragraphJson = value.asJsonObject();
-            String paragraphId = paragraphJson.getString("id");
-            String paragraphTitle = paragraphJson.containsKey("title") ? paragraphJson.getString("title") : "";
-            String text;
-            if (paragraphJson.containsKey("script")) {
-                JsonObject scriptJson = paragraphJson.getJsonObject("script");
-                text = scriptJson.getString("text");
-            }
-            else {
-                text = paragraphJson.containsKey("text") ? paragraphJson.getString("text") : "";
-            }
-            Script script = new Script(text);
-            Paragraph paragraph = new Paragraph(paragraphId, paragraphTitle, script);
-            loadedParagraphs.put(paragraph.id(), paragraph);
-        }
-        return new Notebook(loadedTitle, loadedParagraphs);
-    }
-
     public Notebook copy() throws IOException {
         return copy(name);
     }

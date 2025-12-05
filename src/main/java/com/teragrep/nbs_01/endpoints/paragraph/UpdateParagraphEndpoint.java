@@ -57,6 +57,7 @@ import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -92,7 +93,8 @@ public final class UpdateParagraphEndpoint implements EndPoint {
                     .add("paragraphId", paragraphId)
                     .build();
             JsonObject json = Json.createReader(new StringReader(root.read(notebookPath))).readObject();
-            Notebook notebook = new Notebook().load(json);
+            JsonNotebook jsonNotebook = new JsonNotebook(json);
+            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
 
             // Copy the paragraphs from the notebook into a new map
             Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());

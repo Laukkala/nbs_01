@@ -53,12 +53,14 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -103,15 +105,22 @@ public final class CopyParagraphEndpoint implements EndPoint {
                     .toString();
 
             JsonObject json = Json.createReader(new StringReader(root.read(sourcePath))).readObject();
-            Notebook source = new Notebook().load(json);
+            JsonNotebook jsonNotebook = new JsonNotebook(json);
+            Notebook source = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+
             if (!source.paragraphs().containsKey(sourceParagraphId)) {
                 throw new FileNotFoundException("No such paragraph: " + sourceParagraphId + "!");
             }
             Paragraph sourceParagraph = source.paragraphs().get(sourceParagraphId);
             Paragraph copyParagraph = sourceParagraph.copy(destinationParagraphId);
 
-            Notebook destinationNotebook = new Notebook()
-                    .load(Json.createReader(new StringReader(root.read(destinationPath))).readObject());
+            JsonObject destinationJson = Json.createReader(new StringReader(root.read(destinationPath))).readObject();
+            JsonNotebook jsonDestinationNotebook = new JsonNotebook(destinationJson);
+            Notebook destinationNotebook = new Notebook(
+                    jsonDestinationNotebook.title(),
+                    jsonDestinationNotebook.paragraphs()
+            );
+
             Map<String, Paragraph> destinationParagraphs = destinationNotebook.paragraphs();
             if (destinationParagraphs.containsKey(copyParagraph.id())) {
                 throw new MalformedBodyException("Paragraph " + destinationParagraphId + " already exists!");
@@ -119,7 +128,8 @@ public final class CopyParagraphEndpoint implements EndPoint {
             destinationParagraphs.put(copyParagraph.id(), copyParagraph);
 
             Notebook editedNotebook = new Notebook(destinationNotebook.name(), destinationParagraphs);
-            root.write(destinationPath, editedNotebook.json().toString());
+            SerializedNotebook serializedEditedNotebook = new JsonNotebook(editedNotebook.json());
+            root.write(destinationPath, serializedEditedNotebook.serialize());
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));

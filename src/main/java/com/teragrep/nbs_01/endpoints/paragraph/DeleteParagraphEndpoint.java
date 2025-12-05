@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
@@ -90,7 +91,8 @@ public final class DeleteParagraphEndpoint implements EndPoint {
             Path path = root.root().resolve(notebookPath);
 
             JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
-            Notebook notebook = new Notebook().load(json);
+            JsonNotebook jsonNotebook = new JsonNotebook(json);
+            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
             if (notebook.paragraphs().containsKey(paragraphId)) {
                 notebook.paragraphs().remove(paragraphId);
                 root.write(path, notebook.json().toString());

@@ -43,54 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository;
+package com.teragrep.nbs_01.repository.serialization;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.teragrep.nbs_01.repository.Paragraph;
 
-import java.util.Objects;
+import java.util.Map;
 
-// Represents the text that a user can write into a Paragraph.
-public final class Script {
+public interface SerializedNotebook {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Script.class);
-    private final String text;
+    public abstract String title();
 
-    public Script() {
-        this.text = "";
-    }
+    public abstract Map<String, Paragraph> paragraphs();
 
-    public Script(String text) {
-        this.text = text;
-    }
-
-    public String text() {
-        return text;
-    }
-
-    public JsonObject json() {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("text", text);
-        return builder.build();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Script script = (Script) o;
-        return Objects.equals(text, script.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(text);
-    }
+    public abstract String serialize();
 }

@@ -55,6 +55,7 @@ import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
@@ -88,7 +89,8 @@ public final class CreateParagraphEndpoint implements EndPoint {
             Path path = root.root().resolve(notebookPath);
 
             JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
-            Notebook notebook = new Notebook().load(json);
+            JsonNotebook jsonNotebook = new JsonNotebook(json);
+            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
             if (!notebook.paragraphs().containsKey(paragraphId)) {
                 Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
                 notebook.paragraphs().put(paragraphId, newParagraph);

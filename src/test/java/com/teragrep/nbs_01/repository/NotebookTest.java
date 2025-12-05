@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -112,7 +113,8 @@ class NotebookTest {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         JsonObject json = Assertions
                 .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook1))).readObject());
-        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook().load(json));
+        JsonNotebook jsonNotebook = new JsonNotebook(json);
+        Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Map<String, Paragraph> paragraphs = notebook.paragraphs();
         Assertions.assertEquals(8, paragraphs.size());
     }
@@ -123,7 +125,8 @@ class NotebookTest {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         JsonObject json = Assertions
                 .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook3))).readObject());
-        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook().load(json));
+        JsonNotebook jsonNotebook = new JsonNotebook(json);
+        Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Assertions
                 .assertEquals(
                         "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}}]}",
@@ -137,7 +140,8 @@ class NotebookTest {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         JsonObject json = Assertions
                 .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook4))).readObject());
-        Notebook notebook = Assertions.assertDoesNotThrow(() -> new Notebook().load(json));
+        JsonNotebook jsonNotebook = new JsonNotebook(json);
+        Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Assertions.assertTrue(Files.exists(notebook4));
         Path destinationPath = Paths.get(notebookDirectory.toString(), "newName_copyId");
         Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());

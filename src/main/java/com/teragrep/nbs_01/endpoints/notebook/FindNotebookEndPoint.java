@@ -51,10 +51,12 @@ import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.repository.Notebook;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.apache.http.Header;
@@ -79,14 +81,21 @@ public final class FindNotebookEndPoint implements EndPoint {
 
     @Override
     public Response createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given Path
+        // Find a Notebook from Storage based on given Path
         try {
+            // Parse parameters
             Path path = root.root().resolve(request.path());
+            // Deserialize from Storage
             JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
-            Notebook notebook = new Notebook().load(json);
+            SerializedNotebook serializedNotebook = new JsonNotebook(json);
+            // Create in-memory notebook based on Storage
+            Notebook notebook = new Notebook(serializedNotebook.title(), serializedNotebook.paragraphs());
+            // Generate response
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
+            // We cannot simply return the file contents as is back to the UI, since it's possible that there are legacy Zeppelin files, which have a different structure.
+            // Calling notebook.json() will format the notebook properly whether it was sourced from a legacy file or not.
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
         }
         catch (FileNotFoundException fileNotFoundException) {

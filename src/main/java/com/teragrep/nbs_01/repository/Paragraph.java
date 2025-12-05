@@ -91,26 +91,6 @@ public final class Paragraph {
         return script;
     }
 
-    public Paragraph load(JsonObject json) {
-        String jsonId = json.getString("id");
-        String jsonTitle = json.containsKey("title") ? json.getString("title") : "";
-        boolean isLegacy = json.containsKey("text");
-        Script jsonScript;
-        if (isLegacy) {
-            jsonScript = this.script.load(json.getString("text"));
-        }
-        else {
-            if (!json.containsKey("script")) {
-                jsonScript = this.script.load("");
-            }
-            else {
-                jsonScript = this.script.load(json.getJsonObject("script").getString("text"));
-            }
-        }
-        //Script script = json.containsKey("script") ? this.script.load(json.getJsonObject("script")) : this.script.load(json.containsKey("text") ? json.getJsonObject("text").asJsonObject() : JsonObject.EMPTY_JSON_OBJECT);
-        return new Paragraph(jsonId, jsonTitle, jsonScript);
-    }
-
     public Paragraph copy() {
         String copyId = UUID.randomUUID().toString();
         return copy(copyId);
