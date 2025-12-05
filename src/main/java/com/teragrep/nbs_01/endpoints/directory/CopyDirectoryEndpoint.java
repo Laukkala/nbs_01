@@ -98,8 +98,8 @@ public final class CopyDirectoryEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(Json.createObjectBuilder().build()), headers);
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+        catch (FileNotFoundException notFoundException) {
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (
                 BodyNotFoundException | MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
@@ -107,8 +107,11 @@ public final class CopyDirectoryEndpoint implements EndPoint {
         ) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
     }
 

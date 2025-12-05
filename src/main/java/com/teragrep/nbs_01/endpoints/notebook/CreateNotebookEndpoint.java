@@ -99,10 +99,7 @@ public final class CreateNotebookEndpoint implements EndPoint {
                     new ExceptionBody(new MalformedRequestException("Request body must be valid JSON!", jsonException))
             );
         }
-        return createResponse(path, title);
-    }
 
-    private Response createResponse(Path path, String title) {
         try {
             Path filePath = root.root().resolve(path);
             Notebook newFile = new Notebook(title);
@@ -114,15 +111,19 @@ public final class CreateNotebookEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+        catch (FileNotFoundException notFoundException) {
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (FileAlreadyExistsException | MalformedRequestException fileAlreadyExistsException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(fileAlreadyExistsException));
+        catch (FileAlreadyExistsException | MalformedRequestException badRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
+
     }
 
     @Override

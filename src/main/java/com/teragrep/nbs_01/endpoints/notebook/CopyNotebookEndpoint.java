@@ -105,17 +105,20 @@ public final class CopyNotebookEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+        catch (FileNotFoundException notFoundException) {
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (FileAlreadyExistsException fileAlreadyExistsException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(fileAlreadyExistsException));
+        catch (
+                BodyNotFoundException | MalformedRequestException | JsonException
+                | FileAlreadyExistsException badRequestException
+        ) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (BodyNotFoundException | MalformedRequestException | JsonException bodyNotFoundException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
-        }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
     }
 

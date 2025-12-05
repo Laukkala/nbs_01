@@ -118,15 +118,18 @@ public final class UpdateParagraphEndpoint implements EndPoint {
         }
         catch (
                 MalformedBodyException | MalformedRequestException | BodyNotFoundException
-                | JsonException malformedBodyException
+                | JsonException badRequestException
         ) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedBodyException));
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+        catch (FileNotFoundException notFoundException) {
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
 
     }

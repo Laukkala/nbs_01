@@ -77,11 +77,8 @@ public class DelegatingEndpoint implements EndPoint {
                 return falseEndPoint.createResponse(request);
             }
         }
-        catch (MalformedBodyException malformedBodyException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedBodyException));
-        }
-        catch (BodyNotFoundException bodyNotFoundException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(bodyNotFoundException));
+        catch (MalformedBodyException | BodyNotFoundException badRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
     }
 }

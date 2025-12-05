@@ -85,11 +85,14 @@ public final class ListEndPoint implements EndPoint {
             JsonArray array = arrayBuilder.build();
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(array));
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
+        catch (MalformedRequestException badRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
     }
 

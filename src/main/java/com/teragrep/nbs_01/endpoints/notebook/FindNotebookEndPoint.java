@@ -98,11 +98,14 @@ public final class FindNotebookEndPoint implements EndPoint {
             // Calling notebook.json() will format the notebook properly whether it was sourced from a legacy file or not.
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
         }
-        catch (FileNotFoundException fileNotFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(fileNotFoundException));
+        catch (FileNotFoundException notFoundException) {
+            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
     }
 

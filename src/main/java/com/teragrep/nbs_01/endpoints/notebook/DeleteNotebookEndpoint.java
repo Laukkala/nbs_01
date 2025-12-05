@@ -82,19 +82,22 @@ public final class DeleteNotebookEndpoint implements EndPoint {
             headers.add(new BasicHeader("Location", request.path().toString()));
             return new BasicResponse(HttpStatus.NO_CONTENT_204, headers);
         }
-        catch (MalformedRequestException malformedRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
+        catch (MalformedRequestException badRequestException) {
+            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
-        catch (NoSuchFileException noSuchFileException) {
+        catch (NoSuchFileException notFoundException) {
             return new BasicResponse(
                     HttpStatus.NOT_FOUND_404,
                     new ExceptionBody(new FileNotFoundException("No such file: " + request.path()))
             );
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
-        catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+        catch (IOException serverErrorException) {
+            return new BasicResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(serverErrorException))
+            );
         }
     }
 
