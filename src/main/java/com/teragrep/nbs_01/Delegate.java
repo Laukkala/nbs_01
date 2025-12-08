@@ -45,12 +45,10 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.http.requests.Request;
 
 // Interface for a Delegate, that inspects a Request object, and returns either a true or a false value according to implementation details.
 public abstract interface Delegate {
 
-    public abstract boolean resolve(Request request) throws MalformedBodyException, BodyNotFoundException;
+    public abstract boolean resolve(Request request);
 }

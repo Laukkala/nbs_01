@@ -67,4 +67,9 @@ public class JSONBody implements Body {
     public String asString() {
         return json.toString();
     }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
 }

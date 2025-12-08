@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
@@ -112,10 +111,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         catch (FileNotFoundException notFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (
-                BodyNotFoundException | MalformedRequestException | MalformedBodyException
-                | JsonException badRequestException
-        ) {
+        catch (MalformedRequestException | MalformedBodyException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {

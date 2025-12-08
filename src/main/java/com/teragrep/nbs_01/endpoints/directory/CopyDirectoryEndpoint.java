@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
@@ -102,7 +101,7 @@ public final class CopyDirectoryEndpoint implements EndPoint {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (
-                BodyNotFoundException | MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
+                MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
                 | JsonException badRequestException
         ) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));

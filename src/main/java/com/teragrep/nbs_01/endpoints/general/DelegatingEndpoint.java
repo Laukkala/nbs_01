@@ -47,13 +47,8 @@ package com.teragrep.nbs_01.endpoints.general;
 
 import com.teragrep.nbs_01.Delegate;
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
-import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
-import org.eclipse.jetty.http.HttpStatus;
 
 // Endpoint that delegates the request to one of a collection of Endpoints based on the result of a Delegate
 public class DelegatingEndpoint implements EndPoint {
@@ -69,16 +64,11 @@ public class DelegatingEndpoint implements EndPoint {
     }
 
     public Response createResponse(Request request) {
-        try {
-            if (delegate.resolve(request)) {
-                return trueEndPoint.createResponse(request);
-            }
-            else {
-                return falseEndPoint.createResponse(request);
-            }
+        if (delegate.resolve(request)) {
+            return trueEndPoint.createResponse(request);
         }
-        catch (MalformedBodyException | BodyNotFoundException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+        else {
+            return falseEndPoint.createResponse(request);
         }
     }
 }

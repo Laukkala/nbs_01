@@ -45,7 +45,6 @@
  */
 package com.teragrep.nbs_01.http.requests;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.http.body.Body;
 import org.apache.http.Header;
 
@@ -60,7 +59,7 @@ import java.util.List;
 // Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
 public interface Request {
 
-    public abstract Body body() throws BodyNotFoundException;
+    public abstract Body body();
 
     public abstract Path path();
 

@@ -43,20 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.exceptions;
+package com.teragrep.nbs_01;
 
-// Exception to be thrown when  indicating a user error.
-public final class BodyNotFoundException extends Exception {
+public interface Stubable {
 
-    public BodyNotFoundException(String errorMessage) {
-        super(errorMessage);
-    }
-
-    public BodyNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    public BodyNotFoundException(String errorMessage, Throwable cause) {
-        super(errorMessage, cause);
-    }
+    public abstract boolean isStub();
 }

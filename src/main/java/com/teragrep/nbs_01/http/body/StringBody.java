@@ -61,4 +61,9 @@ public class StringBody implements Body {
     public String asString() {
         return text;
     }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
 }

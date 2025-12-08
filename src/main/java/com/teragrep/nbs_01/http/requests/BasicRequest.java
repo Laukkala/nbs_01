@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.http.requests;
 
 import com.teragrep.nbs_01.StubPath;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.http.body.Body;
 import com.teragrep.nbs_01.http.body.StubBody;
 import org.apache.http.Header;
@@ -90,13 +89,8 @@ public final class BasicRequest implements Request {
         this.headers = headers;
     }
 
-    public Body body() throws BodyNotFoundException {
-        if (body instanceof StubBody) {
-            throw new BodyNotFoundException("Request does not have a body!");
-        }
-        else {
-            return body;
-        }
+    public Body body() {
+        return body;
     }
 
     public Path path() {

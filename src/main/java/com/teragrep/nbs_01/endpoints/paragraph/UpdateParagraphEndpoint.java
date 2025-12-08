@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
@@ -116,10 +115,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(newParagraph.json()), headers);
         }
-        catch (
-                MalformedBodyException | MalformedRequestException | BodyNotFoundException
-                | JsonException badRequestException
-        ) {
+        catch (MalformedBodyException | MalformedRequestException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (FileNotFoundException notFoundException) {
@@ -134,8 +130,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     }
 
-    private void validateRequestParameters(Request request)
-            throws MalformedBodyException, BodyNotFoundException, JsonException {
+    private void validateRequestParameters(Request request) throws MalformedBodyException, JsonException {
         Path requestPath = request.path();
         JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {

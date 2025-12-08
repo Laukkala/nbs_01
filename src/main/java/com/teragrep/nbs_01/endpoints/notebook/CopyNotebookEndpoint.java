@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
@@ -85,6 +84,9 @@ public final class CopyNotebookEndpoint implements EndPoint {
     public Response createResponse(Request request) {
         try {
             // Parse Request parameters
+            if (request.body().isStub()) {
+                throw new MalformedRequestException("Request must contain a Body!");
+            }
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             String sourcePathString = body.getString("sourcePath");
             Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
@@ -108,10 +110,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
         catch (FileNotFoundException notFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (
-                BodyNotFoundException | MalformedRequestException | JsonException
-                | FileAlreadyExistsException badRequestException
-        ) {
+        catch (MalformedRequestException | JsonException | FileAlreadyExistsException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {

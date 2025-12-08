@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
@@ -84,23 +83,17 @@ public final class CreateNotebookEndpoint implements EndPoint {
     }
 
     public Response createResponse(Request request) {
-        Path path = request.path();
-        String title;
         try {
-            JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
-            title = json.getString("title");
-        }
-        catch (BodyNotFoundException bodyNotFoundException) {
-            title = "";
-        }
-        catch (JsonException jsonException) {
-            return new BasicResponse(
-                    HttpStatus.BAD_REQUEST_400,
-                    new ExceptionBody(new MalformedRequestException("Request body must be valid JSON!", jsonException))
-            );
-        }
+            Path path = request.path();
+            String title;
+            if (request.body().isStub()) {
+                title = "";
+            }
+            else {
+                JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
+                title = json.getString("title");
+            }
 
-        try {
             Path filePath = root.root().resolve(path);
             Notebook newFile = new Notebook(title);
             SerializedNotebook serializedNewNotebook = new JsonNotebook(newFile.json());
@@ -114,7 +107,7 @@ public final class CreateNotebookEndpoint implements EndPoint {
         catch (FileNotFoundException notFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (FileAlreadyExistsException | MalformedRequestException badRequestException) {
+        catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {

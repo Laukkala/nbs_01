@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.http.requests.BasicRequest;
 import com.teragrep.nbs_01.http.responses.Response;
@@ -130,6 +131,77 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
                 );
         // Assert that the copied file was created to proper path.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationFile)));
+        // Source file must not have changed
+        Assertions
+                .assertEquals(
+                        sourceFileContent,
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())))
+                );
+    }
+
+    @Test
+    // Assert that a request with no Body to CopyNotebookEndpoint results in an error
+    public void httpCopyNotebookWithNoBodyTest() {
+        // Destination file must not exist
+        Path destinationFile = Paths.get("testNotebookName");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
+
+        // Source file must exist
+        Path sourceFile = notebook2();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
+        String sourceFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
+
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        // Send a request with no Body
+        Response response = endPoint.createResponse(new BasicRequest(destinationFile));
+
+        // Assert that we receive the proper response
+        JsonObject expectedJson = Json.createObjectBuilder().add("message", "Request must contain a Body!").build();
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        // Assert that the no file was copied.
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
+        // Source file must not have changed
+        Assertions
+                .assertEquals(
+                        sourceFileContent,
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())))
+                );
+    }
+
+    @Test
+    // Assert that a request with no Body to CopyNotebookEndpoint results in an error
+    public void httpCopyNotebookWithMalformedBodyTest() {
+        // Destination file must not exist
+        Path destinationFile = Paths.get("testNotebookName");
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
+
+        // Source file must exist
+        Path sourceFile = notebook2();
+        Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
+        String sourceFileContent = Assertions
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
+
+        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        // Send a request with malformed Body
+        String bodyString = "{\"whoops i forgot to format the JSON\"\"true\"}";
+        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new StringBody(bodyString)));
+
+        // Assert that we receive the proper response
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add(
+                        "message",
+                        "Invalid token=STRING at (line no=1, column no=43, offset=42). Expected tokens are: [COLON]"
+                )
+                .build();
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions
+                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        // Assert that the no file was copied.
+        Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
         // Source file must not have changed
         Assertions
                 .assertEquals(

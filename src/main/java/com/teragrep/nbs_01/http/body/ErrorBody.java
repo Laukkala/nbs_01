@@ -85,4 +85,9 @@ public class ErrorBody implements Body {
     public String asString() {
         return message.toString();
     }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
 }

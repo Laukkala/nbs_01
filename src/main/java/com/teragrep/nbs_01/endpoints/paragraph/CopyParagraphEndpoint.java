@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
 import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
@@ -136,7 +135,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
             return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(copyParagraph.json()), headers);
         }
         catch (
-                MalformedBodyException | BodyNotFoundException | FileAlreadyExistsException | MalformedRequestException
+                MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
                 | JsonException badRequestException
         ) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
@@ -152,8 +151,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
         }
     }
 
-    private void validateRequestParameters(Request request)
-            throws MalformedBodyException, BodyNotFoundException, JsonException {
+    private void validateRequestParameters(Request request) throws MalformedBodyException, JsonException {
         Path requestPath = request.path();
         JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {

@@ -45,10 +45,12 @@
  */
 package com.teragrep.nbs_01.http.body;
 
+import com.teragrep.nbs_01.Stubable;
+
 /**
  * Represents the body of a HTML request or a response. Can represent itself as a String.
  */
-public interface Body {
+public interface Body extends Stubable {
 
     public abstract String asString();
 }

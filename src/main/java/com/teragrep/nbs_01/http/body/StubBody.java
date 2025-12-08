@@ -59,4 +59,9 @@ public class StubBody implements Body {
     public String asString() {
         throw new IllegalStateException("Body is a stub!");
     }
+
+    @Override
+    public boolean isStub() {
+        return true;
+    }
 }

@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.http.requests;
 
-import com.teragrep.nbs_01.exceptions.BodyNotFoundException;
+import com.teragrep.nbs_01.http.body.StubBody;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +65,7 @@ public class BasicRequestTest {
     public void stubTest() {
         BasicRequest stubRequest = new BasicRequest();
         Assertions.assertEquals(0, stubRequest.headers().size());
-        Assertions.assertThrows(BodyNotFoundException.class, () -> stubRequest.body());
+        Assertions.assertEquals(StubBody.class, stubRequest.body().getClass());
     }
 
 }
