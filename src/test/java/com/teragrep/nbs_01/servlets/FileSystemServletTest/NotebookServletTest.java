@@ -477,6 +477,115 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
     }
 
     @Test
+    // Assert that a HTTP GET request to /notebook/{/../../../path/to/server/file} endpoint results in an error
+    public void httpFindUnauthorizedFile() {
+        // Write a secret file to target to which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        Assertions
+                .assertDoesNotThrow(() -> Files.write(secretFile, "very_secret_information_pls_dont_leak".getBytes()));
+        Assertions.assertTrue(Files.exists(secretFile));
+
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("../secretFile.txt");
+        Response response = Assertions
+                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + relativePath));
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+    }
+
+    @Test
+    // Assert that a HTTP DELETE request to /notebook/{/../../../path/to/server/file} endpoint results in an error
+    public void httpDeleteUnauthorizedFile() {
+        // Write a secret file to target to which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        Assertions
+                .assertDoesNotThrow(() -> Files.write(secretFile, "very_secret_information_pls_dont_leak".getBytes()));
+        Assertions.assertTrue(Files.exists(secretFile));
+
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + relativePath, "")
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        //Assert that the file was not deleted
+        Assertions.assertTrue(Files.exists(secretFile));
+    }
+
+    @Test
+    // Assert that a HTTP POST request to /notebook/{/../../../path/to/server/file} endpoint results in an error
+    public void httpUpdateUnauthorizedFile() {
+        // Write a secret file to target to which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        Assertions
+                .assertDoesNotThrow(() -> Files.write(secretFile, "very_secret_information_pls_dont_leak".getBytes()));
+        Assertions.assertTrue(Files.exists(secretFile));
+
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPOSTRequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath, "{\"title\":\"newTitle\"}"
+                        )
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        //Assert that the file was not deleted
+        Assertions.assertTrue(Files.exists(secretFile));
+        Assertions
+                .assertEquals(
+                        "very_secret_information_pls_dont_leak",
+                        Assertions.assertDoesNotThrow(() -> Files.readString(secretFile))
+                );
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /notebook/{/../../../path/to/server/file} endpoint results in an error
+    public void httpCreateUnauthorizedFile() {
+        // Define path which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "nefariousFile.txt");
+        if (Files.exists(secretFile)) {
+            Assertions.assertDoesNotThrow(() -> Files.delete(secretFile));
+        }
+        Assertions.assertFalse(Files.exists(secretFile));
+
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "nefariousFile.txt");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest("http://" + serverAddress() + "/notebook/" + relativePath, "")
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        //Assert that no file was created
+        Assertions.assertFalse(Files.exists(secretFile));
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /notebook/{/../../../path/to/server/file} endpoint results in an error
+    public void httpCopyUnauthorizedFile() {
+        // Define path which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "nefariousFile.txt");
+        Assertions.assertFalse(Files.exists(secretFile));
+
+        Path relativePath = Paths.get("..", "nefariousFile.txt");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath,
+                                "{\"sourcePath\":\"my_note3_2A94M5J3Z.zpln\"}"
+                        )
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        //Assert that no file was created
+        Assertions.assertFalse(Files.exists(secretFile));
+    }
+
+    @Test
     public void testContract() {
         EqualsVerifier
                 .forClass(FileSystemServlet.class)

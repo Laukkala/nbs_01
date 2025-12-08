@@ -299,21 +299,24 @@ public class AbstractNotebookServerTest {
         output.write(bytes);
         output.close();
         int status = connection.getResponseCode();
-        InputStreamReader connectionInputStreamReader;
+        InputStream connectionInputStream;
         if (status == 201) {
-            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+            connectionInputStream = connection.getInputStream();
         }
         else {
-            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+            connectionInputStream = connection.getErrorStream();
         }
 
         // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            messages.append(line + "\n");
+        if (connectionInputStream != null) {
+            InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
+            BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                messages.append(line + "\n");
+            }
         }
+
         Body responseBody;
         try {
             JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
@@ -350,22 +353,25 @@ public class AbstractNotebookServerTest {
                 return new BasicResponse(status, new JSONBody(message));
             }
             else {
-                InputStreamReader connectionInputStreamReader;
-                if (connection.getErrorStream() != null) {
-                    connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
+                InputStream connectionInputStream;
+                if (status >= 400 && status < 500) {
+                    connectionInputStream = connection.getErrorStream();
                 }
                 else {
                     try {
-                        connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
+                        connectionInputStream = connection.getInputStream();
                     }
                     catch (IOException ioException) {
                         throw new IOException("Error while reading input from connection", ioException);
                     }
                 }
-                BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    messages.append(line + "\n");
+                if (connectionInputStream != null) {
+                    InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
+                    BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        messages.append(line + "\n");
+                    }
                 }
                 Body responseBody;
                 try {

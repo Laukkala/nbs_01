@@ -382,4 +382,138 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 );
     }
 
+    // Assert that a HTTP GET request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    @Test
+    public void httpFindUnauthorizedParagraphTest() {
+        // Write a secret file to target to which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        Assertions
+                .assertDoesNotThrow(() -> Files.write(secretFile, "very_secret_information_pls_dont_leak".getBytes()));
+        Assertions.assertTrue(Files.exists(secretFile));
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpGETRequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                        + firstParagraphId
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+    }
+
+    // Assert that a HTTP POST request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    @Test
+    public void httpUpdateUnauthorizedParagraphTest() {
+        // Write a secret file to target to which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        Assertions
+                .assertDoesNotThrow(() -> Files.write(secretFile, "very_secret_information_pls_dont_leak".getBytes()));
+        Assertions.assertTrue(Files.exists(secretFile));
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+
+        String newParagraphTitle = "new_paragraph_title";
+        String newParagraphText = "%test\ntesting_this";
+        String requestBody = Json
+                .createObjectBuilder()
+                .add("title", newParagraphTitle)
+                .add("text", newParagraphText)
+                .build()
+                .toString();
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPOSTRequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                        + firstParagraphId,
+                                requestBody
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions
+                .assertEquals(
+                        "very_secret_information_pls_dont_leak",
+                        Assertions.assertDoesNotThrow(() -> Files.readString(secretFile))
+                );
+    }
+
+    // Assert that a HTTP DELETE request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    @Test
+    public void httpDELETEUnauthorizedParagraphTest() {
+        // Write a secret file to target to which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        Assertions
+                .assertDoesNotThrow(() -> Files.write(secretFile, "very_secret_information_pls_dont_leak".getBytes()));
+        Assertions.assertTrue(Files.exists(secretFile));
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                        + firstParagraphId,
+                                ""
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertTrue(Files.exists(secretFile));
+    }
+
+    // Assert that a HTTP PUT request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    @Test
+    public void httpCreateUnauthorizedParagraphTest() {
+        // Define a path which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        if (Files.exists(secretFile)) {
+            Assertions.assertDoesNotThrow(() -> Files.delete(secretFile));
+        }
+        Assertions.assertFalse(Files.exists(secretFile));
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                        + firstParagraphId,
+                                ""
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertFalse(Files.exists(secretFile));
+    }
+
+    // Assert that a HTTP PUT request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    @Test
+    public void httpCopyUnauthorizedParagraphTest() {
+        // Define a path which NBS_01 should not be able to touch
+        Path secretFile = Paths.get("target", "secretFile.txt");
+        if (Files.exists(secretFile)) {
+            Assertions.assertDoesNotThrow(() -> Files.delete(secretFile));
+        }
+        Assertions.assertFalse(Files.exists(secretFile));
+        // Define a path that would get resolved to secretFile by NBS_01
+        Path relativePath = Paths.get("..", "secretFile.txt");
+
+        String putRequestBody = Json
+                .createObjectBuilder()
+                .add("sourcePath", "my_note4_2A94M5J4Z.zpln")
+                .add("sourceParagraphId", "20150326-214658_12335843")
+                .build()
+                .toString();
+
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                        + firstParagraphId,
+                                putRequestBody
+                        )
+                );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertFalse(Files.exists(secretFile));
+    }
+
 }

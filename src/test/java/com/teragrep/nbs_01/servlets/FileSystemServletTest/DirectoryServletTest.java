@@ -317,4 +317,80 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
+
+    @Test
+    // Assert that a HTTP GET request to /directory/{/../../../path/to/server/file} endpoint results in an error
+    public void httpFindUnauthorizedDirectory() {
+        // Write a secret Directory to target to which NBS_01 should not be able to touch
+        Path secretDirectory = Paths.get("target", "secretDirectory/");
+        Assertions.assertDoesNotThrow(() -> Files.createDirectory(secretDirectory));
+        Assertions.assertTrue(Files.exists(secretDirectory));
+
+        // Define a path that would get resolved to secretDirectory by NBS_01
+        Path relativePath = Paths.get("../secretDirectory");
+        Response response = Assertions
+                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + relativePath));
+        // Assert that we got the proper response.
+        Assertions.assertDoesNotThrow(() -> Files.delete(secretDirectory));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+    }
+
+    @Test
+    // Assert that a HTTP DELETE request to /directory/{/../../../path/to/server/file} endpoint results in an error
+    public void httpDeleteUnauthorizedDirectory() {
+        // Write a secret Directory to target to which NBS_01 should not be able to touch
+        Path secretDirectory = Paths.get("target", "secretDirectory/");
+        Assertions.assertDoesNotThrow(() -> Files.createDirectory(secretDirectory));
+        Assertions.assertTrue(Files.exists(secretDirectory));
+
+        // Define a path that would get resolved to secretDirectory by NBS_01
+        Path relativePath = Paths.get("../secretDirectory");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + relativePath, "")
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertTrue(Files.exists(secretDirectory));
+        Assertions.assertDoesNotThrow(() -> Files.delete(secretDirectory));
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /directory/{/../../../path/to/server/file} endpoint results in an error
+    public void httpCreateUnauthorizedDirectory() {
+        // Write a secret Directory to target to which NBS_01 should not be able to touch
+        Path secretDirectory = Paths.get("target", "secretDirectory/");
+        Assertions.assertFalse(Files.exists(secretDirectory));
+
+        // Define a path that would get resolved to secretDirectory by NBS_01
+        Path relativePath = Paths.get("../secretDirectory");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest("http://" + serverAddress() + "/directory/" + relativePath, "")
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertFalse(Files.exists(secretDirectory));
+    }
+
+    @Test
+    // Assert that a HTTP PUT request to /directory/{/../../../path/to/server/file} endpoint results in an error
+    public void httpCopyUnauthorizedDirectory() {
+        // Write a secret Directory to target to which NBS_01 should not be able to touch
+        Path secretDirectory = Paths.get("target", "secretDirectory/");
+        Assertions.assertFalse(Files.exists(secretDirectory));
+
+        // Define a path that would get resolved to secretDirectory by NBS_01
+        Path relativePath = Paths.get("../secretDirectory");
+        Response response = Assertions
+                .assertDoesNotThrow(
+                        () -> makeHttpPUTRequest(
+                                "http://" + serverAddress() + "/directory/" + relativePath,
+                                "{\"sourcePath\":\"my_folder_2A94M5J1D\"}"
+                        )
+                );
+        // Assert that we got the proper response.
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertFalse(Files.exists(secretDirectory));
+    }
 }
