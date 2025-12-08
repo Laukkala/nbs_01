@@ -75,7 +75,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     }
 
     @Test
-    // Assert that a HTTP request to /notebook/find endpoint results in a response with the expected file contents
+    // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint results in a response with the expected file contents
     public void httpFindTest() {
         // Destination notebook must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
@@ -125,6 +125,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
                 );
     }
 
+    // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint with a path not corresponding with any file results in an error
     @Test
     public void httpNotebookNotFoundTest() {
         Path nonExistentNotebookPath = Paths.get("nonExistentNotebook");
@@ -141,6 +142,35 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+    }
+
+    // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint with a path to a malformed / corrupted file results in an error message directing users to check details from logs.
+    @Test
+    public void httpFindCorruptNotebookTest() {
+        Path nonExistentNotebookPath = Paths.get("junkfile");
+        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        Response response = endPoint.createResponse(new BasicRequest(nonExistentNotebookPath));
+
+        // The endpoint should return the correct status and message.
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, response.status());
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(
+                                        response
+                                                .body()
+                                                .asString()
+                                                .contains(
+                                                        "An error occurred while processing your Request. See event id "
+                                                )
+                                )
+                );
+
+        Assertions
+                .assertDoesNotThrow(
+                        () -> Assertions
+                                .assertTrue(response.body().asString().contains(" in the technical log for details."))
+                );
     }
 
     @Test

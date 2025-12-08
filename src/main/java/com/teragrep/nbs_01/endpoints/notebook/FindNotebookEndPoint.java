@@ -58,7 +58,9 @@ import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
+import jakarta.json.stream.JsonParsingException;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -86,7 +88,8 @@ public final class FindNotebookEndPoint implements EndPoint {
             // Parse parameters
             Path path = root.root().resolve(request.path());
             // Deserialize from Storage
-            JsonObject json = Json.createReader(new StringReader(root.read(path))).readObject();
+            String jsonString = root.read(path);
+            JsonObject json = parseFileContent(jsonString);
             SerializedNotebook serializedNotebook = new JsonNotebook(json);
             // Create in-memory notebook based on Storage
             Notebook notebook = new Notebook(serializedNotebook.title(), serializedNotebook.paragraphs());
@@ -98,14 +101,25 @@ public final class FindNotebookEndPoint implements EndPoint {
             // Calling notebook.json() will format the notebook properly whether it was sourced from a legacy file or not.
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
         }
+        // If the file cannot be found from Storage, respond with a 404 not found.
         catch (FileNotFoundException notFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException serverErrorException) {
+        // If Storage throws an IOException while accessing file contents, or the file contents retrieved from storage are not valid JSON, respond with a 500 internal server error.
+        catch (IOException | JsonException serverErrorException) {
             return new BasicResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
+        }
+    }
+
+    private JsonObject parseFileContent(String fileContent) throws JsonException {
+        try {
+            return Json.createReader(new StringReader(fileContent)).readObject();
+        }
+        catch (JsonParsingException jsonParsingException) {
+            throw new JsonException("File content is not valid JSON!", jsonParsingException);
         }
     }
 

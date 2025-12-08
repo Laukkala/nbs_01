@@ -46,14 +46,15 @@
 package com.teragrep.nbs_01.repository.serialization;
 
 import com.teragrep.nbs_01.repository.Paragraph;
+import jakarta.json.JsonException;
 
 import java.util.Map;
 
 public interface SerializedNotebook {
 
-    public abstract String title();
+    public abstract String title() throws JsonException;
 
-    public abstract Map<String, Paragraph> paragraphs();
+    public abstract Map<String, Paragraph> paragraphs() throws JsonException;
 
     public abstract String serialize();
 }
