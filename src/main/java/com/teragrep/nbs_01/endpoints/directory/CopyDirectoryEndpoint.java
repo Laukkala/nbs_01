@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
@@ -85,7 +84,7 @@ public final class CopyDirectoryEndpoint implements EndPoint {
         try {
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             if (!body.containsKey("sourcePath")) {
-                throw new MalformedBodyException("Request must contain a sourcePath!");
+                throw new MalformedRequestException("Request must contain a sourcePath!");
             }
             String sourcePathString = body.getString("sourcePath");
             Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
@@ -100,10 +99,7 @@ public final class CopyDirectoryEndpoint implements EndPoint {
         catch (FileNotFoundException notFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (
-                MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
-                | JsonException badRequestException
-        ) {
+        catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {

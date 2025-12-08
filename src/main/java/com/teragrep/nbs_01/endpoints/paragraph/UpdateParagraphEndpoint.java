@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
@@ -98,7 +97,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
             // Find the paragraph to be edited
             if (!paragraphs.containsKey(paragraphId)) {
-                throw new MalformedBodyException("Paragraph with Id " + paragraphId + " not found!");
+                throw new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!");
             }
             Paragraph originalParagraph = paragraphs.get(paragraphId);
             String scriptText = parameters.containsKey("text") ? parameters
@@ -115,7 +114,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(newParagraph.json()), headers);
         }
-        catch (MalformedBodyException | MalformedRequestException | JsonException badRequestException) {
+        catch (MalformedRequestException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (FileNotFoundException notFoundException) {
@@ -130,21 +129,21 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     }
 
-    private void validateRequestParameters(Request request) throws MalformedBodyException, JsonException {
+    private void validateRequestParameters(Request request) throws MalformedRequestException, JsonException {
         Path requestPath = request.path();
         JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {
-            throw new MalformedBodyException(
+            throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
         if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
-            throw new MalformedBodyException(
+            throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
         if (!json.containsKey("text") && !json.containsKey("title")) {
-            throw new MalformedBodyException("Request does not contain either a text or a title field!");
+            throw new MalformedRequestException("Request does not contain either a text or a title field!");
         }
     }
 

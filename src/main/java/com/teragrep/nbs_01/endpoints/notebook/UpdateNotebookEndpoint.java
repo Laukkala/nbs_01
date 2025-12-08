@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
@@ -84,7 +83,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         try {
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             if (!body.containsKey("title")) {
-                throw new MalformedBodyException("Request does not contain a title!");
+                throw new MalformedRequestException("Request does not contain a title!");
             }
 
             Path path = root.root().resolve(request.path());
@@ -111,7 +110,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         catch (FileNotFoundException notFoundException) {
             return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (MalformedRequestException | MalformedBodyException | JsonException badRequestException) {
+        catch (MalformedRequestException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {

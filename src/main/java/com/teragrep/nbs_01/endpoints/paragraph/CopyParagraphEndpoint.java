@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.exceptions.MalformedBodyException;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
@@ -122,7 +121,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
 
             Map<String, Paragraph> destinationParagraphs = destinationNotebook.paragraphs();
             if (destinationParagraphs.containsKey(copyParagraph.id())) {
-                throw new MalformedBodyException("Paragraph " + destinationParagraphId + " already exists!");
+                throw new MalformedRequestException("Paragraph " + destinationParagraphId + " already exists!");
             }
             destinationParagraphs.put(copyParagraph.id(), copyParagraph);
 
@@ -134,10 +133,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(copyParagraph.json()), headers);
         }
-        catch (
-                MalformedBodyException | FileAlreadyExistsException | MalformedRequestException
-                | JsonException badRequestException
-        ) {
+        catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
             return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (FileNotFoundException notFoundException) {
@@ -151,24 +147,24 @@ public final class CopyParagraphEndpoint implements EndPoint {
         }
     }
 
-    private void validateRequestParameters(Request request) throws MalformedBodyException, JsonException {
+    private void validateRequestParameters(Request request) throws MalformedRequestException, JsonException {
         Path requestPath = request.path();
         JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {
-            throw new MalformedBodyException(
+            throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
         if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
-            throw new MalformedBodyException(
+            throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );
         }
         if (!body.containsKey("sourceParagraphId")) {
-            throw new MalformedBodyException("Request does not contain a source paragraph id");
+            throw new MalformedRequestException("Request does not contain a source paragraph id");
         }
         if (!body.containsKey("sourcePath")) {
-            throw new MalformedBodyException("Request does not contain a source path!");
+            throw new MalformedRequestException("Request does not contain a source path!");
         }
     }
 
