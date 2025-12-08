@@ -80,7 +80,7 @@ public final class DeleteParagraphEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            validateRequestParameters(request);
+            validateRequest(request);
             Path requestPath = request.path();
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
 
@@ -119,7 +119,7 @@ public final class DeleteParagraphEndpoint implements EndPoint {
         }
     }
 
-    private void validateRequestParameters(Request request) throws MalformedRequestException {
+    private void validateRequest(Request request) throws MalformedRequestException {
         Path requestPath = request.path();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedRequestException(

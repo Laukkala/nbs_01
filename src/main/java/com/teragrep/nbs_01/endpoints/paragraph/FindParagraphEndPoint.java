@@ -82,7 +82,7 @@ public final class FindParagraphEndPoint implements EndPoint {
     public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
-            validateRequestParameters(request);
+            validateRequest(request);
             Path requestPath = root.root().resolve(request.path());
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
 
@@ -121,7 +121,7 @@ public final class FindParagraphEndPoint implements EndPoint {
         }
     }
 
-    private void validateRequestParameters(Request request) throws MalformedRequestException {
+    private void validateRequest(Request request) throws MalformedRequestException {
         Path requestPath = request.path();
         if (requestPath.getNameCount() < 3) {
             throw new MalformedRequestException(

@@ -192,10 +192,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add(
-                        "message",
-                        "Invalid token=STRING at (line no=1, column no=43, offset=42). Expected tokens are: [COLON]"
-                )
+                .add("message", "Request body contains invalid JSON!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

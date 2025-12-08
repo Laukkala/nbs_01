@@ -60,6 +60,7 @@ import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
+import jakarta.json.stream.JsonParsingException;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -83,11 +84,8 @@ public final class CopyNotebookEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            // Parse Request parameters
-            if (request.body().isStub()) {
-                throw new MalformedRequestException("Request must contain a Body!");
-            }
-            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
+            validateRequest(request);
+            JsonObject body = parseBody(request);
             String sourcePathString = body.getString("sourcePath");
             Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
             Path destinationPath = root.root().resolve(request.path());
@@ -118,6 +116,24 @@ public final class CopyNotebookEndpoint implements EndPoint {
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
+        }
+    }
+
+    private void validateRequest(Request request) throws MalformedRequestException {
+        // Parse Request parameters
+        if (request.body().isStub()) {
+            throw new MalformedRequestException("Request must contain a Body!");
+        }
+    }
+
+    private JsonObject parseBody(Request request) throws JsonException {
+        String jsonString = request.body().asString();
+        try {
+            JsonObject json = Json.createReader(new StringReader(jsonString)).readObject();
+            return json;
+        }
+        catch (JsonParsingException jsonParsingException) {
+            throw new JsonException("Request body contains invalid JSON!", jsonParsingException);
         }
     }
 

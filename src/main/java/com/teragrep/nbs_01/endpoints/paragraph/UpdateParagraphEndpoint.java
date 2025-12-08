@@ -80,7 +80,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            validateRequestParameters(request);
+            validateRequest(request);
             Path requestPath = request.path();
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
@@ -129,7 +129,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     }
 
-    private void validateRequestParameters(Request request) throws MalformedRequestException, JsonException {
+    private void validateRequest(Request request) throws MalformedRequestException, JsonException {
         Path requestPath = request.path();
         JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {

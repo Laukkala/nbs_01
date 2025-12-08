@@ -87,7 +87,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            validateRequestParameters(request);
+            validateRequest(request);
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             String sourcePathString = body.getString("sourcePath");
             String sourceParagraphId = body.getString("sourceParagraphId");
@@ -147,7 +147,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
         }
     }
 
-    private void validateRequestParameters(Request request) throws MalformedRequestException, JsonException {
+    private void validateRequest(Request request) throws MalformedRequestException, JsonException {
         Path requestPath = request.path();
         JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
         if (requestPath.getNameCount() < 3) {
