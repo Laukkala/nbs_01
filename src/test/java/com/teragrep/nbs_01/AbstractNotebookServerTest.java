@@ -45,8 +45,10 @@
  */
 package com.teragrep.nbs_01;
 
+import com.teragrep.nbs_01.http.body.Body;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
@@ -54,6 +56,7 @@ import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
+import jakarta.json.stream.JsonParsingException;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -232,9 +235,17 @@ public class AbstractNotebookServerTest {
         while ((line = reader.readLine()) != null) {
             messages.append(line + "\n");
         }
-        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+        Body responseBody;
+        try {
+            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            responseBody = new JSONBody(message);
+        }
+        catch (JsonParsingException jsonParsingException) {
+            // Response is not in JSON format. In that case, return a String response.
+            responseBody = new StringBody(messages.toString());
+        }
         connection.disconnect();
-        return new BasicResponse(status, new JSONBody(message));
+        return new BasicResponse(status, responseBody);
     }
 
     public Response makeHttpGETRequest(String urlString) throws IOException {
@@ -260,9 +271,17 @@ public class AbstractNotebookServerTest {
         while ((line = reader.readLine()) != null) {
             messages.append(line);
         }
-        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+        Body responseBody;
+        try {
+            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            responseBody = new JSONBody(message);
+        }
+        catch (JsonParsingException jsonParsingException) {
+            // Response is not in JSON format. In that case, return a String response.
+            responseBody = new StringBody(messages.toString());
+        }
         connection.disconnect();
-        return new BasicResponse(status, new JSONBody(message));
+        return new BasicResponse(status, responseBody);
     }
 
     public Response makeHttpPUTRequest(String urlString, String requestBody) throws IOException {
@@ -295,9 +314,17 @@ public class AbstractNotebookServerTest {
         while ((line = reader.readLine()) != null) {
             messages.append(line + "\n");
         }
-        JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+        Body responseBody;
+        try {
+            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            responseBody = new JSONBody(message);
+        }
+        catch (JsonParsingException jsonParsingException) {
+            // Response is not in JSON format. In that case, return a String response.
+            responseBody = new StringBody(messages.toString());
+        }
         connection.disconnect();
-        return new BasicResponse(status, new JSONBody(message));
+        return new BasicResponse(status, responseBody);
     }
 
     public Response makeHttpDELETERequest(String urlString, String requestBody) throws IOException {
@@ -340,8 +367,16 @@ public class AbstractNotebookServerTest {
                 while ((line = reader.readLine()) != null) {
                     messages.append(line + "\n");
                 }
-                JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-                return new BasicResponse(status, new JSONBody(message));
+                Body responseBody;
+                try {
+                    JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+                    responseBody = new JSONBody(message);
+                }
+                catch (JsonParsingException jsonParsingException) {
+                    // Response is not in JSON format. In that case, return a String response.
+                    responseBody = new StringBody(messages.toString());
+                }
+                return new BasicResponse(status, responseBody);
             }
 
         }
