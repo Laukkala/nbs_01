@@ -46,6 +46,10 @@
 package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
+import com.teragrep.nbs_01.repository.Storage;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.File;
@@ -61,11 +65,13 @@ public class TestServer {
 
     public static void main(String[] args) throws Exception {
         setUp();
-        Configuration configuration = new Configuration(
-                new LocalFilesystemStorage(Paths.get("target/notebooks")),
-                8080
-        );
-        NotebookServer server = new NotebookServer(configuration);
+        Storage storage = new LocalFilesystemStorage(Paths.get("target/notebooks"));
+        Configuration configuration = new Configuration(8080);
+
+        Server jettyServer = new Server(configuration.serverPort());
+        Connector connector = new ServerConnector(jettyServer);
+        jettyServer.addConnector(connector);
+        NotebookServer server = new NotebookServer(jettyServer, storage);
         server.call();
     }
 

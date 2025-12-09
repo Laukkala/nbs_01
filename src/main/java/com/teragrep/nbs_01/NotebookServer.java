@@ -59,9 +59,7 @@ import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import com.teragrep.nbs_01.servlets.HttpServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,16 +72,12 @@ import java.util.concurrent.Callable;
 public class NotebookServer implements Callable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotebookServer.class);
-    private final Configuration configuration;
-    private final Server server;
     private final Storage root;
+    private final Server jettyServer;
 
-    public NotebookServer(Configuration configuration) {
-        this.configuration = configuration;
-        root = configuration.storage();
-        server = new Server(configuration.serverPort());
-        Connector connector = new ServerConnector(server);
-        server.addConnector(connector);
+    public NotebookServer(Server jettyServer, Storage root) {
+        this.jettyServer = jettyServer;
+        this.root = root;
     }
 
     public Object call() throws Exception {
@@ -136,9 +130,9 @@ public class NotebookServer implements Callable {
             collection.addHandler(notebookContextHandler);
             collection.addHandler(directoryContextHandler);
 
-            server.setHandler(collection);
+            jettyServer.setHandler(collection);
 
-            server.start();
+            jettyServer.start();
             LOGGER.info("Server started!");
         }
         catch (IOException ioException) {
@@ -155,7 +149,7 @@ public class NotebookServer implements Callable {
 
     public void stop() throws Exception {
         try {
-            server.stop();
+            jettyServer.stop();
         }
         catch (Exception exception) {
             LOGGER.error("Failed to stop server", exception);

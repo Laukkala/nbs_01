@@ -58,6 +58,9 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParsingException;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,8 +96,15 @@ public class AbstractNotebookServerTest {
     private final String notebook1Paragraph7 = "{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}}";
     private final String notebook1Paragraph8 = "{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
     private final Storage storage = new LocalFilesystemStorage(notebookDirectory);
-    private final Configuration testConfiguration = new Configuration(storage, serverPort);
-    private final NotebookServer server = new NotebookServer(testConfiguration);
+    private final Configuration testConfiguration = new Configuration(serverPort);
+    private final NotebookServer server;
+
+    public AbstractNotebookServerTest() {
+        Server jettyServer = new Server(testConfiguration.serverPort());
+        Connector connector = new ServerConnector(jettyServer);
+        jettyServer.addConnector(connector);
+        server = new NotebookServer(jettyServer, storage);
+    }
 
     @BeforeEach
     public synchronized void startServer() throws Exception {

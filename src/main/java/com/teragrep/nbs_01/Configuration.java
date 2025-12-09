@@ -45,23 +45,15 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.repository.Storage;
-
 import java.util.Objects;
 
 // Configuration object for any settings the NotebookServer might need.
 public final class Configuration {
 
-    private final Storage storage;
     private final int serverPort;
 
-    public Configuration(Storage storage, int serverPort) {
+    public Configuration(int serverPort) {
         this.serverPort = serverPort;
-        this.storage = storage;
-    }
-
-    public Storage storage() {
-        return storage;
     }
 
     public int serverPort() {
@@ -77,11 +69,11 @@ public final class Configuration {
             return false;
         }
         Configuration that = (Configuration) o;
-        return serverPort == that.serverPort && Objects.equals(storage, that.storage);
+        return serverPort == that.serverPort;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(storage, serverPort);
+        return Objects.hash(serverPort);
     }
 }

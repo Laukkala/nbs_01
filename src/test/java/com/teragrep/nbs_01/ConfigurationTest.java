@@ -45,25 +45,20 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigurationTest {
 
     private final int serverPort = 8080;
-    private final Path notebookDir = Paths.get("src/test/resources/notebook");
 
     @Test
     void serverPortTest() {
         Assertions.assertDoesNotThrow(() -> {
-            Configuration configuration = new Configuration(new LocalFilesystemStorage(notebookDir), serverPort);
+            Configuration configuration = new Configuration(serverPort);
             assertEquals(serverPort, configuration.serverPort());
         });
     }
