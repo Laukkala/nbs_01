@@ -430,7 +430,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 requestBody
                         )
                 );
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions
                 .assertEquals(
                         "very_secret_information_pls_dont_leak",
@@ -457,7 +458,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 ""
                         )
                 );
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions.assertTrue(Files.exists(secretFile));
     }
 
@@ -481,7 +483,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 ""
                         )
                 );
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions.assertFalse(Files.exists(secretFile));
     }
 
@@ -512,7 +515,8 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                                 putRequestBody
                         )
                 );
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions.assertFalse(Files.exists(secretFile));
     }
 

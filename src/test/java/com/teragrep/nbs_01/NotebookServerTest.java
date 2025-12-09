@@ -59,7 +59,7 @@ public class NotebookServerTest extends AbstractNotebookServerTest {
     // Assert that a simple HTTP request to an existing endpoint results in return code 200 OK
     public void httpConnectTest() {
         Response response = Assertions
-                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/ping"));
+                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/ping"));
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         String body = Assertions.assertDoesNotThrow(() -> response.body().asString());
         Assertions.assertEquals("{\"message\":\"pong\"}", body);

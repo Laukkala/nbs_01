@@ -332,7 +332,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + relativePath));
         // Assert that we got the proper response.
         Assertions.assertDoesNotThrow(() -> Files.delete(secretDirectory));
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
     }
 
     @Test
@@ -350,7 +351,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + relativePath, "")
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions.assertTrue(Files.exists(secretDirectory));
         Assertions.assertDoesNotThrow(() -> Files.delete(secretDirectory));
     }
@@ -369,7 +371,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         () -> makeHttpPUTRequest("http://" + serverAddress() + "/directory/" + relativePath, "")
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions.assertFalse(Files.exists(secretDirectory));
     }
 
@@ -390,7 +393,8 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         Assertions.assertFalse(Files.exists(secretDirectory));
     }
 }

@@ -84,6 +84,9 @@ public class NotebookServer implements Callable {
         // Start jetty server
         try {
             // Jetty setup
+            ServletContextHandler rootContextHandler = new ServletContextHandler();
+            rootContextHandler.setContextPath("/");
+
             ServletContextHandler notebookContextHandler = new ServletContextHandler();
             notebookContextHandler.setContextPath("/notebook");
 
@@ -119,13 +122,14 @@ public class NotebookServer implements Callable {
             );
             paragraphContextHandler.addServlet(paragraphServlet, "/");
 
-            HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
-            notebookContextHandler.addServlet(pingServlet, "/ping");
-
             HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
             notebookContextHandler.addServlet(listServlet, "/list");
 
+            HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
+            rootContextHandler.addServlet(pingServlet, "/ping");
+
             ContextHandlerCollection collection = new ContextHandlerCollection();
+            collection.addHandler(rootContextHandler);
             collection.addHandler(paragraphContextHandler);
             collection.addHandler(notebookContextHandler);
             collection.addHandler(directoryContextHandler);

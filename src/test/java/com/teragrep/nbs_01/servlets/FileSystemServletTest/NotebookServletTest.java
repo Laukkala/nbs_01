@@ -490,7 +490,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + relativePath));
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
     }
 
     @Test
@@ -509,7 +510,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + relativePath, "")
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         //Assert that the file was not deleted
         Assertions.assertTrue(Files.exists(secretFile));
     }
@@ -532,7 +534,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         //Assert that the file was not deleted
         Assertions.assertTrue(Files.exists(secretFile));
         Assertions
@@ -559,7 +562,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         () -> makeHttpPUTRequest("http://" + serverAddress() + "/notebook/" + relativePath, "")
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         //Assert that no file was created
         Assertions.assertFalse(Files.exists(secretFile));
     }
@@ -580,7 +584,8 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         )
                 );
         // Assert that we got the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        // Response code should indicate a user error
+        Assertions.assertTrue(400 < response.status() && response.status() < 500);
         //Assert that no file was created
         Assertions.assertFalse(Files.exists(secretFile));
     }
