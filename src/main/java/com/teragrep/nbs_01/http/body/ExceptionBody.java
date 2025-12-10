@@ -66,6 +66,10 @@ public class ExceptionBody implements Body {
         this.json = jsonObjectBuilder.build();
     }
 
+    public Throwable exception() {
+        return exception;
+    }
+
     @Override
     public String asString() {
         return json.toString();

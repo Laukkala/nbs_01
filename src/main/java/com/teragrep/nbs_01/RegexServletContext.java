@@ -55,12 +55,15 @@ import java.util.regex.Pattern;
 // Custom Jetty Handler that only handles requests that match a given Regex pattern.
 public final class RegexServletContext extends ServletContextHandler {
 
-    private final String regex;
     private final Pattern pattern;
 
     public RegexServletContext(String regex) {
-        this.regex = regex;
-        this.pattern = Pattern.compile(regex);
+        this(Pattern.compile(regex));
+    }
+
+    public RegexServletContext(Pattern pattern) {
+        this.pattern = pattern;
+
     }
 
     public boolean handle(Request request, Response response, Callback callback) throws Exception {

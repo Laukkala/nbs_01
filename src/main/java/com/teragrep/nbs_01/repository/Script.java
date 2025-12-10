@@ -48,15 +48,12 @@ package com.teragrep.nbs_01.repository;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
 // Represents the text that a user can write into a Paragraph.
 public final class Script {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Script.class);
     private final String text;
 
     public Script() {

@@ -76,10 +76,8 @@ public final class ListEndPoint implements EndPoint {
         // Find all notebooks from Directory structure
         try {
             List<Path> currentFiles = root.children(root.root());
-            StringBuilder sb = new StringBuilder();
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (Path file : currentFiles) {
-                sb.append(file.getFileName());
                 arrayBuilder.add(file.getFileName().toString());
             }
             JsonArray array = arrayBuilder.build();

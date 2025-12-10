@@ -46,8 +46,6 @@
 package com.teragrep.nbs_01.repository;
 
 import jakarta.json.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -58,7 +56,6 @@ import java.util.*;
  */
 public final class Notebook implements FilesystemEntity {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Notebook.class);
     private final Map<String, Paragraph> paragraphs;
     private final String name;
 
@@ -107,7 +104,7 @@ public final class Notebook implements FilesystemEntity {
     }
 
     public Notebook copy(String copyTitle) throws IOException {
-        Map<String, Paragraph> copyParagraphs = new LinkedHashMap<String, Paragraph>();
+        Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
         for (Paragraph paragraph : paragraphs.values()) {
             Paragraph copyParagraph = paragraph.copy();
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
