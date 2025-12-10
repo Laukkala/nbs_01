@@ -57,18 +57,7 @@ import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.

@@ -49,9 +49,7 @@ import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -69,6 +67,11 @@ class NotebookTest {
             .get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
     private final Path notebook3 = Paths.get("target/notebooks/my_note3_2A94M5J3Z.zpln");
     private final Path notebook4 = Paths.get("target/notebooks/my_note4_2A94M5J4Z.zpln");
+
+    public NotebookTest() {
+        deleteFileRecursively(notebookDirectory.toFile());
+        copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
+    }
 
     public void copyFileRecursively(File fileToCopy, File destination) {
         if (fileToCopy.isDirectory()) {
@@ -94,17 +97,6 @@ class NotebookTest {
             }
         }
         fileToDelete.delete();
-    }
-
-    @BeforeEach
-    void setUp() {
-        deleteFileRecursively(notebookDirectory.toFile());
-        copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
-    }
-
-    @AfterEach
-    void tearDown() {
-        deleteFileRecursively(notebookDirectory.toFile());
     }
 
     // Notebooks should have the correct number of paragraphs

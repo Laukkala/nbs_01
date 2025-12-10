@@ -62,20 +62,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
     public CreateParagraphEndPointTest() {
-    }
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
     }
 
     @Test

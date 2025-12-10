@@ -61,18 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     // Assert that a request to DeleteParagraphEndpoint results in a file with edited content being saved on disk.

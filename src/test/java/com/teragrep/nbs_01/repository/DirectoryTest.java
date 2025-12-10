@@ -67,6 +67,11 @@ class DirectoryTest {
     private final Path directory2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
     private final Path junkfile = Paths.get("target/notebooks/junkfile");
 
+    public DirectoryTest() {
+        deleteFileRecursively(notebookDirectory.toFile());
+        copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
+    }
+
     public void copyFileRecursively(File fileToCopy, File destination) {
         if (fileToCopy.isDirectory()) {
             File[] children = fileToCopy.listFiles();
@@ -91,17 +96,6 @@ class DirectoryTest {
             }
         }
         fileToDelete.delete();
-    }
-
-    @BeforeEach
-    void setUp() {
-        deleteFileRecursively(notebookDirectory.toFile());
-        copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
-    }
-
-    @AfterEach
-    void tearDown() {
-        deleteFileRecursively(notebookDirectory.toFile());
     }
 
     // Copying a directory should result in the original and a new copy existing on disk.

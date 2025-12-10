@@ -56,7 +56,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParagraphServletTest extends AbstractNotebookServerTest {
 
     private final String notebookName = "my_note4_2A94M5J4Z.zpln";

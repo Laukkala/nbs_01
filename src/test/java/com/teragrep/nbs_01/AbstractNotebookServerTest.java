@@ -106,6 +106,8 @@ public class AbstractNotebookServerTest {
         server = new NotebookServer(jettyServer, storage);
     }
 
+    // BeforeEach and AfterEach annotations are used here to start and stop the server for each test instance.
+    // The methods also reset any changes the test might have made to .zpln files in "target/notebooks" directory, so that previously run tests do not affect the files of the next test
     @BeforeEach
     public synchronized void startServer() throws Exception {
         copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());

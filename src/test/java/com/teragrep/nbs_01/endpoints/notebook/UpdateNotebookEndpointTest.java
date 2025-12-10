@@ -61,18 +61,7 @@ import org.junit.jupiter.api.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     public void httpUpdateNotebookTest() {

@@ -56,9 +56,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -66,16 +64,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     // Assert that a proper request to CreateNotebookEndpoint results in a correct response and a file being saved to disk.

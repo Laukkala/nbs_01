@@ -59,22 +59,11 @@ import org.junit.jupiter.api.*;
 import java.util.Arrays;
 import java.util.List;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ListEndPointTest extends AbstractNotebookServerTest {
 
     private final List<String> allFileIds = Arrays
             .asList("2A94M5J1Z", "2A94M5J2Z", "2A94M5J3Z", "2A94M5J4Z", "junkfile");
     private final List<String> allFileIdsWithinDirectory = Arrays.asList("2A94M5J1Z", "2A94M5J2Z");
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     // Assert that a HTTP request to /notebook/list endpoint results in a list of notebook IDs

@@ -58,11 +58,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DirectoryServletTest extends AbstractNotebookServerTest {
-
-    public DirectoryServletTest() {
-    }
 
     @Test
     // Assert that a HTTP PUT request to /directory/{path/to/directory} endpoint results in a new file being saved on disk.

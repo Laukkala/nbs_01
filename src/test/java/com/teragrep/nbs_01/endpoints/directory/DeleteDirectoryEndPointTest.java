@@ -57,18 +57,7 @@ import org.junit.jupiter.api.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
-
-    @BeforeEach
-    private void setUp() {
-        copyFileRecursively(notebookResources().toFile(), notebookDirectory().toFile());
-    }
-
-    @AfterEach
-    private void tearDown() {
-        deleteFileRecursively(notebookDirectory().toFile());
-    }
 
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in new directory being saved on disk.

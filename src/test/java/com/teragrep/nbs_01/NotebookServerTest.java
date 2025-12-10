@@ -49,7 +49,6 @@ import com.teragrep.nbs_01.http.responses.Response;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NotebookServerTest extends AbstractNotebookServerTest {
 
     public NotebookServerTest() {
