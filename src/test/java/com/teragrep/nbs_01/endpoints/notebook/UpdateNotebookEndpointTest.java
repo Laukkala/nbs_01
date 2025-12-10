@@ -68,9 +68,6 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Destination notebook must exist
         Path notebookPath = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
-        String originalFileContent = Assertions
-                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
-
         // Make a request editing the title of the notebook.
         String editedTitle = "testTitle";
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));

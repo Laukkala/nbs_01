@@ -327,7 +327,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
     }
 
     private JsonObject readFileContents(Path filePath) {
-        String fileContent = Assertions.assertDoesNotThrow(() -> Files.readString(filePath).toString());
+        String fileContent = Assertions.assertDoesNotThrow(() -> Files.readString(filePath));
         StringReader stringReader = new StringReader(fileContent);
         JsonReader jsonReader = Json.createReader(stringReader);
         JsonObject destinationFileObject = jsonReader.readObject();

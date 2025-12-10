@@ -56,7 +56,6 @@ import org.junit.jupiter.api.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 public class DirectoryServletTest extends AbstractNotebookServerTest {
 
@@ -199,7 +198,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Path directoryPath = directory1();
         // Assert that the correct number of files exist
         Assertions
-                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
+                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).toList().size()));
 
         // Assert that the file to be deleted and its children exist.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
@@ -213,7 +212,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(204, response.status());
         // Assert that a file was deleted.
         Assertions
-                .assertEquals(3, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
+                .assertEquals(3, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).toList().size()));
         // Assert that the correct file was deleted.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directory1())));
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(notebook2())));
@@ -227,7 +226,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the correct number of files exist
         Assertions
-                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
+                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).toList().size()));
 
         // Assert that the file to be deleted does not exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonexistentDirectoryPath)));
@@ -241,7 +240,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(404, response.status());
         // Assert that no files were deleted.
         Assertions
-                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
+                .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).toList().size()));
     }
 
     @Test
