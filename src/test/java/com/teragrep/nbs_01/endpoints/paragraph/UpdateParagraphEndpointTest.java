@@ -64,7 +64,6 @@ import java.nio.file.Paths;
 
 class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
-    private final Path notebookPath = Paths.get("my_folder_2A94M5J1D", "my_note2_2A94M5J2Z.zpln");
     private final String paragraphId = "20150213-230428_1231780373";
     private final String editedParagraphText = "test edit";
     private final String editedTitle = "testTitle";
@@ -73,13 +72,11 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpUpdateParagraphTest() {
         // Assert that a request to UpdateParagraphEndpoint results in a modified file being saved on disk.
         Assertions
-                .assertTrue(
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!")
-                );
+                .assertTrue(Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2()))).contains("%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!"));
 
         Assertions
                 .assertFalse(
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("\"title\":\"" + editedTitle + "\"")
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2()))).contains("\"title\":\"" + editedTitle + "\"")
                 );
 
         final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\""
@@ -89,7 +86,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -112,7 +109,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath)))
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())))
                 );
     }
 
@@ -120,9 +117,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     public void httpUpdateParagraphTextTest() {
         // Assert that a request to UpdateParagraphEndpoint results in a modified file where only the text has been changed being saved on disk.
         Assertions
-                .assertTrue(
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!")
-                );
+                .assertTrue(Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2()))).contains("%test\\n## Congratulations, it\\u0027s done.\\n##### You can create your own notebook in \\u0027Notebook\\u0027 menu. Good luck!"));
 
         final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\""
                 + editedParagraphText
@@ -131,7 +126,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -149,7 +144,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath)))
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())))
                 );
     }
 
@@ -158,7 +153,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Assert that a request to UpdateParagraphEndpoint results in a modified file where only the title has been changed being saved on disk.
         Assertions
                 .assertFalse(
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath))).contains("\"title\":\"" + editedTitle + "\"")
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2()))).contains("\"title\":\"" + editedTitle + "\"")
                 );
 
         final String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\""
@@ -168,7 +163,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -194,7 +189,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions
                 .assertEquals(
                         expectedFileContent,
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebookPath)))
+                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())))
                 );
     }
 
@@ -228,7 +223,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", nonexistentParagraphId);
+        Path requestPath = Paths.get(notebook2().toString(), "paragraph", nonexistentParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
                 .add("title", editedTitle)
@@ -275,7 +270,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebookPath.toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
         JsonObject body = Json.createObjectBuilder().build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
 
