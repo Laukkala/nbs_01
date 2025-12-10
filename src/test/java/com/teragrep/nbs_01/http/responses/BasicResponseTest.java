@@ -45,5 +45,56 @@
  */
 package com.teragrep.nbs_01.http.responses;
 
+import com.teragrep.nbs_01.http.body.Body;
+import com.teragrep.nbs_01.http.body.StringBody;
+import com.teragrep.nbs_01.http.body.StubBody;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.eclipse.jetty.http.HttpStatus;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 public class BasicResponseTest {
+
+    @Test
+    void statusTest() {
+        BasicResponse testResponse = new BasicResponse(HttpStatus.OK_200);
+        Assertions.assertEquals(200, testResponse.status());
+    }
+
+    @Test
+    void bodyTest() {
+        Body body = new StringBody("testPayload");
+        BasicResponse testResponse = new BasicResponse(HttpStatus.OK_200, body);
+
+        Assertions.assertEquals(body, testResponse.body());
+    }
+
+    @Test
+    void headersTest() {
+        Path responsePath = Paths.get("target", "testLocation");
+        Header locationHeader = new BasicHeader("Location", responsePath.toString());
+        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        List<Header> headers = new ArrayList<>();
+        headers.add(locationHeader);
+        headers.add(contentTypeHeader);
+        BasicResponse testResponse = new BasicResponse(HttpStatus.OK_200, headers);
+
+        Assertions.assertEquals(2, testResponse.headers().size());
+        Assertions.assertTrue(testResponse.headers().contains(locationHeader));
+        Assertions.assertTrue(testResponse.headers().contains(contentTypeHeader));
+        Assertions.assertEquals(headers, testResponse.headers());
+    }
+
+    @Test
+    void stubTest() {
+        BasicResponse testResponse = new BasicResponse(HttpStatus.NOT_FOUND_404);
+        Assertions.assertEquals(StubBody.class, testResponse.body().getClass());
+        Assertions.assertEquals(0, testResponse.headers().size());
+    }
 }
