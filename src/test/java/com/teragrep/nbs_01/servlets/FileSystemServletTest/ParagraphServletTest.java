@@ -356,17 +356,25 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
         String newParagraphId = "new_paragraph";
 
+        // Assert that the copied paragraph content is not contained within the saved file of the target notebook
+        String originalFileContents = Assertions
+                .assertDoesNotThrow(
+                        () -> Files.readString(notebookDirectory().resolve(notebook2()))
+                );
+        Assertions.assertFalse(originalFileContents.contains(firstParagraphText));
+        Assertions.assertFalse(originalFileContents.contains(newParagraphId));
+
         // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to create the copy.
         String putRequestBody = Json
                 .createObjectBuilder()
-                .add("sourcePath", "my_note4_2A94M5J4Z.zpln")
-                .add("sourceParagraphId", "20150326-214658_12335843")
+                .add("sourcePath", notebookName)
+                .add("sourceParagraphId", firstParagraphId)
                 .build()
                 .toString();
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/notebook/" + notebook2() + "/paragraph/"
                                         + newParagraphId,
                                 putRequestBody
                         )
@@ -377,8 +385,10 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the copied paragraph is contained within the saved file of the target notebook
         String fileContents = Assertions
                 .assertDoesNotThrow(
-                        () -> Files.readString(Paths.get(notebookDirectory().toString(), notebookPath.toString()))
+                        () -> Files.readString(notebookDirectory().resolve(notebook2()))
                 );
+        Assertions.assertTrue(fileContents.contains(firstParagraphText));
+        Assertions.assertTrue(fileContents.contains(newParagraphId));
     }
 
     // Assert that a HTTP GET request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error

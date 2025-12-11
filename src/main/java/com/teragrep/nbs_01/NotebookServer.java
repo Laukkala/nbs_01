@@ -117,7 +117,7 @@ public class NotebookServer implements Callable {
             FileSystemServlet paragraphServlet = new FileSystemServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
-                    new DelegatingEndpoint(new CopyParagraphEndpoint(root), new CreateParagraphEndpoint(root), new DoAllKeysExistDelegate(Arrays.asList("sourcePath", "sourceParagraph"))), // Endpoint to call on a PUT Request
+                    new DelegatingEndpoint(new CopyParagraphEndpoint(root), new CreateParagraphEndpoint(root), new DoAllKeysExistDelegate(Arrays.asList("sourcePath", "sourceParagraphId"))), // Endpoint to call on a PUT Request
                     new DeleteParagraphEndpoint(root) // Endpoint to call on a DELETE Request
             );
             paragraphContextHandler.addServlet(paragraphServlet, "/");
