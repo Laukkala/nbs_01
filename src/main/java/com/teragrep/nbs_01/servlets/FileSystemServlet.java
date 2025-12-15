@@ -148,15 +148,11 @@ public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
             resp.setHeader(header.getName(), header.getValue());
         }
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
-        try {
-            String responseBody = endPointResponse.body().asString();
+        if (!endPointResponse.body().isStub()) {
             PrintWriter writer = resp.getWriter();
-            writer.write(responseBody);
+            writer.write(endPointResponse.body().asString());
             writer.flush();
             writer.close();
-        }
-        catch (IllegalStateException malformedBodyException) {
-            // Request does not have a body.
         }
     }
 

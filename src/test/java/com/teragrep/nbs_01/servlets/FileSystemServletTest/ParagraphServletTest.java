@@ -358,9 +358,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
         // Assert that the copied paragraph content is not contained within the saved file of the target notebook
         String originalFileContents = Assertions
-                .assertDoesNotThrow(
-                        () -> Files.readString(notebookDirectory().resolve(notebook2()))
-                );
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
         Assertions.assertFalse(originalFileContents.contains(firstParagraphText));
         Assertions.assertFalse(originalFileContents.contains(newParagraphId));
 
@@ -384,9 +382,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
         // Assert that the copied paragraph is contained within the saved file of the target notebook
         String fileContents = Assertions
-                .assertDoesNotThrow(
-                        () -> Files.readString(notebookDirectory().resolve(notebook2()))
-                );
+                .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
         Assertions.assertTrue(fileContents.contains(firstParagraphText));
         Assertions.assertTrue(fileContents.contains(newParagraphId));
     }

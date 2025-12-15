@@ -120,14 +120,11 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
             resp.setHeader(header.getName(), header.getValue());
         }
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
-        try {
+        if (!endPointResponse.body().isStub()) {
             PrintWriter writer = resp.getWriter();
             writer.write(endPointResponse.body().asString());
             writer.flush();
             writer.close();
-        }
-        catch (IllegalStateException malformedBodyException) {
-            // Request does not have a body.
         }
     }
 
