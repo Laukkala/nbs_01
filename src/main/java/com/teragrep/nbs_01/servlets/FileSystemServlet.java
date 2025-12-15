@@ -67,6 +67,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 // HTTPServlet that acts on the Filesystem to Find, Create, Delete and Update Notebooks, Directories and Paragraphs.
+// Request to a FileSystemServlet must have a Path, which is used to identify the resource the user wants to operate on.
 // Delegates each different HTTP request type to a different endpoint.
 public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
 
