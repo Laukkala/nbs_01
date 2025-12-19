@@ -93,7 +93,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
                                         + firstParagraphId
                         )
                 );
@@ -111,7 +111,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
                                         + nonexistentParagraphId
                         )
                 );
@@ -130,7 +130,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookName + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookName + "/paragraph/"
                                         + firstParagraphId
                         )
                 );
@@ -157,7 +157,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
                                         + newParagraphId,
                                 requestBody
                         )
@@ -195,7 +195,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/paragraph/"
                                         + newParagraphId,
                                 requestBody
                         )
@@ -225,7 +225,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
                                         + firstParagraphId,
                                 requestBody
                         )
@@ -249,7 +249,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
                                         + nonexistentParagraphId,
                                 requestBody
                         )
@@ -281,7 +281,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/notebook/" + nonexistentNotebookId + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/paragraph/"
                                         + firstParagraphId,
                                 requestBody
                         )
@@ -325,7 +325,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
                                         + firstParagraphId,
                                 requestBody
                         )
@@ -372,7 +372,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + notebook2() + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebook2() + "/paragraph/"
                                         + newParagraphId,
                                 putRequestBody
                         )
@@ -401,7 +401,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
                                         + firstParagraphId
                         )
                 );
@@ -430,7 +430,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
-                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
                                         + firstParagraphId,
                                 requestBody
                         )
@@ -458,7 +458,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
                                         + firstParagraphId,
                                 ""
                         )
@@ -483,7 +483,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
                                         + firstParagraphId,
                                 ""
                         )
@@ -515,7 +515,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/notebook/" + relativePath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
                                         + firstParagraphId,
                                 putRequestBody
                         )

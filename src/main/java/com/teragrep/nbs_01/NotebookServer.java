@@ -111,8 +111,8 @@ public class NotebookServer implements Callable {
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
 
-            ServletContextHandler paragraphContextHandler = new RegexServletContext(".*/paragraph/[^/]*/?$");
-            paragraphContextHandler.setContextPath("/notebook");
+            ServletContextHandler paragraphContextHandler = new ServletContextHandler();
+            paragraphContextHandler.setContextPath("/paragraph");
 
             FileSystemServlet paragraphServlet = new FileSystemServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
