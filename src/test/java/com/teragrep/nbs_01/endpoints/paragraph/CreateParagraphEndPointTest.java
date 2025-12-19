@@ -72,7 +72,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         String paragraphId = "testParagraphId";
 
-        Path requestPath = Paths.get(notebook3().toString(), "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(notebook3().toString(), paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
@@ -109,7 +109,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         String paragraphId = "testParagraphId";
 
-        Path requestPath = Paths.get(nonexistentFileName, "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(nonexistentFileName, paragraphId);
         JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
         BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);

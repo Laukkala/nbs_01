@@ -93,7 +93,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
             String sourceParagraphId = body.getString("sourceParagraphId");
             Identifier sourceIdentifier = new Identifier(sourcePathString);
             Identifier destinationIdentifier = new Identifier(
-                    request.path().subpath(0, request.path().getNameCount() - 2).toString()
+                    request.path().subpath(0, request.path().getNameCount() - 1).toString()
             );
             String destinationParagraphId = request
                     .path()
@@ -150,12 +150,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
     private void validateRequest(Request request) throws MalformedRequestException, JsonException {
         Path requestPath = request.path();
         JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
-        if (requestPath.getNameCount() < 3) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
-        }
-        if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
+        if (requestPath.getNameCount() < 2) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );

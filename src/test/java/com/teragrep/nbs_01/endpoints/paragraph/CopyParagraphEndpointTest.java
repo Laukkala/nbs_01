@@ -87,7 +87,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(originalDestinationFileObject.toString().contains(expectedParagraphContent));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
 
         JsonObject body = Json
                 .createObjectBuilder()
@@ -145,7 +145,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(sourceFileObject.toString().contains(expectedParagraphContent));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
                 .add("sourcePath", notebook3().toString())
@@ -184,7 +184,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook3().toString()).build();
         BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
@@ -212,7 +212,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(sourceNotebookPath));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
                 .add("sourcePath", sourceNotebookName)
@@ -239,7 +239,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         String sourceParagraphId = "20150213-230428_1231780373";
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourceParagraphId", sourceParagraphId).build();
         BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
         Response response = endPoint.createResponse(request);
@@ -272,7 +272,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(originalDestinationFileObject.toString().contains(destinationParagraphId));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
                 .add("sourcePath", notebook3().toString())
@@ -305,7 +305,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(sourceNotebookPath));
 
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Path requestPath = Paths.get(destinationNotebookPath.toString(), "/paragraph/" + destinationParagraphId);
+        Path requestPath = Paths.get(destinationNotebookPath.toString(), destinationParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
                 .add("sourcePath", notebook3().toString())

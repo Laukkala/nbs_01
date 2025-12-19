@@ -71,7 +71,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         String paragraphId = "20150213-230428_1231780373";
 
-        Path requestPath = Paths.get(notebook3().toString(), "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(notebook3().toString(), paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
@@ -98,7 +98,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String nonExistentParagraphId = "nonExistentParagraphId";
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook3().toString(), "/paragraph/" + nonExistentParagraphId);
+        Path requestPath = Paths.get(notebook3().toString(), nonExistentParagraphId);
 
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
@@ -125,7 +125,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         String paragraphId = "20150213-230428_1231780373";
 
-        Path requestPath = Paths.get(nonExistentNotebookName, "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
         BasicRequest request = new BasicRequest(requestPath);
         Response response = endPoint.createResponse(request);
 

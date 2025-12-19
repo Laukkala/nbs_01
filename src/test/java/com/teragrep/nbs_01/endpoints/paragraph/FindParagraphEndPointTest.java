@@ -70,7 +70,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
         String paragraphId = "20150210-015259_1403135953";
 
-        Path requestPath = Paths.get(notebook1().toString(), "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(notebook1().toString(), paragraphId);
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         Response response = endPoint.createResponse(new BasicRequest(requestPath));
         Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
@@ -91,7 +91,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         String paragraphId = "20150210-015259_1403135953";
 
-        Path requestPath = Paths.get(nonExistentNotebookName + "/paragraph/" + paragraphId);
+        Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
         Response response = endPoint.createResponse(new BasicRequest(requestPath));
 
         // The endpoint should return a Response with the correct status and messagsse.
@@ -110,34 +110,11 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         String nonExistentParagraphId = "nonExistentParagraphId";
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook1().toString() + "/paragraph/" + nonExistentParagraphId);
+        Path requestPath = Paths.get(notebook1().toString(), nonExistentParagraphId);
         Response response = endPoint.createResponse(new BasicRequest(requestPath));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
-    }
-
-    @Test
-    public void httpInvalidRequestFormatTest() {
-        // Assert that a request to FindParagraphEndpoint with an improperly formatted Request results in an error.
-        String nonexistentParagraphId = "nonexistentId";
-        String nonexistentNotebookName = "nonexistentNotebookPath";
-
-        Path queryPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
-
-        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        FindParagraphEndPoint endpoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endpoint.createResponse(new BasicRequest(queryPath));
-
-        // The endpoint should return an JsonResponse with the correct status and specified cause.
-
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("message", "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"")
-                .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));

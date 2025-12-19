@@ -83,7 +83,7 @@ public final class DeleteParagraphEndpoint implements EndPoint {
         try {
             validateRequest(request);
             Path requestPath = request.path();
-            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
+            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 1);
 
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
@@ -122,12 +122,7 @@ public final class DeleteParagraphEndpoint implements EndPoint {
 
     private void validateRequest(Request request) throws MalformedRequestException {
         Path requestPath = request.path();
-        if (requestPath.getNameCount() < 3) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
-        }
-        if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
+        if (requestPath.getNameCount() < 2) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );

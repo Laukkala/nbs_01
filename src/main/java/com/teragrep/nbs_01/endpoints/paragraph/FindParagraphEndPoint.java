@@ -91,7 +91,7 @@ public final class FindParagraphEndPoint implements EndPoint {
                     .toString();
 
             Identifier destinationIdentifier = new Identifier(
-                    request.path().subpath(0, request.path().getNameCount() - 2).toString()
+                    request.path().subpath(0, request.path().getNameCount() - 1).toString()
             );
             JsonObject json = Json.createReader(new StringReader(root.read(destinationIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
@@ -126,12 +126,7 @@ public final class FindParagraphEndPoint implements EndPoint {
 
     private void validateRequest(Request request) throws MalformedRequestException {
         Path requestPath = request.path();
-        if (requestPath.getNameCount() < 3) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
-        }
-        if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
+        if (requestPath.getNameCount() < 2) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );

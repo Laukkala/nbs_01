@@ -80,13 +80,12 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-
             validateRequest(request);
             Path requestPath = request.path();
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
-            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
+            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 1);
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             JsonObject parameters = Json.createObjectBuilder(body).add("paragraphId", paragraphId).build();
             Identifier destinationIdentifier = new Identifier(notebookPath.toString());
@@ -134,12 +133,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
     private void validateRequest(Request request) throws MalformedRequestException, JsonException {
         Path requestPath = request.path();
         JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
-        if (requestPath.getNameCount() < 3) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
-        }
-        if (!requestPath.getName(requestPath.getNameCount() - 2).toString().equals("paragraph")) {
+        if (requestPath.getNameCount() < 2) {
             throw new MalformedRequestException(
                     "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
             );

@@ -93,8 +93,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
-                                        + firstParagraphId
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + firstParagraphId
                         )
                 );
         // Assert that a GET request is responded to with the response code 200 OK
@@ -111,7 +110,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/"
                                         + nonexistentParagraphId
                         )
                 );
@@ -130,7 +129,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookName + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookName + "/"
                                         + firstParagraphId
                         )
                 );
@@ -157,8 +156,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
-                                        + newParagraphId,
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + newParagraphId,
                                 requestBody
                         )
                 );
@@ -195,7 +193,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/"
                                         + newParagraphId,
                                 requestBody
                         )
@@ -225,8 +223,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
-                                        + firstParagraphId,
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + firstParagraphId,
                                 requestBody
                         )
                 );
@@ -249,7 +246,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/"
                                         + nonexistentParagraphId,
                                 requestBody
                         )
@@ -281,7 +278,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/paragraph/"
+                                "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/"
                                         + firstParagraphId,
                                 requestBody
                         )
@@ -325,8 +322,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/paragraph/"
-                                        + firstParagraphId,
+                                "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + firstParagraphId,
                                 requestBody
                         )
                 );
@@ -362,7 +358,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(originalFileContents.contains(firstParagraphText));
         Assertions.assertFalse(originalFileContents.contains(newParagraphId));
 
-        // Make an HTTP PUT request to /notebook/{path/to/notebook/}/paragraph/{paragraphId} to create the copy.
+        // Make an HTTP PUT request to /paragraph/{path/to/notebook/}/{paragraphId} to create the copy.
         String putRequestBody = Json
                 .createObjectBuilder()
                 .add("sourcePath", notebookName)
@@ -372,8 +368,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + notebook2() + "/paragraph/"
-                                        + newParagraphId,
+                                "http://" + serverAddress() + "/paragraph/" + notebook2() + "/" + newParagraphId,
                                 putRequestBody
                         )
                 );
@@ -387,7 +382,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(fileContents.contains(newParagraphId));
     }
 
-    // Assert that a HTTP GET request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    // Assert that a HTTP GET request to /paragraph/{/../../../path/to/server/file}/{paragraphId} endpoint results in an error
     @Test
     public void httpFindUnauthorizedParagraphTest() {
         // Write a secret file to target to which NBS_01 should not be able to touch
@@ -401,14 +396,13 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
-                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
-                                        + firstParagraphId
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId
                         )
                 );
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
     }
 
-    // Assert that a HTTP POST request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    // Assert that a HTTP POST request to /paragraph/{/../../../path/to/server/file}/{paragraphId} endpoint results in an error
     @Test
     public void httpUpdateUnauthorizedParagraphTest() {
         // Write a secret file to target to which NBS_01 should not be able to touch
@@ -430,8 +424,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
-                                        + firstParagraphId,
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId,
                                 requestBody
                         )
                 );
@@ -444,7 +437,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 );
     }
 
-    // Assert that a HTTP DELETE request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    // Assert that a HTTP DELETE request to /paragraph/{/../../../path/to/server/file}/{paragraphId} endpoint results in an error
     @Test
     public void httpDELETEUnauthorizedParagraphTest() {
         // Write a secret file to target to which NBS_01 should not be able to touch
@@ -458,9 +451,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
-                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
-                                        + firstParagraphId,
-                                ""
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId, ""
                         )
                 );
         // Response code should indicate a user error
@@ -468,7 +459,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(secretFile));
     }
 
-    // Assert that a HTTP PUT request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    // Assert that a HTTP PUT request to /paragraph/{/../../../path/to/server/file}/{paragraphId} endpoint results in an error
     @Test
     public void httpCreateUnauthorizedParagraphTest() {
         // Define a path which NBS_01 should not be able to touch
@@ -483,9 +474,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
-                                        + firstParagraphId,
-                                ""
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId, ""
                         )
                 );
         // Response code should indicate a user error
@@ -493,7 +482,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(secretFile));
     }
 
-    // Assert that a HTTP PUT request to /notebook/{/../../../path/to/server/file}/paragraph/{paragraphId} endpoint results in an error
+    // Assert that a HTTP PUT request to /paragraph/{/../../../path/to/server/file}/{paragraphId} endpoint results in an error
     @Test
     public void httpCopyUnauthorizedParagraphTest() {
         // Define a path which NBS_01 should not be able to touch
@@ -515,8 +504,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Response response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
-                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/paragraph/"
-                                        + firstParagraphId,
+                                "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId,
                                 putRequestBody
                         )
                 );

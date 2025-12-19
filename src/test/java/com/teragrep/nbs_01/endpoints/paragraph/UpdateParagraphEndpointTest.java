@@ -86,7 +86,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -126,7 +126,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -163,7 +163,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
@@ -201,7 +201,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of a notebook that doesn't exist.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(nonExistentNotebookName, "paragraph", paragraphId);
+        Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
 
@@ -223,7 +223,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook2().toString(), "paragraph", nonexistentParagraphId);
+        Path requestPath = Paths.get(notebook2().toString(), nonexistentParagraphId);
         JsonObject body = Json
                 .createObjectBuilder()
                 .add("title", editedTitle)
@@ -251,7 +251,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(nonexistentNotebookName, "malformedPathPart", nonexistentParagraphId);
+        Path requestPath = Paths.get(nonexistentNotebookName);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
 
@@ -270,7 +270,7 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
         UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
 
-        Path requestPath = Paths.get(notebook2().toString(), "paragraph", paragraphId);
+        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().build();
         Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
 
