@@ -80,15 +80,17 @@ public final class UpdateParagraphEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
+
             validateRequest(request);
             Path requestPath = request.path();
             String paragraphId = requestPath
                     .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
                     .toString();
-            Path notebookPath = root.root().resolve(requestPath.subpath(0, requestPath.getNameCount() - 2));
+            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             JsonObject parameters = Json.createObjectBuilder(body).add("paragraphId", paragraphId).build();
-            JsonObject json = Json.createReader(new StringReader(root.read(notebookPath))).readObject();
+            Identifier destinationIdentifier = new Identifier(notebookPath.toString());
+            JsonObject json = Json.createReader(new StringReader(root.read(destinationIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
 
@@ -108,7 +110,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
             Notebook newNotebook = new Notebook(notebook.name(), paragraphs);
-            root.write(notebookPath, newNotebook.json().toString());
+            root.write(destinationIdentifier, newNotebook.json().toString());
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));

@@ -67,7 +67,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Path;
 import java.util.*;
 
 // Updates the title of a Notebook.
@@ -85,9 +84,8 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             if (!body.containsKey("title")) {
                 throw new MalformedRequestException("Request does not contain a title!");
             }
-
-            Path path = root.root().resolve(request.path());
-            String fileContent = root.read(path);
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            String fileContent = root.read(destinationIdentifier);
             JsonObject json = Json.createReader(new StringReader(fileContent)).readObject();
             SerializedNotebook serializedOriginal = new JsonNotebook(json);
             Notebook originalNotebook = new Notebook(serializedOriginal.title(), serializedOriginal.paragraphs());
@@ -100,7 +98,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             Notebook modifiedNotebook = new Notebook(title, paragraphs);
             SerializedNotebook serializedModifiedNotebook = new JsonNotebook(modifiedNotebook.json());
             String serializedString = serializedModifiedNotebook.serialize();
-            root.write(path, serializedString);
+            root.write(destinationIdentifier, serializedString);
 
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));

@@ -69,8 +69,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 // Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
@@ -87,10 +85,10 @@ public final class CopyNotebookEndpoint implements EndPoint {
             validateRequest(request);
             JsonObject body = parseBody(request);
             String sourcePathString = body.getString("sourcePath");
-            Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
-            Path destinationPath = root.root().resolve(request.path());
+            Identifier sourceIdentifier = new Identifier(sourcePathString);
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
             // Deserialize from Storage
-            JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourcePath))).readObject();
+            JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
             SerializedNotebook serializedSource = new JsonNotebook(sourceJson);
             Notebook source = new Notebook(serializedSource.title(), serializedSource.paragraphs());
             // Create a copy with newly generated IDs
@@ -98,7 +96,7 @@ public final class CopyNotebookEndpoint implements EndPoint {
             // Serialize to storage
             SerializedNotebook serializedCopy = new JsonNotebook(copy.json());
             String serializedString = serializedCopy.serialize();
-            root.write(destinationPath, serializedString);
+            root.write(destinationIdentifier, serializedString);
             // Generate response
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));

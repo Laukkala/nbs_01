@@ -104,7 +104,13 @@ class NotebookTest {
     void testParagraphs() {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         JsonObject json = Assertions
-                .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook1))).readObject());
+                .assertDoesNotThrow(
+                        () -> Json
+                                .createReader(
+                                        new StringReader(root.read(new Identifier(notebookDirectory.relativize(notebook1).toString())))
+                                )
+                                .readObject()
+                );
         JsonNotebook jsonNotebook = new JsonNotebook(json);
         Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Map<String, Paragraph> paragraphs = notebook.paragraphs();
@@ -116,7 +122,13 @@ class NotebookTest {
     void testJson() {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         JsonObject json = Assertions
-                .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook3))).readObject());
+                .assertDoesNotThrow(
+                        () -> Json
+                                .createReader(
+                                        new StringReader(root.read(new Identifier(notebookDirectory.relativize(notebook3).toString())))
+                                )
+                                .readObject()
+                );
         JsonNotebook jsonNotebook = new JsonNotebook(json);
         Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Assertions
@@ -131,15 +143,22 @@ class NotebookTest {
     void testCopy() {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         JsonObject json = Assertions
-                .assertDoesNotThrow(() -> Json.createReader(new StringReader(root.read(notebook4))).readObject());
+                .assertDoesNotThrow(
+                        () -> Json
+                                .createReader(
+                                        new StringReader(root.read(new Identifier(notebookDirectory.relativize(notebook4).toString())))
+                                )
+                                .readObject()
+                );
         JsonNotebook jsonNotebook = new JsonNotebook(json);
         Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Assertions.assertTrue(Files.exists(notebook4));
-        Path destinationPath = Paths.get(notebookDirectory.toString(), "newName_copyId");
+        Path destinationPath = Paths.get("newName_copyId");
         Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
-        Assertions.assertDoesNotThrow(() -> root.write(destinationPath, copy.json().toString()));
+        Assertions
+                .assertDoesNotThrow(() -> root.write(new Identifier(destinationPath.toString()), copy.json().toString()));
         Assertions.assertTrue(Files.exists(notebook4));
-        Assertions.assertTrue(Files.exists(destinationPath));
+        Assertions.assertTrue(Files.exists(notebookDirectory.resolve(destinationPath)));
     }
 
     @Test

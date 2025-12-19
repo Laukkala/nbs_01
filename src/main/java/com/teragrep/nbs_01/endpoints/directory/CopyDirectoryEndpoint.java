@@ -54,6 +54,7 @@ import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
@@ -66,8 +67,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -87,10 +86,9 @@ public final class CopyDirectoryEndpoint implements EndPoint {
                 throw new MalformedRequestException("Request must contain a sourcePath!");
             }
             String sourcePathString = body.getString("sourcePath");
-            Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
-            Path destinationPath = root.root().resolve(request.path());
-
-            root.copy(sourcePath, destinationPath);
+            Identifier sourceIdentifier = new Identifier(sourcePathString);
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            root.copy(sourceIdentifier, destinationIdentifier);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));

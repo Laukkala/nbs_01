@@ -43,55 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints.directory;
+package com.teragrep.nbs_01.repository;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.http.body.ErrorBody;
-import com.teragrep.nbs_01.ErrorEvent;
-import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.Storage;
-import jakarta.json.Json;
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.http.HttpStatus;
-
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
-// Creates a new Notebook. Should be provided with a path of the File
-public final class CreateDirectoryEndpoint implements EndPoint {
+/**
+ * Represents some kind of identifier that an implementation of Storage can use to uniquely identify a resource, such as
+ * a Notebook or a Directory. LocalFileSystemStorage parses Identifiers as paths pointing to a specific file an
+ * SQLDatabaseStorage for example might parse an Identifier as a primary key with which to identify a row of data from
+ * some table
+ */
+public class Identifier {
 
-    private final Storage root;
+    private final String identifier;
 
-    public CreateDirectoryEndpoint(Storage root) {
-        this.root = root;
+    public Identifier(String identifier) {
+        this.identifier = identifier;
     }
 
-    public Response createResponse(Request request) {
-        try {
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
-            root.createDirectory(destinationIdentifier);
-            ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
-            headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(Json.createObjectBuilder().build()), headers);
-        }
-        catch (FileAlreadyExistsException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
-        }
-        catch (IOException serverErrorException) {
-            return new BasicResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    new ErrorBody(new ErrorEvent(serverErrorException))
-            );
-        }
+    public Path asPath() {
+        return Paths.get(identifier);
+    }
+
+    public String asString() {
+        return identifier;
     }
 
     @Override
@@ -102,12 +79,12 @@ public final class CreateDirectoryEndpoint implements EndPoint {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CreateDirectoryEndpoint that = (CreateDirectoryEndpoint) o;
-        return Objects.equals(root, that.root);
+        Identifier that = (Identifier) o;
+        return Objects.equals(identifier, that.identifier);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(root);
+        return Objects.hash(identifier);
     }
 }

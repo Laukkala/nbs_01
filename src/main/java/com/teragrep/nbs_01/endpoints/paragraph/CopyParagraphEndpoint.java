@@ -51,6 +51,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
@@ -71,7 +72,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
@@ -91,18 +91,16 @@ public final class CopyParagraphEndpoint implements EndPoint {
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             String sourcePathString = body.getString("sourcePath");
             String sourceParagraphId = body.getString("sourceParagraphId");
-            Path sourcePath = root.root().resolve(Paths.get(sourcePathString));
-
-            Path destinationPath = root
-                    .root()
-                    .resolve(request.path())
-                    .subpath(0, root.root().resolve(request.path()).getNameCount() - 2);
+            Identifier sourceIdentifier = new Identifier(sourcePathString);
+            Identifier destinationIdentifier = new Identifier(
+                    request.path().subpath(0, request.path().getNameCount() - 2).toString()
+            );
             String destinationParagraphId = request
                     .path()
                     .subpath(request.path().getNameCount() - 1, request.path().getNameCount())
                     .toString();
 
-            JsonObject json = Json.createReader(new StringReader(root.read(sourcePath))).readObject();
+            JsonObject json = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook source = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
 
@@ -112,7 +110,9 @@ public final class CopyParagraphEndpoint implements EndPoint {
             Paragraph sourceParagraph = source.paragraphs().get(sourceParagraphId);
             Paragraph copyParagraph = sourceParagraph.copy(destinationParagraphId);
 
-            JsonObject destinationJson = Json.createReader(new StringReader(root.read(destinationPath))).readObject();
+            JsonObject destinationJson = Json
+                    .createReader(new StringReader(root.read(destinationIdentifier)))
+                    .readObject();
             JsonNotebook jsonDestinationNotebook = new JsonNotebook(destinationJson);
             Notebook destinationNotebook = new Notebook(
                     jsonDestinationNotebook.title(),
@@ -127,7 +127,7 @@ public final class CopyParagraphEndpoint implements EndPoint {
 
             Notebook editedNotebook = new Notebook(destinationNotebook.name(), destinationParagraphs);
             SerializedNotebook serializedEditedNotebook = new JsonNotebook(editedNotebook.json());
-            root.write(destinationPath, serializedEditedNotebook.serialize());
+            root.write(destinationIdentifier, serializedEditedNotebook.serialize());
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));

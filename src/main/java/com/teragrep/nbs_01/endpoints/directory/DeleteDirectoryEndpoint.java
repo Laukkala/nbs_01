@@ -54,6 +54,7 @@ import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import org.apache.http.Header;
@@ -62,7 +63,6 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -77,8 +77,8 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            Path path = root.root().resolve(request.path());
-            root.deleteDirectory(path);
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            root.deleteDirectory(destinationIdentifier);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             return new BasicResponse(

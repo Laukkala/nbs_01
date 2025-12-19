@@ -51,6 +51,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
@@ -83,14 +84,16 @@ public final class FindParagraphEndPoint implements EndPoint {
         // Find a notebooks from Directory structure based on given ID
         try {
             validateRequest(request);
-            Path requestPath = root.root().resolve(request.path());
-            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 2);
 
-            String paragraphId = requestPath
-                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
+            String paragraphId = request
+                    .path()
+                    .subpath(request.path().getNameCount() - 1, request.path().getNameCount())
                     .toString();
 
-            JsonObject json = Json.createReader(new StringReader(root.read(notebookPath))).readObject();
+            Identifier destinationIdentifier = new Identifier(
+                    request.path().subpath(0, request.path().getNameCount() - 2).toString()
+            );
+            JsonObject json = Json.createReader(new StringReader(root.read(destinationIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
             if (notebook.paragraphs().containsKey(paragraphId)) {

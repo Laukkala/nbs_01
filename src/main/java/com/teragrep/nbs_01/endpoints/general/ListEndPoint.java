@@ -54,12 +54,12 @@ import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,10 +75,10 @@ public final class ListEndPoint implements EndPoint {
     public Response createResponse(Request request) {
         // Find all notebooks from Directory structure
         try {
-            List<Path> currentFiles = root.children(root.root());
+            List<Identifier> currentFiles = root.children(new Identifier(""));
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            for (Path file : currentFiles) {
-                arrayBuilder.add(file.getFileName().toString());
+            for (Identifier file : currentFiles) {
+                arrayBuilder.add(file.asPath().getFileName().toString());
             }
             JsonArray array = arrayBuilder.build();
             return new BasicResponse(HttpStatus.OK_200, new JSONBody(array));

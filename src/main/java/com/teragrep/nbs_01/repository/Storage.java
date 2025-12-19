@@ -51,32 +51,34 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.List;
 
 public interface Storage {
 
-    public abstract Path root();
+    public abstract Identifier root();
 
-    public abstract void move(Path sourcePath, Path destinationPath) throws IOException;
+    public abstract void move(Identifier source, Identifier identifier) throws IOException;
 
-    public abstract void deleteNotebook(Path path) throws NoSuchFileException, MalformedRequestException, IOException;
+    public abstract void deleteNotebook(Identifier identifier)
+            throws NoSuchFileException, MalformedRequestException, IOException;
 
-    public abstract void deleteDirectory(Path path) throws NoSuchFileException, MalformedRequestException, IOException;
+    public abstract void deleteDirectory(Identifier identifier)
+            throws NoSuchFileException, MalformedRequestException, IOException;
 
-    public abstract void copy(Path sourcePath, Path destinationPath)
+    public abstract void copy(Identifier source, Identifier destination)
             throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException;
 
-    public abstract void createDirectory(Path path) throws FileAlreadyExistsException, IOException;
+    public abstract void createDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException;
 
-    public abstract String read(Path path) throws IOException;
+    public abstract String read(Identifier identifier) throws IOException;
 
-    public abstract void write(Path path, String content) throws MalformedRequestException, IOException;
+    public abstract void write(Identifier identifier, String content) throws MalformedRequestException, IOException;
 
-    public abstract List<Path> children(Path path) throws MalformedRequestException, FileNotFoundException, IOException;
-
-    public abstract List<Path> immediateChildren(Path path)
+    public abstract List<Identifier> children(Identifier identifier)
             throws MalformedRequestException, FileNotFoundException, IOException;
 
-    public abstract boolean exists(Path path);
+    public abstract List<Identifier> immediateChildren(Identifier path)
+            throws MalformedRequestException, FileNotFoundException, IOException;
+
+    public abstract boolean exists(Identifier identifierZ);
 }

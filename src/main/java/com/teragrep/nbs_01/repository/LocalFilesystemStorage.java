@@ -73,17 +73,19 @@ public class LocalFilesystemStorage implements Storage {
         this.charset = charset;
     }
 
-    public Path root() {
-        return root;
+    public Identifier root() {
+        return new Identifier(root.toString());
     }
 
     @Override
-    public void move(Path sourcePath, Path destinationPath) throws IOException {
-        Files.move(sourcePath, destinationPath);
+    public void move(Identifier source, Identifier destination) throws IOException {
+        Files.move(root.resolve(source.asPath()), root.resolve(destination.asPath()));
     }
 
     @Override
-    public void deleteDirectory(Path path) throws NoSuchFileException, MalformedRequestException, IOException {
+    public void deleteDirectory(Identifier identifier)
+            throws NoSuchFileException, MalformedRequestException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (!Files.exists(path)) {
             throw new NoSuchFileException("No such file: " + root.relativize(path));
         }
@@ -94,7 +96,9 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void deleteNotebook(Path path) throws NoSuchFileException, MalformedRequestException, IOException {
+    public void deleteNotebook(Identifier identifier)
+            throws NoSuchFileException, MalformedRequestException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (!Files.exists(path)) {
             throw new NoSuchFileException("No such file: " + root.relativize(path));
         }
@@ -110,16 +114,19 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void copy(Path sourcePath, Path destinationPath)
+    public void copy(Identifier source, Identifier destination)
             throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException {
-        if (!children(root).contains(sourcePath)) {
-            throw new FileNotFoundException("No such directory: " + root.relativize(sourcePath) + " !");
+        List<Identifier> children = children(new Identifier(""));
+        if (!children.contains(source)) {
+            throw new FileNotFoundException("No such directory: " + root.relativize(source.asPath()) + " !");
         }
-        Files.walkFileTree(sourcePath, new CopyFileVisitor(sourcePath, destinationPath));
+        Files
+                .walkFileTree(root.resolve(source.asPath()), new CopyFileVisitor(root.resolve(source.asPath()), root.resolve(destination.asPath())));
     }
 
     @Override
-    public void createDirectory(Path path) throws FileAlreadyExistsException, IOException {
+    public void createDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (Files.exists(path)) {
             throw new FileAlreadyExistsException("Path at " + root.relativize(path) + " is already in use!");
         }
@@ -127,7 +134,8 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public String read(Path path) throws FileNotFoundException, IOException {
+    public String read(Identifier identifier) throws FileNotFoundException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (!Files.exists(path) || Files.isDirectory(path)) {
             throw new FileNotFoundException("No such file: " + root.relativize(path));
         }
@@ -135,15 +143,16 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void write(Path path, String content) throws MalformedRequestException, IOException {
+    public void write(Identifier identifier, String content) throws MalformedRequestException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (Files.exists(path) && Files.isDirectory(path)) {
             throw new MalformedRequestException("File at path: " + root.relativize(path) + " is a Directory!");
         }
         Files.write(path, content.getBytes(charset));
     }
 
-    public List<Path> immediateChildren(Path path) throws MalformedRequestException, IOException {
-
+    public List<Identifier> immediateChildren(Identifier identifier) throws MalformedRequestException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (!Files.exists(path)) {
             throw new FileNotFoundException("No such file: " + root.relativize(path));
         }
@@ -151,20 +160,20 @@ public class LocalFilesystemStorage implements Storage {
             throw new MalformedRequestException("File at path " + root.relativize(path) + " is not a directory!");
         }
 
-        ArrayList<Path> files = new ArrayList<>();
+        ArrayList<Identifier> files = new ArrayList<>();
         FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
 
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 if (dir.equals(path)) {
                     return FileVisitResult.CONTINUE;
                 }
-                files.add(dir);
+                files.add(new Identifier(dir.toString()));
                 return FileVisitResult.SKIP_SUBTREE;
             }
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                files.add(file);
+                files.add(new Identifier(file.toString()));
                 return FileVisitResult.CONTINUE;
             }
 
@@ -183,13 +192,14 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public boolean exists(Path path) {
-        return Files.exists(path);
+    public boolean exists(Identifier identifier) {
+        return Files.exists(root.resolve(identifier.asPath()));
     }
 
     @Override
-    public List<Path> children(Path path) throws FileNotFoundException, MalformedRequestException, IOException {
-
+    public List<Identifier> children(Identifier identifier)
+            throws FileNotFoundException, MalformedRequestException, IOException {
+        Path path = root.resolve(identifier.asPath());
         if (!Files.exists(path)) {
             throw new FileNotFoundException("No such file: " + root.relativize(path));
         }
@@ -197,20 +207,20 @@ public class LocalFilesystemStorage implements Storage {
             throw new MalformedRequestException("File at path " + root.relativize(path) + " is not a directory!");
         }
 
-        ArrayList<Path> files = new ArrayList<>();
+        ArrayList<Identifier> files = new ArrayList<>();
         FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
 
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 if (dir.equals(path)) {
                     return FileVisitResult.CONTINUE;
                 }
-                files.add(dir);
+                files.add(new Identifier(root.relativize(dir).toString()));
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                files.add(file);
+                files.add(new Identifier(root.relativize(file).toString()));
                 return FileVisitResult.CONTINUE;
             }
 

@@ -53,6 +53,7 @@ import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -61,7 +62,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -76,8 +76,8 @@ public final class DeleteNotebookEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            Path path = root.root().resolve(request.path());
-            root.deleteNotebook(path);
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            root.deleteNotebook(destinationIdentifier);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));
             return new BasicResponse(HttpStatus.NO_CONTENT_204, headers);

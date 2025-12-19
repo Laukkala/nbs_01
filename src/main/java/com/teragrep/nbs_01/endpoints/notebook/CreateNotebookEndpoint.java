@@ -51,6 +51,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.StringBody;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
@@ -94,11 +95,11 @@ public final class CreateNotebookEndpoint implements EndPoint {
                 title = json.getString("title");
             }
 
-            Path filePath = root.root().resolve(path);
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
             Notebook newFile = new Notebook(title);
             SerializedNotebook serializedNewNotebook = new JsonNotebook(newFile.json());
             String serializedString = serializedNewNotebook.serialize();
-            root.write(filePath, serializedString);
+            root.write(destinationIdentifier, serializedString);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", path.toString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));

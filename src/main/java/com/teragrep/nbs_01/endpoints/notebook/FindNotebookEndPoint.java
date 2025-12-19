@@ -50,6 +50,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.http.requests.Request;
@@ -68,7 +69,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -86,9 +86,9 @@ public final class FindNotebookEndPoint implements EndPoint {
         // Find a Notebook from Storage based on given Path
         try {
             // Parse parameters
-            Path path = root.root().resolve(request.path());
+            Identifier destinationIdentifier = new Identifier(request.path().toString());
             // Deserialize from Storage
-            String jsonString = root.read(path);
+            String jsonString = root.read(destinationIdentifier);
             JsonObject json = parseFileContent(jsonString);
             SerializedNotebook serializedNotebook = new JsonNotebook(json);
             // Create in-memory notebook based on Storage
