@@ -88,14 +88,14 @@ public final class CreateParagraphEndpoint implements EndPoint {
                     .toString();
 
             JsonObject json = Json
-                    .createReader(new StringReader(root.read(new Identifier(notebookPath.toString()))))
+                    .createReader(new StringReader(root.read(new PathIdentifier(notebookPath.toString()))))
                     .readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
             if (!notebook.paragraphs().containsKey(paragraphId)) {
                 Paragraph newParagraph = new Paragraph(paragraphId, "", new Script(""));
                 notebook.paragraphs().put(paragraphId, newParagraph);
-                root.write(new Identifier(notebookPath.toString()), notebook.json().toString());
+                root.write(new PathIdentifier(notebookPath.toString()), notebook.json().toString());
                 ArrayList<Header> headers = new ArrayList<>();
                 headers.add(new BasicHeader("Location", request.path().toString()));
                 headers.add(new BasicHeader("Content-Type", "application/json"));

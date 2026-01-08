@@ -55,6 +55,7 @@ import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
 import com.teragrep.nbs_01.repository.Identifier;
+import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -81,15 +82,15 @@ public final class FindDirectoryEndPoint implements EndPoint {
     public Response createResponse(Request request) {
         // Find a notebooks from Directory structure based on given ID
         try {
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
             List<Identifier> currentFiles = root.immediateChildren(destinationIdentifier);
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (Identifier currentFile : currentFiles) {
-                arrayBuilder.add(currentFile.asPath().getFileName().toString());
+                arrayBuilder.add(currentFile.asShortString());
             }
             JsonObject json = Json
                     .createObjectBuilder()
-                    .add("name", destinationIdentifier.asPath().getFileName().toString())
+                    .add("name", destinationIdentifier.asShortString())
                     .add("children", arrayBuilder.build())
                     .build();
 

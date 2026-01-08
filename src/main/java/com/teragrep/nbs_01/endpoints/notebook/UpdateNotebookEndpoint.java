@@ -84,7 +84,7 @@ public final class UpdateNotebookEndpoint implements EndPoint {
             if (!body.containsKey("title")) {
                 throw new MalformedRequestException("Request does not contain a title!");
             }
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
             String fileContent = root.read(destinationIdentifier);
             JsonObject json = Json.createReader(new StringReader(fileContent)).readObject();
             SerializedNotebook serializedOriginal = new JsonNotebook(json);

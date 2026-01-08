@@ -54,7 +54,7 @@ import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.repository.Identifier;
+import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import org.apache.http.Header;
@@ -77,7 +77,7 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
             root.deleteDirectory(destinationIdentifier);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));

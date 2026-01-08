@@ -85,8 +85,8 @@ public final class CopyNotebookEndpoint implements EndPoint {
             validateRequest(request);
             JsonObject body = parseBody(request);
             String sourcePathString = body.getString("sourcePath");
-            Identifier sourceIdentifier = new Identifier(sourcePathString);
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            PathIdentifier sourceIdentifier = new PathIdentifier(sourcePathString);
+            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
             // Deserialize from Storage
             JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
             SerializedNotebook serializedSource = new JsonNotebook(sourceJson);

@@ -45,24 +45,47 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import java.nio.file.Path;
+import java.util.Objects;
+
 /**
- * Represents some kind of identifier that an implementation of Storage can use to uniquely identify a resource, such as
- * a Notebook or a Directory.
+ * An Identifier that uses a Path to uniquely identify resources
  */
-public interface Identifier {
 
-    /**
-     * Returns the full identifier as a String. eg. full Path of a File.
-     * 
-     * @return
-     */
-    public abstract String asLongString();
+public class PathIdentifier implements Identifier {
 
-    /**
-     * Returns a shortened version of the identifier as a String for use in UI. eg. File name
-     * 
-     * @return
-     */
-    public abstract String asShortString();
+    private final Path identifier;
 
+    public PathIdentifier(String identifier) {
+        this(Path.of(identifier));
+    }
+
+    public PathIdentifier(Path identifier) {
+        this.identifier = identifier;
+    }
+
+    public String asLongString() {
+        return identifier.toString();
+    }
+
+    public String asShortString() {
+        return identifier.getFileName().toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PathIdentifier that = (PathIdentifier) o;
+        return Objects.equals(identifier, that.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier);
+    }
 }

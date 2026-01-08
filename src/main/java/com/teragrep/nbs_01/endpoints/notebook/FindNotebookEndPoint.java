@@ -50,7 +50,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.Identifier;
+import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.http.requests.Request;
@@ -86,7 +86,7 @@ public final class FindNotebookEndPoint implements EndPoint {
         // Find a Notebook from Storage based on given Path
         try {
             // Parse parameters
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
             // Deserialize from Storage
             String jsonString = root.read(destinationIdentifier);
             JsonObject json = parseFileContent(jsonString);

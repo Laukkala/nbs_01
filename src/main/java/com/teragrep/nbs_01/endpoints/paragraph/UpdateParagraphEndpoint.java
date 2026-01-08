@@ -88,7 +88,7 @@ public final class UpdateParagraphEndpoint implements EndPoint {
             Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 1);
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             JsonObject parameters = Json.createObjectBuilder(body).add("paragraphId", paragraphId).build();
-            Identifier destinationIdentifier = new Identifier(notebookPath.toString());
+            PathIdentifier destinationIdentifier = new PathIdentifier(notebookPath.toString());
             JsonObject json = Json.createReader(new StringReader(root.read(destinationIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());

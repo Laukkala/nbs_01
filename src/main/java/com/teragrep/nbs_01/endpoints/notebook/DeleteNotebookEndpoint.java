@@ -53,7 +53,7 @@ import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.requests.Request;
 import com.teragrep.nbs_01.http.responses.BasicResponse;
 import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.repository.Identifier;
+import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -76,7 +76,7 @@ public final class DeleteNotebookEndpoint implements EndPoint {
 
     public Response createResponse(Request request) {
         try {
-            Identifier destinationIdentifier = new Identifier(request.path().toString());
+            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
             root.deleteNotebook(destinationIdentifier);
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", request.path().toString()));

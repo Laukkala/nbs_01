@@ -51,7 +51,7 @@ import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.Identifier;
+import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
@@ -91,8 +91,8 @@ public final class CopyParagraphEndpoint implements EndPoint {
             JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
             String sourcePathString = body.getString("sourcePath");
             String sourceParagraphId = body.getString("sourceParagraphId");
-            Identifier sourceIdentifier = new Identifier(sourcePathString);
-            Identifier destinationIdentifier = new Identifier(
+            PathIdentifier sourceIdentifier = new PathIdentifier(sourcePathString);
+            PathIdentifier destinationIdentifier = new PathIdentifier(
                     request.path().subpath(0, request.path().getNameCount() - 1).toString()
             );
             String destinationParagraphId = request

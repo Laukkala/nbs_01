@@ -107,7 +107,9 @@ class NotebookTest {
                 .assertDoesNotThrow(
                         () -> Json
                                 .createReader(
-                                        new StringReader(root.read(new Identifier(notebookDirectory.relativize(notebook1).toString())))
+                                        new StringReader(
+                                                root.read(new PathIdentifier(notebookDirectory.relativize(notebook1).toString()))
+                                        )
                                 )
                                 .readObject()
                 );
@@ -125,7 +127,9 @@ class NotebookTest {
                 .assertDoesNotThrow(
                         () -> Json
                                 .createReader(
-                                        new StringReader(root.read(new Identifier(notebookDirectory.relativize(notebook3).toString())))
+                                        new StringReader(
+                                                root.read(new PathIdentifier(notebookDirectory.relativize(notebook3).toString()))
+                                        )
                                 )
                                 .readObject()
                 );
@@ -146,7 +150,9 @@ class NotebookTest {
                 .assertDoesNotThrow(
                         () -> Json
                                 .createReader(
-                                        new StringReader(root.read(new Identifier(notebookDirectory.relativize(notebook4).toString())))
+                                        new StringReader(
+                                                root.read(new PathIdentifier(notebookDirectory.relativize(notebook4).toString()))
+                                        )
                                 )
                                 .readObject()
                 );
@@ -156,7 +162,7 @@ class NotebookTest {
         Path destinationPath = Paths.get("newName_copyId");
         Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
         Assertions
-                .assertDoesNotThrow(() -> root.write(new Identifier(destinationPath.toString()), copy.json().toString()));
+                .assertDoesNotThrow(() -> root.write(new PathIdentifier(destinationPath.toString()), copy.json().toString()));
         Assertions.assertTrue(Files.exists(notebook4));
         Assertions.assertTrue(Files.exists(notebookDirectory.resolve(destinationPath)));
     }
