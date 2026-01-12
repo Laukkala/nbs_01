@@ -49,8 +49,8 @@ import com.teragrep.nbs_01.http.body.Body;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.body.StringBody;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
@@ -218,7 +218,7 @@ public class AbstractNotebookServerTest {
         fileToDelete.delete();
     }
 
-    public Response makeHttpPOSTRequest(String urlString, String requestBody) throws IOException {
+    public HTTPResponse makeHttpPOSTRequest(String urlString, String requestBody) throws IOException {
         URL url = new URL(urlString);
         StringBuilder messages = new StringBuilder();
 
@@ -257,10 +257,10 @@ public class AbstractNotebookServerTest {
             responseBody = new StringBody(messages.toString());
         }
         connection.disconnect();
-        return new BasicResponse(status, responseBody);
+        return new BasicHTTPResponse(status, responseBody);
     }
 
-    public Response makeHttpGETRequest(String urlString) throws IOException {
+    public HTTPResponse makeHttpGETRequest(String urlString) throws IOException {
         URL url = new URL(urlString);
         StringBuilder messages = new StringBuilder();
 
@@ -293,10 +293,10 @@ public class AbstractNotebookServerTest {
             responseBody = new StringBody(messages.toString());
         }
         connection.disconnect();
-        return new BasicResponse(status, responseBody);
+        return new BasicHTTPResponse(status, responseBody);
     }
 
-    public Response makeHttpPUTRequest(String urlString, String requestBody) throws IOException {
+    public HTTPResponse makeHttpPUTRequest(String urlString, String requestBody) throws IOException {
         URL url = new URL(urlString);
         StringBuilder messages = new StringBuilder();
 
@@ -339,10 +339,10 @@ public class AbstractNotebookServerTest {
             responseBody = new StringBody(messages.toString());
         }
         connection.disconnect();
-        return new BasicResponse(status, responseBody);
+        return new BasicHTTPResponse(status, responseBody);
     }
 
-    public Response makeHttpDELETERequest(String urlString, String requestBody) throws IOException {
+    public HTTPResponse makeHttpDELETERequest(String urlString, String requestBody) throws IOException {
         URL url = new URL(urlString);
         StringBuilder messages = new StringBuilder();
 
@@ -362,7 +362,7 @@ public class AbstractNotebookServerTest {
                 // Successful responses to DELETE requests should have no content.
                 JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
                 connection.disconnect();
-                return new BasicResponse(status, new JSONBody(message));
+                return new BasicHTTPResponse(status, new JSONBody(message));
             }
             else {
                 InputStream connectionInputStream;
@@ -394,12 +394,15 @@ public class AbstractNotebookServerTest {
                     // Response is not in JSON format. In that case, return a String response.
                     responseBody = new StringBody(messages.toString());
                 }
-                return new BasicResponse(status, responseBody);
+                return new BasicHTTPResponse(status, responseBody);
             }
 
         }
         catch (IOException ioException) {
-            return new BasicResponse(HttpStatus.INTERNAL_SERVER_ERROR_500, new ErrorBody(new ErrorEvent(ioException)));
+            return new BasicHTTPResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    new ErrorBody(new ErrorEvent(ioException))
+            );
         }
     }
 }

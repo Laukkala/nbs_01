@@ -46,13 +46,13 @@
 package com.teragrep.nbs_01.servlets;
 
 import com.teragrep.nbs_01.StubPath;
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.http.body.Body;
 import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.http.body.StubBody;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -68,14 +68,14 @@ import java.util.stream.Collectors;
 // Generic HTTPServlet that delegates received HTTP requests to a single Endpoint, and generates an HTTP response based on output from the Endpoint.
 public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
 
-    private final EndPoint endPoint;
+    private final HTTPEndPoint endPoint;
     private final Charset charset;
 
-    public HttpServlet(EndPoint endPoint) {
+    public HttpServlet(HTTPEndPoint endPoint) {
         this(endPoint, Charset.defaultCharset());
     }
 
-    public HttpServlet(EndPoint endPoint, Charset charset) {
+    public HttpServlet(HTTPEndPoint endPoint, Charset charset) {
         super();
         this.endPoint = endPoint;
         this.charset = charset;
@@ -97,7 +97,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    private void handleHttpRequest(HttpServletRequest req, HttpServletResponse resp, EndPoint requestEndPoint)
+    private void handleHttpRequest(HttpServletRequest req, HttpServletResponse resp, HTTPEndPoint requestEndPoint)
             throws IOException {
         // Read body of request
         BufferedReader reader = req.getReader();
@@ -110,10 +110,10 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         else {
             body = new StubBody();
         }
-        Request endPointRequest = new BasicRequest(new StubPath(), body);
+        HTTPRequest endPointRequest = new BasicHTTPRequest(new StubPath(), body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        Response endPointResponse = requestEndPoint.createResponse(endPointRequest);
+        HTTPResponse endPointResponse = requestEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setCharacterEncoding(charset.name());
         for (Header header : endPointResponse.headers()) {
@@ -122,7 +122,12 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
         if (!endPointResponse.body().isStub()) {
             PrintWriter writer = resp.getWriter();
-            writer.write(endPointResponse.body().asString());
+            try {
+                writer.write(endPointResponse.body().asString());
+            }
+            catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+                throw new RuntimeException(e);
+            }
             writer.flush();
             writer.close();
         }

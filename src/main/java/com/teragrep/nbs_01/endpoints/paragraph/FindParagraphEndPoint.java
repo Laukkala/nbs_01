@@ -45,18 +45,18 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.PathIdentifier;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -67,12 +67,11 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
-// Searches for a paragraph from a given Notebook based on a given ParagraphId, and returns its contents in JSON format.
-public final class FindParagraphEndPoint implements EndPoint {
+// Endpoint that searches for a paragraph with a given ID from a Notebook based on an Identifier, and returns its contents in JSON format.
+public final class FindParagraphEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -80,56 +79,41 @@ public final class FindParagraphEndPoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given ID
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            validateRequest(request);
+            Identifier targetIdentifier = request.targetIdentifier();
+            String paragraphId = request.targetParagraphId();
 
-            String paragraphId = request
-                    .path()
-                    .subpath(request.path().getNameCount() - 1, request.path().getNameCount())
-                    .toString();
-
-            PathIdentifier destinationIdentifier = new PathIdentifier(
-                    request.path().subpath(0, request.path().getNameCount() - 1).toString()
-            );
-            JsonObject json = Json.createReader(new StringReader(root.read(destinationIdentifier))).readObject();
+            // Deserialize from Storage
+            JsonObject json = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
             Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
-            if (notebook.paragraphs().containsKey(paragraphId)) {
-                ArrayList<Header> headers = new ArrayList<>();
-                headers.add(new BasicHeader("Location", request.path().toString()));
-                headers.add(new BasicHeader("Content-Type", "application/json"));
-                return new BasicResponse(
-                        HttpStatus.OK_200,
-                        new JSONBody(notebook.paragraphs().get(paragraphId).json()),
-                        headers
-                );
+
+            if (!notebook.paragraphs().containsKey(paragraphId)) {
+                throw new MalformedRequestException("Paragraph with id " + paragraphId + " not found!");
             }
-            else {
-                throw new MalformedRequestException("Paragraph not found!");
-            }
+
+            // Create response
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
+            return new BasicHTTPResponse(
+                    HttpStatus.OK_200,
+                    new JSONBody(notebook.paragraphs().get(paragraphId).json()),
+                    headers
+            );
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
         catch (MalformedRequestException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
-        }
-    }
-
-    private void validateRequest(Request request) throws MalformedRequestException {
-        Path requestPath = request.path();
-        if (requestPath.getNameCount() < 2) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
     }
 

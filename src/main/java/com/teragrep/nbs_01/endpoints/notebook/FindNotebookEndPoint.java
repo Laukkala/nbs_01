@@ -45,23 +45,22 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.PathIdentifier;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
-import jakarta.json.stream.JsonParsingException;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -72,8 +71,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
-// Finds a given Notebook and returns its contents in JSON format.
-public final class FindNotebookEndPoint implements EndPoint {
+// Endpoint that finds a Notebook with a given Identifier and returns its contents in JSON format.
+public final class FindNotebookEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -82,44 +81,38 @@ public final class FindNotebookEndPoint implements EndPoint {
     }
 
     @Override
-    public Response createResponse(Request request) {
-        // Find a Notebook from Storage based on given Path
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            // Parse parameters
-            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
+            Identifier targetIdentifier = request.targetIdentifier();
+
             // Deserialize from Storage
-            String jsonString = root.read(destinationIdentifier);
-            JsonObject json = parseFileContent(jsonString);
-            SerializedNotebook serializedNotebook = new JsonNotebook(json);
-            // Create in-memory notebook based on Storage
-            Notebook notebook = new Notebook(serializedNotebook.title(), serializedNotebook.paragraphs());
-            // Generate response
-            ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
-            headers.add(new BasicHeader("Content-Type", "application/json"));
+            String jsonString = root.read(targetIdentifier);
+            JsonObject json = Json.createReader(new StringReader(jsonString)).readObject();
             // We cannot simply return the file contents as is back to the UI, since it's possible that there are legacy Zeppelin files, which have a different structure.
-            // Calling notebook.json() will format the notebook properly whether it was sourced from a legacy file or not.
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
+            // Therefore, we must first create an in-memory Notebook object first, and call its .json() method, which will format the notebook properly whether it was sourced from a legacy file or not.
+
+            SerializedNotebook serializedNotebook = new JsonNotebook(json);
+            Notebook notebook = new Notebook(serializedNotebook.title(), serializedNotebook.paragraphs());
+
+            // Create response
+            ArrayList<Header> headers = new ArrayList<>();
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
+            headers.add(new BasicHeader("Content-Type", "application/json"));
+            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
         }
         // If the file cannot be found from Storage, respond with a 404 not found.
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         // If Storage throws an IOException while accessing file contents, or the file contents retrieved from storage are not valid JSON, respond with a 500 internal server error.
         catch (IOException | JsonException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
-    }
-
-    private JsonObject parseFileContent(String fileContent) throws JsonException {
-        try {
-            return Json.createReader(new StringReader(fileContent)).readObject();
-        }
-        catch (JsonParsingException jsonParsingException) {
-            throw new JsonException("File content is not valid JSON!", jsonParsingException);
+        catch (com.teragrep.nbs_01.exceptions.MalformedRequestException malformedRequestException) {
+            throw new RuntimeException(malformedRequestException);
         }
     }
 

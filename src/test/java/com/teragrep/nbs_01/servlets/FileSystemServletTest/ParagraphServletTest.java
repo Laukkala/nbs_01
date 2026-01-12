@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -90,7 +90,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedparagraphContent = "{\"id\":\"" + firstParagraphId + "\",\"title\":\"" + firstParagraphTitle
                 + "\",\"script\":{\"text\":\"" + firstParagraphText + "\"}}";
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + firstParagraphId
@@ -107,7 +107,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpFindNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebookPath + "/"
@@ -117,7 +117,10 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that a faulty GET request is responded to with the response code 404 NOT FOUND
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         // Assert that the body of the response contains a message mentioning that the paragraph was not found
-        JsonObject expectedJson = Json.createObjectBuilder().add("message", "Paragraph not found!").build();
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Paragraph with id " + nonexistentParagraphId + " not found!")
+                .build();
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
     }
@@ -126,7 +129,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpFindParagraphFromNonexistentNotebookTest() {
         String nonexistentNotebookName = "I_DONT_EXIST";
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookName + "/"
@@ -153,7 +156,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedparagraphContent = "{\"id\":\"" + newParagraphId
                 + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + newParagraphId,
@@ -190,7 +193,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
                 + nonexistentNotebookPath + " not found!";
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/"
@@ -220,7 +223,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     @Test
     public void httpDeleteParagraphTest() {
         String requestBody = "";
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + firstParagraphId,
@@ -243,7 +246,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpDeleteNonexistentParagraphTest() {
         String nonexistentParagraphId = "I_DONT_EXIST";
         String requestBody = Json.createObjectBuilder().build().toString();
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebookPath + "/"
@@ -275,7 +278,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         Path nonexistentNotebookPath = Paths.get(notebookDirectory().toString(), nonexistentNotebookId);
         Assertions.assertFalse(Files.exists(nonexistentNotebookPath));
         String requestBody = Json.createObjectBuilder().build().toString();
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/paragraph/" + nonexistentNotebookId + "/"
@@ -319,7 +322,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("script", Json.createObjectBuilder().add("text", newParagraphText))
                 .build()
                 .toString();
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebookPath + "/" + firstParagraphId,
@@ -365,7 +368,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("sourceParagraphId", firstParagraphId)
                 .build()
                 .toString();
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + notebook2() + "/" + newParagraphId,
@@ -393,7 +396,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("..", "secretFile.txt");
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpGETRequest(
                                 "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId
@@ -421,7 +424,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("text", newParagraphText)
                 .build()
                 .toString();
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId,
@@ -448,7 +451,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("..", "secretFile.txt");
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId, ""
@@ -471,7 +474,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("..", "secretFile.txt");
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId, ""
@@ -501,7 +504,7 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .build()
                 .toString();
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/paragraph/" + relativePath + "/" + firstParagraphId,

@@ -159,7 +159,7 @@ class LocalFilesystemStorageTest {
         Assertions.assertTrue(Files.exists(notebook1));
         Assertions.assertTrue(Files.exists(notebook2));
         Assertions
-                .assertDoesNotThrow(() -> root.copy(new PathIdentifier(notebookDirectory.relativize(directory1).toString()), new PathIdentifier(notebookDirectory.relativize(destinationPath).toString())));
+                .assertDoesNotThrow(() -> root.copyDirectory(new PathIdentifier(notebookDirectory.relativize(directory1).toString()), new PathIdentifier(notebookDirectory.relativize(destinationPath).toString())));
         Assertions.assertTrue(Files.exists(destinationPath));
         Assertions.assertTrue(Files.exists(destinationPath.resolve("my_second_folder_2A94M5J2D")));
         Assertions

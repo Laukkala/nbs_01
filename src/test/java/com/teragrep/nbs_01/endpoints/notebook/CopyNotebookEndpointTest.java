@@ -49,8 +49,8 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -81,7 +81,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new JSONBody(body)));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationFile, new JSONBody(body)));
 
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
@@ -142,10 +142,13 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         // Send a request with no Body
-        Response response = endPoint.createResponse(new BasicRequest(destinationFile));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationFile));
 
         // Assert that we receive the proper response
-        JsonObject expectedJson = Json.createObjectBuilder().add("message", "Request must contain a Body!").build();
+        JsonObject expectedJson = Json
+                .createObjectBuilder()
+                .add("message", "Request has a malformed source identifier!")
+                .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
@@ -175,12 +178,13 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         // Send a request with malformed Body
         String bodyString = "{\"whoops i forgot to format the JSON\"\"true\"}";
-        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new StringBody(bodyString)));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(destinationFile, new StringBody(bodyString)));
 
         // Assert that we receive the proper response
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Request body contains invalid JSON!")
+                .add("message", "Request has a malformed source identifier!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
@@ -212,7 +216,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new JSONBody(body)));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationFile, new JSONBody(body)));
 
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
@@ -277,7 +281,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(destinationFile, new JSONBody(body)));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationFile, new JSONBody(body)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
@@ -301,7 +305,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(destinationDirectory, new JSONBody(body)));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationDirectory, new JSONBody(body)));
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
@@ -310,7 +314,12 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions.assertEquals(expectedJson.toString(), response.body().asString());
+        try {
+            Assertions.assertEquals(expectedJson.toString(), response.body().asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
 
         // Source file must not have changed
         Assertions

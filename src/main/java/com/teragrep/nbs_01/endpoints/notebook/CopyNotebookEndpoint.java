@@ -45,22 +45,21 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.StringBody;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
-import jakarta.json.stream.JsonParsingException;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -71,8 +70,8 @@ import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
-// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public final class CopyNotebookEndpoint implements EndPoint {
+// Endpoint that copies a Notebook based on a given Identifier, and creates a new Notebook with the same content to a location based on another Identifier.
+public final class CopyNotebookEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -80,58 +79,40 @@ public final class CopyNotebookEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            validateRequest(request);
-            JsonObject body = parseBody(request);
-            String sourcePathString = body.getString("sourcePath");
-            PathIdentifier sourceIdentifier = new PathIdentifier(sourcePathString);
-            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
-            // Deserialize from Storage
+            Identifier sourceIdentifier = request.sourceIdentifier();
+            Identifier targetIdentifier = request.targetIdentifier();
+
+            // Deserialize source from Storage
             JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
             SerializedNotebook serializedSource = new JsonNotebook(sourceJson);
             Notebook source = new Notebook(serializedSource.title(), serializedSource.paragraphs());
-            // Create a copy with newly generated IDs
+
+            // Create a copy, which also generates unique IDs for copied paragraphs.
             Notebook copy = source.copy();
-            // Serialize to storage
+            // Serialize copy to storage
             SerializedNotebook serializedCopy = new JsonNotebook(copy.json());
             String serializedString = serializedCopy.serialize();
-            root.write(destinationIdentifier, serializedString);
-            // Generate response
+            root.write(targetIdentifier, serializedString);
+
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
+            return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (MalformedRequestException | JsonException | FileAlreadyExistsException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
-        }
-    }
-
-    private void validateRequest(Request request) throws MalformedRequestException {
-        // Parse Request parameters
-        if (request.body().isStub()) {
-            throw new MalformedRequestException("Request must contain a Body!");
-        }
-    }
-
-    private JsonObject parseBody(Request request) throws JsonException {
-        String jsonString = request.body().asString();
-        try {
-            JsonObject json = Json.createReader(new StringReader(jsonString)).readObject();
-            return json;
-        }
-        catch (JsonParsingException jsonParsingException) {
-            throw new JsonException("Request body contains invalid JSON!", jsonParsingException);
         }
     }
 

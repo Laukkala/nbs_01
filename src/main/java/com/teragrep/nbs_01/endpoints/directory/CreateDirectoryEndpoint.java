@@ -45,15 +45,16 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.repository.PathIdentifier;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import org.apache.http.Header;
@@ -65,8 +66,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-// Creates a new Notebook. Should be provided with a path of the File
-public final class CreateDirectoryEndpoint implements EndPoint {
+// Endpoint that creates a new Directory to a location based on an Identifier.
+public final class CreateDirectoryEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -74,20 +75,26 @@ public final class CreateDirectoryEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
-            root.createDirectory(destinationIdentifier);
+            Identifier targetIdentifier = request.targetIdentifier();
+            root.createDirectory(targetIdentifier);
+
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(Json.createObjectBuilder().build()), headers);
+            return new BasicHTTPResponse(
+                    HttpStatus.CREATED_201,
+                    new JSONBody(Json.createObjectBuilder().build()),
+                    headers
+            );
         }
-        catch (FileAlreadyExistsException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+        catch (MalformedRequestException | FileAlreadyExistsException badRequestException) {
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );

@@ -59,18 +59,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicResponseTest {
+public class BasicHTTPResponseTest {
 
     @Test
     void statusTest() {
-        BasicResponse testResponse = new BasicResponse(HttpStatus.OK_200);
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200);
         Assertions.assertEquals(200, testResponse.status());
     }
 
     @Test
     void bodyTest() {
         Body body = new StringBody("testPayload");
-        BasicResponse testResponse = new BasicResponse(HttpStatus.OK_200, body);
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, body);
 
         Assertions.assertEquals(body, testResponse.body());
     }
@@ -83,7 +83,7 @@ public class BasicResponseTest {
         List<Header> headers = new ArrayList<>();
         headers.add(locationHeader);
         headers.add(contentTypeHeader);
-        BasicResponse testResponse = new BasicResponse(HttpStatus.OK_200, headers);
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, headers);
 
         Assertions.assertEquals(2, testResponse.headers().size());
         Assertions.assertTrue(testResponse.headers().contains(locationHeader));
@@ -93,7 +93,7 @@ public class BasicResponseTest {
 
     @Test
     void stubTest() {
-        BasicResponse testResponse = new BasicResponse(HttpStatus.NOT_FOUND_404);
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404);
         Assertions.assertEquals(StubBody.class, testResponse.body().getClass());
         Assertions.assertEquals(0, testResponse.headers().size());
     }

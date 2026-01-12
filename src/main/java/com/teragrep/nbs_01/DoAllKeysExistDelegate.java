@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.requests.Request;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
@@ -67,11 +67,17 @@ public final class DoAllKeysExistDelegate implements Delegate {
         this.keys = keys;
     }
 
-    public boolean resolve(Request request) {
+    public boolean resolve(HTTPRequest request) {
         if (request.body().isStub()) {
             return false;
         }
-        JsonObject parameters = Json.createReader(new StringReader(request.body().asString())).readObject();
+        JsonObject parameters = null;
+        try {
+            parameters = Json.createReader(new StringReader(request.body().asString())).readObject();
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
         for (String key : keys) {
             if (!parameters.containsKey(key)) {
                 return false;

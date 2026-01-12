@@ -43,25 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.requests;
+package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.body.Body;
-import org.apache.http.Header;
-
-import java.nio.file.Path;
-import java.util.List;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.repository.Identifier;
 
 /**
- * Representation of an HTTP request. Composed of a collection of Headers, a Body, and a Path Provides access to its
- * components.
+ * Request contains all the information any Endpoint might need.
  */
-// Request object contains parameters that the user wants to send to NBS_01.
-// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
 public interface Request {
 
-    public abstract Body body();
+    public abstract RequestType type();
 
-    public abstract Path path();
+    public abstract String title() throws MalformedRequestException;
 
-    public abstract List<Header> headers();
+    public abstract String targetParagraphId() throws MalformedRequestException;
+
+    public abstract String sourceParagraphId() throws MalformedRequestException;
+
+    public abstract String text() throws MalformedRequestException;
+
+    public abstract Identifier targetIdentifier() throws MalformedRequestException;
+
+    public abstract Identifier sourceIdentifier() throws MalformedRequestException;
+
+    public static enum RequestType {
+        GENERIC, NOTEBOOK, DIRECTORY, PARAGRAPH,
+    }
+
+    public static enum StringParameter {
+        TITLE, TEXT, SOURCEPARAGRAPHID, TARGETPARAGRAPHID
+    }
+
+    public static enum IdentifierParameter {
+        SOURCEIDENTIFIER, TARGETIDENTIFIER
+    }
 }

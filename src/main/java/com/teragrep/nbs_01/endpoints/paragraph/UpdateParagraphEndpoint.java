@@ -45,16 +45,16 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
@@ -66,11 +66,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Path;
 import java.util.*;
 
-// Updates the text and optionally the title of a given paragraph within a Notebook. Should be provided with the path to the Notebook, the ID of the  Paragraph as well as the updated content of the Paragraph.
-public final class UpdateParagraphEndpoint implements EndPoint {
+// Endpoint that updates the text and/or title of a paragraph with a given ID within a Notebook based on an Identifier.
+public final class UpdateParagraphEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -78,68 +77,62 @@ public final class UpdateParagraphEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            validateRequest(request);
-            Path requestPath = request.path();
-            String paragraphId = requestPath
-                    .subpath(requestPath.getNameCount() - 1, requestPath.getNameCount())
-                    .toString();
-            Path notebookPath = requestPath.subpath(0, requestPath.getNameCount() - 1);
-            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
-            JsonObject parameters = Json.createObjectBuilder(body).add("paragraphId", paragraphId).build();
-            PathIdentifier destinationIdentifier = new PathIdentifier(notebookPath.toString());
-            JsonObject json = Json.createReader(new StringReader(root.read(destinationIdentifier))).readObject();
+            Identifier targetIdentifier = request.targetIdentifier();
+            String paragraphId = request.targetParagraphId();
+
+            // Deserialize notebook from Storage
+            JsonObject json = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
             JsonNotebook jsonNotebook = new JsonNotebook(json);
-            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+            Map<String, Paragraph> paragraphs = jsonNotebook.paragraphs();
 
-            // Copy the paragraphs from the notebook into a new map
-            Map<String, Paragraph> paragraphs = new HashMap<>(notebook.paragraphs());
-
-            // Find the paragraph to be edited
+            // Throw an error if the paragraph doesn't exist
             if (!paragraphs.containsKey(paragraphId)) {
                 throw new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!");
             }
             Paragraph originalParagraph = paragraphs.get(paragraphId);
-            String scriptText = parameters.containsKey("text") ? parameters
-                    .getString("text") : originalParagraph.script().text();
-            String title = parameters.containsKey("title") ? parameters.getString("title") : originalParagraph.title();
+
+            // Get modified script text and / or title from request.
+            String scriptText;
+            try {
+                scriptText = request.text();
+            }
+            catch (MalformedRequestException exception) {
+                scriptText = originalParagraph.script().text();
+            }
+            String title;
+            try {
+                title = request.title();
+            }
+            catch (MalformedRequestException exception) {
+                title = originalParagraph.title();
+            }
             Script newScript = new Script(scriptText);
 
+            // Overwrite the old paragraph with the edited paragraph, and serialize the notebook to Storage
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
-            Notebook newNotebook = new Notebook(notebook.name(), paragraphs);
-            root.write(destinationIdentifier, newNotebook.json().toString());
+            Notebook newNotebook = new Notebook(jsonNotebook.title(), paragraphs);
+            root.write(targetIdentifier, newNotebook.json().toString());
+
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(newParagraph.json()), headers);
+            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(newParagraph.json()), headers);
         }
         catch (MalformedRequestException | JsonException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
-        }
-
-    }
-
-    private void validateRequest(Request request) throws MalformedRequestException, JsonException {
-        Path requestPath = request.path();
-        JsonObject json = Json.createReader(new StringReader(request.body().asString())).readObject();
-        if (requestPath.getNameCount() < 2) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
-        }
-        if (!json.containsKey("text") && !json.containsKey("title")) {
-            throw new MalformedRequestException("Request does not contain either a text or a title field!");
         }
     }
 

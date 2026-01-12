@@ -43,55 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.requests;
+package com.teragrep.nbs_01.exceptions;
 
-import com.teragrep.nbs_01.StubPath;
-import com.teragrep.nbs_01.http.body.Body;
-import com.teragrep.nbs_01.http.body.StringBody;
-import com.teragrep.nbs_01.http.body.StubBody;
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+// Exception to be thrown when a Stubable object is accessed.
+public final class StubObjectException extends Exception {
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-public class BasicRequestTest {
-
-    @Test
-    public void headersTest() {
-        Path requestPath = Paths.get("target", "testLocation");
-        Header locationHeader = new BasicHeader("Location", requestPath.toString());
-        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
-        List<Header> headers = new ArrayList<>();
-        headers.add(locationHeader);
-        headers.add(contentTypeHeader);
-        BasicRequest testRequest = new BasicRequest(requestPath, headers);
-
-        Assertions.assertEquals(2, testRequest.headers().size());
-        Assertions.assertTrue(testRequest.headers().contains(locationHeader));
-        Assertions.assertTrue(testRequest.headers().contains(contentTypeHeader));
-        Assertions.assertEquals(headers, testRequest.headers());
+    public StubObjectException(String errorMessage) {
+        super(errorMessage);
     }
 
-    @Test
-    public void bodyTest() {
-        Path requestPath = Paths.get("target", "testLocation");
-        Body body = new StringBody("testPayload");
-        BasicRequest testRequest = new BasicRequest(requestPath, body);
-
-        Assertions.assertEquals(body, testRequest.body());
+    public StubObjectException(Throwable cause) {
+        super(cause);
     }
 
-    @Test
-    public void stubTest() {
-        BasicRequest stubRequest = new BasicRequest();
-        Assertions.assertEquals(0, stubRequest.headers().size());
-        Assertions.assertEquals(StubBody.class, stubRequest.body().getClass());
-        Assertions.assertEquals(StubPath.class, stubRequest.path().getClass());
+    public StubObjectException(String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
     }
-
 }

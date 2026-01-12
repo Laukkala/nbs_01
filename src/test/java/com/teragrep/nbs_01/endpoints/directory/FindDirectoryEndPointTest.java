@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -73,7 +73,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
                 + notebook1().getFileName() + "\"]}";
 
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(directory2()));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(directory2()));
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", directory2().toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
@@ -90,7 +90,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonExistentPath)));
 
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(nonExistentPath));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(nonExistentPath));
 
         // The endpoint should return a response with the correct status and message
 

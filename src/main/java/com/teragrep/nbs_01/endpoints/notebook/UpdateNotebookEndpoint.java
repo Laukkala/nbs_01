@@ -45,16 +45,16 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.StringBody;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
@@ -69,8 +69,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
-// Updates the title of a Notebook.
-public final class UpdateNotebookEndpoint implements EndPoint {
+// Endpoint that updates the title of a Notebook based on a given Identifier
+public final class UpdateNotebookEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -78,41 +78,36 @@ public final class UpdateNotebookEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
-            if (!body.containsKey("title")) {
-                throw new MalformedRequestException("Request does not contain a title!");
-            }
-            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
-            String fileContent = root.read(destinationIdentifier);
+            Identifier targetIdentifier = request.targetIdentifier();
+            String title = request.title();
+
+            // Deserialize current notebook from Storage
+            String fileContent = root.read(targetIdentifier);
             JsonObject json = Json.createReader(new StringReader(fileContent)).readObject();
             SerializedNotebook serializedOriginal = new JsonNotebook(json);
-            Notebook originalNotebook = new Notebook(serializedOriginal.title(), serializedOriginal.paragraphs());
 
-            // Create a copy of the current paragraphs
-            Map<String, Paragraph> paragraphs = new LinkedHashMap<>(originalNotebook.paragraphs());
-
-            // Add a modified title
-            String title = body.getString("title");
-            Notebook modifiedNotebook = new Notebook(title, paragraphs);
+            // Create a new Notebook with the modified title and serialize it to Storage.
+            Notebook modifiedNotebook = new Notebook(title, serializedOriginal.paragraphs());
             SerializedNotebook serializedModifiedNotebook = new JsonNotebook(modifiedNotebook.json());
             String serializedString = serializedModifiedNotebook.serialize();
-            root.write(destinationIdentifier, serializedString);
+            root.write(targetIdentifier, serializedString);
 
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.OK_200, new StringBody(serializedString), headers);
+            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(serializedString), headers);
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (MalformedRequestException | JsonException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );

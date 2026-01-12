@@ -46,11 +46,12 @@
 package com.teragrep.nbs_01.http.body;
 
 import com.teragrep.nbs_01.Stubable;
+import com.teragrep.nbs_01.exceptions.StubObjectException;
 
 /**
  * Represents the body of a HTML request or a response. Can represent itself as a String.
  */
 public interface Body extends Stubable {
 
-    public abstract String asString();
+    public abstract String asString() throws StubObjectException;
 }

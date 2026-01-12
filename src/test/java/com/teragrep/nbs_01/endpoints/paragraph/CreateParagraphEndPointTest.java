@@ -46,10 +46,11 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.Request;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -73,8 +74,8 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         String paragraphId = "testParagraphId";
 
         Path requestPath = Paths.get(notebook3().toString(), paragraphId);
-        BasicRequest request = new BasicRequest(requestPath);
-        Response response = endPoint.createResponse(request);
+        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        HTTPResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
 
         JsonObject expectedJson = Json
@@ -85,7 +86,10 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Header expectedLocationHeader = new BasicHeader(
+                "Location",
+                requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
+        );
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
@@ -111,8 +115,8 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(nonexistentFileName, paragraphId);
         JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
-        BasicRequest request = new BasicRequest(requestPath, new JSONBody(body));
-        Response response = endPoint.createResponse(request);
+        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 

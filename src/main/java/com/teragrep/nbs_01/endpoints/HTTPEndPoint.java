@@ -43,52 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.body;
+package com.teragrep.nbs_01.endpoints;
 
-import com.teragrep.nbs_01.ErrorEvent;
-import com.teragrep.nbs_01.exceptions.StubObjectException;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 
-/**
- * A Body that takes an ErrorEvent. Provides access to the ErrorEvent and Generates a preset message body that does not
- * expose the inner workings of the program to the end user.
- */
-public class ErrorBody implements Body {
+// EndPoints are objects that can be assigned to Jetty Handler objects, which define what procedures are executed when that endpoint is called by a client.
+public interface HTTPEndPoint {
 
-    private final JsonObject message;
-    private final ErrorEvent event;
-
-    public ErrorBody(ErrorEvent event) {
-        this(
-                event,
-                Json
-                        .createObjectBuilder()
-                        .add(
-                                "message",
-                                "An error occurred while processing your Request. See event id " + event.id()
-                                        + " in the technical log for details."
-                        )
-                        .build()
-        );
-    }
-
-    public ErrorBody(ErrorEvent event, JsonObject message) {
-        this.event = event;
-        this.message = message;
-    }
-
-    public ErrorEvent event() {
-        return event;
-    }
-
-    @Override
-    public String asString() throws StubObjectException {
-        return message.toString();
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
-    }
+    // createResponse is where the functionality of the endpoint should be defined. The response should be created and returned.
+    public abstract HTTPResponse createResponse(HTTPRequest request);
 }

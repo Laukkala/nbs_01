@@ -45,15 +45,15 @@
  */
 package com.teragrep.nbs_01.endpoints.general;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Storage;
@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.Objects;
 
 // Endpoint that lists all the paths of saved notebooks in a given Directory.
-public final class ListEndPoint implements EndPoint {
+public final class ListEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -73,7 +73,7 @@ public final class ListEndPoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         // Find all notebooks from Directory structure
         try {
             List<Identifier> currentFiles = root.children(new PathIdentifier(""));
@@ -82,13 +82,13 @@ public final class ListEndPoint implements EndPoint {
                 arrayBuilder.add(file.asShortString());
             }
             JsonArray array = arrayBuilder.build();
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(array));
+            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(array));
         }
         catch (MalformedRequestException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );

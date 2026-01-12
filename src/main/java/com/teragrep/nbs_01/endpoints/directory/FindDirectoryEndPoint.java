@@ -45,17 +45,16 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -70,8 +69,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// Finds a given Directory and returns the names of its children in JSON format.
-public final class FindDirectoryEndPoint implements EndPoint {
+// Finds a given Directory and returns its own name and the names of its children in JSON format based on a given Identifier.
+public final class FindDirectoryEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -79,34 +78,37 @@ public final class FindDirectoryEndPoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
-        // Find a notebooks from Directory structure based on given ID
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
-            List<Identifier> currentFiles = root.immediateChildren(destinationIdentifier);
+            // Find a directory and get a list of its children
+            Identifier targetIdentifier = request.targetIdentifier();
+            List<Identifier> currentFiles = root.immediateChildren(targetIdentifier);
+
+            // Create response
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (Identifier currentFile : currentFiles) {
                 arrayBuilder.add(currentFile.asShortString());
             }
+
             JsonObject json = Json
                     .createObjectBuilder()
-                    .add("name", destinationIdentifier.asShortString())
+                    .add("name", targetIdentifier.asShortString())
                     .add("children", arrayBuilder.build())
                     .build();
 
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.OK_200, new JSONBody(json), headers);
+            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(json), headers);
         }
         catch (MalformedRequestException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );

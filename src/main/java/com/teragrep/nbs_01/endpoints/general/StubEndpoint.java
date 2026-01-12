@@ -45,23 +45,26 @@
  */
 package com.teragrep.nbs_01.endpoints.general;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 
 // Stub object for Endpoints.
-public final class StubEndpoint implements EndPoint {
+public final class StubEndpoint implements HTTPEndPoint {
 
     // On receiving a request, returns a 405 METHOD NOT ALLOWED
     public StubEndpoint() {
 
     }
 
-    public Response createResponse(Request request) {
-        return new BasicResponse(HttpStatus.METHOD_NOT_ALLOWED_405, new JSONBody(Json.createObjectBuilder().build()));
+    public HTTPResponse createResponse(HTTPRequest request) {
+        return new BasicHTTPResponse(
+                HttpStatus.METHOD_NOT_ALLOWED_405,
+                new JSONBody(Json.createObjectBuilder().build())
+        );
     }
 }

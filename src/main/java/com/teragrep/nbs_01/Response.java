@@ -43,54 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.responses;
+package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.body.Body;
-import com.teragrep.nbs_01.http.body.StubBody;
-import org.apache.http.Header;
+public interface Response {
 
-import java.util.ArrayList;
-import java.util.List;
+    public abstract String message();
 
-/**
- * Basic Response implementation
- */
-public final class BasicResponse implements Response {
-
-    private final int status;
-    private final Body body;
-    private final List<Header> headers;
-
-    public BasicResponse(int status) {
-        this(status, new StubBody(), new ArrayList<>());
-    }
-
-    public BasicResponse(int status, List<Header> headers) {
-        this(status, new StubBody(), headers);
-    }
-
-    public BasicResponse(int status, Body body) {
-        this(status, body, new ArrayList<>());
-    }
-
-    public BasicResponse(int status, Body body, List<Header> headers) {
-        this.status = status;
-        this.body = body;
-        this.headers = headers;
-    }
-
-    @Override
-    public int status() {
-        return status;
-    }
-
-    @Override
-    public Body body() {
-        return body;
-    }
-
-    @Override
-    public List<Header> headers() {
-        return headers;
-    }
+    public abstract boolean success();
 }

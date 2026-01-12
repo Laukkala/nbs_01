@@ -43,52 +43,75 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.body;
+package com.teragrep.nbs_01.http.responses;
 
-import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.exceptions.StubObjectException;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.http.body.Body;
+import com.teragrep.nbs_01.http.body.StubBody;
+import org.apache.http.Header;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A Body that takes an ErrorEvent. Provides access to the ErrorEvent and Generates a preset message body that does not
- * expose the inner workings of the program to the end user.
+ * Basic Response implementation
  */
-public class ErrorBody implements Body {
+public final class BasicHTTPResponse implements HTTPResponse {
 
-    private final JsonObject message;
-    private final ErrorEvent event;
+    private final int status;
+    private final Body body;
+    private final List<Header> headers;
 
-    public ErrorBody(ErrorEvent event) {
-        this(
-                event,
-                Json
-                        .createObjectBuilder()
-                        .add(
-                                "message",
-                                "An error occurred while processing your Request. See event id " + event.id()
-                                        + " in the technical log for details."
-                        )
-                        .build()
-        );
+    public BasicHTTPResponse(int status) {
+        this(status, new StubBody(), new ArrayList<>());
     }
 
-    public ErrorBody(ErrorEvent event, JsonObject message) {
-        this.event = event;
-        this.message = message;
+    public BasicHTTPResponse(int status, List<Header> headers) {
+        this(status, new StubBody(), headers);
     }
 
-    public ErrorEvent event() {
-        return event;
+    public BasicHTTPResponse(int status, Body body) {
+        this(status, body, new ArrayList<>());
+    }
+
+    public BasicHTTPResponse(int status, Body body, List<Header> headers) {
+        this.status = status;
+        this.body = body;
+        this.headers = headers;
     }
 
     @Override
-    public String asString() throws StubObjectException {
-        return message.toString();
+    public int status() {
+        return status;
     }
 
     @Override
-    public boolean isStub() {
-        return false;
+    public Body body() {
+        return body;
+    }
+
+    @Override
+    public List<Header> headers() {
+        return headers;
+    }
+
+    @Override
+    public String message() {
+        try {
+            return body.asString();
+        }
+        catch (StubObjectException exception) {
+            return "";
+        }
+    }
+
+    @Override
+    public boolean success() {
+        if (status >= 200 && status < 300) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

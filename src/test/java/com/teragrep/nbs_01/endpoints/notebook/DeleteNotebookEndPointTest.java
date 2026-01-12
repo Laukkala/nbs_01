@@ -47,9 +47,10 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
+import com.teragrep.nbs_01.exceptions.StubObjectException;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -65,14 +66,14 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
         DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(notebook3()));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(notebook3()));
         // Assert that we receive the proper response.
         Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
         Assertions.assertEquals(204, response.status());
         Assertions.assertEquals(1, response.headers().size());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         // Assert that Response should not hava a body.
-        Assertions.assertThrows(IllegalStateException.class, () -> response.body().asString());
+        Assertions.assertThrows(StubObjectException.class, () -> response.body().asString());
         // Assert that the file was created.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(notebook3())));
     }

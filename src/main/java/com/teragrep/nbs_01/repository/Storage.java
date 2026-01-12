@@ -65,7 +65,7 @@ public interface Storage {
     public abstract void deleteDirectory(Identifier identifier)
             throws NoSuchFileException, MalformedRequestException, IOException;
 
-    public abstract void copy(Identifier source, Identifier destination)
+    public abstract void copyDirectory(Identifier source, Identifier destination)
             throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException;
 
     public abstract void createDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException;

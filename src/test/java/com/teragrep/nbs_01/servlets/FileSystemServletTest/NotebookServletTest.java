@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -70,7 +70,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         String requestBody = Json.createObjectBuilder().add("title", newNotebookTitle).build().toString();
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath, requestBody
@@ -102,7 +102,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(newNotebookPath)));
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath, requestBody
@@ -125,7 +125,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Path newNotebookPath = Paths.get("testFileName_12345.zpln");
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest("http://" + serverAddress() + "/notebook/" + newNotebookPath, "")
                 );
@@ -152,7 +152,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath,
@@ -247,7 +247,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating already exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath,
@@ -276,7 +276,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         String existingFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook1())));
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(newNotebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + newNotebookPath,
@@ -308,7 +308,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that the file to be deleted exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + notebookPath, "")
                 );
@@ -328,7 +328,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Path directoryPath = directory1();
         // Assert that the path we are looking for exists, even though it's not a directory.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + directoryPath, "{}")
                 );
@@ -351,7 +351,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                 .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).collect(Collectors.toList()).size()));
         // Assert that the file to be deleted doesn't exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(notebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + notebookPath, "{}")
                 );
@@ -368,7 +368,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         // Assert that the file exists.
         Path notebookPath = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + notebookPath));
         Assertions
                 .assertDoesNotThrow(
@@ -382,7 +382,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Path directoryPath = directory1();
         // Assert that the path we are looking for exists, even though it's not a notebook.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + directoryPath));
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
         JsonObject expectedJson = Json.createObjectBuilder().add("message", "No such file: " + directoryPath).build();
@@ -396,7 +396,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Path notebookPath = Paths.get("I_DONT_EXIST");
         // Assert that the file does not exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(notebookPath)));
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + notebookPath));
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
     }
@@ -417,7 +417,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
                         Assertions.assertDoesNotThrow(() -> Files.readAllLines(notebookDirectory().resolve(notebookPath)).stream().collect(Collectors.joining()))
                 );
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath,
@@ -442,7 +442,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         Path notebookPath = directory1();
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath,
@@ -461,7 +461,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         Path notebookPath = Paths.get("I_DONT_EXIST");
 
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + notebookPath,
@@ -483,7 +483,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("../secretFile.txt");
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/notebook/" + relativePath));
         // Assert that we got the proper response.
         // Response code should indicate a user error
@@ -501,7 +501,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("..", "secretFile.txt");
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/notebook/" + relativePath, "")
                 );
@@ -523,7 +523,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("..", "secretFile.txt");
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPOSTRequest(
                                 "http://" + serverAddress() + "/notebook/" + relativePath, "{\"title\":\"newTitle\"}"
@@ -553,7 +553,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretFile by NBS_01
         Path relativePath = Paths.get("..", "nefariousFile.txt");
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest("http://" + serverAddress() + "/notebook/" + relativePath, "")
                 );
@@ -572,7 +572,7 @@ public class NotebookServletTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(secretFile));
 
         Path relativePath = Paths.get("..", "nefariousFile.txt");
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/notebook/" + relativePath,

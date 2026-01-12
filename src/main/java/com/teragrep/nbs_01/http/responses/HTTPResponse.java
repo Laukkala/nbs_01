@@ -43,61 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.requests;
+package com.teragrep.nbs_01.http.responses;
 
-import com.teragrep.nbs_01.StubPath;
+import com.teragrep.nbs_01.Response;
 import com.teragrep.nbs_01.http.body.Body;
-import com.teragrep.nbs_01.http.body.StubBody;
 import org.apache.http.Header;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Basic Request implementation
+ * Representation of an HTTP response. Composed of a collection of Headers, a Body, and an HTTP status code Provides
+ * access to its components.
  */
-public final class BasicRequest implements Request {
+public interface HTTPResponse extends Response {
 
-    private final Body body;
-    private final Path path;
-    private final List<Header> headers;
+    public abstract int status();
 
-    public BasicRequest() {
-        this(new StubBody(), new StubPath(), new ArrayList<>());
-    }
+    public abstract Body body();
 
-    public BasicRequest(Body body) {
-        this(body, new StubPath(), new ArrayList<>());
-    }
-
-    public BasicRequest(Path path) {
-        this(new StubBody(), path, new ArrayList<>());
-    }
-
-    public BasicRequest(Path path, List<Header> headers) {
-        this(new StubBody(), path, headers);
-    }
-
-    public BasicRequest(Path path, Body body) {
-        this(body, path, new ArrayList<>());
-    }
-
-    public BasicRequest(Body body, Path path, List<Header> headers) {
-        this.body = body;
-        this.path = path;
-        this.headers = headers;
-    }
-
-    public Body body() {
-        return body;
-    }
-
-    public Path path() {
-        return path;
-    }
-
-    public List<Header> headers() {
-        return headers;
-    }
+    public abstract List<Header> headers();
 }

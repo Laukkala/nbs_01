@@ -115,7 +115,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void copy(Identifier source, Identifier destination)
+    public void copyDirectory(Identifier source, Identifier destination)
             throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException {
         List<Identifier> children = children(new PathIdentifier(""));
         if (!children.contains(source)) {

@@ -43,22 +43,55 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.http.responses;
+package com.teragrep.nbs_01.http.requests;
 
+import com.teragrep.nbs_01.StubPath;
 import com.teragrep.nbs_01.http.body.Body;
+import com.teragrep.nbs_01.http.body.StringBody;
+import com.teragrep.nbs_01.http.body.StubBody;
 import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Representation of an HTTP response. Composed of a collection of Headers, a Body, and an HTTP status code Provides
- * access to its components.
- */
-public interface Response {
+public class BasicHTTPRequestTest {
 
-    public abstract int status();
+    @Test
+    public void headersTest() {
+        Path requestPath = Paths.get("target", "testLocation");
+        Header locationHeader = new BasicHeader("Location", requestPath.toString());
+        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        List<Header> headers = new ArrayList<>();
+        headers.add(locationHeader);
+        headers.add(contentTypeHeader);
+        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, headers);
 
-    public abstract Body body();
+        Assertions.assertEquals(2, testRequest.headers().size());
+        Assertions.assertTrue(testRequest.headers().contains(locationHeader));
+        Assertions.assertTrue(testRequest.headers().contains(contentTypeHeader));
+        Assertions.assertEquals(headers, testRequest.headers());
+    }
 
-    public abstract List<Header> headers();
+    @Test
+    public void bodyTest() {
+        Path requestPath = Paths.get("target", "testLocation");
+        Body body = new StringBody("testPayload");
+        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, body);
+
+        Assertions.assertEquals(body, testRequest.body());
+    }
+
+    @Test
+    public void stubTest() {
+        BasicHTTPRequest stubRequest = new BasicHTTPRequest();
+        Assertions.assertEquals(0, stubRequest.headers().size());
+        Assertions.assertEquals(StubBody.class, stubRequest.body().getClass());
+        Assertions.assertEquals(StubPath.class, stubRequest.path().getClass());
+    }
+
 }

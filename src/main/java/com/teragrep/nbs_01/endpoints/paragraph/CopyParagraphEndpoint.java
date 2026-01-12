@@ -45,20 +45,17 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.repository.PathIdentifier;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
@@ -71,13 +68,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public final class CopyParagraphEndpoint implements EndPoint {
+// Endpoint that finds a Paragraph with a given Id from a Notebook based on an Identifier and then creates a new paragraph to another existing Notebook identified with another Identifier, using a given paragraphID.
+public final class CopyParagraphEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -85,81 +81,59 @@ public final class CopyParagraphEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            validateRequest(request);
-            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
-            String sourcePathString = body.getString("sourcePath");
-            String sourceParagraphId = body.getString("sourceParagraphId");
-            PathIdentifier sourceIdentifier = new PathIdentifier(sourcePathString);
-            PathIdentifier destinationIdentifier = new PathIdentifier(
-                    request.path().subpath(0, request.path().getNameCount() - 1).toString()
-            );
-            String destinationParagraphId = request
-                    .path()
-                    .subpath(request.path().getNameCount() - 1, request.path().getNameCount())
-                    .toString();
+            String sourceParagraphId = request.sourceParagraphId();
+            String targetParagraphId = request.targetParagraphId();
+            Identifier sourceIdentifier = request.sourceIdentifier();
+            Identifier targetIdentifier = request.targetIdentifier();
 
-            JsonObject json = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
-            JsonNotebook jsonNotebook = new JsonNotebook(json);
-            Notebook source = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+            // Deserialize source notebook from Storage
+            JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
+            SerializedNotebook serializedSource = new JsonNotebook(sourceJson);
+            Map<String, Paragraph> sourceParagraphs = serializedSource.paragraphs();
 
-            if (!source.paragraphs().containsKey(sourceParagraphId)) {
+            // Throw error if requested source paragraph doesn't exist
+            if (!sourceParagraphs.containsKey(sourceParagraphId)) {
                 throw new FileNotFoundException("No such paragraph: " + sourceParagraphId + "!");
             }
-            Paragraph sourceParagraph = source.paragraphs().get(sourceParagraphId);
-            Paragraph copyParagraph = sourceParagraph.copy(destinationParagraphId);
 
-            JsonObject destinationJson = Json
-                    .createReader(new StringReader(root.read(destinationIdentifier)))
-                    .readObject();
-            JsonNotebook jsonDestinationNotebook = new JsonNotebook(destinationJson);
-            Notebook destinationNotebook = new Notebook(
-                    jsonDestinationNotebook.title(),
-                    jsonDestinationNotebook.paragraphs()
-            );
+            // Create a copy of the paragraph from the source notebook
+            Paragraph sourceParagraph = sourceParagraphs.get(sourceParagraphId);
+            Paragraph copyParagraph = sourceParagraph.copy(targetParagraphId);
 
-            Map<String, Paragraph> destinationParagraphs = destinationNotebook.paragraphs();
+            // Deserialize destination notebook from Storage, and add the copied paragraph
+            JsonObject destinationJson = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
+            SerializedNotebook serializedDestination = new JsonNotebook(destinationJson);
+            Map<String, Paragraph> destinationParagraphs = serializedDestination.paragraphs();
+            // Throw error if requested destination paragraph already exists in destination notebook
             if (destinationParagraphs.containsKey(copyParagraph.id())) {
-                throw new MalformedRequestException("Paragraph " + destinationParagraphId + " already exists!");
+                throw new MalformedRequestException("Paragraph " + copyParagraph.id() + " already exists!");
             }
             destinationParagraphs.put(copyParagraph.id(), copyParagraph);
 
-            Notebook editedNotebook = new Notebook(destinationNotebook.name(), destinationParagraphs);
-            SerializedNotebook serializedEditedNotebook = new JsonNotebook(editedNotebook.json());
-            root.write(destinationIdentifier, serializedEditedNotebook.serialize());
+            // Serialize edited destination notebook to storage
+            Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);
+            SerializedNotebook serializedDestinationNotebook = new JsonNotebook(destinationNotebook.json());
+            root.write(targetIdentifier, serializedDestinationNotebook.serialize());
+
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(copyParagraph.json()), headers);
+            return new BasicHTTPResponse(HttpStatus.CREATED_201, new JSONBody(copyParagraph.json()), headers);
         }
         catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
-        }
-    }
-
-    private void validateRequest(Request request) throws MalformedRequestException, JsonException {
-        Path requestPath = request.path();
-        JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
-        if (requestPath.getNameCount() < 2) {
-            throw new MalformedRequestException(
-                    "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\""
-            );
-        }
-        if (!body.containsKey("sourceParagraphId")) {
-            throw new MalformedRequestException("Request does not contain a source paragraph id");
-        }
-        if (!body.containsKey("sourcePath")) {
-            throw new MalformedRequestException("Request does not contain a source path!");
         }
     }
 

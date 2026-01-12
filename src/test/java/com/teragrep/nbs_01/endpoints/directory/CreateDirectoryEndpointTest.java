@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -71,7 +71,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Destination directory must not exist
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newDirectoryPath)));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(newDirectoryPath));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(newDirectoryPath));
         // Assert that we receive the proper response.
         JsonObject expectedJson = Json.createObjectBuilder().build();
 
@@ -92,7 +92,7 @@ class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
         // Destination directory must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
         CreateDirectoryEndpoint endPoint = new CreateDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        Response response = endPoint.createResponse(new BasicRequest(directory1()));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(directory1()));
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()

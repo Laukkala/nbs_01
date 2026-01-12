@@ -46,10 +46,11 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.Request;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -88,10 +89,14 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Header expectedLocationHeader = new BasicHeader(
+                "Location",
+                requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
+        );
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
@@ -128,7 +133,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
 
         JsonObject expectedJson = Json
@@ -165,7 +171,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebook2().toString(), paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body)));
         // Assert that we got the proper response.
 
         JsonObject expectedJson = Json
@@ -203,7 +210,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body)));
 
         // The endpoint should return a Response with the correct status and message.
         JsonObject expectedJson = Json
@@ -230,7 +238,8 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("paragraphId", nonexistentParagraphId)
                 .add("text", editedParagraphText)
                 .build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body)));
 
         // The endpoint should return a Response with the correct status and message.
         JsonObject expectedJson = Json
@@ -253,31 +262,13 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(nonexistentNotebookName);
         JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body)));
 
         // The endpoint should return a Response with the correct status and message.
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Request path must be in format  \"{path/to/notebook}/paragraph/{paragraphId}\"")
-                .build();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
-    }
-
-    @Test
-    public void httpInvalidRequestParametersTest() {
-        // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-
-        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
-        JsonObject body = Json.createObjectBuilder().build();
-        Response response = endpoint.createResponse(new BasicRequest(requestPath, new JSONBody(body)));
-
-        // The endpoint should return a Response with the correct status and message.
-        JsonObject expectedJson = Json
-                .createObjectBuilder()
-                .add("message", "Request does not contain either a text or a title field!")
+                .add("message", "Request has a malformed identifier!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

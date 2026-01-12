@@ -45,16 +45,16 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
-import com.teragrep.nbs_01.repository.PathIdentifier;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import org.apache.http.Header;
@@ -66,8 +66,8 @@ import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-// Endpoint that deletes a Directory or a Notebook. Should be provided with a path of the File
-public final class DeleteDirectoryEndpoint implements EndPoint {
+// Endpoint that deletes a Directory from a location based on an Identifier.
+public final class DeleteDirectoryEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -75,28 +75,30 @@ public final class DeleteDirectoryEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            PathIdentifier destinationIdentifier = new PathIdentifier(request.path().toString());
-            root.deleteDirectory(destinationIdentifier);
+            Identifier targetIdentifier = request.targetIdentifier();
+            root.deleteDirectory(targetIdentifier);
+
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
-            return new BasicResponse(
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
+            return new BasicHTTPResponse(
                     HttpStatus.NO_CONTENT_204,
                     new JSONBody(Json.createObjectBuilder().build()),
                     headers
             );
         }
         catch (MalformedRequestException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
         catch (NoSuchFileException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );

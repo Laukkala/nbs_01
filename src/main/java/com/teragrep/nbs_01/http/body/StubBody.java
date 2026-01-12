@@ -45,6 +45,8 @@
  */
 package com.teragrep.nbs_01.http.body;
 
+import com.teragrep.nbs_01.exceptions.StubObjectException;
+
 /**
  * An object representing the absence of a Body Should be used when a Request or a response does not contain a Body at
  * all.
@@ -56,8 +58,8 @@ public class StubBody implements Body {
     }
 
     @Override
-    public String asString() {
-        throw new IllegalStateException("Body is a stub!");
+    public String asString() throws StubObjectException {
+        throw new StubObjectException("Body is a stub!");
     }
 
     @Override

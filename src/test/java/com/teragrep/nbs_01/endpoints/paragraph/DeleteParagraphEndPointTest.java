@@ -46,9 +46,10 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.Request;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -72,11 +73,14 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String paragraphId = "20150213-230428_1231780373";
 
         Path requestPath = Paths.get(notebook3().toString(), paragraphId);
-        BasicRequest request = new BasicRequest(requestPath);
-        Response response = endPoint.createResponse(request);
+        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        HTTPResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", requestPath.toString());
+        Header expectedLocationHeader = new BasicHeader(
+                "Location",
+                requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
+        );
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
 
         // Assert that the file was changed.
@@ -100,8 +104,8 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebook3().toString(), nonExistentParagraphId);
 
-        BasicRequest request = new BasicRequest(requestPath);
-        Response response = endPoint.createResponse(request);
+        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return a Response with the correct status and message.
 
@@ -126,8 +130,8 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String paragraphId = "20150213-230428_1231780373";
 
         Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
-        BasicRequest request = new BasicRequest(requestPath);
-        Response response = endPoint.createResponse(request);
+        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 

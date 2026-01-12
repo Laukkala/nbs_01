@@ -70,6 +70,11 @@ public class ExceptionBodyTest {
 
         ExceptionBody body = new ExceptionBody(throwable1);
         JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
-        Assertions.assertEquals(expectedBody.toString(), body.asString());
+        try {
+            Assertions.assertEquals(expectedBody.toString(), body.asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -45,6 +45,8 @@
  */
 package com.teragrep.nbs_01.http.body;
 
+import com.teragrep.nbs_01.exceptions.StubObjectException;
+
 /**
  * A Body that encapsulates a String
  */
@@ -58,7 +60,7 @@ public class StringBody implements Body {
     }
 
     @Override
-    public String asString() {
+    public String asString() throws StubObjectException {
         return text;
     }
 

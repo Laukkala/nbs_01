@@ -43,14 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.endpoints;
+package com.teragrep.nbs_01.http.requests;
 
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.Request;
+import com.teragrep.nbs_01.http.body.Body;
+import org.apache.http.Header;
 
-// EndPoints are objects that can be assigned to Jetty Handler objects, which define what procedures are executed when that endpoint is called by a client.
-public interface EndPoint {
+import java.nio.file.Path;
+import java.util.List;
 
-    // createResponse is where the functionality of the endpoint should be defined. The response should be created and returned.
-    public abstract Response createResponse(Request request);
+/**
+ * Representation of an HTTP request. Composed of a collection of Headers, a Body, and a Path Provides access to its
+ * components.
+ */
+// Request object contains parameters that the user wants to send to NBS_01.
+// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
+public interface HTTPRequest extends Request {
+
+    public abstract Body body();
+
+    public abstract Path path();
+
+    public abstract List<Header> headers();
 }

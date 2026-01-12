@@ -45,34 +45,31 @@
  */
 package com.teragrep.nbs_01.endpoints.directory;
 
-import com.teragrep.nbs_01.endpoints.EndPoint;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.BasicResponse;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.PathIdentifier;
 import com.teragrep.nbs_01.repository.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-// Copies a Notebook. Should be provided with a path of the File and a path of the source notebook to be copied.
-public final class CopyDirectoryEndpoint implements EndPoint {
+// Endpoint that copies a Directory based on a given Identifier, and creates a new Directory containing copies of the original Directory's children to a new location based on another Identifier.
+public final class CopyDirectoryEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
@@ -80,29 +77,30 @@ public final class CopyDirectoryEndpoint implements EndPoint {
         this.root = root;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         try {
-            JsonObject body = Json.createReader(new StringReader(request.body().asString())).readObject();
-            if (!body.containsKey("sourcePath")) {
-                throw new MalformedRequestException("Request must contain a sourcePath!");
-            }
-            String sourcePathString = body.getString("sourcePath");
-            Identifier sourceIdentifier = new PathIdentifier(sourcePathString);
-            Identifier destinationIdentifier = new PathIdentifier(request.path());
-            root.copy(sourceIdentifier, destinationIdentifier);
+            Identifier sourceIdentifier = request.sourceIdentifier();
+            Identifier targetIdentifier = request.targetIdentifier();
+            root.copyDirectory(sourceIdentifier, targetIdentifier);
+
+            // Create response
             ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", request.path().toString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicResponse(HttpStatus.CREATED_201, new JSONBody(Json.createObjectBuilder().build()), headers);
+            return new BasicHTTPResponse(
+                    HttpStatus.CREATED_201,
+                    new JSONBody(Json.createObjectBuilder().build()),
+                    headers
+            );
         }
         catch (FileNotFoundException notFoundException) {
-            return new BasicResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (IOException serverErrorException) {
-            return new BasicResponse(
+            return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );

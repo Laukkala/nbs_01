@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 
@@ -57,7 +57,7 @@ public class NotebookServerTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a simple HTTP request to an existing endpoint results in return code 200 OK
     public void httpConnectTest() {
-        Response response = Assertions
+        HTTPResponse response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/ping"));
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
         String body = Assertions.assertDoesNotThrow(() -> response.body().asString());

@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.http.body;
 
+import com.teragrep.nbs_01.exceptions.StubObjectException;
 import jakarta.json.JsonStructure;
 
 /**
@@ -64,7 +65,7 @@ public class JSONBody implements Body {
     }
 
     @Override
-    public String asString() {
+    public String asString() throws StubObjectException {
         return json.toString();
     }
 

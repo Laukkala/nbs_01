@@ -46,24 +46,24 @@
 package com.teragrep.nbs_01.endpoints.general;
 
 import com.teragrep.nbs_01.Delegate;
-import com.teragrep.nbs_01.endpoints.EndPoint;
-import com.teragrep.nbs_01.http.requests.Request;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
+import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 
 // Endpoint that delegates the request to one of a collection of Endpoints based on the result of a Delegate
-public class DelegatingEndpoint implements EndPoint {
+public class DelegatingEndpoint implements HTTPEndPoint {
 
     private final Delegate delegate;
-    private final EndPoint trueEndPoint;
-    private final EndPoint falseEndPoint;
+    private final HTTPEndPoint trueEndPoint;
+    private final HTTPEndPoint falseEndPoint;
 
-    public DelegatingEndpoint(EndPoint trueEndPoint, EndPoint falseEndPoint, Delegate delegate) {
+    public DelegatingEndpoint(HTTPEndPoint trueEndPoint, HTTPEndPoint falseEndPoint, Delegate delegate) {
         this.trueEndPoint = trueEndPoint;
         this.falseEndPoint = falseEndPoint;
         this.delegate = delegate;
     }
 
-    public Response createResponse(Request request) {
+    public HTTPResponse createResponse(HTTPRequest request) {
         if (delegate.resolve(request)) {
             return trueEndPoint.createResponse(request);
         }

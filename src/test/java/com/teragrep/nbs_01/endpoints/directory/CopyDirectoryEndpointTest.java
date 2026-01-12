@@ -48,8 +48,8 @@ package com.teragrep.nbs_01.endpoints.directory;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicRequest;
-import com.teragrep.nbs_01.http.responses.Response;
+import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
+import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
@@ -85,8 +85,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", directory1().toString()).build();
-        Response response = endPoint
-                .createResponse(new BasicRequest(Paths.get(destinationDirectory.toString()), new JSONBody(body)));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(Paths.get(destinationDirectory.toString()), new JSONBody(body)));
 
         // Assert that we receive the proper response.
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
@@ -125,7 +125,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectory.toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(destinationDirectory, new JSONBody(body)));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationDirectory, new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
 
         // Assert that the file was not created.
@@ -145,7 +145,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", directory2().toString()).build();
-        Response response = endPoint.createResponse(new BasicRequest(directory1(), new JSONBody(body)));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(directory1(), new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 
