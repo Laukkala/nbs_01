@@ -47,6 +47,8 @@ package com.teragrep.nbs_01.repository;
 
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
+import com.teragrep.nbs_01.repository.serialization.SerializedParagraph;
+import com.teragrep.nbs_01.repository.serialization.SerializedScript;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -82,6 +84,10 @@ public interface Storage {
 
     public abstract SerializedNotebook serializeNotebook(Notebook notebook)
             throws IOException, MalformedRequestException;
+
+    public abstract SerializedParagraph serializeParagraph(Paragraph paragraph);
+
+    public abstract SerializedScript serializeScript(Script script);
 
     public abstract boolean exists(Identifier identifierZ);
 }

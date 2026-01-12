@@ -45,10 +45,6 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-
 import java.util.Objects;
 import java.util.UUID;
 
@@ -69,14 +65,6 @@ public final class Paragraph {
         this.id = id;
         this.title = title;
         this.script = script;
-    }
-
-    public JsonObject json() {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("id", id);
-        builder.add("title", title != null ? title : "");
-        builder.add("script", script.json());
-        return builder.build();
     }
 
     public String title() {

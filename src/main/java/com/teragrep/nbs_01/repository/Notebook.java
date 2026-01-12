@@ -45,8 +45,6 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import jakarta.json.*;
-
 import java.io.IOException;
 import java.util.*;
 

@@ -50,7 +50,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
@@ -88,14 +88,11 @@ public final class FindParagraphEndPoint implements HTTPEndPoint {
             }
 
             // Create response
+            String paragraphContent = root.serializeParagraph(notebook.paragraphs().get(paragraphId)).serialize();
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(
-                    HttpStatus.OK_200,
-                    new JSONBody(notebook.paragraphs().get(paragraphId).json()),
-                    headers
-            );
+            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(paragraphContent), headers);
         }
         catch (FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));

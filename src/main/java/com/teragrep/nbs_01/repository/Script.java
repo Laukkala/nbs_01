@@ -45,10 +45,6 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-
 import java.util.Objects;
 
 // Represents the text that a user can write into a Paragraph.
@@ -66,12 +62,6 @@ public final class Script {
 
     public String text() {
         return text;
-    }
-
-    public JsonObject json() {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("text", text);
-        return builder.build();
     }
 
     @Override

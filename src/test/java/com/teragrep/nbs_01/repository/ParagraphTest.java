@@ -46,22 +46,9 @@
 package com.teragrep.nbs_01.repository;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ParagraphTest {
-
-    // Paragraph should be in the proper JSON format when json() is called.
-    @Test
-    void json() {
-        Script testScript = new Script("%spark\nprintln(\"Hello Spark\")");
-        Paragraph paragraph = new Paragraph("testParagraph", "testTitle", testScript);
-        Assertions
-                .assertEquals(
-                        "{\"id\":\"testParagraph\",\"title\":\"testTitle\",\"script\":{\"text\":\"%spark\\nprintln(\\\"Hello Spark\\\")\"}}",
-                        paragraph.json().toString()
-                );
-    }
 
     @Test
     public void testContract() {

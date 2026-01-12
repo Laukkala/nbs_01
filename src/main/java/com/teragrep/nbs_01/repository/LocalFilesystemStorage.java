@@ -46,8 +46,7 @@
 package com.teragrep.nbs_01.repository;
 
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
+import com.teragrep.nbs_01.repository.serialization.*;
 import jakarta.json.*;
 
 import java.io.File;
@@ -205,7 +204,13 @@ public class LocalFilesystemStorage implements Storage {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 
         for (Paragraph paragraph : notebook.paragraphs().values()) {
-            arrayBuilder.add(paragraph.json());
+            JsonObjectBuilder paragraphBuilder = Json.createObjectBuilder();
+            paragraphBuilder.add("id", paragraph.id());
+            paragraphBuilder.add("title", paragraph.title());
+            JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
+            scriptBuilder.add("text", paragraph.script().text());
+            paragraphBuilder.add("script", scriptBuilder.build());
+            arrayBuilder.add(paragraphBuilder.build());
         }
         JsonArray paragraphJsonArray = arrayBuilder.build();
         builder.add("paragraphs", paragraphJsonArray);
@@ -213,6 +218,24 @@ public class LocalFilesystemStorage implements Storage {
 
         JsonNotebook jsonNotebook = new JsonNotebook(json);
         return jsonNotebook;
+    }
+
+    @Override
+    public SerializedParagraph serializeParagraph(Paragraph paragraph) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("id", paragraph.id());
+        builder.add("title", paragraph.title() != null ? paragraph.title() : "");
+        JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
+        scriptBuilder.add("text", paragraph.script().text());
+        builder.add("script", scriptBuilder.build());
+        return new JsonParagraph(builder.build());
+    }
+
+    @Override
+    public SerializedScript serializeScript(Script script) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("text", script.text());
+        return new JsonScript(builder.build());
     }
 
     @Override
