@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.repository;
 
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -108,7 +109,7 @@ class NotebookTest {
                         () -> Json
                                 .createReader(
                                         new StringReader(
-                                                root.read(new PathIdentifier(notebookDirectory.relativize(notebook1).toString()))
+                                                root.readFile(new PathIdentifier(notebookDirectory.relativize(notebook1).toString()))
                                         )
                                 )
                                 .readObject()
@@ -117,29 +118,6 @@ class NotebookTest {
         Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Map<String, Paragraph> paragraphs = notebook.paragraphs();
         Assertions.assertEquals(8, paragraphs.size());
-    }
-
-    // Calling json() should have the same content as in the test file.
-    @Test
-    void testJson() {
-        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
-        JsonObject json = Assertions
-                .assertDoesNotThrow(
-                        () -> Json
-                                .createReader(
-                                        new StringReader(
-                                                root.read(new PathIdentifier(notebookDirectory.relativize(notebook3).toString()))
-                                        )
-                                )
-                                .readObject()
-                );
-        JsonNotebook jsonNotebook = new JsonNotebook(json);
-        Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
-        Assertions
-                .assertEquals(
-                        "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Hello, I'm a new notebook. Totally different to the previous one, I have one less paragraphs, you see.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}}]}",
-                        notebook.json().toString()
-                );
     }
 
     // After copying a Notebook, both the original and the copied notebook should exist.
@@ -151,7 +129,7 @@ class NotebookTest {
                         () -> Json
                                 .createReader(
                                         new StringReader(
-                                                root.read(new PathIdentifier(notebookDirectory.relativize(notebook4).toString()))
+                                                root.readFile(new PathIdentifier(notebookDirectory.relativize(notebook4).toString()))
                                         )
                                 )
                                 .readObject()
@@ -161,8 +139,9 @@ class NotebookTest {
         Assertions.assertTrue(Files.exists(notebook4));
         Path destinationPath = Paths.get("newName_copyId");
         Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
+        SerializedNotebook serializedNotebook = Assertions.assertDoesNotThrow(() -> root.serializeNotebook(copy));
         Assertions
-                .assertDoesNotThrow(() -> root.write(new PathIdentifier(destinationPath.toString()), copy.json().toString()));
+                .assertDoesNotThrow(() -> root.writeFile(new PathIdentifier(destinationPath.toString()), serializedNotebook.serialize()));
         Assertions.assertTrue(Files.exists(notebook4));
         Assertions.assertTrue(Files.exists(notebookDirectory.resolve(destinationPath)));
     }

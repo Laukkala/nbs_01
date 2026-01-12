@@ -57,7 +57,6 @@ import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Storage;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
@@ -86,15 +85,14 @@ public final class CreateNotebookEndpoint implements HTTPEndPoint {
 
             // Create new notebook and serialize it to Storage
             Notebook newFile = new Notebook(title);
-            SerializedNotebook serializedNewNotebook = new JsonNotebook(newFile.json());
-            String serializedString = serializedNewNotebook.serialize();
-            root.write(targetIdentifier, serializedString);
+            SerializedNotebook notebook = root.serializeNotebook(newFile);
+            root.writeFile(targetIdentifier, notebook.serialize());
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
+            return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(notebook.serialize()), headers);
         }
         catch (FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));

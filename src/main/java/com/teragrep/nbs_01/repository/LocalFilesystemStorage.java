@@ -46,15 +46,20 @@
 package com.teragrep.nbs_01.repository;
 
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
+import jakarta.json.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -78,12 +83,6 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void move(Identifier source, Identifier destination) throws IOException {
-        Paths.get(source.asLongString());
-        Files.move(root.resolve(source.asLongString()), root.resolve(destination.asLongString()));
-    }
-
-    @Override
     public void deleteDirectory(Identifier identifier)
             throws NoSuchFileException, MalformedRequestException, IOException {
         Path path = root.resolve(identifier.asLongString());
@@ -97,8 +96,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void deleteNotebook(Identifier identifier)
-            throws NoSuchFileException, MalformedRequestException, IOException {
+    public void deleteFile(Identifier identifier) throws NoSuchFileException, MalformedRequestException, IOException {
         Path path = root.resolve(identifier.asLongString());
         if (!Files.exists(path)) {
             throw new NoSuchFileException("No such file: " + root.relativize(path));
@@ -109,15 +107,10 @@ public class LocalFilesystemStorage implements Storage {
         delete(path);
     }
 
-    private void delete(Path path) throws NoSuchFileException, IOException {
-        Stream<Path> files = Files.walk(path);
-        files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-    }
-
     @Override
     public void copyDirectory(Identifier source, Identifier destination)
             throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException {
-        List<Identifier> children = children(new PathIdentifier(""));
+        List<Identifier> children = listFiles(new PathIdentifier(""));
         if (!children.contains(source)) {
             throw new FileNotFoundException("No such directory: " + source.asLongString() + " !");
         }
@@ -126,7 +119,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void createDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException {
+    public void writeDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException {
         Path path = root.resolve(identifier.asLongString());
         if (Files.exists(path)) {
             throw new FileAlreadyExistsException("Path at " + root.relativize(path) + " is already in use!");
@@ -135,7 +128,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public String read(Identifier identifier) throws FileNotFoundException, IOException {
+    public String readFile(Identifier identifier) throws FileNotFoundException, IOException {
         Path path = root.resolve(identifier.asLongString());
         if (!Files.exists(path) || Files.isDirectory(path)) {
             throw new FileNotFoundException("No such file: " + root.relativize(path));
@@ -144,15 +137,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void write(Identifier identifier, String content) throws MalformedRequestException, IOException {
-        Path path = root.resolve(identifier.asLongString());
-        if (Files.exists(path) && Files.isDirectory(path)) {
-            throw new MalformedRequestException("File at path: " + root.relativize(path) + " is a Directory!");
-        }
-        Files.write(path, content.getBytes(charset));
-    }
-
-    public List<Identifier> immediateChildren(Identifier identifier) throws MalformedRequestException, IOException {
+    public String readDirectory(Identifier identifier) throws IOException, MalformedRequestException {
         Path path = root.resolve(identifier.asLongString());
         if (!Files.exists(path)) {
             throw new FileNotFoundException("No such file: " + root.relativize(path));
@@ -161,20 +146,20 @@ public class LocalFilesystemStorage implements Storage {
             throw new MalformedRequestException("File at path " + root.relativize(path) + " is not a directory!");
         }
 
-        ArrayList<Identifier> files = new ArrayList<>();
+        ArrayList<String> fileNames = new ArrayList<>();
         FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
 
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 if (dir.equals(path)) {
                     return FileVisitResult.CONTINUE;
                 }
-                files.add(new PathIdentifier(dir.toString()));
+                fileNames.add(dir.getFileName().toString());
                 return FileVisitResult.SKIP_SUBTREE;
             }
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                files.add(new PathIdentifier(file.toString()));
+                fileNames.add(file.getFileName().toString());
                 return FileVisitResult.CONTINUE;
             }
 
@@ -188,8 +173,55 @@ public class LocalFilesystemStorage implements Storage {
                 return super.postVisitDirectory(dir, exc);
             }
         };
+
         Files.walkFileTree(path, fileVisitor);
-        return files;
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        for (String fileName : fileNames) {
+            arrayBuilder.add(fileName);
+        }
+
+        JsonObject json = Json
+                .createObjectBuilder()
+                .add("name", identifier.asShortString())
+                .add("children", arrayBuilder.build())
+                .build();
+        return json.toString();
+    }
+
+    @Override
+    public Notebook deserializeNotebook(Identifier identifier) throws IOException {
+        JsonObject sourceJson = Json.createReader(new StringReader(readFile(identifier))).readObject();
+        SerializedNotebook serializedSource = new JsonNotebook(sourceJson);
+        return new Notebook(serializedSource.title(), serializedSource.paragraphs());
+    }
+
+    @Override
+    public SerializedNotebook serializeNotebook(Notebook notebook) throws IOException, MalformedRequestException {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("name", notebook.name());
+        //compatibility fields//
+        builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
+        // end //
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        for (Paragraph paragraph : notebook.paragraphs().values()) {
+            arrayBuilder.add(paragraph.json());
+        }
+        JsonArray paragraphJsonArray = arrayBuilder.build();
+        builder.add("paragraphs", paragraphJsonArray);
+        JsonObject json = builder.build();
+
+        JsonNotebook jsonNotebook = new JsonNotebook(json);
+        return jsonNotebook;
+    }
+
+    @Override
+    public void writeFile(Identifier identifier, String content) throws MalformedRequestException, IOException {
+        Path path = root.resolve(identifier.asLongString());
+        if (Files.exists(path) && Files.isDirectory(path)) {
+            throw new MalformedRequestException("File at path: " + root.relativize(path) + " is a Directory!");
+        }
+        Files.write(path, content.getBytes(charset));
     }
 
     @Override
@@ -198,7 +230,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public List<Identifier> children(Identifier identifier)
+    public List<Identifier> listFiles(Identifier identifier)
             throws FileNotFoundException, MalformedRequestException, IOException {
         Path path = root.resolve(identifier.asLongString());
         if (!Files.exists(path)) {
@@ -237,6 +269,11 @@ public class LocalFilesystemStorage implements Storage {
         };
         Files.walkFileTree(path, fileVisitor);
         return files;
+    }
+
+    private void delete(Path path) throws NoSuchFileException, IOException {
+        Stream<Path> files = Files.walk(path);
+        files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     }
 
     private class CopyFileVisitor extends SimpleFileVisitor<Path> {
@@ -282,6 +319,5 @@ public class LocalFilesystemStorage implements Storage {
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
             return super.postVisitDirectory(dir, exc);
         }
-
     }
 }

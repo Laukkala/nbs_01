@@ -49,25 +49,21 @@ import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.Notebook;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Storage;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import jakarta.json.Json;
 import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -86,19 +82,17 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
             Identifier targetIdentifier = request.targetIdentifier();
 
             // Deserialize from Storage
-            String jsonString = root.read(targetIdentifier);
-            JsonObject json = Json.createReader(new StringReader(jsonString)).readObject();
-            // We cannot simply return the file contents as is back to the UI, since it's possible that there are legacy Zeppelin files, which have a different structure.
-            // Therefore, we must first create an in-memory Notebook object first, and call its .json() method, which will format the notebook properly whether it was sourced from a legacy file or not.
 
-            SerializedNotebook serializedNotebook = new JsonNotebook(json);
-            Notebook notebook = new Notebook(serializedNotebook.title(), serializedNotebook.paragraphs());
+            // We cannot simply return the file contents as is back to the UI using root.read(), since it's possible that there are legacy Zeppelin files, which have a different structure.
+            // Therefore, we must first create an in-memory Notebook object first via root.deserialize(), which will format the notebook properly whether it was sourced from a legacy file or not.
+            Notebook notebook = root.deserializeNotebook(targetIdentifier);
+            SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(notebook.json()), headers);
+            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(serializedNotebook.serialize()), headers);
         }
         // If the file cannot be found from Storage, respond with a 404 not found.
         catch (FileNotFoundException notFoundException) {

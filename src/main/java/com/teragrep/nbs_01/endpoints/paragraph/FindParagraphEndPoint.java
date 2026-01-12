@@ -54,19 +54,15 @@ import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Storage;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -85,9 +81,7 @@ public final class FindParagraphEndPoint implements HTTPEndPoint {
             String paragraphId = request.targetParagraphId();
 
             // Deserialize from Storage
-            JsonObject json = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
-            JsonNotebook jsonNotebook = new JsonNotebook(json);
-            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+            Notebook notebook = root.deserializeNotebook(targetIdentifier);
 
             if (!notebook.paragraphs().containsKey(paragraphId)) {
                 throw new MalformedRequestException("Paragraph with id " + paragraphId + " not found!");

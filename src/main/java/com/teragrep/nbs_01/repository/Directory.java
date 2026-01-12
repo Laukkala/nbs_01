@@ -45,13 +45,9 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 // Represents a single Directory that can contain Filesystem objects.
@@ -66,22 +62,14 @@ public final class Directory implements FilesystemEntity {
         this.children = children;
     }
 
-    public Directory copy() throws IOException {
-        List<FilesystemEntity> copiedChildren = new ArrayList<>();
-        for (FilesystemEntity child : children) {
-            FilesystemEntity copy = child.copy();
-            copiedChildren.add(copy);
-        }
-        return new Directory(name, copiedChildren);
-    }
-
-    public JsonObject json() {
-        JsonArrayBuilder childArray = Json.createArrayBuilder();
-        for (FilesystemEntity child : children()) {
-            childArray.add(child.name());
-        }
-        return Json.createObjectBuilder().add("name", name).add("children", childArray).build();
-    }
+    //public Directory copy() throws IOException {
+    //    List<FilesystemEntity> copiedChildren = new ArrayList<>();
+    //    for (FilesystemEntity child : children) {
+    //        FilesystemEntity copy = child.copy();
+    //        copiedChildren.add(copy);
+    //    }
+    //    return new Directory(name, copiedChildren);
+    //}
 
     public String name() {
         return name;

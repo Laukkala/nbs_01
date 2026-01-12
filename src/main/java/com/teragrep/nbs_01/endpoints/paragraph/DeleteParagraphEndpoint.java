@@ -53,19 +53,16 @@ import com.teragrep.nbs_01.http.body.ExceptionBody;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Storage;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -84,9 +81,7 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
             String targetParagraphId = request.targetParagraphId();
 
             // Deserialize notebook from Storage
-            JsonObject json = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
-            JsonNotebook jsonNotebook = new JsonNotebook(json);
-            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+            Notebook notebook = root.deserializeNotebook(targetIdentifier);
 
             // Throw error if paragraph with given ID does not exist
             if (!notebook.paragraphs().containsKey(targetParagraphId)) {
@@ -95,7 +90,8 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
 
             // Remove the paragraph and serialize notebook to Storage
             notebook.paragraphs().remove(targetParagraphId);
-            root.write(targetIdentifier, notebook.json().toString());
+            SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
+            root.writeFile(targetIdentifier, serializedNotebook.serialize());
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();

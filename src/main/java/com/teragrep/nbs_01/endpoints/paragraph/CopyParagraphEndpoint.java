@@ -54,19 +54,15 @@ import com.teragrep.nbs_01.http.body.JSONBody;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import jakarta.json.Json;
 import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -89,8 +85,7 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             Identifier targetIdentifier = request.targetIdentifier();
 
             // Deserialize source notebook from Storage
-            JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
-            SerializedNotebook serializedSource = new JsonNotebook(sourceJson);
+            Notebook serializedSource = root.deserializeNotebook(sourceIdentifier);
             Map<String, Paragraph> sourceParagraphs = serializedSource.paragraphs();
 
             // Throw error if requested source paragraph doesn't exist
@@ -103,8 +98,7 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             Paragraph copyParagraph = sourceParagraph.copy(targetParagraphId);
 
             // Deserialize destination notebook from Storage, and add the copied paragraph
-            JsonObject destinationJson = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
-            SerializedNotebook serializedDestination = new JsonNotebook(destinationJson);
+            Notebook serializedDestination = root.deserializeNotebook(targetIdentifier);
             Map<String, Paragraph> destinationParagraphs = serializedDestination.paragraphs();
             // Throw error if requested destination paragraph already exists in destination notebook
             if (destinationParagraphs.containsKey(copyParagraph.id())) {
@@ -113,9 +107,9 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             destinationParagraphs.put(copyParagraph.id(), copyParagraph);
 
             // Serialize edited destination notebook to storage
-            Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);
-            SerializedNotebook serializedDestinationNotebook = new JsonNotebook(destinationNotebook.json());
-            root.write(targetIdentifier, serializedDestinationNotebook.serialize());
+            Notebook destinationNotebook = new Notebook(serializedDestination.name(), destinationParagraphs);
+            SerializedNotebook serializedDestinationNotebook = root.serializeNotebook(destinationNotebook);
+            root.writeFile(targetIdentifier, serializedDestinationNotebook.serialize());
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();

@@ -78,7 +78,7 @@ public final class CreateDirectoryEndpoint implements HTTPEndPoint {
     public HTTPResponse createResponse(HTTPRequest request) {
         try {
             Identifier targetIdentifier = request.targetIdentifier();
-            root.createDirectory(targetIdentifier);
+            root.writeDirectory(targetIdentifier);
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();

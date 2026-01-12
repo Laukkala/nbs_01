@@ -55,17 +55,14 @@ import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
-import jakarta.json.Json;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
 // Endpoint that updates the text and/or title of a paragraph with a given ID within a Notebook based on an Identifier.
@@ -83,9 +80,8 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
             String paragraphId = request.targetParagraphId();
 
             // Deserialize notebook from Storage
-            JsonObject json = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
-            JsonNotebook jsonNotebook = new JsonNotebook(json);
-            Map<String, Paragraph> paragraphs = jsonNotebook.paragraphs();
+            Notebook notebook = root.deserializeNotebook(targetIdentifier);
+            Map<String, Paragraph> paragraphs = notebook.paragraphs();
 
             // Throw an error if the paragraph doesn't exist
             if (!paragraphs.containsKey(paragraphId)) {
@@ -113,8 +109,9 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
             // Overwrite the old paragraph with the edited paragraph, and serialize the notebook to Storage
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
-            Notebook newNotebook = new Notebook(jsonNotebook.title(), paragraphs);
-            root.write(targetIdentifier, newNotebook.json().toString());
+            Notebook newNotebook = new Notebook(notebook.name(), paragraphs);
+            SerializedNotebook serializedNotebook = root.serializeNotebook(newNotebook);
+            root.writeFile(targetIdentifier, serializedNotebook.serialize());
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();

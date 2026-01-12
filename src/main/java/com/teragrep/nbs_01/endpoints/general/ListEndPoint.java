@@ -76,7 +76,7 @@ public final class ListEndPoint implements HTTPEndPoint {
     public HTTPResponse createResponse(HTTPRequest request) {
         // Find all notebooks from Directory structure
         try {
-            List<Identifier> currentFiles = root.children(new PathIdentifier(""));
+            List<Identifier> currentFiles = root.listFiles(new PathIdentifier(""));
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (Identifier file : currentFiles) {
                 arrayBuilder.add(file.asShortString());

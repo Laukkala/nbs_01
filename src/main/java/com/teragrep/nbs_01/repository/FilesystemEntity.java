@@ -45,16 +45,9 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import jakarta.json.JsonObject;
-
-import java.io.IOException;
-
 // An interface for Filesystem objects, such as Notebooks and Directories.
 public interface FilesystemEntity {
 
-    public abstract FilesystemEntity copy() throws IOException;
-
     public abstract String name();
 
-    public abstract JsonObject json();
 }

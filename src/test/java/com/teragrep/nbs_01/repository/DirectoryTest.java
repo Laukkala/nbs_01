@@ -95,54 +95,6 @@ class DirectoryTest {
         fileToDelete.delete();
     }
 
-    // Copying a directory should result in the original and a new copy existing on disk.
-    @Test
-    void testCopy() {
-
-        Notebook testNotebook1 = new Notebook("testNotebook1");
-        Notebook testNotebook2 = new Notebook("testNotebook2");
-        List<FilesystemEntity> notebooks1 = new ArrayList<>();
-        notebooks1.add(testNotebook1);
-        notebooks1.add(testNotebook2);
-        Directory subDirectory = new Directory("dir", notebooks1);
-
-        List<FilesystemEntity> rootNotebooks = new ArrayList<>();
-        Notebook testNotebook3 = new Notebook("testNotebook1");
-        rootNotebooks.add(testNotebook3);
-        rootNotebooks.add(subDirectory);
-        Directory rootDir = new Directory("root", rootNotebooks);
-        Path destinationDirectoryPath = notebookDirectory.resolve(Paths.get("destination"));
-
-        Directory copiedDirectory = Assertions.assertDoesNotThrow(() -> rootDir.copy());
-
-        // Both copied directory and the original directory (and their children) should exist
-        copiedDirectory.equals(rootDir);
-    }
-
-    // Calling json() should result in a valid JSON object.
-    @Test
-    void testJson() {
-        Notebook testNotebook1 = new Notebook(notebook1.getFileName().toString());
-        Notebook testNotebook2 = new Notebook(notebook2.getFileName().toString());
-        List<FilesystemEntity> notebooks1 = new ArrayList<>();
-        notebooks1.add(testNotebook1);
-        notebooks1.add(testNotebook2);
-        Directory subDirectory = new Directory(directory1.getFileName().toString(), notebooks1);
-
-        List<FilesystemEntity> rootNotebooks = new ArrayList<>();
-        Notebook testNotebook3 = new Notebook(notebook3.getFileName().toString());
-        rootNotebooks.add(testNotebook3);
-        rootNotebooks.add(subDirectory);
-        Directory rootDir = new Directory("root", rootNotebooks);
-
-        Assertions
-                .assertEquals(
-                        "{\"name\":\"root\",\"children\":[\"" + notebook3.getFileName() + "\",\""
-                                + directory1.getFileName() + "\"]}",
-                        rootDir.json().toString()
-                );
-    }
-
     @Test
     public void testContract() {
         EqualsVerifier.forClass(Directory.class).verify();

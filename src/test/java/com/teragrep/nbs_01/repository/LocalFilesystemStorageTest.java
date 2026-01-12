@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -99,29 +100,6 @@ class LocalFilesystemStorageTest {
     }
 
     @Test
-    void move() {
-        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
-        Path destinationPath = notebookDirectory.resolve("testPath");
-        Assertions.assertTrue(Files.exists(directory1));
-        Assertions.assertTrue(Files.exists(directory2));
-        Assertions.assertTrue(Files.exists(notebook1));
-        Assertions.assertTrue(Files.exists(notebook2));
-        Assertions
-                .assertDoesNotThrow(() -> root.move(new PathIdentifier(notebookDirectory.relativize(directory1).toString()), new PathIdentifier(notebookDirectory.relativize(destinationPath).toString())));
-        Assertions.assertTrue(Files.exists(destinationPath));
-        Assertions.assertTrue(Files.exists(destinationPath.resolve("my_second_folder_2A94M5J2D")));
-        Assertions
-                .assertTrue(Files.exists(destinationPath.resolve("my_second_folder_2A94M5J2D").resolve("my_note1_2A94M5J1Z.zpln")));
-        Assertions.assertTrue(Files.exists(destinationPath.resolve("my_note2_2A94M5J2Z.zpln")));
-
-        // Source files should not exist
-        Assertions.assertFalse(Files.exists(directory1));
-        Assertions.assertFalse(Files.exists(directory2));
-        Assertions.assertFalse(Files.exists(notebook1));
-        Assertions.assertFalse(Files.exists(notebook2));
-    }
-
-    @Test
     void deleteDirectory() {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         Assertions.assertTrue(Files.exists(directory1));
@@ -146,7 +124,7 @@ class LocalFilesystemStorageTest {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         Assertions.assertTrue(Files.exists(notebook1));
         Assertions
-                .assertDoesNotThrow(() -> root.deleteNotebook(new PathIdentifier(notebookDirectory.relativize(notebook1).toString())));
+                .assertDoesNotThrow(() -> root.deleteFile(new PathIdentifier(notebookDirectory.relativize(notebook1).toString())));
         Assertions.assertFalse(Files.exists(notebook1));
     }
 
@@ -179,7 +157,7 @@ class LocalFilesystemStorageTest {
         Path testDirectory = notebookDirectory.resolve(Paths.get("testDirectory"));
         Assertions
                 .assertDoesNotThrow(
-                        () -> root.createDirectory(new PathIdentifier(notebookDirectory.relativize(testDirectory).toString()))
+                        () -> root.writeDirectory(new PathIdentifier(notebookDirectory.relativize(testDirectory).toString()))
                 );
         Assertions.assertTrue(Files.exists(testDirectory));
     }
@@ -188,7 +166,7 @@ class LocalFilesystemStorageTest {
     void read() {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         String notebook1Content = Assertions
-                .assertDoesNotThrow(() -> root.read(new PathIdentifier(notebookDirectory.relativize(notebook1).toString())));
+                .assertDoesNotThrow(() -> root.readFile(new PathIdentifier(notebookDirectory.relativize(notebook1).toString())));
         Assertions.assertEquals(Assertions.assertDoesNotThrow(() -> Files.readString(notebook1)), notebook1Content);
     }
 
@@ -197,49 +175,39 @@ class LocalFilesystemStorageTest {
         LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
         Path notebookPath = Paths.get(notebookDirectory.toString(), "createdNotebook_newNotebookId");
         Notebook notebook = new Notebook("title");
+        SerializedNotebook serializedNotebook = Assertions.assertDoesNotThrow(() -> root.serializeNotebook(notebook));
 
         Assertions.assertFalse(Files.exists(notebookPath));
         Assertions
-                .assertDoesNotThrow(() -> root.write(new PathIdentifier(notebookDirectory.relativize(notebookPath).toString()), notebook.json().toString()));
+                .assertDoesNotThrow(() -> root.writeFile(new PathIdentifier(notebookDirectory.relativize(notebookPath).toString()), serializedNotebook.serialize()));
         Assertions.assertTrue(Files.exists(notebookPath));
     }
 
     @Test
-    void testImmediateChildren() {
+    void testReadDirectory() {
         LocalFilesystemStorage root = Assertions
                 .assertDoesNotThrow(() -> new LocalFilesystemStorage(notebookDirectory));
-        List<Identifier> rootChildren = Assertions
-                .assertDoesNotThrow(() -> root.immediateChildren(new PathIdentifier("")));
-        List<Identifier> directory1Children = Assertions
-                .assertDoesNotThrow(
-                        () -> root.immediateChildren(new PathIdentifier(notebookDirectory.relativize(directory1).toString()))
-                );
-        List<Identifier> directory2Children = Assertions
-                .assertDoesNotThrow(
-                        () -> root.immediateChildren(new PathIdentifier(notebookDirectory.relativize(directory2).toString()))
-                );
+        String rootChildren = Assertions.assertDoesNotThrow(() -> root.readDirectory(new PathIdentifier("")));
+        String directory1Children = Assertions
+                .assertDoesNotThrow(() -> root.readDirectory(new PathIdentifier(notebookDirectory.relativize(directory1).toString())));
+        String directory2Children = Assertions
+                .assertDoesNotThrow(() -> root.readDirectory(new PathIdentifier(notebookDirectory.relativize(directory2).toString())));
 
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(4, rootChildren.size()));
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(2, directory1Children.size()));
-        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(1, directory2Children.size()));
+        Assertions.assertTrue(rootChildren.contains(notebook3.getFileName().toString()));
+        Assertions.assertTrue(rootChildren.contains(notebook4.getFileName().toString()));
+        Assertions.assertTrue(rootChildren.contains(directory1.getFileName().toString()));
 
-        Assertions.assertTrue(rootChildren.contains(new PathIdentifier(notebook3.toString())));
-        Assertions.assertTrue(rootChildren.contains(new PathIdentifier(notebook4.toString())));
-        Assertions.assertTrue(rootChildren.contains(new PathIdentifier(directory1.toString())));
+        Assertions.assertTrue(directory1Children.contains(notebook2.getFileName().toString()));
+        Assertions.assertTrue(directory1Children.contains(directory2.getFileName().toString()));
 
-        Assertions.assertEquals(2, directory1Children.size());
-        Assertions.assertTrue(directory1Children.contains(new PathIdentifier(notebook2.toString())));
-        Assertions.assertTrue(directory1Children.contains(new PathIdentifier(directory2.toString())));
-
-        Assertions.assertEquals(1, directory2Children.size());
-        Assertions.assertTrue(directory2Children.contains(new PathIdentifier(notebook1.toString())));
+        Assertions.assertTrue(directory2Children.contains(notebook1.getFileName().toString()));
     }
 
     @Test
     void testChildren() {
         LocalFilesystemStorage root = Assertions
                 .assertDoesNotThrow(() -> new LocalFilesystemStorage(notebookDirectory));
-        List<Identifier> allChildren = Assertions.assertDoesNotThrow(() -> root.children(new PathIdentifier("")));
+        List<Identifier> allChildren = Assertions.assertDoesNotThrow(() -> root.listFiles(new PathIdentifier("")));
         Assertions.assertEquals(7, allChildren.size());
     }
 }

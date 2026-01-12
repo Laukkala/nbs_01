@@ -77,7 +77,7 @@ public final class DeleteNotebookEndpoint implements HTTPEndPoint {
     public HTTPResponse createResponse(HTTPRequest request) {
         try {
             Identifier targetIdentifier = request.targetIdentifier();
-            root.deleteNotebook(targetIdentifier);
+            root.deleteFile(targetIdentifier);
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();

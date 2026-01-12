@@ -83,22 +83,6 @@ public final class Notebook implements FilesystemEntity {
         return paragraphs;
     }
 
-    public JsonObject json() {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("name", name);
-        //compatibility fields//
-        builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
-        // end //
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-
-        for (Paragraph paragraph : paragraphs.values()) {
-            arrayBuilder.add(paragraph.json());
-        }
-        JsonArray paragraphJsonArray = arrayBuilder.build();
-        builder.add("paragraphs", paragraphJsonArray);
-        return builder.build();
-    }
-
     public Notebook copy() throws IOException {
         return copy(name);
     }

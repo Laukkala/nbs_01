@@ -55,18 +55,14 @@ import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import jakarta.json.Json;
 import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
@@ -85,22 +81,23 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
             Identifier targetIdentifier = request.targetIdentifier();
 
             // Deserialize source from Storage
-            JsonObject sourceJson = Json.createReader(new StringReader(root.read(sourceIdentifier))).readObject();
-            SerializedNotebook serializedSource = new JsonNotebook(sourceJson);
-            Notebook source = new Notebook(serializedSource.title(), serializedSource.paragraphs());
+            Notebook source = root.deserializeNotebook(sourceIdentifier);
 
             // Create a copy, which also generates unique IDs for copied paragraphs.
             Notebook copy = source.copy();
             // Serialize copy to storage
-            SerializedNotebook serializedCopy = new JsonNotebook(copy.json());
-            String serializedString = serializedCopy.serialize();
-            root.write(targetIdentifier, serializedString);
+            SerializedNotebook serializedDestination = root.serializeNotebook(copy);
+            root.writeFile(targetIdentifier, serializedDestination.serialize());
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(serializedString), headers);
+            return new BasicHTTPResponse(
+                    HttpStatus.CREATED_201,
+                    new StringBody(serializedDestination.serialize()),
+                    headers
+            );
         }
         catch (FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));

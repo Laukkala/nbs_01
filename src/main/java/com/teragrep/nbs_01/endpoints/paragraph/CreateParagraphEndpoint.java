@@ -55,17 +55,13 @@ import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
-import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -84,9 +80,7 @@ public final class CreateParagraphEndpoint implements HTTPEndPoint {
             String targetParagraphId = request.targetParagraphId();
 
             // Deserialize notebook
-            JsonObject json = Json.createReader(new StringReader(root.read(targetIdentifier))).readObject();
-            SerializedNotebook jsonNotebook = new JsonNotebook(json);
-            Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+            Notebook notebook = root.deserializeNotebook(targetIdentifier);
 
             // Throw error if a paragraph with the ID already exists.
             if (notebook.paragraphs().containsKey(targetParagraphId)) {
@@ -96,7 +90,8 @@ public final class CreateParagraphEndpoint implements HTTPEndPoint {
             // Add a new empty paragraph to the notebook and serialize to Storage
             Paragraph newParagraph = new Paragraph(targetParagraphId, "", new Script(""));
             notebook.paragraphs().put(targetParagraphId, newParagraph);
-            root.write(targetIdentifier, notebook.json().toString());
+            SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
+            root.writeFile(targetIdentifier, serializedNotebook.serialize());
 
             // Create response
             ArrayList<Header> headers = new ArrayList<>();

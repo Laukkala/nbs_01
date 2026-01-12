@@ -50,15 +50,12 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.http.body.ErrorBody;
 import com.teragrep.nbs_01.ErrorEvent;
 import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
+import com.teragrep.nbs_01.http.body.StringBody;
 import com.teragrep.nbs_01.http.requests.HTTPRequest;
 import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
 import com.teragrep.nbs_01.http.responses.HTTPResponse;
 import com.teragrep.nbs_01.repository.Identifier;
 import com.teragrep.nbs_01.repository.Storage;
-import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -66,7 +63,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 // Finds a given Directory and returns its own name and the names of its children in JSON format based on a given Identifier.
@@ -82,24 +78,13 @@ public final class FindDirectoryEndPoint implements HTTPEndPoint {
         try {
             // Find a directory and get a list of its children
             Identifier targetIdentifier = request.targetIdentifier();
-            List<Identifier> currentFiles = root.immediateChildren(targetIdentifier);
+            String directoryContent = root.readDirectory(targetIdentifier);
 
             // Create response
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            for (Identifier currentFile : currentFiles) {
-                arrayBuilder.add(currentFile.asShortString());
-            }
-
-            JsonObject json = Json
-                    .createObjectBuilder()
-                    .add("name", targetIdentifier.asShortString())
-                    .add("children", arrayBuilder.build())
-                    .build();
-
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(json), headers);
+            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(directoryContent), headers);
         }
         catch (MalformedRequestException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
