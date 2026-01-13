@@ -43,61 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.http.body;
+package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.exceptions.StubObjectException;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 
-/**
- * A Body that takes a Throwable. Generates message body that contains only the highest level Exception message to be
- * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
- */
+import java.nio.file.Path;
 
-public class ExceptionBody implements Body {
+public class HTTPBasicRequestPath implements HTTPRequestPath {
 
-    private final JsonObject json;
-    private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+    private final Path path;
 
-    public ExceptionBody(Throwable exception) {
-        this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
-    }
-
-    public Throwable exception() {
-        return exception;
+    public HTTPBasicRequestPath(Path path) {
+        this.path = path;
     }
 
     @Override
-    public String asString() throws StubObjectException {
-        return json.toString();
+    public Path path() throws MalformedRequestException {
+        return path;
     }
 
     @Override
-    public String title() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a Title!");
-    }
-
-    @Override
-    public String sourceParagraphId() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a SourceParagraphID!");
-    }
-
-    @Override
-    public String sourceIdentifier() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a SourceIdentifier!!");
-    }
-
-    @Override
-    public String text() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a Text!");
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
+    public String paragraphId() throws MalformedRequestException {
+        throw new MalformedRequestException("Path does not contain a paragraphId!");
     }
 }

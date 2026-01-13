@@ -65,6 +65,26 @@ public class StringBody implements Body {
     }
 
     @Override
+    public String title() throws StubObjectException {
+        throw new StubObjectException("No such field: \"title\"");
+    }
+
+    @Override
+    public String sourceParagraphId() throws StubObjectException {
+        throw new StubObjectException("No such field: \"sourceParagraphId\"");
+    }
+
+    @Override
+    public String sourceIdentifier() throws StubObjectException {
+        throw new StubObjectException("No such field: \"sourceParagraphId\"");
+    }
+
+    @Override
+    public String text() throws StubObjectException {
+        throw new StubObjectException("No such field: \"text\"");
+    }
+
+    @Override
     public boolean isStub() {
         return false;
     }

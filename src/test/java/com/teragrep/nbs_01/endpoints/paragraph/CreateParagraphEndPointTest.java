@@ -46,8 +46,8 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.protocols.Request;
 import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.path.HTTPParagraphRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -74,7 +74,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
         String paragraphId = "testParagraphId";
 
         Path requestPath = Paths.get(notebook3().toString(), paragraphId);
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
         HTTPResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
 
@@ -115,7 +115,7 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(nonexistentFileName, paragraphId);
         JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.

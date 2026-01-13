@@ -45,20 +45,16 @@
  */
 package com.teragrep.nbs_01.protocols.http;
 
-import com.teragrep.nbs_01.StubPath;
+import com.teragrep.nbs_01.protocols.http.path.HTTPRequestPath;
+import com.teragrep.nbs_01.protocols.http.path.StubPath;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.exceptions.StubObjectException;
 import com.teragrep.nbs_01.protocols.http.body.Body;
 import com.teragrep.nbs_01.protocols.http.body.StubBody;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
-import jakarta.json.Json;
-import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
 import org.apache.http.Header;
 
-import java.io.StringReader;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,40 +64,30 @@ import java.util.List;
 public final class BasicHTTPRequest implements HTTPRequest {
 
     private final Body body;
-    private final Path path;
+    private final HTTPRequestPath path;
     private final List<Header> headers;
-    private final RequestType type;
 
     public BasicHTTPRequest() {
-        this(RequestType.GENERIC, new StubBody(), new StubPath(), new ArrayList<>());
+        this(new StubBody(), new StubPath(), new ArrayList<>());
     }
 
     public BasicHTTPRequest(Body body) {
-        this(RequestType.GENERIC, body, new StubPath(), new ArrayList<>());
+        this(body, new StubPath(), new ArrayList<>());
     }
 
-    public BasicHTTPRequest(Path path) {
-        this(RequestType.GENERIC, new StubBody(), path, new ArrayList<>());
+    public BasicHTTPRequest(HTTPRequestPath path) {
+        this(new StubBody(), path, new ArrayList<>());
     }
 
-    public BasicHTTPRequest(RequestType type, Path path) {
-        this(type, new StubBody(), path, new ArrayList<>());
+    public BasicHTTPRequest(HTTPRequestPath path, List<Header> headers) {
+        this(new StubBody(), path, headers);
     }
 
-    public BasicHTTPRequest(Path path, List<Header> headers) {
-        this(RequestType.GENERIC, new StubBody(), path, headers);
+    public BasicHTTPRequest(HTTPRequestPath path, Body body) {
+        this(body, path, new ArrayList<>());
     }
 
-    public BasicHTTPRequest(Path path, Body body) {
-        this(RequestType.GENERIC, body, path, new ArrayList<>());
-    }
-
-    public BasicHTTPRequest(RequestType type, Path path, Body body) {
-        this(type, body, path, new ArrayList<>());
-    }
-
-    public BasicHTTPRequest(RequestType type, Body body, Path path, List<Header> headers) {
-        this.type = type;
+    public BasicHTTPRequest(Body body, HTTPRequestPath path, List<Header> headers) {
         this.body = body;
         this.path = path;
         this.headers = headers;
@@ -111,7 +97,7 @@ public final class BasicHTTPRequest implements HTTPRequest {
         return body;
     }
 
-    public Path path() {
+    public HTTPRequestPath path() {
         return path;
     }
 
@@ -120,23 +106,9 @@ public final class BasicHTTPRequest implements HTTPRequest {
     }
 
     @Override
-    public RequestType type() {
-        return type;
-    }
-
-    @Override
     public String title() throws MalformedRequestException {
         try {
-            JsonObject json = Json.createReader(new StringReader(body.asString())).readObject();
-            if (json.containsKey("title")) {
-                return json.getString("title");
-            }
-            else {
-                throw new JsonException("Json does not contain title!");
-            }
-        }
-        catch (IllegalStateException | JsonException exception) {
-            throw new MalformedRequestException("Request has a malformed title!", exception);
+            return body().title();
         }
         catch (StubObjectException e) {
             return "";
@@ -145,74 +117,41 @@ public final class BasicHTTPRequest implements HTTPRequest {
 
     @Override
     public String targetParagraphId() throws MalformedRequestException {
-        final int nameCount = path.getNameCount();
-        return path.subpath(nameCount - 1, nameCount).toString();
+        return path().paragraphId();
     }
 
     @Override
     public String sourceParagraphId() throws MalformedRequestException {
         try {
-            JsonObject json = Json.createReader(new StringReader(body.asString())).readObject();
-            if (json.containsKey("sourceParagraphId")) {
-                return json.getString("sourceParagraphId");
-            }
-            else {
-                throw new JsonException("Json does not contain sourceParagraphId");
-            }
-        }
-        catch (IllegalStateException | JsonException exception) {
-            throw new MalformedRequestException("Request has a malformed sourceParagraph identifier!", exception);
+            return body().sourceParagraphId();
         }
         catch (StubObjectException e) {
-            throw new RuntimeException(e);
+            throw new MalformedRequestException("Request has a malformed sourceParagraph identifier!", e);
         }
     }
 
     @Override
     public String text() throws MalformedRequestException {
         try {
-            JsonObject json = Json.createReader(new StringReader(body.asString())).readObject();
-            if (json.containsKey("text")) {
-                return json.getString("text");
-            }
-            else {
-                throw new JsonException("Json does not contain text!");
-            }
-        }
-        catch (IllegalStateException | JsonException exception) {
-            throw new MalformedRequestException("Request has a malformed text!", exception);
+            return body().text();
         }
         catch (StubObjectException e) {
-            throw new RuntimeException(e);
+            throw new MalformedRequestException("Request has a malformed text!", e);
         }
     }
 
     @Override
     public Identifier targetIdentifier() throws MalformedRequestException {
-        if (type.equals(RequestType.PARAGRAPH)) {
-            if (path.getNameCount() < 2) {
-                throw new MalformedRequestException("Request has a malformed identifier!");
-            }
-            return new PathIdentifier(path.subpath(0, path.getNameCount() - 1));
-        }
-        else {
-            return new PathIdentifier(path);
-        }
+        return new PathIdentifier(path.path());
     }
 
     @Override
     public Identifier sourceIdentifier() throws MalformedRequestException {
         try {
-            JsonObject json = Json.createReader(new StringReader(body.asString())).readObject();
-            if (json.containsKey("sourcePath")) {
-
-                return new PathIdentifier(json.getString("sourcePath"));
-            }
-            else {
-                throw new JsonException("Json does not contain sourcePath");
-            }
+            String sourceString = body().sourceIdentifier();
+            return new PathIdentifier(sourceString);
         }
-        catch (StubObjectException | JsonException exception) {
+        catch (StubObjectException exception) {
             throw new MalformedRequestException("Request has a malformed source identifier!", exception);
         }
     }

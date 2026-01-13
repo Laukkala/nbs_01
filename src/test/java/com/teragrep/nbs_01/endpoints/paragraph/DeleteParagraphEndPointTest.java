@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.protocols.Request;
+import com.teragrep.nbs_01.protocols.http.path.HTTPParagraphRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -73,7 +73,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String paragraphId = "20150213-230428_1231780373";
 
         Path requestPath = Paths.get(notebook3().toString(), paragraphId);
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
         HTTPResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
@@ -104,7 +104,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebook3().toString(), nonExistentParagraphId);
 
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
         HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return a Response with the correct status and message.
@@ -130,7 +130,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
         String paragraphId = "20150213-230428_1231780373";
 
         Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath);
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
         HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.

@@ -43,57 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.body;
+package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.protocols.http.body.JSONBody;
-import jakarta.json.Json;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 
-public class JsonBodyTest {
+import java.nio.file.Path;
 
-    // JsonBody should be able to represent itself as both a JsonStructure (a JsonObject or a JsonArray) and a String
-    @Test
-    void testJsonBodyAsString() {
+public class HTTPParagraphRequestPath implements HTTPRequestPath {
 
-        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
+    private final Path path;
 
-        JSONBody body = new JSONBody(expectedBody);
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
+    public HTTPParagraphRequestPath(Path path) {
+        this.path = path;
+    }
+
+    @Override
+    public Path path() throws MalformedRequestException {
+        int nameCount = path.getNameCount();
+        if (nameCount < 2) {
+            throw new MalformedRequestException("Request has a malformed identifier!");
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
+        else {
+            return path.subpath(0, nameCount - 1);
         }
     }
 
-    @Test
-    void testJsonBodyAsJsonObject() {
-
-        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
-
-        JSONBody body = new JSONBody(expectedBody);
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
+    @Override
+    public String paragraphId() throws MalformedRequestException {
+        int nameCount = path.getNameCount();
+        if (nameCount < 2) {
+            throw new MalformedRequestException("Request has a malformed identifier!");
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    void testJsonBodyAsJsonArray() {
-
-        JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
-
-        JSONBody body = new JSONBody(expectedBody);
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
+        else {
+            return path.subpath(nameCount - 1, nameCount).toString();
         }
     }
 }

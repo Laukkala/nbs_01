@@ -43,56 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.requests;
+package com.teragrep.nbs_01.protocols.http.body;
 
-import com.teragrep.nbs_01.StubPath;
-import com.teragrep.nbs_01.protocols.http.body.Body;
-import com.teragrep.nbs_01.protocols.http.body.StringBody;
-import com.teragrep.nbs_01.protocols.http.body.StubBody;
-import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
+import com.teragrep.nbs_01.exceptions.ErrorEvent;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.UUID;
 
-public class BasicHTTPRequestTest {
+public class ErrorBodyTest {
 
+    // An ErrorBody should generate a specific message on creation, containing an event Id.
     @Test
-    public void headersTest() {
-        Path requestPath = Paths.get("target", "testLocation");
-        Header locationHeader = new BasicHeader("Location", requestPath.toString());
-        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
-        List<Header> headers = new ArrayList<>();
-        headers.add(locationHeader);
-        headers.add(contentTypeHeader);
-        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, headers);
+    void testErrorBodyGeneration() {
 
-        Assertions.assertEquals(2, testRequest.headers().size());
-        Assertions.assertTrue(testRequest.headers().contains(locationHeader));
-        Assertions.assertTrue(testRequest.headers().contains(contentTypeHeader));
-        Assertions.assertEquals(headers, testRequest.headers());
+        final String throwable1message = "Failed to open notebook!";
+        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
+        final UUID eventId = UUID.randomUUID();
+
+        Throwable throwable4 = new FileNotFoundException(throwable4message);
+        Throwable throwable3 = new IOException(throwable3message, throwable4);
+        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
+        Throwable throwable1 = new Exception(throwable1message, throwable2);
+
+        ErrorBody body = new ErrorBody(new ErrorEvent(throwable1, eventId));
+        JsonObject expectedBody = Json
+                .createObjectBuilder()
+                .add(
+                        "message",
+                        "An error occurred while processing your Request. See event id " + eventId
+                                + " in the technical log for details."
+                )
+                .build();
+        try {
+            Assertions.assertEquals(expectedBody.toString(), body.asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    @Test
-    public void bodyTest() {
-        Path requestPath = Paths.get("target", "testLocation");
-        Body body = new StringBody("testPayload");
-        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, body);
-
-        Assertions.assertEquals(body, testRequest.body());
-    }
-
-    @Test
-    public void stubTest() {
-        BasicHTTPRequest stubRequest = new BasicHTTPRequest();
-        Assertions.assertEquals(0, stubRequest.headers().size());
-        Assertions.assertEquals(StubBody.class, stubRequest.body().getClass());
-        Assertions.assertEquals(StubPath.class, stubRequest.path().getClass());
-    }
-
 }

@@ -45,24 +45,56 @@
  */
 package com.teragrep.nbs_01.protocols.http;
 
-import com.teragrep.nbs_01.protocols.Request;
 import com.teragrep.nbs_01.protocols.http.body.Body;
-import com.teragrep.nbs_01.protocols.http.path.HTTPRequestPath;
+import com.teragrep.nbs_01.protocols.http.body.StringBody;
+import com.teragrep.nbs_01.protocols.http.body.StubBody;
 import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.eclipse.jetty.http.HttpStatus;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Representation of an HTTP request. Composed of a collection of Headers, a Body, and a Path Provides access to its
- * components.
- */
-// Request object contains parameters that the user wants to send to NBS_01.
-// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
-public interface HTTPRequest extends Request {
+public class BasicHTTPResponseTest {
 
-    public abstract Body body();
+    @Test
+    void statusTest() {
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200);
+        Assertions.assertEquals(200, testResponse.status());
+    }
 
-    public abstract HTTPRequestPath path();
+    @Test
+    void bodyTest() {
+        Body body = new StringBody("testPayload");
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, body);
 
-    public abstract List<Header> headers();
+        Assertions.assertEquals(body, testResponse.body());
+    }
+
+    @Test
+    void headersTest() {
+        Path responsePath = Paths.get("target", "testLocation");
+        Header locationHeader = new BasicHeader("Location", responsePath.toString());
+        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        List<Header> headers = new ArrayList<>();
+        headers.add(locationHeader);
+        headers.add(contentTypeHeader);
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, headers);
+
+        Assertions.assertEquals(2, testResponse.headers().size());
+        Assertions.assertTrue(testResponse.headers().contains(locationHeader));
+        Assertions.assertTrue(testResponse.headers().contains(contentTypeHeader));
+        Assertions.assertEquals(headers, testResponse.headers());
+    }
+
+    @Test
+    void stubTest() {
+        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404);
+        Assertions.assertEquals(StubBody.class, testResponse.body().getClass());
+        Assertions.assertEquals(0, testResponse.headers().size());
+    }
 }

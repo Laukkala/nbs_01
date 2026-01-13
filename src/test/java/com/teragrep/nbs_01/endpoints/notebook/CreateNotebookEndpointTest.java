@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -73,7 +74,8 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookPath)));
 
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(newNotebookPath));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(newNotebookPath)));
         // Assert that we receive the proper response.
 
         JsonObject expectedJson = Json
@@ -104,7 +106,8 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         String title = "newNotebook";
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", title).build();
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(newNotebookPath, new JSONBody(body)));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(newNotebookPath), new JSONBody(body)));
         // Assert that we receive the proper response.
 
         JsonObject expectedJson = Json
@@ -133,7 +136,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         String originalFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(notebook2()));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook2())));
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
         String editedFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
@@ -149,7 +152,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
         Assertions.assertTrue(Files.isDirectory(notebookDirectory().resolve(directory1())));
         CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(directory1()));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(directory1())));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

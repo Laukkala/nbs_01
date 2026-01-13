@@ -43,61 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.http.body;
+package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.exceptions.StubObjectException;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 
-/**
- * A Body that takes a Throwable. Generates message body that contains only the highest level Exception message to be
- * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
- */
+import java.nio.file.*;
 
-public class ExceptionBody implements Body {
+public class StubPath implements HTTPRequestPath {
 
-    private final JsonObject json;
-    private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+    public StubPath() {
 
-    public ExceptionBody(Throwable exception) {
-        this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
-    }
-
-    public Throwable exception() {
-        return exception;
     }
 
     @Override
-    public String asString() throws StubObjectException {
-        return json.toString();
+    public boolean equals(Object other) {
+        throw new IllegalStateException("Path is a stub!");
     }
 
     @Override
-    public String title() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a Title!");
+    public int hashCode() {
+        throw new IllegalStateException("Path is a stub!");
     }
 
     @Override
-    public String sourceParagraphId() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a SourceParagraphID!");
+    public String toString() {
+        throw new IllegalStateException("Path is a stub!");
     }
 
     @Override
-    public String sourceIdentifier() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a SourceIdentifier!!");
+    public Path path() throws MalformedRequestException {
+        throw new MalformedRequestException("Path is a stub!");
     }
 
     @Override
-    public String text() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a Text!");
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
+    public String paragraphId() throws MalformedRequestException {
+        throw new MalformedRequestException("Path is a stub!");
     }
 }

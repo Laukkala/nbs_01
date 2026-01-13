@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.servlets;
 
-import com.teragrep.nbs_01.StubPath;
+import com.teragrep.nbs_01.protocols.http.path.StubPath;
 import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
 import com.teragrep.nbs_01.protocols.http.body.Body;
 import com.teragrep.nbs_01.protocols.http.body.StringBody;

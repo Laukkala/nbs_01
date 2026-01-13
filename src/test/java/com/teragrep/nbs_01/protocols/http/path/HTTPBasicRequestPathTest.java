@@ -43,39 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.body;
+package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.protocols.http.body.ExceptionBody;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class ExceptionBodyTest {
+class HTTPBasicRequestPathTest {
 
-    // ExceptionBody should contain a message with the top reason in the stack, but not deeper
     @Test
-    void testExceptionBodyGeneration() {
-        final String throwable1message = "No such notebook!";
-        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
+    void path() {
+        HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
+        Path filePath = Assertions.assertDoesNotThrow(() -> path.path());
+        Assertions.assertEquals(Paths.get("first", "second", "third"), filePath);
+    }
 
-        Throwable throwable4 = new FileNotFoundException(throwable4message);
-        Throwable throwable3 = new IOException(throwable3message, throwable4);
-        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
-        Throwable throwable1 = new Exception(throwable1message, throwable2);
-
-        ExceptionBody body = new ExceptionBody(throwable1);
-        JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    void paragraphId() {
+        HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
+        Assertions.assertThrows(MalformedRequestException.class, () -> path.paragraphId());
     }
 }

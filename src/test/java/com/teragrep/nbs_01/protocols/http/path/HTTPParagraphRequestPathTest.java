@@ -43,50 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.body;
+package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.exceptions.ErrorEvent;
-import com.teragrep.nbs_01.protocols.http.body.ErrorBody;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.UUID;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class ErrorBodyTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    // An ErrorBody should generate a specific message on creation, containing an event Id.
+class HTTPParagraphRequestPathTest {
+
     @Test
-    void testErrorBodyGeneration() {
+    void path() {
+        HTTPParagraphRequestPath path = new HTTPParagraphRequestPath(Paths.get("first", "second", "third"));
+        Path filePath = Assertions.assertDoesNotThrow(() -> path.path());
+        Assertions.assertEquals(Paths.get("first", "second"), filePath);
+    }
 
-        final String throwable1message = "Failed to open notebook!";
-        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
-        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
-        final UUID eventId = UUID.randomUUID();
-
-        Throwable throwable4 = new FileNotFoundException(throwable4message);
-        Throwable throwable3 = new IOException(throwable3message, throwable4);
-        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
-        Throwable throwable1 = new Exception(throwable1message, throwable2);
-
-        ErrorBody body = new ErrorBody(new ErrorEvent(throwable1, eventId));
-        JsonObject expectedBody = Json
-                .createObjectBuilder()
-                .add(
-                        "message",
-                        "An error occurred while processing your Request. See event id " + eventId
-                                + " in the technical log for details."
-                )
-                .build();
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    void paragraphId() {
+        HTTPParagraphRequestPath path = new HTTPParagraphRequestPath(Paths.get("first", "second", "third"));
+        String filePath = Assertions.assertDoesNotThrow(() -> path.paragraphId());
+        Assertions.assertEquals("third", filePath);
     }
 }

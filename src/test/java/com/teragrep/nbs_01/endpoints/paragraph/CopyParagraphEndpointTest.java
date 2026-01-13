@@ -47,8 +47,8 @@ package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.google.common.base.Charsets;
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.protocols.Request;
 import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.path.HTTPParagraphRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -95,7 +95,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -155,7 +155,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -190,7 +190,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook3().toString()).build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -222,7 +222,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", sourceNotebookName)
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -245,7 +245,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
         CopyParagraphEndpoint endPoint = new CopyParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         Path requestPath = Paths.get(notebook1().toString(), destinationParagraphId);
         JsonObject body = Json.createObjectBuilder().add("sourceParagraphId", sourceParagraphId).build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -282,7 +282,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.
@@ -315,7 +315,7 @@ class CopyParagraphEndpointTest extends AbstractNotebookServerTest {
                 .add("sourcePath", notebook3().toString())
                 .add("sourceParagraphId", sourceParagraphId)
                 .build();
-        BasicHTTPRequest request = new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath, new JSONBody(body));
+        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
         HTTPResponse response = endPoint.createResponse(request);
 
         // Assert that we receive the proper response.

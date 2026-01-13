@@ -45,24 +45,54 @@
  */
 package com.teragrep.nbs_01.protocols.http;
 
-import com.teragrep.nbs_01.protocols.Request;
-import com.teragrep.nbs_01.protocols.http.body.Body;
+import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.protocols.http.path.HTTPRequestPath;
+import com.teragrep.nbs_01.protocols.http.path.StubPath;
+import com.teragrep.nbs_01.protocols.http.body.Body;
+import com.teragrep.nbs_01.protocols.http.body.StringBody;
+import com.teragrep.nbs_01.protocols.http.body.StubBody;
 import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Representation of an HTTP request. Composed of a collection of Headers, a Body, and a Path Provides access to its
- * components.
- */
-// Request object contains parameters that the user wants to send to NBS_01.
-// Specific implementations of Request verify that the parameters are given in a supported format and throw an Exception if the parameters are invalid.
-public interface HTTPRequest extends Request {
+public class BasicHTTPRequestTest {
 
-    public abstract Body body();
+    @Test
+    public void headersTest() {
+        HTTPRequestPath requestPath = new HTTPBasicRequestPath(Paths.get("target", "testLocation"));
+        Header locationHeader = new BasicHeader("Location", requestPath.toString());
+        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        List<Header> headers = new ArrayList<>();
+        headers.add(locationHeader);
+        headers.add(contentTypeHeader);
+        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, headers);
 
-    public abstract HTTPRequestPath path();
+        Assertions.assertEquals(2, testRequest.headers().size());
+        Assertions.assertTrue(testRequest.headers().contains(locationHeader));
+        Assertions.assertTrue(testRequest.headers().contains(contentTypeHeader));
+        Assertions.assertEquals(headers, testRequest.headers());
+    }
 
-    public abstract List<Header> headers();
+    @Test
+    public void bodyTest() {
+        HTTPBasicRequestPath requestPath = new HTTPBasicRequestPath(Paths.get("target", "testLocation"));
+        Body body = new StringBody("testPayload");
+        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, body);
+
+        Assertions.assertEquals(body, testRequest.body());
+    }
+
+    @Test
+    public void stubTest() {
+        BasicHTTPRequest stubRequest = new BasicHTTPRequest();
+        Assertions.assertEquals(0, stubRequest.headers().size());
+        Assertions.assertEquals(StubBody.class, stubRequest.body().getClass());
+        Assertions.assertEquals(StubPath.class, stubRequest.path().getClass());
+    }
+
 }

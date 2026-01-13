@@ -54,4 +54,12 @@ import com.teragrep.nbs_01.exceptions.StubObjectException;
 public interface Body extends Stubable {
 
     public abstract String asString() throws StubObjectException;
+
+    public abstract String title() throws StubObjectException;
+
+    public abstract String sourceParagraphId() throws StubObjectException;
+
+    public abstract String sourceIdentifier() throws StubObjectException;
+
+    public abstract String text() throws StubObjectException;
 }

@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -72,7 +73,8 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         String editedTitle = "testTitle";
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
-        HTTPResponse response = endpoint.createResponse(new BasicHTTPRequest(notebookPath, new JSONBody(body)));
+        HTTPResponse response = endpoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebookPath), new JSONBody(body)));
 
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
@@ -102,7 +104,7 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
         UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
         HTTPResponse response = endpoint
-                .createResponse(new BasicHTTPRequest(nonExistentNotebookPath, new JSONBody(body)));
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentNotebookPath), new JSONBody(body)));
         // Assert that we got the proper response.
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.

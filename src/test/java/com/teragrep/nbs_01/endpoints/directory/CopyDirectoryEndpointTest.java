@@ -47,6 +47,7 @@ package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -86,7 +87,7 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", directory1().toString()).build();
         HTTPResponse response = endPoint
-                .createResponse(new BasicHTTPRequest(Paths.get(destinationDirectory.toString()), new JSONBody(body)));
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(Paths.get(destinationDirectory.toString())), new JSONBody(body)));
 
         // Assert that we receive the proper response.
         JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
@@ -125,7 +126,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceDirectory.toString()).build();
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(destinationDirectory, new JSONBody(body)));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationDirectory), new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
 
         // Assert that the file was not created.
@@ -145,7 +147,8 @@ class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
         CopyDirectoryEndpoint endPoint = new CopyDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         JsonObject body = Json.createObjectBuilder().add("sourcePath", directory2().toString()).build();
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(directory1(), new JSONBody(body)));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(directory1()), new JSONBody(body)));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

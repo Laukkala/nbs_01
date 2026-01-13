@@ -63,6 +63,26 @@ public class StubBody implements Body {
     }
 
     @Override
+    public String title() throws StubObjectException {
+        throw new StubObjectException("Body is a stub!");
+    }
+
+    @Override
+    public String sourceParagraphId() throws StubObjectException {
+        throw new StubObjectException("Body is a stub!");
+    }
+
+    @Override
+    public String sourceIdentifier() throws StubObjectException {
+        throw new StubObjectException("Body is a stub!");
+    }
+
+    @Override
+    public String text() throws StubObjectException {
+        throw new StubObjectException("Body is a stub!");
+    }
+
+    @Override
     public boolean isStub() {
         return true;
     }

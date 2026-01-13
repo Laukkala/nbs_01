@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.endpoints.directory;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -66,7 +67,8 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Destination directory must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(deletedDirectoryPath)));
         DeleteDirectoryEndpoint endPoint = new DeleteDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(deletedDirectoryPath));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(deletedDirectoryPath)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
         Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryPath.toString());

@@ -53,21 +53,16 @@ import com.teragrep.nbs_01.repository.identifiers.Identifier;
  */
 public interface Request {
 
-    public abstract RequestType type();
+    public abstract Identifier targetIdentifier() throws MalformedRequestException;
 
-    public abstract String title() throws MalformedRequestException;
+    public abstract Identifier sourceIdentifier() throws MalformedRequestException;
 
     public abstract String targetParagraphId() throws MalformedRequestException;
 
     public abstract String sourceParagraphId() throws MalformedRequestException;
 
+    public abstract String title() throws MalformedRequestException;
+
     public abstract String text() throws MalformedRequestException;
 
-    public abstract Identifier targetIdentifier() throws MalformedRequestException;
-
-    public abstract Identifier sourceIdentifier() throws MalformedRequestException;
-
-    public static enum RequestType {
-        GENERIC, NOTEBOOK, DIRECTORY, PARAGRAPH,
-    }
 }

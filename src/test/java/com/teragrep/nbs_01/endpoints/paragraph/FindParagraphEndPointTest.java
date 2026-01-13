@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.protocols.Request;
+import com.teragrep.nbs_01.protocols.http.path.HTTPParagraphRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -74,7 +74,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
         Path requestPath = Paths.get(notebook1().toString(), paragraphId);
         FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         HTTPResponse response = endPoint
-                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath));
+                .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath)));
         Header expectedLocationHeader = new BasicHeader(
                 "Location",
                 requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
@@ -98,7 +98,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
         HTTPResponse response = endPoint
-                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath));
+                .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath)));
 
         // The endpoint should return a Response with the correct status and messagsse.
         JsonObject expectedJson = Json
@@ -118,7 +118,7 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
         Path requestPath = Paths.get(notebook1().toString(), nonExistentParagraphId);
         HTTPResponse response = endPoint
-                .createResponse(new BasicHTTPRequest(Request.RequestType.PARAGRAPH, requestPath));
+                .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         JsonObject expectedJson = Json

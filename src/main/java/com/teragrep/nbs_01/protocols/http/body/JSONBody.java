@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.protocols.http.body;
 
 import com.teragrep.nbs_01.exceptions.StubObjectException;
-import jakarta.json.JsonStructure;
+import jakarta.json.*;
 
 /**
  * A Body that encapsulates a JsonStructure
@@ -67,6 +67,58 @@ public class JSONBody implements Body {
     @Override
     public String asString() throws StubObjectException {
         return json.toString();
+    }
+
+    @Override
+    public String title() throws StubObjectException {
+        if (
+            json.asJsonObject().containsKey("title")
+                    && json.asJsonObject().get("title").getValueType().equals(JsonValue.ValueType.STRING)
+        ) {
+            return json.asJsonObject().getString("title");
+        }
+        else {
+            throw new StubObjectException("No such value: \"title\"");
+        }
+    }
+
+    @Override
+    public String sourceParagraphId() throws StubObjectException {
+        if (
+            json.asJsonObject().containsKey("sourceParagraphId")
+                    && json.asJsonObject().get("sourceParagraphId").getValueType().equals(JsonValue.ValueType.STRING)
+        ) {
+            return json.asJsonObject().getString("sourceParagraphId");
+        }
+        else {
+            throw new StubObjectException("No such value: \"sourceParagraphId\"");
+        }
+    }
+
+    @Override
+    public String sourceIdentifier() throws StubObjectException {
+        if (
+            json.asJsonObject().containsKey("sourcePath")
+                    && json.asJsonObject().get("sourcePath").getValueType().equals(JsonValue.ValueType.STRING)
+        ) {
+            return json.asJsonObject().getString("sourcePath");
+        }
+        else {
+            throw new StubObjectException("No such value: \"sourcePath\"");
+        }
+    }
+
+    @Override
+    public String text() throws StubObjectException {
+        if (
+            json.asJsonObject().containsKey("text")
+                    && json.asJsonObject().get("text").getValueType().equals(JsonValue.ValueType.STRING)
+        ) {
+            return json.asJsonObject().getString("text");
+        }
+        else {
+            throw new StubObjectException("No such value: \"text\"");
+        }
     }
 
     @Override

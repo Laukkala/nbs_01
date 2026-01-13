@@ -43,59 +43,56 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.protocols.responses;
+package com.teragrep.nbs_01.protocols.http.body;
 
-import com.teragrep.nbs_01.protocols.http.body.Body;
-import com.teragrep.nbs_01.protocols.http.body.StringBody;
-import com.teragrep.nbs_01.protocols.http.body.StubBody;
-import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.http.HttpStatus;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+public class JsonBodyTest {
 
-public class BasicHTTPResponseTest {
-
+    // JsonBody should be able to represent itself as both a JsonStructure (a JsonObject or a JsonArray) and a String
     @Test
-    void statusTest() {
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200);
-        Assertions.assertEquals(200, testResponse.status());
+    void testJsonBodyAsString() {
+
+        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
+
+        JSONBody body = new JSONBody(expectedBody);
+        try {
+            Assertions.assertEquals(expectedBody.toString(), body.asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    void bodyTest() {
-        Body body = new StringBody("testPayload");
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, body);
+    void testJsonBodyAsJsonObject() {
 
-        Assertions.assertEquals(body, testResponse.body());
+        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
+
+        JSONBody body = new JSONBody(expectedBody);
+        try {
+            Assertions.assertEquals(expectedBody.toString(), body.asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    void headersTest() {
-        Path responsePath = Paths.get("target", "testLocation");
-        Header locationHeader = new BasicHeader("Location", responsePath.toString());
-        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
-        List<Header> headers = new ArrayList<>();
-        headers.add(locationHeader);
-        headers.add(contentTypeHeader);
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, headers);
+    void testJsonBodyAsJsonArray() {
 
-        Assertions.assertEquals(2, testResponse.headers().size());
-        Assertions.assertTrue(testResponse.headers().contains(locationHeader));
-        Assertions.assertTrue(testResponse.headers().contains(contentTypeHeader));
-        Assertions.assertEquals(headers, testResponse.headers());
-    }
+        JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
 
-    @Test
-    void stubTest() {
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404);
-        Assertions.assertEquals(StubBody.class, testResponse.body().getClass());
-        Assertions.assertEquals(0, testResponse.headers().size());
+        JSONBody body = new JSONBody(expectedBody);
+        try {
+            Assertions.assertEquals(expectedBody.toString(), body.asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

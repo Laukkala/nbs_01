@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
+import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
@@ -71,7 +72,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         String expectedFileContent = "\"name\":\"my_note1\",\"config\":{}";
 
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(notebook1()));
+        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook1())));
         Header expectedLocationHeader = new BasicHeader("Location", notebook1().toString());
         Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
@@ -120,7 +121,8 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
         Path nonExistentNotebookPath = Paths.get("nonExistentNotebook");
         // Start server and wait for it to initialize.
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(nonExistentNotebookPath));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentNotebookPath)));
 
         // The endpoint should return the correct status and message.
         JsonObject expectedJson = Json
@@ -138,7 +140,8 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpFindCorruptNotebookTest() {
         Path nonExistentNotebookPath = Paths.get("junkfile");
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(nonExistentNotebookPath));
+        HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentNotebookPath)));
 
         // The endpoint should return the correct status and message.
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, response.status());

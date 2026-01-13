@@ -45,59 +45,36 @@
  */
 package com.teragrep.nbs_01.protocols.http.body;
 
-import com.teragrep.nbs_01.exceptions.StubObjectException;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-/**
- * A Body that takes a Throwable. Generates message body that contains only the highest level Exception message to be
- * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
- */
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-public class ExceptionBody implements Body {
+public class ExceptionBodyTest {
 
-    private final JsonObject json;
-    private final Throwable exception;
-    private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+    // ExceptionBody should contain a message with the top reason in the stack, but not deeper
+    @Test
+    void testExceptionBodyGeneration() {
+        final String throwable1message = "No such notebook!";
+        final String throwable2message = "Notebook at /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
+        final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
 
-    public ExceptionBody(Throwable exception) {
-        this.exception = exception;
-        jsonObjectBuilder.add("message", exception.getMessage());
-        this.json = jsonObjectBuilder.build();
-    }
+        Throwable throwable4 = new FileNotFoundException(throwable4message);
+        Throwable throwable3 = new IOException(throwable3message, throwable4);
+        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
+        Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-    public Throwable exception() {
-        return exception;
-    }
-
-    @Override
-    public String asString() throws StubObjectException {
-        return json.toString();
-    }
-
-    @Override
-    public String title() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a Title!");
-    }
-
-    @Override
-    public String sourceParagraphId() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a SourceParagraphID!");
-    }
-
-    @Override
-    public String sourceIdentifier() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a SourceIdentifier!!");
-    }
-
-    @Override
-    public String text() throws StubObjectException {
-        throw new StubObjectException("ExceptionBody does not have a Text!");
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
+        ExceptionBody body = new ExceptionBody(throwable1);
+        JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
+        try {
+            Assertions.assertEquals(expectedBody.toString(), body.asString());
+        }
+        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

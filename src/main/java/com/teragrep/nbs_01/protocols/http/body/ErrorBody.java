@@ -88,6 +88,26 @@ public class ErrorBody implements Body {
     }
 
     @Override
+    public String title() throws StubObjectException {
+        throw new StubObjectException("ErrorBody does not have a Title!");
+    }
+
+    @Override
+    public String sourceParagraphId() throws StubObjectException {
+        throw new StubObjectException("ErrorBody does not have a SourceParagraphID!");
+    }
+
+    @Override
+    public String sourceIdentifier() throws StubObjectException {
+        throw new StubObjectException("ErrorBody does not have a SourceIdentifier!!");
+    }
+
+    @Override
+    public String text() throws StubObjectException {
+        throw new StubObjectException("ErrorBody does not have a Text!");
+    }
+
+    @Override
     public boolean isStub() {
         return false;
     }
