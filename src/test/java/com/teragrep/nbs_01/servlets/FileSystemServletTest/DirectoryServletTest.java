@@ -276,7 +276,7 @@ public class DirectoryServletTest extends AbstractNotebookServerTest {
         expectedChildren.add(directory2().getFileName().toString());
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("name", directoryPath.toString())
+                .add("title", directoryPath.toString())
                 .add("children", expectedChildren)
                 .build();
         Assertions

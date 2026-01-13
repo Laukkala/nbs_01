@@ -61,14 +61,26 @@ public final class JsonNotebook implements SerializedNotebook {
 
     @Override
     public String title() throws JsonException {
-        String name;
-        if (!jsonObject.containsKey("name")) {
-            name = "";
+        String title;
+        if (!jsonObject.containsKey("title") && !jsonObject.containsKey("name")) {
+            title = "";
         }
+        else if (jsonObject.containsKey("title")) {
+            JsonValue.ValueType type = jsonObject.get("title").getValueType();
+            if (type.equals(JsonValue.ValueType.STRING)) {
+                title = jsonObject.getString("title");
+            }
+            else {
+                throw new JsonException(
+                        "Expected key 'title' to be of type " + JsonValue.ValueType.STRING + " but was: " + type
+                );
+            }
+        }
+        // Handling of legacy zeppelin files that use "name" instead of "title"
         else {
             JsonValue.ValueType type = jsonObject.get("name").getValueType();
             if (type.equals(JsonValue.ValueType.STRING)) {
-                name = jsonObject.getString("name");
+                title = jsonObject.getString("name");
             }
             else {
                 throw new JsonException(
@@ -76,7 +88,7 @@ public final class JsonNotebook implements SerializedNotebook {
                 );
             }
         }
-        return name;
+        return title;
     }
 
     @Override

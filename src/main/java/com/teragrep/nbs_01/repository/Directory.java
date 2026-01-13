@@ -55,16 +55,15 @@ public final class Directory implements FilesystemEntity {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
     private final List<FilesystemEntity> children;
-    private final String name;
+    private final String title;
 
-    public Directory(String name, List<FilesystemEntity> children) {
-        this.name = name;
+    public Directory(String title, List<FilesystemEntity> children) {
+        this.title = title;
         this.children = children;
     }
 
-
-    public String name() {
-        return name;
+    public String title() {
+        return title;
     }
 
     public List<FilesystemEntity> children() {
@@ -80,11 +79,11 @@ public final class Directory implements FilesystemEntity {
             return false;
         }
         Directory directory = (Directory) o;
-        return Objects.equals(children, directory.children) && Objects.equals(name, directory.name);
+        return Objects.equals(children, directory.children) && Objects.equals(title, directory.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(children, name);
+        return Objects.hash(children, title);
     }
 }

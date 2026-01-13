@@ -69,7 +69,7 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpFindTest() {
         // Destination notebook must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
-        String expectedFileContent = "\"name\":\"my_note1\",\"config\":{}";
+        String expectedFileContent = "\"title\":\"my_note1\",\"config\":{}";
 
         FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
         HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook1())));

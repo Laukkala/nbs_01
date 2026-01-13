@@ -55,26 +55,26 @@ import java.util.*;
 public final class Notebook implements FilesystemEntity {
 
     private final Map<String, Paragraph> paragraphs;
-    private final String name;
+    private final String title;
 
     // Constructor for a stub notebook that can be loaded from file.
     public Notebook() {
-        this.name = "";
+        this.title = "";
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String name) {
-        this.name = name;
+    public Notebook(String title) {
+        this.title = title;
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String name, Map<String, Paragraph> paragraphs) {
-        this.name = name;
+    public Notebook(String title, Map<String, Paragraph> paragraphs) {
+        this.title = title;
         this.paragraphs = paragraphs;
     }
 
-    public String name() {
-        return name;
+    public String title() {
+        return title;
     }
 
     public Map<String, Paragraph> paragraphs() {
@@ -82,7 +82,7 @@ public final class Notebook implements FilesystemEntity {
     }
 
     public Notebook copy() throws IOException {
-        return copy(name);
+        return copy(title);
     }
 
     public Notebook copy(String copyTitle) throws IOException {
@@ -104,11 +104,11 @@ public final class Notebook implements FilesystemEntity {
             return false;
         }
         Notebook notebook = (Notebook) o;
-        return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(name, notebook.name);
+        return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(title, notebook.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(paragraphs, name);
+        return Objects.hash(paragraphs, title);
     }
 }

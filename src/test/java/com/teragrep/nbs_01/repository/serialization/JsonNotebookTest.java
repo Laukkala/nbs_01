@@ -74,7 +74,7 @@ class JsonNotebookTest {
             .build();
     private final JsonObject testJsonObject = Json
             .createObjectBuilder()
-            .add("name", "testTitle")
+            .add("title", "testTitle")
             .add("paragraphs", testJsonParagraphs)
             .build();
 

@@ -70,7 +70,7 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Destination directory must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory2())));
 
-        String expectedFileContent = "{\"name\":\"my_second_folder_2A94M5J2D\",\"children\":[\""
+        String expectedFileContent = "{\"title\":\"my_second_folder_2A94M5J2D\",\"children\":[\""
                 + notebook1().getFileName() + "\"]}";
 
         FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new LocalFilesystemStorage(notebookDirectory()));

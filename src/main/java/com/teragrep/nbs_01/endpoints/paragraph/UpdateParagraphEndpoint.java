@@ -111,7 +111,7 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
             // Overwrite the old paragraph with the edited paragraph, and serialize the notebook to Storage
             Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
-            Notebook newNotebook = new Notebook(notebook.name(), paragraphs);
+            Notebook newNotebook = new Notebook(notebook.title(), paragraphs);
             SerializedNotebook serializedNotebook = root.serializeNotebook(newNotebook);
             root.writeFile(targetIdentifier, serializedNotebook.serialize());
 

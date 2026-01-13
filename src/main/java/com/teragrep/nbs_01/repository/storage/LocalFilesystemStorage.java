@@ -186,7 +186,7 @@ public class LocalFilesystemStorage implements Storage {
 
         JsonObject json = Json
                 .createObjectBuilder()
-                .add("name", identifier.asShortString())
+                .add("title", identifier.asShortString())
                 .add("children", arrayBuilder.build())
                 .build();
         return json.toString();
@@ -202,7 +202,7 @@ public class LocalFilesystemStorage implements Storage {
     @Override
     public SerializedNotebook serializeNotebook(Notebook notebook) throws IOException, MalformedRequestException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("name", notebook.name());
+        builder.add("title", notebook.title());
         //compatibility fields//
         builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
         // end //

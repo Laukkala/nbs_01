@@ -85,7 +85,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         // Assert that the file was changed.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        String expectedFileContent = "{\"name\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
+        String expectedFileContent = "{\"title\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
         Assertions
                 .assertEquals(
                         expectedFileContent,

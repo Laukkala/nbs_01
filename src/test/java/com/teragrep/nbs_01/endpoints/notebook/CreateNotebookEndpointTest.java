@@ -80,7 +80,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("name", "")
+                .add("title", "")
                 .add("config", Json.createObjectBuilder().build())
                 .add("paragraphs", Json.createArrayBuilder())
                 .build();
@@ -112,7 +112,7 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
 
         JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("name", title)
+                .add("title", title)
                 .add("config", Json.createObjectBuilder().build())
                 .add("paragraphs", Json.createArrayBuilder())
                 .build();

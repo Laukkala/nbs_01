@@ -93,7 +93,7 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
             ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(modifiedNotebook.name()), headers);
+            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(modifiedNotebook.title()), headers);
         }
         catch (FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));

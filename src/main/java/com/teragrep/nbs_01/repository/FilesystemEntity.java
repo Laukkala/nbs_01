@@ -48,6 +48,6 @@ package com.teragrep.nbs_01.repository;
 // An interface for Filesystem objects, such as Notebooks and Directories.
 public interface FilesystemEntity {
 
-    public abstract String name();
+    public abstract String title();
 
 }
