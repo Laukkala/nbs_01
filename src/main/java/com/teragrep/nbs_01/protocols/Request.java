@@ -70,12 +70,4 @@ public interface Request {
     public static enum RequestType {
         GENERIC, NOTEBOOK, DIRECTORY, PARAGRAPH,
     }
-
-    public static enum StringParameter {
-        TITLE, TEXT, SOURCEPARAGRAPHID, TARGETPARAGRAPHID
-    }
-
-    public static enum IdentifierParameter {
-        SOURCEIDENTIFIER, TARGETIDENTIFIER
-    }
 }
