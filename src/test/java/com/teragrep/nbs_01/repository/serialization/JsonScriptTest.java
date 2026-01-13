@@ -50,8 +50,6 @@ import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class JsonScriptTest {
 
     private final JsonObject testScript1 = Json.createObjectBuilder().add("text", "testText1").build();

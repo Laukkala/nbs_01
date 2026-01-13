@@ -52,9 +52,11 @@ import com.teragrep.nbs_01.exceptions.ErrorEvent;
 import com.teragrep.nbs_01.protocols.http.body.ExceptionBody;
 import com.teragrep.nbs_01.protocols.http.body.StringBody;
 import com.teragrep.nbs_01.protocols.http.HTTPRequest;
-import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
+import com.teragrep.nbs_01.repository.Notebook;
+import com.teragrep.nbs_01.repository.Paragraph;
+import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
@@ -65,7 +67,9 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
 
 // Endpoint that updates the text and/or title of a paragraph with a given ID within a Notebook based on an Identifier.
 public final class UpdateParagraphEndpoint implements HTTPEndPoint {

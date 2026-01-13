@@ -47,7 +47,7 @@ package com.teragrep.nbs_01.protocols.http.path;
 
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 
-import java.nio.file.*;
+import java.nio.file.Path;
 
 public class StubPath implements HTTPRequestPath {
 

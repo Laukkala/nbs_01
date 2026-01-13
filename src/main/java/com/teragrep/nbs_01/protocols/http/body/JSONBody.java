@@ -46,7 +46,8 @@
 package com.teragrep.nbs_01.protocols.http.body;
 
 import com.teragrep.nbs_01.exceptions.StubObjectException;
-import jakarta.json.*;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
 
 /**
  * A Body that encapsulates a JsonStructure

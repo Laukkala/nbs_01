@@ -46,13 +46,13 @@
 package com.teragrep.nbs_01.repository;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 
 class DirectoryTest {
 

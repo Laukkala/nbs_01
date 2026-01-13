@@ -53,8 +53,8 @@ import com.teragrep.nbs_01.protocols.http.body.ExceptionBody;
 import com.teragrep.nbs_01.protocols.http.body.StringBody;
 import com.teragrep.nbs_01.protocols.http.HTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
-import com.teragrep.nbs_01.repository.*;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
+import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
@@ -65,7 +65,8 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 // Endpoint that updates the title of a Notebook based on a given Identifier
 public final class UpdateNotebookEndpoint implements HTTPEndPoint {

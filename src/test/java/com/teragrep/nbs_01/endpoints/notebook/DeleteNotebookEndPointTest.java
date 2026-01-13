@@ -55,7 +55,8 @@ import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 

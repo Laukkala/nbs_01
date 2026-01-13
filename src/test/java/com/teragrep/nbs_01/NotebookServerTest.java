@@ -47,7 +47,8 @@ package com.teragrep.nbs_01;
 
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class NotebookServerTest extends AbstractNotebookServerTest {
 
