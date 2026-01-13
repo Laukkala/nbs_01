@@ -49,8 +49,7 @@ import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -58,6 +57,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LocalFilesystemStorageTest {
 
     private final Path notebookSource = Paths.get("src/test/resources");
@@ -71,11 +71,6 @@ class LocalFilesystemStorageTest {
     private final Path directory2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
     private final Path junkfile = Paths.get("target/notebooks/junkfile");
 
-    public LocalFilesystemStorageTest() {
-        deleteFileRecursively(notebookDirectory.toFile());
-        copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
-    }
-
     private void deleteFileRecursively(File fileToDelete) {
         File[] children = fileToDelete.listFiles();
         if (children != null) {
@@ -84,6 +79,16 @@ class LocalFilesystemStorageTest {
             }
         }
         fileToDelete.delete();
+    }
+
+    @AfterEach
+    private void clearFiles() {
+        deleteFileRecursively(notebookDirectory.toFile());
+    }
+
+    @BeforeEach
+    private void copyFiles() {
+        copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
     }
 
     private void copyFileRecursively(File fileToCopy, File destination) {
