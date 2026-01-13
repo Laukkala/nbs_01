@@ -70,15 +70,17 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpCreateParagraphTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        String paragraphId = "testParagraphId";
+        final CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final String paragraphId = "testParagraphId";
 
-        Path requestPath = Paths.get(notebook3().toString(), paragraphId);
-        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
-        HTTPResponse response = endPoint.createResponse(request);
+        final Path requestPath = Paths.get(notebook3().toString(), paragraphId);
+        final BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
+        final HTTPResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("id", paragraphId)
                 .add("title", "")
@@ -86,18 +88,18 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader(
+        final Header expectedLocationHeader = new BasicHeader(
                 "Location",
                 requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
         );
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
                 .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        String expectedFileContent = "{\"id\":\"" + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
+        final String expectedFileContent = "{\"id\":\"" + paragraphId + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
         Assertions
                 .assertTrue(Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook3())).contains(expectedFileContent)));
     }
@@ -106,21 +108,26 @@ public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP request to /notebook/new endpoint with a path that alreday doesn't contain a file results in an error.
     public void httpCreateParagraphInNonExistentPathTest() {
 
-        String nonexistentFileName = "NonExistentFile";
-        Path nonexistentFilePath = Paths.get(notebookDirectory().toString(), nonexistentFileName);
+        final String nonexistentFileName = "NonExistentFile";
+        final Path nonexistentFilePath = Paths.get(notebookDirectory().toString(), nonexistentFileName);
         // Assert that the file we are trying to add a paragraph to doesn't exist.
         Assertions.assertFalse(Files.exists(nonexistentFilePath));
-        CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        String paragraphId = "testParagraphId";
+        final CreateParagraphEndpoint endPoint = new CreateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final String paragraphId = "testParagraphId";
 
-        Path requestPath = Paths.get(nonexistentFileName, paragraphId);
-        JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
-        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body));
-        HTTPResponse response = endPoint.createResponse(request);
+        final Path requestPath = Paths.get(nonexistentFileName, paragraphId);
+        final JsonObject body = Json.createObjectBuilder().add("paragraphId", paragraphId).build();
+        final BasicHTTPRequest request = new BasicHTTPRequest(
+                new HTTPParagraphRequestPath(requestPath),
+                new JSONBody(body)
+        );
+        final HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonexistentFileName)
                 .build();

@@ -63,27 +63,27 @@ public class TestServer {
     private static final Path notebookSource = Paths.get("src/test/resources");
     private static final Path notebookDirectory = Paths.get("target/notebooks");
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         setUp();
-        Storage storage = new LocalFilesystemStorage(Paths.get("target/notebooks"));
-        Configuration configuration = new Configuration(8080);
+        final Storage storage = new LocalFilesystemStorage(Paths.get("target/notebooks"));
+        final Configuration configuration = new Configuration(8080);
 
-        Server jettyServer = new Server(configuration.serverPort());
-        Connector connector = new ServerConnector(jettyServer);
+        final Server jettyServer = new Server(configuration.serverPort());
+        final Connector connector = new ServerConnector(jettyServer);
         jettyServer.addConnector(connector);
-        NotebookServer server = new NotebookServer(jettyServer, storage);
+        final NotebookServer server = new NotebookServer(jettyServer, storage);
         server.call();
     }
 
-    public static void copyFileRecursively(File fileToCopy, File destination) {
+    public static void copyFileRecursively(final File fileToCopy, final File destination) {
         if (fileToCopy.isDirectory()) {
-            File[] children = fileToCopy.listFiles();
-            for (File child : children) {
+            final File[] children = fileToCopy.listFiles();
+            for (final File child : children) {
                 copyFileRecursively(child, Paths.get(destination.toString(), child.getName()).toFile());
             }
         }
         if (!destination.exists()) {
-            File parent = destination.getParentFile();
+            final File parent = destination.getParentFile();
             if (!parent.exists()) {
                 parent.mkdirs();
             }
@@ -91,10 +91,10 @@ public class TestServer {
         }
     }
 
-    public static void deleteFileRecursively(File fileToDelete) {
-        File[] children = fileToDelete.listFiles();
+    public static void deleteFileRecursively(final File fileToDelete) {
+        final File[] children = fileToDelete.listFiles();
         if (children != null) {
-            for (File child : children) {
+            for (final File child : children) {
                 deleteFileRecursively(child);
             }
         }

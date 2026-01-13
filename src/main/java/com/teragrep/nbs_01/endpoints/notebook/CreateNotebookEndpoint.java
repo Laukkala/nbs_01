@@ -74,33 +74,33 @@ public final class CreateNotebookEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public CreateNotebookEndpoint(Storage root) {
+    public CreateNotebookEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
-            String title = request.title();
+            final Identifier targetIdentifier = request.targetIdentifier();
+            final String title = request.title();
 
             // Create new notebook and serialize it to Storage
-            Notebook newFile = new Notebook(title);
-            SerializedNotebook notebook = root.serializeNotebook(newFile);
+            final Notebook newFile = new Notebook(title);
+            final SerializedNotebook notebook = root.serializeNotebook(newFile);
             root.writeFile(targetIdentifier, notebook.serialize());
 
             // Create response
-            ArrayList<Header> headers = new ArrayList<>();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(notebook.serialize()), headers);
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
+        catch (final FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -110,14 +110,14 @@ public final class CreateNotebookEndpoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CreateNotebookEndpoint that = (CreateNotebookEndpoint) o;
+        final CreateNotebookEndpoint that = (CreateNotebookEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

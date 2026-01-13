@@ -76,15 +76,15 @@ class NotebookTest {
         copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
     }
 
-    public void copyFileRecursively(File fileToCopy, File destination) {
+    public void copyFileRecursively(final File fileToCopy, final File destination) {
         if (fileToCopy.isDirectory()) {
-            File[] children = fileToCopy.listFiles();
-            for (File child : children) {
+            final File[] children = fileToCopy.listFiles();
+            for (final File child : children) {
                 copyFileRecursively(child, Paths.get(destination.toString(), child.getName()).toFile());
             }
         }
         if (!destination.exists()) {
-            File parent = destination.getParentFile();
+            final File parent = destination.getParentFile();
             if (!parent.exists()) {
                 parent.mkdirs();
             }
@@ -92,10 +92,10 @@ class NotebookTest {
         }
     }
 
-    public void deleteFileRecursively(File fileToDelete) {
-        File[] children = fileToDelete.listFiles();
+    public void deleteFileRecursively(final File fileToDelete) {
+        final File[] children = fileToDelete.listFiles();
         if (children != null) {
-            for (File child : children) {
+            for (final File child : children) {
                 deleteFileRecursively(child);
             }
         }
@@ -105,8 +105,8 @@ class NotebookTest {
     // Notebooks should have the correct number of paragraphs
     @Test
     void testParagraphs() {
-        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
-        JsonObject json = Assertions
+        final LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
+        final JsonObject json = Assertions
                 .assertDoesNotThrow(
                         () -> Json
                                 .createReader(
@@ -116,17 +116,17 @@ class NotebookTest {
                                 )
                                 .readObject()
                 );
-        JsonNotebook jsonNotebook = new JsonNotebook(json);
-        Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
-        Map<String, Paragraph> paragraphs = notebook.paragraphs();
+        final JsonNotebook jsonNotebook = new JsonNotebook(json);
+        final Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+        final Map<String, Paragraph> paragraphs = notebook.paragraphs();
         Assertions.assertEquals(8, paragraphs.size());
     }
 
     // After copying a Notebook, both the original and the copied notebook should exist.
     @Test
     void testCopy() {
-        LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
-        JsonObject json = Assertions
+        final LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
+        final JsonObject json = Assertions
                 .assertDoesNotThrow(
                         () -> Json
                                 .createReader(
@@ -136,12 +136,12 @@ class NotebookTest {
                                 )
                                 .readObject()
                 );
-        JsonNotebook jsonNotebook = new JsonNotebook(json);
-        Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
+        final JsonNotebook jsonNotebook = new JsonNotebook(json);
+        final Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Assertions.assertTrue(Files.exists(notebook4));
-        Path destinationPath = Paths.get("newName_copyId");
-        Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
-        SerializedNotebook serializedNotebook = Assertions.assertDoesNotThrow(() -> root.serializeNotebook(copy));
+        final Path destinationPath = Paths.get("newName_copyId");
+        final Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
+        final SerializedNotebook serializedNotebook = Assertions.assertDoesNotThrow(() -> root.serializeNotebook(copy));
         Assertions
                 .assertDoesNotThrow(() -> root.writeFile(new PathIdentifier(destinationPath.toString()), serializedNotebook.serialize()));
         Assertions.assertTrue(Files.exists(notebook4));

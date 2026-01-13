@@ -67,27 +67,29 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpUpdateNotebookTest() {
         // Destination notebook must exist
-        Path notebookPath = notebook2();
+        final Path notebookPath = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
         // Make a request editing the title of the notebook.
-        String editedTitle = "testTitle";
-        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
-        HTTPResponse response = endpoint
+        final String editedTitle = "testTitle";
+        final UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebookPath), new JSONBody(body)));
 
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedLocationHeader = new BasicHeader("Location", notebookPath.toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(editedTitle)));
 
-        String updatedFileContent = Assertions
+        final String updatedFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
         // Assert that the notebook title has been saved to the file in the correct place.
-        String expectedFileContent = "{\"title\":\"" + editedTitle
+        final String expectedFileContent = "{\"title\":\"" + editedTitle
                 + "\",\"config\":{},\"paragraphs\":[{\"id\":\"20150213-230428_1231780373\",\"title\":\"\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
         Assertions.assertEquals(expectedFileContent, updatedFileContent);
     }
@@ -95,21 +97,23 @@ class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that trying to update a nonexistent notebook results in an error.
     @Test
     public void httpUpdateNonexistentNotebookTest() {
-        Path nonExistentNotebookPath = notebookDirectory().resolve("nonExistentNotebook");
+        final Path nonExistentNotebookPath = notebookDirectory().resolve("nonExistentNotebook");
 
         // Destination notebook must not exist
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
 
-        String editedTitle = "testTitle";
-        UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
-        HTTPResponse response = endpoint
+        final String editedTitle = "testTitle";
+        final UpdateNotebookEndpoint endpoint = new UpdateNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentNotebookPath), new JSONBody(body)));
         // Assert that we got the proper response.
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonExistentNotebookPath)
                 .build();

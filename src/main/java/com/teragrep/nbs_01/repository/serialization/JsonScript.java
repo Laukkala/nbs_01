@@ -53,18 +53,18 @@ public class JsonScript implements SerializedScript {
 
     private final JsonObject jsonObject;
 
-    public JsonScript(JsonObject jsonObject) {
+    public JsonScript(final JsonObject jsonObject) {
         this.jsonObject = jsonObject;
     }
 
     @Override
     public String text() throws JsonException {
-        String text;
+        final String text;
         if (!jsonObject.containsKey("text")) {
             text = "";
         }
         else {
-            JsonValue.ValueType type = jsonObject.get("text").getValueType();
+            final JsonValue.ValueType type = jsonObject.get("text").getValueType();
             if (type.equals(JsonValue.ValueType.STRING)) {
                 text = jsonObject.getString("text");
             }

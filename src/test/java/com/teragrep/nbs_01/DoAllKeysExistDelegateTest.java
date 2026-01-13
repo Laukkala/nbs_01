@@ -68,19 +68,19 @@ class DoAllKeysExistDelegateTest {
     @Test
     public void resolvePresentKeys() {
         Assertions.assertDoesNotThrow(() -> {
-            List<String> testKeys = new ArrayList<>();
+            final List<String> testKeys = new ArrayList<>();
             testKeys.add(testKey1);
             testKeys.add(testKey2);
             testKeys.add(testKey3);
-            DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
+            final DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
 
-            JsonObject body = Json
+            final JsonObject body = Json
                     .createObjectBuilder()
                     .add(testKey1, "testValue1")
                     .add(testKey2, "testValue2")
                     .add(testKey3, "testValue3")
                     .build();
-            HTTPRequest testRequest = new BasicHTTPRequest(new JSONBody(body));
+            final HTTPRequest testRequest = new BasicHTTPRequest(new JSONBody(body));
             Assertions.assertTrue(delegate.resolve(testRequest));
         });
     }
@@ -88,17 +88,17 @@ class DoAllKeysExistDelegateTest {
     @Test
     public void resolveMissingKey() {
         Assertions.assertDoesNotThrow(() -> {
-            List<String> testKeys = new ArrayList<>();
+            final List<String> testKeys = new ArrayList<>();
             testKeys.add(testKey1);
             testKeys.add(testKey2);
             testKeys.add(testKey3);
-            DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
-            JsonObject body = Json
+            final DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
+            final JsonObject body = Json
                     .createObjectBuilder()
                     .add(testKey1, "testValue1")
                     .add(testKey2, "testValue2")
                     .build();
-            HTTPRequest testRequest = new BasicHTTPRequest(new JSONBody(body));
+            final HTTPRequest testRequest = new BasicHTTPRequest(new JSONBody(body));
             Assertions.assertFalse(delegate.resolve(testRequest));
         });
     }
@@ -106,10 +106,10 @@ class DoAllKeysExistDelegateTest {
     @Test
     public void resolveEmptyKeys() {
         Assertions.assertDoesNotThrow(() -> {
-            List<String> testKeys = new ArrayList<>();
-            DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
-            JsonObject body = Json.createObjectBuilder().add(testKey1, "testValue1").build();
-            HTTPRequest testRequest = new BasicHTTPRequest(new JSONBody(body));
+            final List<String> testKeys = new ArrayList<>();
+            final DoAllKeysExistDelegate delegate = new DoAllKeysExistDelegate(testKeys);
+            final JsonObject body = Json.createObjectBuilder().add(testKey1, "testValue1").build();
+            final HTTPRequest testRequest = new BasicHTTPRequest(new JSONBody(body));
             Assertions.assertTrue(delegate.resolve(testRequest));
         });
     }

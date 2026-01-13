@@ -69,20 +69,22 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpFindTest() {
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
-        String paragraphId = "20150210-015259_1403135953";
+        final String paragraphId = "20150210-015259_1403135953";
 
-        Path requestPath = Paths.get(notebook1().toString(), paragraphId);
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint
+        final Path requestPath = Paths.get(notebook1().toString(), paragraphId);
+        final FindParagraphEndPoint endPoint = new FindParagraphEndPoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath)));
-        Header expectedLocationHeader = new BasicHeader(
+        final Header expectedLocationHeader = new BasicHeader(
                 "Location",
                 requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
         );
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
-        String expectedFileContent = "{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}}";
+        final String expectedFileContent = "{\"id\":\"20150210-015259_1403135953\",\"title\":\"Load data into table\",\"script\":{\"text\":\"%test import org.apache.commons.io.IOUtils\\nimport java.net.URL\\nimport java.nio.charset.Charset\\n\\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\\n// So you don't need create them manually\\n\\n// load bank data\\nval bankText = sc.parallelize(\\n    IOUtils.toString(\\n        new URL(\\\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\\\"),\\n        Charset.forName(\\\"utf8\\\")).split(\\\"\\\\n\\\"))\\n\\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\\n\\nval bank = bankText.map(s => s.split(\\\";\\\")).filter(s => s(0) != \\\"\\\\\\\"age\\\\\\\"\\\").map(\\n    s => Bank(s(0).toInt, \\n            s(1).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(2).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(3).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\"),\\n            s(5).replaceAll(\\\"\\\\\\\"\\\", \\\"\\\").toInt\\n        )\\n).toDF()\\nbank.registerTempTable(\\\"bank\\\")\"}}";
         Assertions
                 .assertDoesNotThrow(
                         () -> Assertions.assertEquals(expectedFileContent, response.body().asString().strip())
@@ -92,16 +94,18 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent Notebook results in an error
     public void httpFindParagraphFromNonExistentNotebookTest() {
-        String nonExistentNotebookName = "NonExistentNotebook";
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        String paragraphId = "20150210-015259_1403135953";
+        final String nonExistentNotebookName = "NonExistentNotebook";
+        final FindParagraphEndPoint endPoint = new FindParagraphEndPoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final String paragraphId = "20150210-015259_1403135953";
 
-        Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
-        HTTPResponse response = endPoint
+        final Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath)));
 
         // The endpoint should return a Response with the correct status and messagsse.
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonExistentNotebookName)
                 .build();
@@ -113,15 +117,17 @@ public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint with a nonexistent paragraphId results in an error
     public void httpFindNonexistentParagraph() {
-        String nonExistentParagraphId = "nonExistentParagraphId";
-        FindParagraphEndPoint endPoint = new FindParagraphEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        final String nonExistentParagraphId = "nonExistentParagraphId";
+        final FindParagraphEndPoint endPoint = new FindParagraphEndPoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(notebook1().toString(), nonExistentParagraphId);
-        HTTPResponse response = endPoint
+        final Path requestPath = Paths.get(notebook1().toString(), nonExistentParagraphId);
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Paragraph with id " + nonExistentParagraphId + " not found!")
                 .build();

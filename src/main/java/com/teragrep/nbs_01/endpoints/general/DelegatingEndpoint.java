@@ -56,13 +56,17 @@ public class DelegatingEndpoint implements HTTPEndPoint {
     private final HTTPEndPoint trueEndPoint;
     private final HTTPEndPoint falseEndPoint;
 
-    public DelegatingEndpoint(HTTPEndPoint trueEndPoint, HTTPEndPoint falseEndPoint, Delegate delegate) {
+    public DelegatingEndpoint(
+            final HTTPEndPoint trueEndPoint,
+            final HTTPEndPoint falseEndPoint,
+            final Delegate delegate
+    ) {
         this.trueEndPoint = trueEndPoint;
         this.falseEndPoint = falseEndPoint;
         this.delegate = delegate;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         if (delegate.resolve(request)) {
             return trueEndPoint.createResponse(request);
         }

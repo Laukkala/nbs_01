@@ -66,10 +66,13 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook3())));
+        final DeleteNotebookEndpoint endPoint = new DeleteNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook3())));
         // Assert that we receive the proper response.
-        Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
+        final Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
         Assertions.assertEquals(204, response.status());
         Assertions.assertEquals(1, response.headers().size());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());

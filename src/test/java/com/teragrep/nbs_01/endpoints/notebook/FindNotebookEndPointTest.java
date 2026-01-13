@@ -69,12 +69,13 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     public void httpFindTest() {
         // Destination notebook must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook1())));
-        String expectedFileContent = "\"title\":\"my_note1\",\"config\":{}";
+        final String expectedFileContent = "\"title\":\"my_note1\",\"config\":{}";
 
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook1())));
-        Header expectedLocationHeader = new BasicHeader("Location", notebook1().toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        final HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook1())));
+        final Header expectedLocationHeader = new BasicHeader("Location", notebook1().toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
@@ -118,14 +119,14 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint with a path not corresponding with any file results in an error
     @Test
     public void httpNotebookNotFoundTest() {
-        Path nonExistentNotebookPath = Paths.get("nonExistentNotebook");
+        final Path nonExistentNotebookPath = Paths.get("nonExistentNotebook");
         // Start server and wait for it to initialize.
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint
+        final FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentNotebookPath)));
 
         // The endpoint should return the correct status and message.
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonExistentNotebookPath)
                 .build();
@@ -138,9 +139,9 @@ public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
     // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint with a path to a malformed / corrupted file results in an error message directing users to check details from logs.
     @Test
     public void httpFindCorruptNotebookTest() {
-        Path nonExistentNotebookPath = Paths.get("junkfile");
-        FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint
+        final Path nonExistentNotebookPath = Paths.get("junkfile");
+        final FindNotebookEndPoint endPoint = new FindNotebookEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentNotebookPath)));
 
         // The endpoint should return the correct status and message.

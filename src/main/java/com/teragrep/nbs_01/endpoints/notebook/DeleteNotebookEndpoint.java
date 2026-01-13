@@ -70,32 +70,32 @@ public final class DeleteNotebookEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public DeleteNotebookEndpoint(Storage root) {
+    public DeleteNotebookEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
+            final Identifier targetIdentifier = request.targetIdentifier();
             root.deleteFile(targetIdentifier);
 
             // Create response
-            ArrayList<Header> headers = new ArrayList<>();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             return new BasicHTTPResponse(HttpStatus.NO_CONTENT_204, headers);
         }
-        catch (MalformedRequestException badRequestException) {
+        catch (final MalformedRequestException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         // DELETE requests should return 404 NOT FOUND if the requested file doesn't exist in the first place
-        catch (NoSuchFileException notFoundException) {
+        catch (final NoSuchFileException notFoundException) {
             return new BasicHTTPResponse(
                     HttpStatus.NOT_FOUND_404,
                     new ExceptionBody(new FileNotFoundException("No such file!"))
             );
         }
         // Any other IOException indicates that a more critical error happened, and should be logged.
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -104,14 +104,14 @@ public final class DeleteNotebookEndpoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DeleteNotebookEndpoint that = (DeleteNotebookEndpoint) o;
+        final DeleteNotebookEndpoint that = (DeleteNotebookEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

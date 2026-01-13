@@ -80,13 +80,13 @@ class JsonNotebookTest {
 
     @Test
     void titleTest() {
-        JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
+        final JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
         Assertions.assertEquals("testTitle", testNotebook.title());
     }
 
     @Test
     void paragraphsTest() {
-        JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
+        final JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
         Assertions.assertEquals(2, testNotebook.paragraphs().size());
         Assertions.assertEquals("paragraph1id", testNotebook.paragraphs().get("paragraph1id").id());
         Assertions.assertEquals("paragraph2id", testNotebook.paragraphs().get("paragraph2id").id());
@@ -98,7 +98,7 @@ class JsonNotebookTest {
 
     @Test
     void serializeTest() {
-        JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
+        final JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
         Assertions.assertEquals(testJsonObject.toString(), testNotebook.serialize());
     }
 }

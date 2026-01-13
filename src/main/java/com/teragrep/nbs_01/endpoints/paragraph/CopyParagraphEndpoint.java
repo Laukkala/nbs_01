@@ -75,20 +75,20 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public CopyParagraphEndpoint(Storage root) {
+    public CopyParagraphEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            String sourceParagraphId = request.sourceParagraphId();
-            String targetParagraphId = request.targetParagraphId();
-            Identifier sourceIdentifier = request.sourceIdentifier();
-            Identifier targetIdentifier = request.targetIdentifier();
+            final String sourceParagraphId = request.sourceParagraphId();
+            final String targetParagraphId = request.targetParagraphId();
+            final Identifier sourceIdentifier = request.sourceIdentifier();
+            final Identifier targetIdentifier = request.targetIdentifier();
 
             // Deserialize source notebook from Storage
-            Notebook serializedSource = root.deserializeNotebook(sourceIdentifier);
-            Map<String, Paragraph> sourceParagraphs = serializedSource.paragraphs();
+            final Notebook serializedSource = root.deserializeNotebook(sourceIdentifier);
+            final Map<String, Paragraph> sourceParagraphs = serializedSource.paragraphs();
 
             // Throw error if requested source paragraph doesn't exist
             if (!sourceParagraphs.containsKey(sourceParagraphId)) {
@@ -96,12 +96,12 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             }
 
             // Create a copy of the paragraph from the source notebook
-            Paragraph sourceParagraph = sourceParagraphs.get(sourceParagraphId);
-            Paragraph copyParagraph = sourceParagraph.copy(targetParagraphId);
+            final Paragraph sourceParagraph = sourceParagraphs.get(sourceParagraphId);
+            final Paragraph copyParagraph = sourceParagraph.copy(targetParagraphId);
 
             // Deserialize destination notebook from Storage, and add the copied paragraph
-            Notebook serializedDestination = root.deserializeNotebook(targetIdentifier);
-            Map<String, Paragraph> destinationParagraphs = serializedDestination.paragraphs();
+            final Notebook serializedDestination = root.deserializeNotebook(targetIdentifier);
+            final Map<String, Paragraph> destinationParagraphs = serializedDestination.paragraphs();
             // Throw error if requested destination paragraph already exists in destination notebook
             if (destinationParagraphs.containsKey(copyParagraph.id())) {
                 throw new MalformedRequestException("Paragraph " + copyParagraph.id() + " already exists!");
@@ -109,24 +109,24 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             destinationParagraphs.put(copyParagraph.id(), copyParagraph);
 
             // Serialize edited destination notebook to storage
-            Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);
-            SerializedNotebook serializedDestinationNotebook = root.serializeNotebook(destinationNotebook);
+            final Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);
+            final SerializedNotebook serializedDestinationNotebook = root.serializeNotebook(destinationNotebook);
             root.writeFile(targetIdentifier, serializedDestinationNotebook.serialize());
 
             // Create response
-            String paragraphContent = root.serializeParagraph(copyParagraph).serialize();
-            ArrayList<Header> headers = new ArrayList<>();
+            final String paragraphContent = root.serializeParagraph(copyParagraph).serialize();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(paragraphContent), headers);
         }
-        catch (FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
+        catch (final FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -135,14 +135,14 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CopyParagraphEndpoint that = (CopyParagraphEndpoint) o;
+        final CopyParagraphEndpoint that = (CopyParagraphEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

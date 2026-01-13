@@ -72,36 +72,36 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public UpdateNotebookEndpoint(Storage root) {
+    public UpdateNotebookEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
-            String title = request.title();
+            final Identifier targetIdentifier = request.targetIdentifier();
+            final String title = request.title();
 
             // Deserialize current notebook from Storage
-            Notebook serializedNotebook = root.deserializeNotebook(targetIdentifier);
+            final Notebook serializedNotebook = root.deserializeNotebook(targetIdentifier);
 
             // Create a new Notebook with the modified title and serialize it to Storage.
-            Notebook modifiedNotebook = new Notebook(title, serializedNotebook.paragraphs());
-            SerializedNotebook serializedModifiedNotebook = root.serializeNotebook(modifiedNotebook);
+            final Notebook modifiedNotebook = new Notebook(title, serializedNotebook.paragraphs());
+            final SerializedNotebook serializedModifiedNotebook = root.serializeNotebook(modifiedNotebook);
             root.writeFile(targetIdentifier, serializedModifiedNotebook.serialize());
 
             // Create response
-            ArrayList<Header> headers = new ArrayList<>();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(modifiedNotebook.title()), headers);
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (MalformedRequestException | JsonException badRequestException) {
+        catch (final MalformedRequestException | JsonException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -110,14 +110,14 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UpdateNotebookEndpoint that = (UpdateNotebookEndpoint) o;
+        final UpdateNotebookEndpoint that = (UpdateNotebookEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

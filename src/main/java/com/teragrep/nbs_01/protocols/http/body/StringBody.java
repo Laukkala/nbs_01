@@ -55,7 +55,7 @@ public class StringBody implements Body {
 
     private final String text;
 
-    public StringBody(String text) {
+    public StringBody(final String text) {
         this.text = text;
     }
 

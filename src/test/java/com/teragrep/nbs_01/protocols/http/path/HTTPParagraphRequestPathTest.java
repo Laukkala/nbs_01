@@ -57,15 +57,15 @@ class HTTPParagraphRequestPathTest {
 
     @Test
     void path() {
-        HTTPParagraphRequestPath path = new HTTPParagraphRequestPath(Paths.get("first", "second", "third"));
-        Path filePath = Assertions.assertDoesNotThrow(() -> path.path());
+        final HTTPParagraphRequestPath path = new HTTPParagraphRequestPath(Paths.get("first", "second", "third"));
+        final Path filePath = Assertions.assertDoesNotThrow(() -> path.path());
         Assertions.assertEquals(Paths.get("first", "second"), filePath);
     }
 
     @Test
     void paragraphId() {
-        HTTPParagraphRequestPath path = new HTTPParagraphRequestPath(Paths.get("first", "second", "third"));
-        String filePath = Assertions.assertDoesNotThrow(() -> path.paragraphId());
+        final HTTPParagraphRequestPath path = new HTTPParagraphRequestPath(Paths.get("first", "second", "third"));
+        final String filePath = Assertions.assertDoesNotThrow(() -> path.paragraphId());
         Assertions.assertEquals("third", filePath);
     }
 }

@@ -57,7 +57,7 @@ public final class Directory implements FilesystemEntity {
     private final List<FilesystemEntity> children;
     private final String title;
 
-    public Directory(String title, List<FilesystemEntity> children) {
+    public Directory(final String title, final List<FilesystemEntity> children) {
         this.title = title;
         this.children = children;
     }
@@ -71,14 +71,14 @@ public final class Directory implements FilesystemEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Directory directory = (Directory) o;
+        final Directory directory = (Directory) o;
         return Objects.equals(children, directory.children) && Objects.equals(title, directory.title);
     }
 

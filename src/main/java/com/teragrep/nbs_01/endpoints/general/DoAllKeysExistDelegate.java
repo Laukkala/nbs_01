@@ -59,15 +59,15 @@ public final class DoAllKeysExistDelegate implements Delegate {
 
     private final List<String> keys;
 
-    public DoAllKeysExistDelegate(String key) {
+    public DoAllKeysExistDelegate(final String key) {
         this.keys = Arrays.asList(key);
     }
 
-    public DoAllKeysExistDelegate(List<String> keys) {
+    public DoAllKeysExistDelegate(final List<String> keys) {
         this.keys = keys;
     }
 
-    public boolean resolve(HTTPRequest request) {
+    public boolean resolve(final HTTPRequest request) {
         if (request.body().isStub()) {
             return false;
         }
@@ -75,10 +75,10 @@ public final class DoAllKeysExistDelegate implements Delegate {
         try {
             parameters = Json.createReader(new StringReader(request.body().asString())).readObject();
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
             throw new RuntimeException(e);
         }
-        for (String key : keys) {
+        for (final String key : keys) {
             if (!parameters.containsKey(key)) {
                 return false;
             }
@@ -87,14 +87,14 @@ public final class DoAllKeysExistDelegate implements Delegate {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DoAllKeysExistDelegate delegate = (DoAllKeysExistDelegate) o;
+        final DoAllKeysExistDelegate delegate = (DoAllKeysExistDelegate) o;
         return Objects.equals(keys, delegate.keys);
     }
 

@@ -56,7 +56,7 @@ public final class Script {
         this.text = "";
     }
 
-    public Script(String text) {
+    public Script(final String text) {
         this.text = text;
     }
 
@@ -65,14 +65,14 @@ public final class Script {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Script script = (Script) o;
+        final Script script = (Script) o;
         return Objects.equals(text, script.text);
     }
 

@@ -71,23 +71,23 @@ public final class BasicHTTPRequest implements HTTPRequest {
         this(new StubBody(), new StubPath(), new ArrayList<>());
     }
 
-    public BasicHTTPRequest(Body body) {
+    public BasicHTTPRequest(final Body body) {
         this(body, new StubPath(), new ArrayList<>());
     }
 
-    public BasicHTTPRequest(HTTPRequestPath path) {
+    public BasicHTTPRequest(final HTTPRequestPath path) {
         this(new StubBody(), path, new ArrayList<>());
     }
 
-    public BasicHTTPRequest(HTTPRequestPath path, List<Header> headers) {
+    public BasicHTTPRequest(final HTTPRequestPath path, final List<Header> headers) {
         this(new StubBody(), path, headers);
     }
 
-    public BasicHTTPRequest(HTTPRequestPath path, Body body) {
+    public BasicHTTPRequest(final HTTPRequestPath path, final Body body) {
         this(body, path, new ArrayList<>());
     }
 
-    public BasicHTTPRequest(Body body, HTTPRequestPath path, List<Header> headers) {
+    public BasicHTTPRequest(final Body body, final HTTPRequestPath path, final List<Header> headers) {
         this.body = body;
         this.path = path;
         this.headers = headers;
@@ -110,7 +110,7 @@ public final class BasicHTTPRequest implements HTTPRequest {
         try {
             return body().title();
         }
-        catch (StubObjectException e) {
+        catch (final StubObjectException e) {
             return "";
         }
     }
@@ -125,7 +125,7 @@ public final class BasicHTTPRequest implements HTTPRequest {
         try {
             return body().sourceParagraphId();
         }
-        catch (StubObjectException e) {
+        catch (final StubObjectException e) {
             throw new MalformedRequestException("Request has a malformed sourceParagraph identifier!", e);
         }
     }
@@ -135,7 +135,7 @@ public final class BasicHTTPRequest implements HTTPRequest {
         try {
             return body().text();
         }
-        catch (StubObjectException e) {
+        catch (final StubObjectException e) {
             throw new MalformedRequestException("Request has a malformed text!", e);
         }
     }
@@ -148,10 +148,10 @@ public final class BasicHTTPRequest implements HTTPRequest {
     @Override
     public Identifier sourceIdentifier() throws MalformedRequestException {
         try {
-            String sourceString = body().sourceIdentifier();
+            final String sourceString = body().sourceIdentifier();
             return new PathIdentifier(sourceString);
         }
-        catch (StubObjectException exception) {
+        catch (final StubObjectException exception) {
             throw new MalformedRequestException("Request has a malformed source identifier!", exception);
         }
     }

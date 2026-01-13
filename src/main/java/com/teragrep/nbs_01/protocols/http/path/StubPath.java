@@ -56,7 +56,7 @@ public class StubPath implements HTTPRequestPath {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         throw new IllegalStateException("Path is a stub!");
     }
 

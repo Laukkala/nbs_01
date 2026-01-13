@@ -63,27 +63,27 @@ public class BasicHTTPResponseTest {
 
     @Test
     void statusTest() {
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200);
+        final BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200);
         Assertions.assertEquals(200, testResponse.status());
     }
 
     @Test
     void bodyTest() {
-        Body body = new StringBody("testPayload");
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, body);
+        final Body body = new StringBody("testPayload");
+        final BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, body);
 
         Assertions.assertEquals(body, testResponse.body());
     }
 
     @Test
     void headersTest() {
-        Path responsePath = Paths.get("target", "testLocation");
-        Header locationHeader = new BasicHeader("Location", responsePath.toString());
-        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
-        List<Header> headers = new ArrayList<>();
+        final Path responsePath = Paths.get("target", "testLocation");
+        final Header locationHeader = new BasicHeader("Location", responsePath.toString());
+        final Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final List<Header> headers = new ArrayList<>();
         headers.add(locationHeader);
         headers.add(contentTypeHeader);
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, headers);
+        final BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.OK_200, headers);
 
         Assertions.assertEquals(2, testResponse.headers().size());
         Assertions.assertTrue(testResponse.headers().contains(locationHeader));
@@ -93,7 +93,7 @@ public class BasicHTTPResponseTest {
 
     @Test
     void stubTest() {
-        BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404);
+        final BasicHTTPResponse testResponse = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404);
         Assertions.assertEquals(StubBody.class, testResponse.body().getClass());
         Assertions.assertEquals(0, testResponse.headers().size());
     }

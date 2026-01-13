@@ -71,24 +71,24 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that a proper request to CopyNotebookEndpoint results in a correct response and a file being saved to disk.
     public void httpCopyNotebookTest() {
         // Destination file must not exist
-        Path destinationFile = Paths.get("testNotebookName");
+        final Path destinationFile = Paths.get("testNotebookName");
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
 
         // Source file must exist
-        Path sourceFile = notebook2();
+        final Path sourceFile = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
-        String sourceFileContent = Assertions
+        final String sourceFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
 
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
-        HTTPResponse response = endPoint
+        final CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationFile), new JSONBody(body)));
 
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", destinationFile.toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedLocationHeader = new BasicHeader("Location", destinationFile.toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions
@@ -133,22 +133,22 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that a request with no Body to CopyNotebookEndpoint results in an error
     public void httpCopyNotebookWithNoBodyTest() {
         // Destination file must not exist
-        Path destinationFile = Paths.get("testNotebookName");
+        final Path destinationFile = Paths.get("testNotebookName");
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
 
         // Source file must exist
-        Path sourceFile = notebook2();
+        final Path sourceFile = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
-        String sourceFileContent = Assertions
+        final String sourceFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
 
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         // Send a request with no Body
-        HTTPResponse response = endPoint
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationFile)));
 
         // Assert that we receive the proper response
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Request has a malformed source identifier!")
                 .build();
@@ -169,23 +169,23 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that a request with no Body to CopyNotebookEndpoint results in an error
     public void httpCopyNotebookWithMalformedBodyTest() {
         // Destination file must not exist
-        Path destinationFile = Paths.get("testNotebookName");
+        final Path destinationFile = Paths.get("testNotebookName");
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
 
         // Source file must exist
-        Path sourceFile = notebook2();
+        final Path sourceFile = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
-        String sourceFileContent = Assertions
+        final String sourceFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
 
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
         // Send a request with malformed Body
-        String bodyString = "{\"whoops i forgot to format the JSON\"\"true\"}";
-        HTTPResponse response = endPoint
+        final String bodyString = "{\"whoops i forgot to format the JSON\"\"true\"}";
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationFile), new StringBody(bodyString)));
 
         // Assert that we receive the proper response
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Request has a malformed source identifier!")
                 .build();
@@ -206,26 +206,26 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that a proper request to CopyNotebookEndpoint results in a correct response and a file being overwritten to disk.
     public void httpCopyAndOverwriteNotebookTest() {
         // Destination file must exist
-        Path destinationFile = notebook3();
+        final Path destinationFile = notebook3();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationFile)));
-        String destinationFileContent = Assertions
+        final String destinationFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(destinationFile)));
 
         // Source file must exist
-        Path sourceFile = notebook2();
+        final Path sourceFile = notebook2();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
-        String sourceFileContent = Assertions
+        final String sourceFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
 
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
-        HTTPResponse response = endPoint
+        final CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final JsonObject body = Json.createObjectBuilder().add("sourcePath", notebook2().toString()).build();
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationFile), new JSONBody(body)));
 
         // Assert that we receive the proper response and that it contains the text from all the paragraphs from the source notebook
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedLocationHeader = new BasicHeader("Location", notebook3().toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions
@@ -276,16 +276,16 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that a request to CopyNotebookEndpoint with a source path that does not have a file results in an error
     public void httpCopyNonExistentSourceNotebookTest() {
         // Destination file must not exist
-        Path destinationFile = Paths.get("testNotebookName");
+        final Path destinationFile = Paths.get("testNotebookName");
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(destinationFile)));
 
         // Source file must not exist
-        Path sourceFile = Paths.get("I_DONT_EXIST");
+        final Path sourceFile = Paths.get("I_DONT_EXIST");
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(sourceFile)));
 
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
-        HTTPResponse response = endPoint
+        final CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationFile), new JSONBody(body)));
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
@@ -298,22 +298,22 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
     // Assert that a request to CopyNotebookEndpoint to a path that contains a directory results in an error
     public void httpCopyNotebookIntoUnavailablePathTest() {
         // Destination file must exist and be a directory
-        Path destinationDirectory = directory1();
+        final Path destinationDirectory = directory1();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(destinationDirectory)));
         Assertions.assertTrue(Files.isDirectory(notebookDirectory().resolve(destinationDirectory)));
 
         // Source file must exist
-        Path sourceFile = notebook1();
+        final Path sourceFile = notebook1();
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(sourceFile)));
-        String sourceFileContent = Assertions
+        final String sourceFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(sourceFile)));
 
-        CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
-        HTTPResponse response = endPoint
+        final CopyNotebookEndpoint endPoint = new CopyNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final JsonObject body = Json.createObjectBuilder().add("sourcePath", sourceFile.toString()).build();
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(destinationDirectory), new JSONBody(body)));
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "File at path: " + directory1() + " is a Directory!")
                 .build();
@@ -323,7 +323,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         try {
             Assertions.assertEquals(expectedJson.toString(), response.body().asString());
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
             throw new RuntimeException(e);
         }
 

@@ -58,7 +58,7 @@ class ConfigurationTest {
     @Test
     void serverPortTest() {
         Assertions.assertDoesNotThrow(() -> {
-            Configuration configuration = new Configuration(serverPort);
+            final Configuration configuration = new Configuration(serverPort);
             assertEquals(serverPort, configuration.serverPort());
         });
     }

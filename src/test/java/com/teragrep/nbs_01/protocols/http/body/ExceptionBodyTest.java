@@ -63,17 +63,17 @@ public class ExceptionBodyTest {
         final String throwable3message = "File at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln was not found!";
         final String throwable4message = "No permission to access file at path /notebooks/my_folder_2A94M5J1D/nonexistentNotebook.zpln!";
 
-        Throwable throwable4 = new FileNotFoundException(throwable4message);
-        Throwable throwable3 = new IOException(throwable3message, throwable4);
-        Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
-        Throwable throwable1 = new Exception(throwable1message, throwable2);
+        final Throwable throwable4 = new FileNotFoundException(throwable4message);
+        final Throwable throwable3 = new IOException(throwable3message, throwable4);
+        final Throwable throwable2 = new RuntimeException(throwable2message, throwable3);
+        final Throwable throwable1 = new Exception(throwable1message, throwable2);
 
-        ExceptionBody body = new ExceptionBody(throwable1);
-        JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
+        final ExceptionBody body = new ExceptionBody(throwable1);
+        final JsonObject expectedBody = Json.createObjectBuilder().add("message", throwable1message).build();
         try {
             Assertions.assertEquals(expectedBody.toString(), body.asString());
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
             throw new RuntimeException(e);
         }
     }

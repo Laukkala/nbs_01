@@ -72,63 +72,63 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public UpdateParagraphEndpoint(Storage root) {
+    public UpdateParagraphEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
-            String paragraphId = request.targetParagraphId();
+            final Identifier targetIdentifier = request.targetIdentifier();
+            final String paragraphId = request.targetParagraphId();
 
             // Deserialize notebook from Storage
-            Notebook notebook = root.deserializeNotebook(targetIdentifier);
-            Map<String, Paragraph> paragraphs = notebook.paragraphs();
+            final Notebook notebook = root.deserializeNotebook(targetIdentifier);
+            final Map<String, Paragraph> paragraphs = notebook.paragraphs();
 
             // Throw an error if the paragraph doesn't exist
             if (!paragraphs.containsKey(paragraphId)) {
                 throw new MalformedRequestException("Paragraph with Id " + paragraphId + " not found!");
             }
-            Paragraph originalParagraph = paragraphs.get(paragraphId);
+            final Paragraph originalParagraph = paragraphs.get(paragraphId);
 
             // Get modified script text and / or title from request.
             String scriptText;
             try {
                 scriptText = request.text();
             }
-            catch (MalformedRequestException exception) {
+            catch (final MalformedRequestException exception) {
                 scriptText = originalParagraph.script().text();
             }
             String title;
             try {
                 title = request.title();
             }
-            catch (MalformedRequestException exception) {
+            catch (final MalformedRequestException exception) {
                 title = originalParagraph.title();
             }
-            Script newScript = new Script(scriptText);
+            final Script newScript = new Script(scriptText);
 
             // Overwrite the old paragraph with the edited paragraph, and serialize the notebook to Storage
-            Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
+            final Paragraph newParagraph = new Paragraph(originalParagraph.id(), title, newScript);
             paragraphs.put(newParagraph.id(), newParagraph);
-            Notebook newNotebook = new Notebook(notebook.title(), paragraphs);
-            SerializedNotebook serializedNotebook = root.serializeNotebook(newNotebook);
+            final Notebook newNotebook = new Notebook(notebook.title(), paragraphs);
+            final SerializedNotebook serializedNotebook = root.serializeNotebook(newNotebook);
             root.writeFile(targetIdentifier, serializedNotebook.serialize());
 
             // Create response
-            String paragraphContent = root.serializeParagraph(newParagraph).serialize();
-            ArrayList<Header> headers = new ArrayList<>();
+            final String paragraphContent = root.serializeParagraph(newParagraph).serialize();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(paragraphContent), headers);
         }
-        catch (MalformedRequestException | JsonException badRequestException) {
+        catch (final MalformedRequestException | JsonException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -137,14 +137,14 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UpdateParagraphEndpoint that = (UpdateParagraphEndpoint) o;
+        final UpdateParagraphEndpoint that = (UpdateParagraphEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

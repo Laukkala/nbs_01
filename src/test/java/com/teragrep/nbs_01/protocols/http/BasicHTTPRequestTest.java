@@ -64,13 +64,13 @@ public class BasicHTTPRequestTest {
 
     @Test
     public void headersTest() {
-        HTTPRequestPath requestPath = new HTTPBasicRequestPath(Paths.get("target", "testLocation"));
-        Header locationHeader = new BasicHeader("Location", requestPath.toString());
-        Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
-        List<Header> headers = new ArrayList<>();
+        final HTTPRequestPath requestPath = new HTTPBasicRequestPath(Paths.get("target", "testLocation"));
+        final Header locationHeader = new BasicHeader("Location", requestPath.toString());
+        final Header contentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final List<Header> headers = new ArrayList<>();
         headers.add(locationHeader);
         headers.add(contentTypeHeader);
-        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, headers);
+        final BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, headers);
 
         Assertions.assertEquals(2, testRequest.headers().size());
         Assertions.assertTrue(testRequest.headers().contains(locationHeader));
@@ -80,16 +80,16 @@ public class BasicHTTPRequestTest {
 
     @Test
     public void bodyTest() {
-        HTTPBasicRequestPath requestPath = new HTTPBasicRequestPath(Paths.get("target", "testLocation"));
-        Body body = new StringBody("testPayload");
-        BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, body);
+        final HTTPBasicRequestPath requestPath = new HTTPBasicRequestPath(Paths.get("target", "testLocation"));
+        final Body body = new StringBody("testPayload");
+        final BasicHTTPRequest testRequest = new BasicHTTPRequest(requestPath, body);
 
         Assertions.assertEquals(body, testRequest.body());
     }
 
     @Test
     public void stubTest() {
-        BasicHTTPRequest stubRequest = new BasicHTTPRequest();
+        final BasicHTTPRequest stubRequest = new BasicHTTPRequest();
         Assertions.assertEquals(0, stubRequest.headers().size());
         Assertions.assertEquals(StubBody.class, stubRequest.body().getClass());
         Assertions.assertEquals(StubPath.class, stubRequest.path().getClass());

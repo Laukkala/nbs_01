@@ -57,13 +57,13 @@ public class JsonBodyTest {
     @Test
     void testJsonBodyAsString() {
 
-        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
+        final JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
 
-        JSONBody body = new JSONBody(expectedBody);
+        final JSONBody body = new JSONBody(expectedBody);
         try {
             Assertions.assertEquals(expectedBody.toString(), body.asString());
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
             throw new RuntimeException(e);
         }
     }
@@ -71,13 +71,13 @@ public class JsonBodyTest {
     @Test
     void testJsonBodyAsJsonObject() {
 
-        JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
+        final JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
 
-        JSONBody body = new JSONBody(expectedBody);
+        final JSONBody body = new JSONBody(expectedBody);
         try {
             Assertions.assertEquals(expectedBody.toString(), body.asString());
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
             throw new RuntimeException(e);
         }
     }
@@ -85,13 +85,13 @@ public class JsonBodyTest {
     @Test
     void testJsonBodyAsJsonArray() {
 
-        JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
+        final JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
 
-        JSONBody body = new JSONBody(expectedBody);
+        final JSONBody body = new JSONBody(expectedBody);
         try {
             Assertions.assertEquals(expectedBody.toString(), body.asString());
         }
-        catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
             throw new RuntimeException(e);
         }
     }

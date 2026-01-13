@@ -71,61 +71,68 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     private final HTTPEndPoint endPoint;
     private final Charset charset;
 
-    public HttpServlet(HTTPEndPoint endPoint) {
+    public HttpServlet(final HTTPEndPoint endPoint) {
         this(endPoint, Charset.defaultCharset());
     }
 
-    public HttpServlet(HTTPEndPoint endPoint, Charset charset) {
+    public HttpServlet(final HTTPEndPoint endPoint, final Charset charset) {
         super();
         this.endPoint = endPoint;
         this.charset = charset;
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    private void handleHttpRequest(HttpServletRequest req, HttpServletResponse resp, HTTPEndPoint requestEndPoint)
-            throws IOException {
+    private void handleHttpRequest(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            final HTTPEndPoint requestEndPoint
+    ) throws IOException {
         // Read body of request
-        BufferedReader reader = req.getReader();
-        String bodyString = reader.lines().collect(Collectors.joining());
+        final BufferedReader reader = req.getReader();
+        final String bodyString = reader.lines().collect(Collectors.joining());
         reader.close();
-        Body body;
+        final Body body;
         if (!bodyString.isEmpty()) {
             body = new StringBody(bodyString);
         }
         else {
             body = new StubBody();
         }
-        HTTPRequest endPointRequest = new BasicHTTPRequest(new StubPath(), body);
+        final HTTPRequest endPointRequest = new BasicHTTPRequest(new StubPath(), body);
 
         // Transfer the Request to an EndPoint and create an HTTP response using the generated response object
-        HTTPResponse endPointResponse = requestEndPoint.createResponse(endPointRequest);
+        final HTTPResponse endPointResponse = requestEndPoint.createResponse(endPointRequest);
         resp.setStatus(endPointResponse.status());
         resp.setCharacterEncoding(charset.name());
-        for (Header header : endPointResponse.headers()) {
+        for (final Header header : endPointResponse.headers()) {
             resp.setHeader(header.getName(), header.getValue());
         }
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
         if (!endPointResponse.body().isStub()) {
-            PrintWriter writer = resp.getWriter();
+            final PrintWriter writer = resp.getWriter();
             try {
                 writer.write(endPointResponse.body().asString());
             }
-            catch (com.teragrep.nbs_01.exceptions.StubObjectException e) {
+            catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
                 throw new RuntimeException(e);
             }
             writer.flush();
@@ -134,14 +141,14 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        HttpServlet that = (HttpServlet) o;
+        final HttpServlet that = (HttpServlet) o;
         return Objects.equals(endPoint, that.endPoint) && Objects.equals(charset, that.charset);
     }
 

@@ -48,15 +48,15 @@ package com.teragrep.nbs_01.exceptions;
 // Exception to be thrown when a Stubable object is accessed.
 public final class StubObjectException extends Exception {
 
-    public StubObjectException(String errorMessage) {
+    public StubObjectException(final String errorMessage) {
         super(errorMessage);
     }
 
-    public StubObjectException(Throwable cause) {
+    public StubObjectException(final Throwable cause) {
         super(cause);
     }
 
-    public StubObjectException(String errorMessage, Throwable cause) {
+    public StubObjectException(final String errorMessage, final Throwable cause) {
         super(errorMessage, cause);
     }
 }

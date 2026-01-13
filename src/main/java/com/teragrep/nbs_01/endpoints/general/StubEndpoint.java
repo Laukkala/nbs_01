@@ -61,7 +61,7 @@ public final class StubEndpoint implements HTTPEndPoint {
 
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         return new BasicHTTPResponse(
                 HttpStatus.METHOD_NOT_ALLOWED_405,
                 new JSONBody(Json.createObjectBuilder().build())

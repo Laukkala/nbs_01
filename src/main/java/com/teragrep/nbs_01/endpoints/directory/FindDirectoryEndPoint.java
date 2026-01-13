@@ -70,29 +70,29 @@ public final class FindDirectoryEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public FindDirectoryEndPoint(Storage root) {
+    public FindDirectoryEndPoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
             // Find a directory and get a list of its children
-            Identifier targetIdentifier = request.targetIdentifier();
-            String directoryContent = root.readDirectory(targetIdentifier);
+            final Identifier targetIdentifier = request.targetIdentifier();
+            final String directoryContent = root.readDirectory(targetIdentifier);
 
             // Create response
-            ArrayList<Header> headers = new ArrayList<>();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(directoryContent), headers);
         }
-        catch (MalformedRequestException badRequestException) {
+        catch (final MalformedRequestException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -101,14 +101,14 @@ public final class FindDirectoryEndPoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FindDirectoryEndPoint that = (FindDirectoryEndPoint) o;
+        final FindDirectoryEndPoint that = (FindDirectoryEndPoint) o;
         return Objects.equals(root, that.root);
     }
 

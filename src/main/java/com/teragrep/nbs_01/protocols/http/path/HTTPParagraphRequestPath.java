@@ -53,13 +53,13 @@ public class HTTPParagraphRequestPath implements HTTPRequestPath {
 
     private final Path path;
 
-    public HTTPParagraphRequestPath(Path path) {
+    public HTTPParagraphRequestPath(final Path path) {
         this.path = path;
     }
 
     @Override
     public Path path() throws MalformedRequestException {
-        int nameCount = path.getNameCount();
+        final int nameCount = path.getNameCount();
         if (nameCount < 2) {
             throw new MalformedRequestException("Request has a malformed identifier!");
         }
@@ -70,7 +70,7 @@ public class HTTPParagraphRequestPath implements HTTPRequestPath {
 
     @Override
     public String paragraphId() throws MalformedRequestException {
-        int nameCount = path.getNameCount();
+        final int nameCount = path.getNameCount();
         if (nameCount < 2) {
             throw new MalformedRequestException("Request has a malformed identifier!");
         }

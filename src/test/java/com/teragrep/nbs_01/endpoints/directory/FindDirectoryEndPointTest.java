@@ -70,14 +70,17 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
         // Destination directory must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory2())));
 
-        String expectedFileContent = "{\"title\":\"my_second_folder_2A94M5J2D\",\"children\":[\""
+        final String expectedFileContent = "{\"title\":\"my_second_folder_2A94M5J2D\",\"children\":[\""
                 + notebook1().getFileName() + "\"]}";
 
-        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(directory2())));
+        final FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(directory2())));
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", directory2().toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedLocationHeader = new BasicHeader("Location", directory2().toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedFileContent, response.body().asString()));
@@ -87,16 +90,18 @@ public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
     public void httpDirectoryNotFoundTest() {
 
         // Destination directory must not exist
-        Path nonExistentPath = Paths.get("nonExistentPath");
+        final Path nonExistentPath = Paths.get("nonExistentPath");
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonExistentPath)));
 
-        FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint
+        final FindDirectoryEndPoint endPoint = new FindDirectoryEndPoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(nonExistentPath)));
 
         // The endpoint should return a response with the correct status and message
 
-        JsonObject expectedResponse = Json
+        final JsonObject expectedResponse = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonExistentPath)
                 .build();

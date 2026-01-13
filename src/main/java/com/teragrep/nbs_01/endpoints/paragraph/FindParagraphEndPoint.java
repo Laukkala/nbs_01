@@ -71,52 +71,52 @@ public final class FindParagraphEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public FindParagraphEndPoint(Storage root) {
+    public FindParagraphEndPoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
-            String paragraphId = request.targetParagraphId();
+            final Identifier targetIdentifier = request.targetIdentifier();
+            final String paragraphId = request.targetParagraphId();
 
             // Deserialize from Storage
-            Notebook notebook = root.deserializeNotebook(targetIdentifier);
+            final Notebook notebook = root.deserializeNotebook(targetIdentifier);
 
             if (!notebook.paragraphs().containsKey(paragraphId)) {
                 throw new MalformedRequestException("Paragraph with id " + paragraphId + " not found!");
             }
 
             // Create response
-            String paragraphContent = root.serializeParagraph(notebook.paragraphs().get(paragraphId)).serialize();
-            ArrayList<Header> headers = new ArrayList<>();
+            final String paragraphContent = root.serializeParagraph(notebook.paragraphs().get(paragraphId)).serialize();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(paragraphContent), headers);
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
-        catch (MalformedRequestException badRequestException) {
+        catch (final MalformedRequestException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FindParagraphEndPoint that = (FindParagraphEndPoint) o;
+        final FindParagraphEndPoint that = (FindParagraphEndPoint) o;
         return Objects.equals(root, that.root);
     }
 

@@ -61,7 +61,7 @@ public class ExceptionBody implements Body {
     private final Throwable exception;
     private final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
-    public ExceptionBody(Throwable exception) {
+    public ExceptionBody(final Throwable exception) {
         this.exception = exception;
         jsonObjectBuilder.add("message", exception.getMessage());
         this.json = jsonObjectBuilder.build();

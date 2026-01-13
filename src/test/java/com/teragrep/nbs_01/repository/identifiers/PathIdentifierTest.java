@@ -56,13 +56,13 @@ class PathIdentifierTest {
 
     @Test
     void asLongStringTest() {
-        PathIdentifier identifier = new PathIdentifier(Path.of("first", "second", "third"));
+        final PathIdentifier identifier = new PathIdentifier(Path.of("first", "second", "third"));
         Assertions.assertEquals("first/second/third", identifier.asLongString());
     }
 
     @Test
     void asShortStringTest() {
-        PathIdentifier identifier = new PathIdentifier(Path.of("first", "second", "third"));
+        final PathIdentifier identifier = new PathIdentifier(Path.of("first", "second", "third"));
         Assertions.assertEquals("third", identifier.asShortString());
     }
 }

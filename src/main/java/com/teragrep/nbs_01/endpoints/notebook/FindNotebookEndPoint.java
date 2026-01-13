@@ -72,53 +72,53 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public FindNotebookEndPoint(Storage root) {
+    public FindNotebookEndPoint(final Storage root) {
         this.root = root;
     }
 
     @Override
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
+            final Identifier targetIdentifier = request.targetIdentifier();
 
             // Deserialize from Storage
 
             // We cannot simply return the file contents as is back to the UI using root.read(), since it's possible that there are legacy Zeppelin files, which have a different structure.
             // Therefore, we must first create an in-memory Notebook object first via root.deserialize(), which will format the notebook properly whether it was sourced from a legacy file or not.
-            Notebook notebook = root.deserializeNotebook(targetIdentifier);
-            SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
+            final Notebook notebook = root.deserializeNotebook(targetIdentifier);
+            final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
 
             // Create response
-            ArrayList<Header> headers = new ArrayList<>();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(serializedNotebook.serialize()), headers);
         }
         // If the file cannot be found from Storage, respond with a 404 not found.
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         // If Storage throws an IOException while accessing file contents, or the file contents retrieved from storage are not valid JSON, respond with a 500 internal server error.
-        catch (IOException | JsonException serverErrorException) {
+        catch (final IOException | JsonException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
-        catch (com.teragrep.nbs_01.exceptions.MalformedRequestException malformedRequestException) {
+        catch (final com.teragrep.nbs_01.exceptions.MalformedRequestException malformedRequestException) {
             throw new RuntimeException(malformedRequestException);
         }
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FindNotebookEndPoint that = (FindNotebookEndPoint) o;
+        final FindNotebookEndPoint that = (FindNotebookEndPoint) o;
         return Objects.equals(root, that.root);
     }
 

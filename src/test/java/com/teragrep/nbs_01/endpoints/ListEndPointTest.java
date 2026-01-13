@@ -68,9 +68,9 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/list endpoint results in a list of notebook IDs
     public void httpListAllTest() {
-        ListEndPoint listEndPoint = new ListEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = listEndPoint.createResponse(new BasicHTTPRequest());
-        for (String filename : allFileIds) {
+        final ListEndPoint listEndPoint = new ListEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        final HTTPResponse response = listEndPoint.createResponse(new BasicHTTPRequest());
+        for (final String filename : allFileIds) {
             Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(filename)));
         }
     }
@@ -78,10 +78,10 @@ public class ListEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request with a defined DirectoryId to /notebook/list endpoint results in a list of notebook IDs contained in that directory
     public void httpListWithinFolderTest() {
-        ListEndPoint listEndPoint = new ListEndPoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject requestBody = Json.createObjectBuilder().add("directoryPath", directory1().toString()).build();
-        HTTPResponse response = listEndPoint.createResponse(new BasicHTTPRequest(new JSONBody(requestBody)));
-        for (String filename : allFileIdsWithinDirectory) {
+        final ListEndPoint listEndPoint = new ListEndPoint(new LocalFilesystemStorage(notebookDirectory()));
+        final JsonObject requestBody = Json.createObjectBuilder().add("directoryPath", directory1().toString()).build();
+        final HTTPResponse response = listEndPoint.createResponse(new BasicHTTPRequest(new JSONBody(requestBody)));
+        for (final String filename : allFileIdsWithinDirectory) {
             Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(response.body().asString().contains(filename)));
         }
     }

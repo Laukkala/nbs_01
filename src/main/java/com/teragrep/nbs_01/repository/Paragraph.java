@@ -61,7 +61,7 @@ public final class Paragraph {
         this.script = new Script();
     }
 
-    public Paragraph(String id, String title, Script script) {
+    public Paragraph(final String id, final String title, final Script script) {
         this.id = id;
         this.title = title;
         this.script = script;
@@ -80,24 +80,24 @@ public final class Paragraph {
     }
 
     public Paragraph copy() {
-        String copyId = UUID.randomUUID().toString();
+        final String copyId = UUID.randomUUID().toString();
         return copy(copyId);
     }
 
-    public Paragraph copy(String copyId) {
-        Paragraph copy = new Paragraph(copyId, title, new Script(script().text()));
+    public Paragraph copy(final String copyId) {
+        final Paragraph copy = new Paragraph(copyId, title, new Script(script().text()));
         return copy;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Paragraph paragraph = (Paragraph) o;
+        final Paragraph paragraph = (Paragraph) o;
         return Objects.equals(id, paragraph.id) && Objects.equals(title, paragraph.title)
                 && Objects.equals(script, paragraph.script);
     }

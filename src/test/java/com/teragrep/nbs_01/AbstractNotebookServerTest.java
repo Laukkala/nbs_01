@@ -101,8 +101,8 @@ public class AbstractNotebookServerTest {
     private final NotebookServer server;
 
     public AbstractNotebookServerTest() {
-        Server jettyServer = new Server(testConfiguration.serverPort());
-        Connector connector = new ServerConnector(jettyServer);
+        final Server jettyServer = new Server(testConfiguration.serverPort());
+        final Connector connector = new ServerConnector(jettyServer);
         jettyServer.addConnector(connector);
         server = new NotebookServer(jettyServer, storage);
     }
@@ -193,15 +193,15 @@ public class AbstractNotebookServerTest {
         return serverAddress;
     }
 
-    public void copyFileRecursively(File fileToCopy, File destination) {
+    public void copyFileRecursively(final File fileToCopy, final File destination) {
         if (fileToCopy.isDirectory()) {
-            File[] children = fileToCopy.listFiles();
-            for (File child : children) {
+            final File[] children = fileToCopy.listFiles();
+            for (final File child : children) {
                 copyFileRecursively(child, Paths.get(destination.toString(), child.getName()).toFile());
             }
         }
         if (!destination.exists()) {
-            File parent = destination.getParentFile();
+            final File parent = destination.getParentFile();
             if (!parent.exists()) {
                 parent.mkdirs();
             }
@@ -209,32 +209,32 @@ public class AbstractNotebookServerTest {
         }
     }
 
-    public void deleteFileRecursively(File fileToDelete) {
-        File[] children = fileToDelete.listFiles();
+    public void deleteFileRecursively(final File fileToDelete) {
+        final File[] children = fileToDelete.listFiles();
         if (children != null) {
-            for (File child : children) {
+            for (final File child : children) {
                 deleteFileRecursively(child);
             }
         }
         fileToDelete.delete();
     }
 
-    public HTTPResponse makeHttpPOSTRequest(String urlString, String requestBody) throws IOException {
-        URL url = new URL(urlString);
-        StringBuilder messages = new StringBuilder();
+    public HTTPResponse makeHttpPOSTRequest(final String urlString, final String requestBody) throws IOException {
+        final URL url = new URL(urlString);
+        final StringBuilder messages = new StringBuilder();
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
-        byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
+        final byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
-        OutputStream output = connection.getOutputStream();
+        final OutputStream output = connection.getOutputStream();
         output.write(bytes);
         output.close();
-        int status = connection.getResponseCode();
-        InputStreamReader connectionInputStreamReader;
+        final int status = connection.getResponseCode();
+        final InputStreamReader connectionInputStreamReader;
         if (status == 200) {
             connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
         }
@@ -242,7 +242,7 @@ public class AbstractNotebookServerTest {
             connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
         }
         // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+        final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -250,10 +250,10 @@ public class AbstractNotebookServerTest {
         }
         Body responseBody;
         try {
-            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
             responseBody = new JSONBody(message);
         }
-        catch (JsonParsingException jsonParsingException) {
+        catch (final JsonParsingException jsonParsingException) {
             // Response is not in JSON format. In that case, return a String response.
             responseBody = new StringBody(messages.toString());
         }
@@ -261,16 +261,16 @@ public class AbstractNotebookServerTest {
         return new BasicHTTPResponse(status, responseBody);
     }
 
-    public HTTPResponse makeHttpGETRequest(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        StringBuilder messages = new StringBuilder();
+    public HTTPResponse makeHttpGETRequest(final String urlString) throws IOException {
+        final URL url = new URL(urlString);
+        final StringBuilder messages = new StringBuilder();
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
 
-        int status = connection.getResponseCode();
-        InputStreamReader connectionInputStreamReader;
+        final int status = connection.getResponseCode();
+        final InputStreamReader connectionInputStreamReader;
         if (status == 200) {
             connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
         }
@@ -278,7 +278,7 @@ public class AbstractNotebookServerTest {
             connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
         }
         // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+        final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -286,10 +286,10 @@ public class AbstractNotebookServerTest {
         }
         Body responseBody;
         try {
-            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
             responseBody = new JSONBody(message);
         }
-        catch (JsonParsingException jsonParsingException) {
+        catch (final JsonParsingException jsonParsingException) {
             // Response is not in JSON format. In that case, return a String response.
             responseBody = new StringBody(messages.toString());
         }
@@ -297,22 +297,22 @@ public class AbstractNotebookServerTest {
         return new BasicHTTPResponse(status, responseBody);
     }
 
-    public HTTPResponse makeHttpPUTRequest(String urlString, String requestBody) throws IOException {
-        URL url = new URL(urlString);
-        StringBuilder messages = new StringBuilder();
+    public HTTPResponse makeHttpPUTRequest(final String urlString, final String requestBody) throws IOException {
+        final URL url = new URL(urlString);
+        final StringBuilder messages = new StringBuilder();
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("PUT");
         connection.setDoOutput(true);
 
-        byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
+        final byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
-        OutputStream output = connection.getOutputStream();
+        final OutputStream output = connection.getOutputStream();
         output.write(bytes);
         output.close();
-        int status = connection.getResponseCode();
-        InputStream connectionInputStream;
+        final int status = connection.getResponseCode();
+        final InputStream connectionInputStream;
         if (status == 201) {
             connectionInputStream = connection.getInputStream();
         }
@@ -322,8 +322,8 @@ public class AbstractNotebookServerTest {
 
         // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
         if (connectionInputStream != null) {
-            InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
-            BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+            final InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
+            final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
             String line;
             while ((line = reader.readLine()) != null) {
                 messages.append(line + "\n");
@@ -332,10 +332,10 @@ public class AbstractNotebookServerTest {
 
         Body responseBody;
         try {
-            JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+            final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
             responseBody = new JSONBody(message);
         }
-        catch (JsonParsingException jsonParsingException) {
+        catch (final JsonParsingException jsonParsingException) {
             // Response is not in JSON format. In that case, return a String response.
             responseBody = new StringBody(messages.toString());
         }
@@ -343,30 +343,30 @@ public class AbstractNotebookServerTest {
         return new BasicHTTPResponse(status, responseBody);
     }
 
-    public HTTPResponse makeHttpDELETERequest(String urlString, String requestBody) throws IOException {
-        URL url = new URL(urlString);
-        StringBuilder messages = new StringBuilder();
+    public HTTPResponse makeHttpDELETERequest(final String urlString, final String requestBody) throws IOException {
+        final URL url = new URL(urlString);
+        final StringBuilder messages = new StringBuilder();
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("DELETE");
-        byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
+        final byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.connect();
-        OutputStream output = connection.getOutputStream();
+        final OutputStream output = connection.getOutputStream();
         output.write(bytes);
         output.close();
-        int status;
+        final int status;
         try {
             status = connection.getResponseCode();
             if (status == 204) {
                 // Successful responses to DELETE requests should have no content.
-                JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
+                final JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
                 connection.disconnect();
                 return new BasicHTTPResponse(status, new JSONBody(message));
             }
             else {
-                InputStream connectionInputStream;
+                final InputStream connectionInputStream;
                 if (status >= 400 && status < 500) {
                     connectionInputStream = connection.getErrorStream();
                 }
@@ -374,13 +374,13 @@ public class AbstractNotebookServerTest {
                     try {
                         connectionInputStream = connection.getInputStream();
                     }
-                    catch (IOException ioException) {
+                    catch (final IOException ioException) {
                         throw new IOException("Error while reading input from connection", ioException);
                     }
                 }
                 if (connectionInputStream != null) {
-                    InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
-                    BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+                    final InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
+                    final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
                     String line;
                     while ((line = reader.readLine()) != null) {
                         messages.append(line + "\n");
@@ -388,10 +388,10 @@ public class AbstractNotebookServerTest {
                 }
                 Body responseBody;
                 try {
-                    JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
+                    final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
                     responseBody = new JSONBody(message);
                 }
-                catch (JsonParsingException jsonParsingException) {
+                catch (final JsonParsingException jsonParsingException) {
                     // Response is not in JSON format. In that case, return a String response.
                     responseBody = new StringBody(messages.toString());
                 }
@@ -399,7 +399,7 @@ public class AbstractNotebookServerTest {
             }
 
         }
-        catch (IOException ioException) {
+        catch (final IOException ioException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(ioException))

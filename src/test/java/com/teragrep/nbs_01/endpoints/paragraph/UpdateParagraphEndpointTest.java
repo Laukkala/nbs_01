@@ -85,23 +85,29 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 + "\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
-        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
-        HTTPResponse response = endpoint
+        final Path requestPath = Paths.get(notebook2().toString(), paragraphId);
+        final JsonObject body = Json
+                .createObjectBuilder()
+                .add("title", editedTitle)
+                .add("text", editedParagraphText)
+                .build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body)));
         // Assert that we got the proper response.
         Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        Header expectedLocationHeader = new BasicHeader(
+        final Header expectedLocationHeader = new BasicHeader(
                 "Location",
                 requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
         );
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("id", paragraphId)
                 .add("title", editedTitle)
@@ -129,15 +135,17 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 + "\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
-        JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
-        HTTPResponse response = endpoint
+        final Path requestPath = Paths.get(notebook2().toString(), paragraphId);
+        final JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body)));
         // Assert that we got the proper response.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("id", paragraphId)
                 .add("title", "")
@@ -167,15 +175,17 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
                 + "\",\"script\":{\"text\":\"%test\\n## Congratulations, it's done.\\n##### You can create your own notebook in 'Notebook' menu. Good luck!\"}},{\"id\":\"20150326-214658_12335843\",\"title\":\"\",\"script\":{\"text\":\"%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM'2011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```\"}},{\"id\":\"20150703-133047_853701097\",\"title\":\"\",\"script\":{\"text\":\"\"}}]}";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(notebook2().toString(), paragraphId);
-        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
-        HTTPResponse response = endpoint
+        final Path requestPath = Paths.get(notebook2().toString(), paragraphId);
+        final JsonObject body = Json.createObjectBuilder().add("title", editedTitle).build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body)));
         // Assert that we got the proper response.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("id", paragraphId)
                 .add("title", editedTitle)
@@ -203,18 +213,24 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpUpdateParagraphInNonexistentNotebookTest() {
         // Assert that a request to UpdateParagraphEndpoint with a nonexistent notebook path results in an error.
-        String nonExistentNotebookName = "nonExistentNotebook";
+        final String nonExistentNotebookName = "nonExistentNotebook";
 
         // Make a request editing the title of a notebook that doesn't exist.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
-        JsonObject body = Json.createObjectBuilder().add("title", editedTitle).add("text", editedParagraphText).build();
-        HTTPResponse response = endpoint
+        final Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
+        final JsonObject body = Json
+                .createObjectBuilder()
+                .add("title", editedTitle)
+                .add("text", editedParagraphText)
+                .build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body)));
 
         // The endpoint should return a Response with the correct status and message.
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonExistentNotebookName)
                 .build();
@@ -226,23 +242,25 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpUpdateNonexistentParagraphTest() {
         // Assert that a request to UpdateParagraphEndpoint with a nonexistent paragraphId results in an error.
-        String nonexistentParagraphId = "nonexistentId";
+        final String nonexistentParagraphId = "nonexistentId";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(notebook2().toString(), nonexistentParagraphId);
-        JsonObject body = Json
+        final Path requestPath = Paths.get(notebook2().toString(), nonexistentParagraphId);
+        final JsonObject body = Json
                 .createObjectBuilder()
                 .add("title", editedTitle)
                 .add("paragraphId", nonexistentParagraphId)
                 .add("text", editedParagraphText)
                 .build();
-        HTTPResponse response = endpoint
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body)));
 
         // The endpoint should return a Response with the correct status and message.
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Paragraph with Id " + nonexistentParagraphId + " not found!")
                 .build();
@@ -254,19 +272,21 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpInvalidRequestFormatTest() {
         // Assert that a request to UpdateParagraphEndpoint with an improperly formatted Request results in an error.
-        String nonexistentParagraphId = "nonexistentId";
-        String nonexistentNotebookName = "nonexistentNotebookPath";
+        final String nonexistentParagraphId = "nonexistentId";
+        final String nonexistentNotebookName = "nonexistentNotebookPath";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
-        UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final UpdateParagraphEndpoint endpoint = new UpdateParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(nonexistentNotebookName);
-        JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
-        HTTPResponse response = endpoint
+        final Path requestPath = Paths.get(nonexistentNotebookName);
+        final JsonObject body = Json.createObjectBuilder().add("text", editedParagraphText).build();
+        final HTTPResponse response = endpoint
                 .createResponse(new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath), new JSONBody(body)));
 
         // The endpoint should return a Response with the correct status and message.
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Request has a malformed identifier!")
                 .build();

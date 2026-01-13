@@ -73,26 +73,26 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public CopyNotebookEndpoint(Storage root) {
+    public CopyNotebookEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier sourceIdentifier = request.sourceIdentifier();
-            Identifier targetIdentifier = request.targetIdentifier();
+            final Identifier sourceIdentifier = request.sourceIdentifier();
+            final Identifier targetIdentifier = request.targetIdentifier();
 
             // Deserialize source from Storage
-            Notebook source = root.deserializeNotebook(sourceIdentifier);
+            final Notebook source = root.deserializeNotebook(sourceIdentifier);
 
             // Create a copy, which also generates unique IDs for copied paragraphs.
-            Notebook copy = source.copy();
+            final Notebook copy = source.copy();
             // Serialize copy to storage
-            SerializedNotebook serializedDestination = root.serializeNotebook(copy);
+            final SerializedNotebook serializedDestination = root.serializeNotebook(copy);
             root.writeFile(targetIdentifier, serializedDestination.serialize());
 
             // Create response
-            ArrayList<Header> headers = new ArrayList<>();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(
@@ -101,13 +101,13 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
                     headers
             );
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (MalformedRequestException | JsonException | FileAlreadyExistsException badRequestException) {
+        catch (final MalformedRequestException | JsonException | FileAlreadyExistsException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -116,14 +116,14 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CopyNotebookEndpoint that = (CopyNotebookEndpoint) o;
+        final CopyNotebookEndpoint that = (CopyNotebookEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

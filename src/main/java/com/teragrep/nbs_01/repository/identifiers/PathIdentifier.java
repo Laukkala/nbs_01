@@ -56,11 +56,11 @@ public class PathIdentifier implements Identifier {
 
     private final Path identifier;
 
-    public PathIdentifier(String identifier) {
+    public PathIdentifier(final String identifier) {
         this(Path.of(identifier));
     }
 
-    public PathIdentifier(Path identifier) {
+    public PathIdentifier(final Path identifier) {
         this.identifier = identifier;
     }
 
@@ -73,14 +73,14 @@ public class PathIdentifier implements Identifier {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PathIdentifier that = (PathIdentifier) o;
+        final PathIdentifier that = (PathIdentifier) o;
         return Objects.equals(identifier, that.identifier);
     }
 

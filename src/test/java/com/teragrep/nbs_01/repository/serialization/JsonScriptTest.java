@@ -59,8 +59,8 @@ class JsonScriptTest {
 
     @Test
     void text() {
-        JsonScript script1 = new JsonScript(testScript1);
-        JsonScript script2 = new JsonScript(testScript2);
+        final JsonScript script1 = new JsonScript(testScript1);
+        final JsonScript script2 = new JsonScript(testScript2);
 
         Assertions.assertEquals("testText1", script1.text());
         Assertions.assertEquals("testText2", script2.text());
@@ -68,8 +68,8 @@ class JsonScriptTest {
 
     @Test
     void serialize() {
-        JsonScript script1 = new JsonScript(testScript1);
-        JsonScript script2 = new JsonScript(testScript2);
+        final JsonScript script1 = new JsonScript(testScript1);
+        final JsonScript script2 = new JsonScript(testScript2);
 
         Assertions.assertEquals(testScript1.toString(), script1.serialize());
         Assertions.assertEquals(testScript2.toString(), script2.serialize());

@@ -56,14 +56,14 @@ class HTTPBasicRequestPathTest {
 
     @Test
     void path() {
-        HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
-        Path filePath = Assertions.assertDoesNotThrow(() -> path.path());
+        final HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
+        final Path filePath = Assertions.assertDoesNotThrow(() -> path.path());
         Assertions.assertEquals(Paths.get("first", "second", "third"), filePath);
     }
 
     @Test
     void paragraphId() {
-        HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
+        final HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
         Assertions.assertThrows(MalformedRequestException.class, () -> path.paragraphId());
     }
 }

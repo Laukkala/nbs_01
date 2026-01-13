@@ -63,15 +63,17 @@ public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in new directory being saved on disk.
     public void httpDeleteDirectoryTest() {
-        Path deletedDirectoryPath = directory2();
+        final Path deletedDirectoryPath = directory2();
         // Destination directory must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(deletedDirectoryPath)));
-        DeleteDirectoryEndpoint endPoint = new DeleteDirectoryEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint
+        final DeleteDirectoryEndpoint endPoint = new DeleteDirectoryEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(deletedDirectoryPath)));
         // Assert that we receive the proper response.
         Assertions.assertEquals(204, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryPath.toString());
+        final Header expectedLocationHeader = new BasicHeader("Location", deletedDirectoryPath.toString());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         // Destination directory must not exist
         Assertions.assertFalse(Files.exists(deletedDirectoryPath));

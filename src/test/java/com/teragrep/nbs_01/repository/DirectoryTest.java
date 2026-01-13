@@ -69,15 +69,15 @@ class DirectoryTest {
         copyFileRecursively(notebookSource.toFile(), notebookDirectory.toFile());
     }
 
-    public void copyFileRecursively(File fileToCopy, File destination) {
+    public void copyFileRecursively(final File fileToCopy, final File destination) {
         if (fileToCopy.isDirectory()) {
-            File[] children = fileToCopy.listFiles();
-            for (File child : children) {
+            final File[] children = fileToCopy.listFiles();
+            for (final File child : children) {
                 copyFileRecursively(child, Paths.get(destination.toString(), child.getName()).toFile());
             }
         }
         if (!destination.exists()) {
-            File parent = destination.getParentFile();
+            final File parent = destination.getParentFile();
             if (!parent.exists()) {
                 parent.mkdirs();
             }
@@ -85,10 +85,10 @@ class DirectoryTest {
         }
     }
 
-    public void deleteFileRecursively(File fileToDelete) {
-        File[] children = fileToDelete.listFiles();
+    public void deleteFileRecursively(final File fileToDelete) {
+        final File[] children = fileToDelete.listFiles();
         if (children != null) {
-            for (File child : children) {
+            for (final File child : children) {
                 deleteFileRecursively(child);
             }
         }

@@ -72,7 +72,7 @@ public class NotebookServer implements Callable {
     private final Storage root;
     private final Server jettyServer;
 
-    public NotebookServer(Server jettyServer, Storage root) {
+    public NotebookServer(final Server jettyServer, final Storage root) {
         this.jettyServer = jettyServer;
         this.root = root;
     }
@@ -81,14 +81,14 @@ public class NotebookServer implements Callable {
         // Start jetty server
         try {
             // Jetty setup
-            ServletContextHandler rootContextHandler = new ServletContextHandler();
+            final ServletContextHandler rootContextHandler = new ServletContextHandler();
             rootContextHandler.setContextPath("/");
 
-            ServletContextHandler notebookContextHandler = new ServletContextHandler();
+            final ServletContextHandler notebookContextHandler = new ServletContextHandler();
             notebookContextHandler.setContextPath("/notebook");
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
-            FileSystemServlet notebookServlet = new FileSystemServlet(
+            final FileSystemServlet notebookServlet = new FileSystemServlet(
                     new FindNotebookEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateNotebookEndpoint(root), // Endpoint to call on a POST Request
                     new DelegatingEndpoint(new CopyNotebookEndpoint(root), new CreateNotebookEndpoint(root), new DoAllKeysExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
@@ -96,11 +96,11 @@ public class NotebookServer implements Callable {
             );
             notebookContextHandler.addServlet(notebookServlet, "/");
 
-            ServletContextHandler directoryContextHandler = new ServletContextHandler();
+            final ServletContextHandler directoryContextHandler = new ServletContextHandler();
             directoryContextHandler.setContextPath("/directory");
 
             // Servlets mapped to paths. NBS_01 Servlets are defined with the help of Endpoints, but any Servlet implementation can be used.
-            FileSystemServlet directoryServlet = new FileSystemServlet(
+            final FileSystemServlet directoryServlet = new FileSystemServlet(
                     new FindDirectoryEndPoint(root), // Endpoint to call on a GET Request
                     new StubEndpoint(), // Endpoint to call on a POST Request
                     new DelegatingEndpoint(new CopyDirectoryEndpoint(root), new CreateDirectoryEndpoint(root), new DoAllKeysExistDelegate("sourcePath")), // Endpoint to call on a PUT Request
@@ -108,10 +108,10 @@ public class NotebookServer implements Callable {
             );
             directoryContextHandler.addServlet(directoryServlet, "/");
 
-            ServletContextHandler paragraphContextHandler = new ServletContextHandler();
+            final ServletContextHandler paragraphContextHandler = new ServletContextHandler();
             paragraphContextHandler.setContextPath("/paragraph");
 
-            FileSystemServlet paragraphServlet = new FileSystemServlet(
+            final FileSystemServlet paragraphServlet = new FileSystemServlet(
                     new FindParagraphEndPoint(root), // Endpoint to call on a GET Request
                     new UpdateParagraphEndpoint(root), // Endpoint to call on a POST Request
                     new DelegatingEndpoint(new CopyParagraphEndpoint(root), new CreateParagraphEndpoint(root), new DoAllKeysExistDelegate(Arrays.asList("sourcePath", "sourceParagraphId"))), // Endpoint to call on a PUT Request
@@ -119,13 +119,13 @@ public class NotebookServer implements Callable {
             );
             paragraphContextHandler.addServlet(paragraphServlet, "/");
 
-            HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
+            final HttpServlet listServlet = new HttpServlet(new ListEndPoint(root));
             notebookContextHandler.addServlet(listServlet, "/list");
 
-            HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
+            final HttpServlet pingServlet = new HttpServlet(new PingEndpoint());
             rootContextHandler.addServlet(pingServlet, "/ping");
 
-            ContextHandlerCollection collection = new ContextHandlerCollection();
+            final ContextHandlerCollection collection = new ContextHandlerCollection();
             collection.addHandler(rootContextHandler);
             collection.addHandler(paragraphContextHandler);
             collection.addHandler(notebookContextHandler);
@@ -136,11 +136,11 @@ public class NotebookServer implements Callable {
             jettyServer.start();
             LOGGER.info("Server started!");
         }
-        catch (IOException ioException) {
+        catch (final IOException ioException) {
             LOGGER.error("An error occurred while configuring server", ioException);
             throw ioException;
         }
-        catch (Exception exception) {
+        catch (final Exception exception) {
             LOGGER.error("An error occurred while starting server", exception);
             throw exception;
         }
@@ -152,7 +152,7 @@ public class NotebookServer implements Callable {
         try {
             jettyServer.stop();
         }
-        catch (Exception exception) {
+        catch (final Exception exception) {
             LOGGER.error("Failed to stop server", exception);
             throw exception;
         }

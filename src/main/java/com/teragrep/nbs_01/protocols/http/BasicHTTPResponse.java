@@ -62,19 +62,19 @@ public final class BasicHTTPResponse implements HTTPResponse {
     private final Body body;
     private final List<Header> headers;
 
-    public BasicHTTPResponse(int status) {
+    public BasicHTTPResponse(final int status) {
         this(status, new StubBody(), new ArrayList<>());
     }
 
-    public BasicHTTPResponse(int status, List<Header> headers) {
+    public BasicHTTPResponse(final int status, final List<Header> headers) {
         this(status, new StubBody(), headers);
     }
 
-    public BasicHTTPResponse(int status, Body body) {
+    public BasicHTTPResponse(final int status, final Body body) {
         this(status, body, new ArrayList<>());
     }
 
-    public BasicHTTPResponse(int status, Body body, List<Header> headers) {
+    public BasicHTTPResponse(final int status, final Body body, final List<Header> headers) {
         this.status = status;
         this.body = body;
         this.headers = headers;
@@ -100,7 +100,7 @@ public final class BasicHTTPResponse implements HTTPResponse {
         try {
             return body.asString();
         }
-        catch (StubObjectException exception) {
+        catch (final StubObjectException exception) {
             return "";
         }
     }

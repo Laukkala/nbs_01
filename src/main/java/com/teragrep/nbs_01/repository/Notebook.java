@@ -63,12 +63,12 @@ public final class Notebook implements FilesystemEntity {
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String title) {
+    public Notebook(final String title) {
         this.title = title;
         this.paragraphs = new LinkedHashMap<>();
     }
 
-    public Notebook(String title, Map<String, Paragraph> paragraphs) {
+    public Notebook(final String title, final Map<String, Paragraph> paragraphs) {
         this.title = title;
         this.paragraphs = paragraphs;
     }
@@ -85,25 +85,25 @@ public final class Notebook implements FilesystemEntity {
         return copy(title);
     }
 
-    public Notebook copy(String copyTitle) throws IOException {
-        Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
-        for (Paragraph paragraph : paragraphs.values()) {
-            Paragraph copyParagraph = paragraph.copy();
+    public Notebook copy(final String copyTitle) throws IOException {
+        final Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
+        for (final Paragraph paragraph : paragraphs.values()) {
+            final Paragraph copyParagraph = paragraph.copy();
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
         }
-        Notebook copyNotebook = new Notebook(copyTitle, copyParagraphs);
+        final Notebook copyNotebook = new Notebook(copyTitle, copyParagraphs);
         return copyNotebook;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Notebook notebook = (Notebook) o;
+        final Notebook notebook = (Notebook) o;
         return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(title, notebook.title);
     }
 

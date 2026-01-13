@@ -69,16 +69,18 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a proper request to CreateNotebookEndpoint results in a correct response and a file being saved to disk.
     public void httpCreateNotebookTest() {
-        Path newNotebookPath = Paths.get("testNotebook");
+        final Path newNotebookPath = Paths.get("testNotebook");
         // Destination notebook must not exist
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookPath)));
 
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint
+        final CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(newNotebookPath)));
         // Assert that we receive the proper response.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("title", "")
                 .add("config", Json.createObjectBuilder().build())
@@ -86,8 +88,8 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", newNotebookPath.toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedLocationHeader = new BasicHeader("Location", newNotebookPath.toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
@@ -99,18 +101,20 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a proper request to CreateNotebookEndpoint with a specified title in request body results in a correct response and a file being saved to disk.
     public void httpCreateNotebookWithTitleTest() {
-        Path newNotebookPath = Paths.get("testNotebook");
+        final Path newNotebookPath = Paths.get("testNotebook");
         // Destination notebook must not exist
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(newNotebookPath)));
 
-        String title = "newNotebook";
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        JsonObject body = Json.createObjectBuilder().add("title", title).build();
-        HTTPResponse response = endPoint
+        final String title = "newNotebook";
+        final CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final JsonObject body = Json.createObjectBuilder().add("title", title).build();
+        final HTTPResponse response = endPoint
                 .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(newNotebookPath), new JSONBody(body)));
         // Assert that we receive the proper response.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("title", title)
                 .add("config", Json.createObjectBuilder().build())
@@ -118,8 +122,8 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
                 .build();
 
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Header expectedLocationHeader = new BasicHeader("Location", newNotebookPath.toString());
-        Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
+        final Header expectedLocationHeader = new BasicHeader("Location", newNotebookPath.toString());
+        final Header expectedContentTypeHeader = new BasicHeader("Content-Type", "application/json");
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         Assertions.assertEquals(expectedContentTypeHeader.toString(), response.headers().get(1).toString());
         Assertions
@@ -133,12 +137,15 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
     public void httpCreateAndOverwriteNotebookTest() {
         // Destination notebook must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook2())));
-        String originalFileContent = Assertions
+        final String originalFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook2())));
+        final CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(notebook2())));
         Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        String editedFileContent = Assertions
+        final String editedFileContent = Assertions
                 .assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook2())));
         // Destination file must have changed.
         Assertions.assertNotEquals(originalFileContent, editedFileContent);
@@ -151,8 +158,11 @@ class CreateNotebookEndpointTest extends AbstractNotebookServerTest {
         // Destination notebook must exist
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
         Assertions.assertTrue(Files.isDirectory(notebookDirectory().resolve(directory1())));
-        CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        HTTPResponse response = endPoint.createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(directory1())));
+        final CreateNotebookEndpoint endPoint = new CreateNotebookEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final HTTPResponse response = endPoint
+                .createResponse(new BasicHTTPRequest(new HTTPBasicRequestPath(directory1())));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
     }
 

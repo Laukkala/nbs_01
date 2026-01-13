@@ -56,7 +56,7 @@ public class JSONBody implements Body {
 
     private final JsonStructure json;
 
-    public JSONBody(JsonStructure json) {
+    public JSONBody(final JsonStructure json) {
         this.json = json;
     }
 

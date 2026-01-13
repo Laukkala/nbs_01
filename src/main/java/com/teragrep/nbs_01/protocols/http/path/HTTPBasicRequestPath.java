@@ -53,7 +53,7 @@ public class HTTPBasicRequestPath implements HTTPRequestPath {
 
     private final Path path;
 
-    public HTTPBasicRequestPath(Path path) {
+    public HTTPBasicRequestPath(final Path path) {
         this.path = path;
     }
 

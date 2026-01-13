@@ -59,7 +59,7 @@ public class ErrorBody implements Body {
     private final JsonObject message;
     private final ErrorEvent event;
 
-    public ErrorBody(ErrorEvent event) {
+    public ErrorBody(final ErrorEvent event) {
         this(
                 event,
                 Json
@@ -73,7 +73,7 @@ public class ErrorBody implements Body {
         );
     }
 
-    public ErrorBody(ErrorEvent event, JsonObject message) {
+    public ErrorBody(final ErrorEvent event, final JsonObject message) {
         this.event = event;
         this.message = message;
     }

@@ -54,17 +54,17 @@ public final class JsonParagraph implements SerializedParagraph {
 
     private final JsonObject jsonObject;
 
-    public JsonParagraph(JsonObject jsonObject) {
+    public JsonParagraph(final JsonObject jsonObject) {
         this.jsonObject = jsonObject;
     }
 
     @Override
     public String id() throws JsonException {
-        String id;
+        final String id;
         if (!jsonObject.containsKey("id")) {
             throw new JsonException("Json does not contain expected key 'id'");
         }
-        JsonValue.ValueType type = jsonObject.get("id").getValueType();
+        final JsonValue.ValueType type = jsonObject.get("id").getValueType();
         if (type.equals(JsonValue.ValueType.STRING)) {
             id = jsonObject.getString("id");
         }
@@ -78,12 +78,12 @@ public final class JsonParagraph implements SerializedParagraph {
 
     @Override
     public String title() throws JsonException {
-        String title;
+        final String title;
         if (!jsonObject.containsKey("title")) {
             title = "";
         }
         else {
-            JsonValue.ValueType type = jsonObject.get("title").getValueType();
+            final JsonValue.ValueType type = jsonObject.get("title").getValueType();
             if (type.equals(JsonValue.ValueType.STRING)) {
                 title = jsonObject.getString("title");
             }
@@ -98,11 +98,11 @@ public final class JsonParagraph implements SerializedParagraph {
 
     @Override
     public Script script() throws JsonException {
-        Script script;
+        final Script script;
         if (jsonObject.containsKey("script")) {
-            JsonValue.ValueType type = jsonObject.get("script").getValueType();
+            final JsonValue.ValueType type = jsonObject.get("script").getValueType();
             if (type.equals(JsonValue.ValueType.OBJECT)) {
-                JsonObject scriptJson = jsonObject.getJsonObject("script");
+                final JsonObject scriptJson = jsonObject.getJsonObject("script");
                 script = new Script(new JsonScript(scriptJson).text());
             }
             else {
@@ -113,9 +113,9 @@ public final class JsonParagraph implements SerializedParagraph {
         }
         // To support legacy .zpln files, we must also check for 'text' key
         else if (jsonObject.containsKey("text")) {
-            JsonValue.ValueType type = jsonObject.get("text").getValueType();
+            final JsonValue.ValueType type = jsonObject.get("text").getValueType();
             if (type.equals(JsonValue.ValueType.STRING)) {
-                String scriptText = jsonObject.getString("text");
+                final String scriptText = jsonObject.getString("text");
                 script = new Script(scriptText);
             }
             else {

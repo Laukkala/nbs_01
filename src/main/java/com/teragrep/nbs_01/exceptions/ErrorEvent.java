@@ -59,11 +59,11 @@ public class ErrorEvent {
     private final Throwable exception;
     private final UUID eventId;
 
-    public ErrorEvent(Throwable exception) {
+    public ErrorEvent(final Throwable exception) {
         this(exception, UUID.randomUUID());
     }
 
-    public ErrorEvent(Throwable exception, UUID eventId) {
+    public ErrorEvent(final Throwable exception, final UUID eventId) {
         LOGGER.error("Event_" + eventId, exception);
         this.exception = exception;
         this.eventId = eventId;

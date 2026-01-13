@@ -60,7 +60,7 @@ public final class PingEndpoint implements HTTPEndPoint {
 
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         return new BasicHTTPResponse(
                 HttpStatus.OK_200,
                 new JSONBody(Json.createObjectBuilder().add("message", "pong").build())

@@ -56,17 +56,17 @@ class ErrorEventTest {
 
     @Test
     void idTest() {
-        Exception testException = new Exception("Test message");
-        UUID eventId = UUID.randomUUID();
-        ErrorEvent event = new ErrorEvent(testException, eventId);
+        final Exception testException = new Exception("Test message");
+        final UUID eventId = UUID.randomUUID();
+        final ErrorEvent event = new ErrorEvent(testException, eventId);
         Assertions.assertEquals(eventId, event.id());
     }
 
     @Test
     void exceptionTest() {
-        Exception testException = new Exception("Test message");
-        UUID eventId = UUID.randomUUID();
-        ErrorEvent event = new ErrorEvent(testException, eventId);
+        final Exception testException = new Exception("Test message");
+        final UUID eventId = UUID.randomUUID();
+        final ErrorEvent event = new ErrorEvent(testException, eventId);
         Assertions.assertEquals(testException, event.exception());
     }
 }

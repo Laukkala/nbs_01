@@ -70,8 +70,8 @@ class JsonParagraphTest {
 
     @Test
     void id() {
-        JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
-        JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
+        final JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
+        final JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
 
         Assertions.assertEquals("paragraph1id", testParagraph1.id());
         Assertions.assertEquals("paragraph2id", testParagraph2.id());
@@ -79,8 +79,8 @@ class JsonParagraphTest {
 
     @Test
     void title() {
-        JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
-        JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
+        final JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
+        final JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
 
         Assertions.assertEquals("paragraph1Title", testParagraph1.title());
         Assertions.assertEquals("paragraph2Title", testParagraph2.title());
@@ -88,10 +88,10 @@ class JsonParagraphTest {
 
     @Test
     void script() {
-        JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
-        JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
-        Script script1 = new Script("testText1");
-        Script script2 = new Script("testText2");
+        final JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
+        final JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
+        final Script script1 = new Script("testText1");
+        final Script script2 = new Script("testText2");
 
         Assertions.assertEquals(script1, testParagraph1.script());
         Assertions.assertEquals(script2, testParagraph2.script());
@@ -99,8 +99,8 @@ class JsonParagraphTest {
 
     @Test
     void serialize() {
-        JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
-        JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
+        final JsonParagraph testParagraph1 = new JsonParagraph(testJsonParagraph1);
+        final JsonParagraph testParagraph2 = new JsonParagraph(testJsonParagraph2);
 
         Assertions.assertEquals(testJsonParagraph1.toString(), testParagraph1.serialize());
         Assertions.assertEquals(testJsonParagraph2.toString(), testParagraph2.serialize());

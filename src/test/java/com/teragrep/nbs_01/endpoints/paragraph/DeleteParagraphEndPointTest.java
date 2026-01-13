@@ -69,15 +69,17 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteParagraphTest() {
         // Assert that the file we are deleting from exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        String paragraphId = "20150213-230428_1231780373";
+        final DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final String paragraphId = "20150213-230428_1231780373";
 
-        Path requestPath = Paths.get(notebook3().toString(), paragraphId);
-        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
-        HTTPResponse response = endPoint.createResponse(request);
+        final Path requestPath = Paths.get(notebook3().toString(), paragraphId);
+        final BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
+        final HTTPResponse response = endPoint.createResponse(request);
         // Assert that we receive the proper response.
         Assertions.assertEquals(HttpStatus.NO_CONTENT_204, response.status());
-        Header expectedLocationHeader = new BasicHeader(
+        final Header expectedLocationHeader = new BasicHeader(
                 "Location",
                 requestPath.subpath(0, requestPath.getNameCount() - 1).toString()
         );
@@ -85,7 +87,7 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
         // Assert that the file was changed.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        String expectedFileContent = "{\"title\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
+        final String expectedFileContent = "{\"title\":\"my_note2\",\"config\":{},\"paragraphs\":[]}";
         Assertions
                 .assertEquals(
                         expectedFileContent,
@@ -99,17 +101,19 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     public void httpDeleteNonexistentParagraphTest() {
         // Assert that the file we are deleting already exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook3())));
-        String nonExistentParagraphId = "nonExistentParagraphId";
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
+        final String nonExistentParagraphId = "nonExistentParagraphId";
+        final DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
 
-        Path requestPath = Paths.get(notebook3().toString(), nonExistentParagraphId);
+        final Path requestPath = Paths.get(notebook3().toString(), nonExistentParagraphId);
 
-        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
-        HTTPResponse response = endPoint.createResponse(request);
+        final BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
+        final HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return a Response with the correct status and message.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Paragraph " + nonExistentParagraphId + " doesn't exist!")
                 .build();
@@ -123,19 +127,21 @@ public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
     // Assert that a request to DeleteParagraphEndpoint a path to a nonexistent notebook results in an error.
     public void httpDeleteParagraphFromNonexistentNotebookTest() {
         // Assert that the file we are creating doesn't already exist.
-        String nonExistentNotebookName = "nonExistentNotebook";
-        Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
+        final String nonExistentNotebookName = "nonExistentNotebook";
+        final Path nonExistentNotebookPath = Paths.get(notebookDirectory().toString(), nonExistentNotebookName);
         Assertions.assertFalse(Files.exists(nonExistentNotebookPath));
-        DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(new LocalFilesystemStorage(notebookDirectory()));
-        String paragraphId = "20150213-230428_1231780373";
+        final DeleteParagraphEndpoint endPoint = new DeleteParagraphEndpoint(
+                new LocalFilesystemStorage(notebookDirectory())
+        );
+        final String paragraphId = "20150213-230428_1231780373";
 
-        Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
-        BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
-        HTTPResponse response = endPoint.createResponse(request);
+        final Path requestPath = Paths.get(nonExistentNotebookName, paragraphId);
+        final BasicHTTPRequest request = new BasicHTTPRequest(new HTTPParagraphRequestPath(requestPath));
+        final HTTPResponse response = endPoint.createResponse(request);
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
 
-        JsonObject expectedJson = Json
+        final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "No such file: " + nonExistentNotebookName)
                 .build();

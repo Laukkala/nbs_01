@@ -69,25 +69,25 @@ public final class ListEndPoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public ListEndPoint(Storage root) {
+    public ListEndPoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         // Find all notebooks from Directory structure
         try {
-            List<Identifier> currentFiles = root.listFiles(new PathIdentifier(""));
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            for (Identifier file : currentFiles) {
+            final List<Identifier> currentFiles = root.listFiles(new PathIdentifier(""));
+            final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (final Identifier file : currentFiles) {
                 arrayBuilder.add(file.asShortString());
             }
-            JsonArray array = arrayBuilder.build();
+            final JsonArray array = arrayBuilder.build();
             return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(array));
         }
-        catch (MalformedRequestException badRequestException) {
+        catch (final MalformedRequestException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
@@ -96,14 +96,14 @@ public final class ListEndPoint implements HTTPEndPoint {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ListEndPoint that = (ListEndPoint) o;
+        final ListEndPoint that = (ListEndPoint) o;
         return Objects.equals(root, that.root);
     }
 

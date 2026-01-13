@@ -72,17 +72,17 @@ public final class CreateParagraphEndpoint implements HTTPEndPoint {
 
     private final Storage root;
 
-    public CreateParagraphEndpoint(Storage root) {
+    public CreateParagraphEndpoint(final Storage root) {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(HTTPRequest request) {
+    public HTTPResponse createResponse(final HTTPRequest request) {
         try {
-            Identifier targetIdentifier = request.targetIdentifier();
-            String targetParagraphId = request.targetParagraphId();
+            final Identifier targetIdentifier = request.targetIdentifier();
+            final String targetParagraphId = request.targetParagraphId();
 
             // Deserialize notebook
-            Notebook notebook = root.deserializeNotebook(targetIdentifier);
+            final Notebook notebook = root.deserializeNotebook(targetIdentifier);
 
             // Throw error if a paragraph with the ID already exists.
             if (notebook.paragraphs().containsKey(targetParagraphId)) {
@@ -90,41 +90,41 @@ public final class CreateParagraphEndpoint implements HTTPEndPoint {
             }
 
             // Add a new empty paragraph to the notebook and serialize to Storage
-            Paragraph newParagraph = new Paragraph(targetParagraphId, "", new Script(""));
+            final Paragraph newParagraph = new Paragraph(targetParagraphId, "", new Script(""));
             notebook.paragraphs().put(targetParagraphId, newParagraph);
-            SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
+            final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
             root.writeFile(targetIdentifier, serializedNotebook.serialize());
 
             // Create response
-            String paragraphContent = root.serializeParagraph(newParagraph).serialize();
-            ArrayList<Header> headers = new ArrayList<>();
+            final String paragraphContent = root.serializeParagraph(newParagraph).serialize();
+            final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(paragraphContent), headers);
         }
-        catch (FileNotFoundException notFoundException) {
+        catch (final FileNotFoundException notFoundException) {
             return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
-        catch (IOException serverErrorException) {
+        catch (final IOException serverErrorException) {
             return new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
-        catch (MalformedRequestException badRequestException) {
+        catch (final MalformedRequestException badRequestException) {
             return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CreateParagraphEndpoint that = (CreateParagraphEndpoint) o;
+        final CreateParagraphEndpoint that = (CreateParagraphEndpoint) o;
         return Objects.equals(root, that.root);
     }
 

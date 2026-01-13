@@ -55,18 +55,18 @@ public final class JsonNotebook implements SerializedNotebook {
 
     private final JsonObject jsonObject;
 
-    public JsonNotebook(JsonObject jsonObject) {
+    public JsonNotebook(final JsonObject jsonObject) {
         this.jsonObject = jsonObject;
     }
 
     @Override
     public String title() throws JsonException {
-        String title;
+        final String title;
         if (!jsonObject.containsKey("title") && !jsonObject.containsKey("name")) {
             title = "";
         }
         else if (jsonObject.containsKey("title")) {
-            JsonValue.ValueType type = jsonObject.get("title").getValueType();
+            final JsonValue.ValueType type = jsonObject.get("title").getValueType();
             if (type.equals(JsonValue.ValueType.STRING)) {
                 title = jsonObject.getString("title");
             }
@@ -78,7 +78,7 @@ public final class JsonNotebook implements SerializedNotebook {
         }
         // Handling of legacy zeppelin files that use "name" instead of "title"
         else {
-            JsonValue.ValueType type = jsonObject.get("name").getValueType();
+            final JsonValue.ValueType type = jsonObject.get("name").getValueType();
             if (type.equals(JsonValue.ValueType.STRING)) {
                 title = jsonObject.getString("name");
             }
@@ -93,23 +93,27 @@ public final class JsonNotebook implements SerializedNotebook {
 
     @Override
     public Map<String, Paragraph> paragraphs() throws JsonException {
-        Map<String, Paragraph> loadedParagraphs = new HashMap<>();
-        JsonValue.ValueType type = jsonObject.get("paragraphs").getValueType();
-        JsonArray paragraphArray = jsonObject.getJsonArray("paragraphs");
+        final Map<String, Paragraph> loadedParagraphs = new HashMap<>();
+        final JsonValue.ValueType type = jsonObject.get("paragraphs").getValueType();
+        final JsonArray paragraphArray = jsonObject.getJsonArray("paragraphs");
         if (!type.equals(JsonValue.ValueType.ARRAY)) {
             throw new JsonException(
                     "Expected key 'paragraphs' to be of type " + JsonValue.ValueType.ARRAY + " but was: " + type
             );
         }
-        for (JsonValue value : paragraphArray) {
+        for (final JsonValue value : paragraphArray) {
             if (!value.getValueType().equals(JsonValue.ValueType.OBJECT)) {
                 throw new JsonException(
                         "Expected array value to be of type " + JsonValue.ValueType.OBJECT + " but was: " + type
                 );
             }
-            JsonObject paragraphJson = value.asJsonObject();
-            JsonParagraph jsonParagraph = new JsonParagraph(paragraphJson);
-            Paragraph paragraph = new Paragraph(jsonParagraph.id(), jsonParagraph.title(), jsonParagraph.script());
+            final JsonObject paragraphJson = value.asJsonObject();
+            final JsonParagraph jsonParagraph = new JsonParagraph(paragraphJson);
+            final Paragraph paragraph = new Paragraph(
+                    jsonParagraph.id(),
+                    jsonParagraph.title(),
+                    jsonParagraph.script()
+            );
             loadedParagraphs.put(paragraph.id(), paragraph);
         }
         return loadedParagraphs;
