@@ -43,12 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository;
+package com.teragrep.nbs_01.repository.storage;
 
+import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
-import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
