@@ -62,14 +62,6 @@ public final class Directory implements FilesystemEntity {
         this.children = children;
     }
 
-    //public Directory copy() throws IOException {
-    //    List<FilesystemEntity> copiedChildren = new ArrayList<>();
-    //    for (FilesystemEntity child : children) {
-    //        FilesystemEntity copy = child.copy();
-    //        copiedChildren.add(copy);
-    //    }
-    //    return new Directory(name, copiedChildren);
-    //}
 
     public String name() {
         return name;
