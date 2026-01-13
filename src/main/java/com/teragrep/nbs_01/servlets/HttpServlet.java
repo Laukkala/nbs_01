@@ -76,7 +76,6 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     public HttpServlet(final HTTPEndPoint endPoint, final Charset charset) {
-        super();
         this.endPoint = endPoint;
         this.charset = charset;
     }

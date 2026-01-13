@@ -49,6 +49,7 @@ import com.teragrep.nbs_01.exceptions.StubObjectException;
 import com.teragrep.nbs_01.protocols.http.body.Body;
 import com.teragrep.nbs_01.protocols.http.body.StubBody;
 import org.apache.http.Header;
+import org.apache.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,11 +108,6 @@ public final class BasicHTTPResponse implements HTTPResponse {
 
     @Override
     public boolean success() {
-        if (status >= 200 && status < 300) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return status >= HttpStatus.SC_OK && status < HttpStatus.SC_MULTIPLE_CHOICES;
     }
 }

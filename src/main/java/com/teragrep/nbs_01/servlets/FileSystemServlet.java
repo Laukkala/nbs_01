@@ -102,7 +102,6 @@ public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
             final HTTPEndPoint deleteEndPoint,
             final Charset charset
     ) {
-        super();
         this.getEndPoint = getEndPoint;
         this.postEndPoint = postEndPoint;
         this.putEndPoint = putEndPoint;
