@@ -45,7 +45,10 @@
  */
 package com.teragrep.nbs_01.repository;
 
+import com.teragrep.nbs_01.repository.identifiers.Identifier;
+import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
+import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

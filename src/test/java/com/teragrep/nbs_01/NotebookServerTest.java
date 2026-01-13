@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.*;
 

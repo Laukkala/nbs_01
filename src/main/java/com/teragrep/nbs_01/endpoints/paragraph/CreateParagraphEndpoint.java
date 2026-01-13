@@ -45,17 +45,19 @@
  */
 package com.teragrep.nbs_01.endpoints.paragraph;
 
-import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
+import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.http.body.ErrorBody;
-import com.teragrep.nbs_01.ErrorEvent;
-import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.StringBody;
-import com.teragrep.nbs_01.http.requests.HTTPRequest;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.http.body.ErrorBody;
+import com.teragrep.nbs_01.exceptions.ErrorEvent;
+import com.teragrep.nbs_01.protocols.http.body.ExceptionBody;
+import com.teragrep.nbs_01.protocols.http.body.StringBody;
+import com.teragrep.nbs_01.protocols.http.HTTPRequest;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import com.teragrep.nbs_01.repository.*;
-import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
+import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
+import com.teragrep.nbs_01.repository.storage.Storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;

@@ -46,10 +46,10 @@
 package com.teragrep.nbs_01.endpoints.paragraph;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.Request;
-import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.Request;
+import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;

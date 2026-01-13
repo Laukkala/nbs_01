@@ -46,7 +46,7 @@
 package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import com.teragrep.nbs_01.servlets.FileSystemServlet;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

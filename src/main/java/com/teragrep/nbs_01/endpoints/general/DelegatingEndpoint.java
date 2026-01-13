@@ -45,10 +45,9 @@
  */
 package com.teragrep.nbs_01.endpoints.general;
 
-import com.teragrep.nbs_01.Delegate;
-import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
-import com.teragrep.nbs_01.http.requests.HTTPRequest;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
+import com.teragrep.nbs_01.protocols.http.HTTPRequest;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 
 // Endpoint that delegates the request to one of a collection of Endpoints based on the result of a Delegate
 public class DelegatingEndpoint implements HTTPEndPoint {

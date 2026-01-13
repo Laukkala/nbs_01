@@ -45,14 +45,14 @@
  */
 package com.teragrep.nbs_01.servlets;
 
-import com.teragrep.nbs_01.Request;
-import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
-import com.teragrep.nbs_01.http.body.Body;
-import com.teragrep.nbs_01.http.body.StringBody;
-import com.teragrep.nbs_01.http.body.StubBody;
-import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
-import com.teragrep.nbs_01.http.requests.HTTPRequest;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.Request;
+import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
+import com.teragrep.nbs_01.protocols.http.body.Body;
+import com.teragrep.nbs_01.protocols.http.body.StringBody;
+import com.teragrep.nbs_01.protocols.http.body.StubBody;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
+import com.teragrep.nbs_01.protocols.http.HTTPRequest;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

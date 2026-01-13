@@ -45,18 +45,18 @@
  */
 package com.teragrep.nbs_01.endpoints.general;
 
-import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
+import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
-import com.teragrep.nbs_01.http.body.ErrorBody;
-import com.teragrep.nbs_01.ErrorEvent;
-import com.teragrep.nbs_01.http.body.ExceptionBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.HTTPRequest;
-import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
-import com.teragrep.nbs_01.repository.Identifier;
-import com.teragrep.nbs_01.repository.PathIdentifier;
-import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.protocols.http.body.ErrorBody;
+import com.teragrep.nbs_01.exceptions.ErrorEvent;
+import com.teragrep.nbs_01.protocols.http.body.ExceptionBody;
+import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.HTTPRequest;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
+import com.teragrep.nbs_01.repository.identifiers.Identifier;
+import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
+import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 

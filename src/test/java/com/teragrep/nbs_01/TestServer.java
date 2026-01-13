@@ -45,8 +45,8 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
+import com.teragrep.nbs_01.repository.storage.Storage;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;

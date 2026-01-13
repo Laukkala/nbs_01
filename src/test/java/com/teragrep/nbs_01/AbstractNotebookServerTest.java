@@ -45,14 +45,15 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.body.Body;
-import com.teragrep.nbs_01.http.body.ErrorBody;
-import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.body.StringBody;
-import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
-import com.teragrep.nbs_01.repository.LocalFilesystemStorage;
-import com.teragrep.nbs_01.repository.Storage;
+import com.teragrep.nbs_01.exceptions.ErrorEvent;
+import com.teragrep.nbs_01.protocols.http.body.Body;
+import com.teragrep.nbs_01.protocols.http.body.ErrorBody;
+import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.body.StringBody;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
+import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
+import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;

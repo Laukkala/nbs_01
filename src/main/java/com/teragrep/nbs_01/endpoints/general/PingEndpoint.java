@@ -45,11 +45,11 @@
  */
 package com.teragrep.nbs_01.endpoints.general;
 
-import com.teragrep.nbs_01.endpoints.HTTPEndPoint;
-import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.HTTPRequest;
-import com.teragrep.nbs_01.http.responses.BasicHTTPResponse;
-import com.teragrep.nbs_01.http.responses.HTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
+import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.HTTPRequest;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
+import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import jakarta.json.Json;
 import org.eclipse.jetty.http.HttpStatus;
 

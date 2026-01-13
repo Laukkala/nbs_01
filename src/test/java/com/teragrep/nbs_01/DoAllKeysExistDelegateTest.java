@@ -45,9 +45,10 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.http.body.JSONBody;
-import com.teragrep.nbs_01.http.requests.BasicHTTPRequest;
-import com.teragrep.nbs_01.http.requests.HTTPRequest;
+import com.teragrep.nbs_01.endpoints.general.DoAllKeysExistDelegate;
+import com.teragrep.nbs_01.protocols.http.body.JSONBody;
+import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
+import com.teragrep.nbs_01.protocols.http.HTTPRequest;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
