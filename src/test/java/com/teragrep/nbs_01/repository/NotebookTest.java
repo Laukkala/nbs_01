@@ -68,7 +68,6 @@ class NotebookTest {
     private final Path notebookDirectory = Paths.get("target/notebooks");
     private final Path notebook1 = Paths
             .get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D/my_note1_2A94M5J1Z.zpln");
-    private final Path notebook3 = Paths.get("target/notebooks/my_note3_2A94M5J3Z.zpln");
     private final Path notebook4 = Paths.get("target/notebooks/my_note4_2A94M5J4Z.zpln");
 
     public NotebookTest() {

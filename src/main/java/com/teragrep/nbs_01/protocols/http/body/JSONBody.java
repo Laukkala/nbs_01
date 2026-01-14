@@ -61,10 +61,6 @@ public class JSONBody implements Body {
         this.json = json;
     }
 
-    public JsonStructure json() {
-        return json;
-    }
-
     @Override
     public String asString() throws StubObjectException {
         return json.toString();

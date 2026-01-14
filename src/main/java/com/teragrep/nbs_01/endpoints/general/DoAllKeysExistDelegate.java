@@ -71,7 +71,7 @@ public final class DoAllKeysExistDelegate implements Delegate {
         if (request.body().isStub()) {
             return false;
         }
-        JsonObject parameters = null;
+        JsonObject parameters;
         try {
             parameters = Json.createReader(new StringReader(request.body().asString())).readObject();
         }

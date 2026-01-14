@@ -187,10 +187,6 @@ public class AbstractNotebookServerTest {
         return directory2;
     }
 
-    public Path junkfile() {
-        return junkfile;
-    }
-
     public Path notebookResources() {
         return notebookResources;
     }

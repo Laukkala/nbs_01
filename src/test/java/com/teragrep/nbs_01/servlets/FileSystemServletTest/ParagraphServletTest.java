@@ -79,7 +79,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
 
     private final String sixthParagraphId = "20150326-214658_12335843";
     private final String sixthParagraphText = "%test\\n\\nAbout bank data\\n\\n```\\nCitation Request:\\n  This dataset is public available for research. The details are described in [Moro et al., 2011]. \\n  Please include this citation if you plan to use this database:\\n\\n  [Moro et al., 2011] S. Moro, R. Laureano and P. Cortez. Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology. \\n  In P. Novais et al. (Eds.), Proceedings of the European Simulation and Modelling Conference - ESM\\u00272011, pp. 117-121, Guimarães, Portugal, October, 2011. EUROSIS.\\n\\n  Available at: [pdf] http://hdl.handle.net/1822/14838\\n                [bib] http://www3.dsi.uminho.pt/pcortez/bib/2011-esm-1.txt\\n```";
-    private final String expectedErrorResponseMessage = "An error occurred while processing your Request. See event id ";
     private final Path notebookPath = Paths.get(notebookName);
 
     public ParagraphServletTest() {
@@ -153,7 +152,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
     public void httpCreateParagraphTest() {
         final String newParagraphId = "2025-01-01-021311-132-133";
         final String requestBody = Json.createObjectBuilder().build().toString();
-        final String expectedResponseMessage = "Created new paragraph " + newParagraphId;
         final String expectedparagraphContent = "{\"id\":\"" + newParagraphId
                 + "\",\"title\":\"\",\"script\":{\"text\":\"\"}}";
 
@@ -191,8 +189,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
         final String nonexistentNotebookId = "I_DONT_EXIST";
         final Path nonexistentNotebookPath = Paths.get(notebookDirectory().toString(), nonexistentNotebookId);
         final String requestBody = Json.createObjectBuilder().build().toString();
-        final String expectedResponseMessage = "java.io.FileNotFoundException: Notebook or directory with path "
-                + nonexistentNotebookPath + " not found!";
 
         final HTTPResponse response = Assertions
                 .assertDoesNotThrow(
@@ -315,7 +311,6 @@ public class ParagraphServletTest extends AbstractNotebookServerTest {
                 .add("text", newParagraphText)
                 .build()
                 .toString();
-        final String expectedResponseMessage = "Paragraph edited successfully";
         final String expectedParagraphContent = Json
                 .createObjectBuilder()
                 .add("id", firstParagraphId)

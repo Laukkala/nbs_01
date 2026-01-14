@@ -45,16 +45,12 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Objects;
 
 // Represents a single Directory that can contain Filesystem objects.
 public final class Directory implements FilesystemEntity {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Directory.class);
     private final List<FilesystemEntity> children;
     private final String title;
 
@@ -65,10 +61,6 @@ public final class Directory implements FilesystemEntity {
 
     public String title() {
         return title;
-    }
-
-    public List<FilesystemEntity> children() {
-        return children;
     }
 
     @Override

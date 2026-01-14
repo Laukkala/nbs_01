@@ -73,7 +73,6 @@ class LocalFilesystemStorageTest {
     private final Path notebook4 = Paths.get("target/notebooks/my_note4_2A94M5J4Z.zpln");
     private final Path directory1 = Paths.get("target/notebooks/my_folder_2A94M5J1D");
     private final Path directory2 = Paths.get("target/notebooks/my_folder_2A94M5J1D/my_second_folder_2A94M5J2D");
-    private final Path junkfile = Paths.get("target/notebooks/junkfile");
 
     private void deleteFileRecursively(final File fileToDelete) {
         final File[] children = fileToDelete.listFiles();

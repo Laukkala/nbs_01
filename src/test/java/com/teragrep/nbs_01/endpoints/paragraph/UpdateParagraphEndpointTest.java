@@ -273,7 +273,6 @@ class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
     @Test
     public void httpInvalidRequestFormatTest() {
         // Assert that a request to UpdateParagraphEndpoint with an improperly formatted Request results in an error.
-        final String nonexistentParagraphId = "nonexistentId";
         final String nonexistentNotebookName = "nonexistentNotebookPath";
 
         // Make a request editing the title of the notebook as well as the text of a paragraph, identified with an ID.
