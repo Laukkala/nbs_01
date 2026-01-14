@@ -150,7 +150,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Request has a malformed source identifier!")
+                .add("message", "Request does not contain a sourceidentifier!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions
@@ -187,7 +187,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("message", "Request has a malformed source identifier!")
+                .add("message", "Request does not contain a sourceidentifier!")
                 .build();
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
         Assertions

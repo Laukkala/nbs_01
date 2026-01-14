@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.exceptions.StubObjectException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -64,6 +64,6 @@ class HTTPBasicRequestPathTest {
     @Test
     void paragraphId() {
         final HTTPBasicRequestPath path = new HTTPBasicRequestPath(Paths.get("first", "second", "third"));
-        Assertions.assertThrows(MalformedRequestException.class, () -> path.paragraphId());
+        Assertions.assertThrows(StubObjectException.class, () -> path.paragraphId());
     }
 }

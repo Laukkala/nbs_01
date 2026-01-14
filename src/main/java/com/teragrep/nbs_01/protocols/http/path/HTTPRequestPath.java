@@ -46,6 +46,7 @@
 package com.teragrep.nbs_01.protocols.http.path;
 
 import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.exceptions.StubObjectException;
 
 import java.nio.file.Path;
 
@@ -53,5 +54,5 @@ public interface HTTPRequestPath {
 
     public abstract Path path() throws MalformedRequestException;
 
-    public abstract String paragraphId() throws MalformedRequestException;
+    public abstract String paragraphId() throws MalformedRequestException, StubObjectException;
 }

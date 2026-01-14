@@ -62,7 +62,7 @@ public class JSONBody implements Body {
     }
 
     @Override
-    public String asString() throws StubObjectException {
+    public String asString() {
         return json.toString();
     }
 

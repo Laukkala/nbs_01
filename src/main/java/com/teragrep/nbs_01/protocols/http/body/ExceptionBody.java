@@ -72,7 +72,7 @@ public class ExceptionBody implements Body {
     }
 
     @Override
-    public String asString() throws StubObjectException {
+    public String asString() {
         return json.toString();
     }
 

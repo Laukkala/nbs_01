@@ -45,7 +45,7 @@
  */
 package com.teragrep.nbs_01.protocols.http.path;
 
-import com.teragrep.nbs_01.exceptions.MalformedRequestException;
+import com.teragrep.nbs_01.exceptions.StubObjectException;
 
 import java.nio.file.Path;
 
@@ -58,12 +58,12 @@ public class HTTPBasicRequestPath implements HTTPRequestPath {
     }
 
     @Override
-    public Path path() throws MalformedRequestException {
+    public Path path() {
         return path;
     }
 
     @Override
-    public String paragraphId() throws MalformedRequestException {
-        throw new MalformedRequestException("Path does not contain a paragraphId!");
+    public String paragraphId() throws StubObjectException {
+        throw new StubObjectException("Path does not contain a paragraphId!");
     }
 }

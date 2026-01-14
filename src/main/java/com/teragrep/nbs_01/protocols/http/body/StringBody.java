@@ -60,7 +60,7 @@ public class StringBody implements Body {
     }
 
     @Override
-    public String asString() throws StubObjectException {
+    public String asString() {
         return text;
     }
 

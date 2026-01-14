@@ -86,8 +86,7 @@ public interface Storage {
 
     public abstract Notebook deserializeNotebook(Identifier identifier) throws IOException;
 
-    public abstract SerializedNotebook serializeNotebook(Notebook notebook)
-            throws IOException, MalformedRequestException;
+    public abstract SerializedNotebook serializeNotebook(Notebook notebook);
 
     public abstract SerializedParagraph serializeParagraph(Paragraph paragraph);
 

@@ -169,8 +169,7 @@ public class LocalFilesystemStorage implements Storage {
         final ArrayList<String> fileNames = new ArrayList<>();
         final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
 
-            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-                    throws IOException {
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
                 if (dir.equals(path)) {
                     return FileVisitResult.CONTINUE;
                 }
@@ -217,7 +216,7 @@ public class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public SerializedNotebook serializeNotebook(final Notebook notebook) throws IOException, MalformedRequestException {
+    public SerializedNotebook serializeNotebook(final Notebook notebook) {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("title", notebook.title());
         //compatibility fields//
@@ -289,8 +288,7 @@ public class LocalFilesystemStorage implements Storage {
         final ArrayList<Identifier> files = new ArrayList<>();
         final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<>() {
 
-            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-                    throws IOException {
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
                 if (dir.equals(path)) {
                     return FileVisitResult.CONTINUE;
                 }

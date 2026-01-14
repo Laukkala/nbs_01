@@ -53,7 +53,6 @@ import com.teragrep.nbs_01.protocols.http.body.StubBody;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
@@ -80,23 +79,19 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         this.charset = charset;
     }
 
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHttpRequest(req, resp, endPoint);
     }
 

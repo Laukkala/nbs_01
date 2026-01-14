@@ -81,7 +81,13 @@ public final class CreateNotebookEndpoint implements HTTPEndPoint {
     public HTTPResponse createResponse(final HTTPRequest request) {
         try {
             final Identifier targetIdentifier = request.targetIdentifier();
-            final String title = request.title();
+            String title;
+            try {
+                title = request.title();
+            }
+            catch (MalformedRequestException e) {
+                title = "";
+            }
 
             // Create new notebook and serialize it to Storage
             final Notebook newFile = new Notebook(title);

@@ -103,6 +103,7 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
             catch (final MalformedRequestException exception) {
                 scriptText = originalParagraph.script().text();
             }
+            // Retrieve the title from the request. If the request does not have a title, use the existing title of the paragraph.
             String title;
             try {
                 title = request.title();

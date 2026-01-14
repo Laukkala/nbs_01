@@ -110,14 +110,19 @@ public final class BasicHTTPRequest implements HTTPRequest {
         try {
             return body().title();
         }
-        catch (final StubObjectException e) {
-            return "";
+        catch (StubObjectException stubObjectException) {
+            throw new MalformedRequestException("Request does not contain a Title!", stubObjectException);
         }
     }
 
     @Override
     public String targetParagraphId() throws MalformedRequestException {
-        return path().paragraphId();
+        try {
+            return path().paragraphId();
+        }
+        catch (StubObjectException stubObjectException) {
+            throw new MalformedRequestException("Request does not contain a TargetParagraphId!", stubObjectException);
+        }
     }
 
     @Override
@@ -125,8 +130,8 @@ public final class BasicHTTPRequest implements HTTPRequest {
         try {
             return body().sourceParagraphId();
         }
-        catch (final StubObjectException e) {
-            throw new MalformedRequestException("Request has a malformed sourceParagraph identifier!", e);
+        catch (StubObjectException stubObjectException) {
+            throw new MalformedRequestException("Request does not contain a SourceParagraphId!", stubObjectException);
         }
     }
 
@@ -135,8 +140,8 @@ public final class BasicHTTPRequest implements HTTPRequest {
         try {
             return body().text();
         }
-        catch (final StubObjectException e) {
-            throw new MalformedRequestException("Request has a malformed text!", e);
+        catch (StubObjectException stubObjectException) {
+            throw new MalformedRequestException("Request does not contain a Text!", stubObjectException);
         }
     }
 
@@ -151,8 +156,8 @@ public final class BasicHTTPRequest implements HTTPRequest {
             final String sourceString = body().sourceIdentifier();
             return new PathIdentifier(sourceString);
         }
-        catch (final StubObjectException exception) {
-            throw new MalformedRequestException("Request has a malformed source identifier!", exception);
+        catch (StubObjectException stubObjectException) {
+            throw new MalformedRequestException("Request does not contain a sourceidentifier!", stubObjectException);
         }
     }
 }

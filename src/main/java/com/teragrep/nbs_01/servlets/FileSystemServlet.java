@@ -59,7 +59,6 @@ import com.teragrep.nbs_01.protocols.http.path.HTTPRequestPath;
 import jakarta.json.Json;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
@@ -110,26 +109,22 @@ public final class FileSystemServlet extends jakarta.servlet.http.HttpServlet {
     }
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHTTPRequest(req, resp, getEndPoint);
     }
 
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHTTPRequest(req, resp, postEndPoint);
     }
 
     @Override
-    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHTTPRequest(req, resp, putEndPoint);
     }
 
     @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         handleHTTPRequest(req, resp, deleteEndPoint);
     }
 

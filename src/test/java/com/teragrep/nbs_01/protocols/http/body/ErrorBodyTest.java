@@ -81,11 +81,6 @@ public class ErrorBodyTest {
                                 + " in the technical log for details."
                 )
                 .build();
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 }

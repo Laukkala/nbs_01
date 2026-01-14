@@ -60,12 +60,7 @@ public class JsonBodyTest {
         final JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
 
         final JSONBody body = new JSONBody(expectedBody);
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 
     @Test
@@ -74,12 +69,7 @@ public class JsonBodyTest {
         final JsonObject expectedBody = Json.createObjectBuilder().add("testKey", "testValue").build();
 
         final JSONBody body = new JSONBody(expectedBody);
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 
     @Test
@@ -88,11 +78,6 @@ public class JsonBodyTest {
         final JsonArray expectedBody = Json.createArrayBuilder().add("testValue").build();
 
         final JSONBody body = new JSONBody(expectedBody);
-        try {
-            Assertions.assertEquals(expectedBody.toString(), body.asString());
-        }
-        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+        Assertions.assertEquals(expectedBody.toString(), body.asString());
     }
 }
