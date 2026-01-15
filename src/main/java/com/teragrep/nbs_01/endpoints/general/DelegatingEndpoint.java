@@ -67,11 +67,13 @@ public class DelegatingEndpoint implements HTTPEndPoint {
     }
 
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         if (delegate.resolve(request)) {
-            return trueEndPoint.createResponse(request);
+            response = trueEndPoint.createResponse(request);
         }
         else {
-            return falseEndPoint.createResponse(request);
+            response = falseEndPoint.createResponse(request);
         }
+        return response;
     }
 }

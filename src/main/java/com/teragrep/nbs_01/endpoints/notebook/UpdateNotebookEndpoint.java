@@ -78,6 +78,7 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
     }
 
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         try {
             final Identifier targetIdentifier = request.targetIdentifier();
             final String title = request.title();
@@ -94,20 +95,21 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
             final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(modifiedNotebook.title()), headers);
+            response = new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(modifiedNotebook.title()), headers);
         }
         catch (final FileNotFoundException notFoundException) {
-            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            response = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (final MalformedRequestException | JsonException badRequestException) {
-            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            response = new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (final IOException serverErrorException) {
-            return new BasicHTTPResponse(
+            response = new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
+        return response;
     }
 
     @Override

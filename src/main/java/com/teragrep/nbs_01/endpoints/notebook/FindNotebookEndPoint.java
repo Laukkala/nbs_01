@@ -78,6 +78,7 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
 
     @Override
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         try {
             final Identifier targetIdentifier = request.targetIdentifier();
 
@@ -92,15 +93,19 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
             final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(serializedNotebook.serialize()), headers);
+            response = new BasicHTTPResponse(
+                    HttpStatus.OK_200,
+                    new StringBody(serializedNotebook.serialize()),
+                    headers
+            );
         }
         // If the file cannot be found from Storage, respond with a 404 not found.
         catch (final FileNotFoundException notFoundException) {
-            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            response = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         // If Storage throws an IOException while accessing file contents, or the file contents retrieved from storage are not valid JSON, respond with a 500 internal server error.
         catch (final IOException | JsonException serverErrorException) {
-            return new BasicHTTPResponse(
+            response = new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
@@ -108,6 +113,7 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
         catch (final com.teragrep.nbs_01.exceptions.MalformedRequestException malformedRequestException) {
             throw new RuntimeException(malformedRequestException);
         }
+        return response;
     }
 
     @Override

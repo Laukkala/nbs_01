@@ -75,6 +75,7 @@ public final class FindDirectoryEndPoint implements HTTPEndPoint {
     }
 
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         try {
             // Find a directory and get a list of its children
             final Identifier targetIdentifier = request.targetIdentifier();
@@ -84,20 +85,21 @@ public final class FindDirectoryEndPoint implements HTTPEndPoint {
             final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(directoryContent), headers);
+            response = new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(directoryContent), headers);
         }
         catch (final MalformedRequestException badRequestException) {
-            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            response = new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (final FileNotFoundException notFoundException) {
-            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            response = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (final IOException serverErrorException) {
-            return new BasicHTTPResponse(
+            response = new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
+        return response;
     }
 
     @Override

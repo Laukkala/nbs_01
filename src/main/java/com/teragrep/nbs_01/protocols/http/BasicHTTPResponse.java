@@ -98,12 +98,14 @@ public final class BasicHTTPResponse implements HTTPResponse {
 
     @Override
     public String message() {
+        String message;
         try {
-            return body.asString();
+            message = body.asString();
         }
         catch (final StubObjectException exception) {
-            return "";
+            message = "";
         }
+        return message;
     }
 
     @Override

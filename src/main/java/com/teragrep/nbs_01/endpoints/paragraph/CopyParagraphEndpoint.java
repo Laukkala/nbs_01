@@ -81,6 +81,7 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
     }
 
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         try {
             final String sourceParagraphId = request.sourceParagraphId();
             final String targetParagraphId = request.targetParagraphId();
@@ -119,20 +120,21 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
-            return new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(paragraphContent), headers);
+            response = new BasicHTTPResponse(HttpStatus.CREATED_201, new StringBody(paragraphContent), headers);
         }
         catch (final FileAlreadyExistsException | MalformedRequestException | JsonException badRequestException) {
-            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            response = new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (final FileNotFoundException notFoundException) {
-            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            response = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (final IOException serverErrorException) {
-            return new BasicHTTPResponse(
+            response = new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
+        return response;
     }
 
     @Override

@@ -51,6 +51,8 @@ import com.teragrep.nbs_01.repository.identifiers.Identifier;
 /**
  * Request contains all the information any Endpoint might need.
  */
+//TODO: Maybe title() should be a Title object instead (Title & StubTitle)
+//TODO: Maybe text() should be a Text object instead (Text & StubText)
 public interface Request {
 
     public abstract Identifier targetIdentifier() throws MalformedRequestException;

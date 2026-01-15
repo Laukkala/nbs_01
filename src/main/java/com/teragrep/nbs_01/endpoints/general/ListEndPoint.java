@@ -76,6 +76,7 @@ public final class ListEndPoint implements HTTPEndPoint {
     }
 
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         // Find all notebooks from Directory structure
         try {
             final List<Identifier> currentFiles = root.listFiles(new PathIdentifier(""));
@@ -84,17 +85,18 @@ public final class ListEndPoint implements HTTPEndPoint {
                 arrayBuilder.add(file.asShortString());
             }
             final JsonArray array = arrayBuilder.build();
-            return new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(array));
+            response = new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(array));
         }
         catch (final MalformedRequestException badRequestException) {
-            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            response = new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
         catch (final IOException serverErrorException) {
-            return new BasicHTTPResponse(
+            response = new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
+        return response;
     }
 
     @Override

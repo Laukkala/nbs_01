@@ -76,6 +76,7 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
     }
 
     public HTTPResponse createResponse(final HTTPRequest request) {
+        HTTPResponse response;
         try {
             final Identifier targetIdentifier = request.targetIdentifier();
             final String targetParagraphId = request.targetParagraphId();
@@ -96,20 +97,21 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
             headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
-            return new BasicHTTPResponse(HttpStatus.NO_CONTENT_204, headers);
+            response = new BasicHTTPResponse(HttpStatus.NO_CONTENT_204, headers);
         }
         catch (final FileNotFoundException notFoundException) {
-            return new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
+            response = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
         }
         catch (final IOException serverErrorException) {
-            return new BasicHTTPResponse(
+            response = new BasicHTTPResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
         }
         catch (final MalformedRequestException badRequestException) {
-            return new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
+            response = new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(badRequestException));
         }
+        return response;
     }
 
     @Override
