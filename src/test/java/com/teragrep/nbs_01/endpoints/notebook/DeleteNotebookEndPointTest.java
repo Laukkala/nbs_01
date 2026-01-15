@@ -47,7 +47,6 @@ package com.teragrep.nbs_01.endpoints.notebook;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.endpoints.directory.DeleteDirectoryEndpoint;
-import com.teragrep.nbs_01.exceptions.StubObjectException;
 import com.teragrep.nbs_01.protocols.http.path.HTTPBasicRequestPath;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPRequest;
@@ -78,7 +77,7 @@ public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
         Assertions.assertEquals(1, response.headers().size());
         Assertions.assertEquals(expectedLocationHeader.toString(), response.headers().get(0).toString());
         // Assert that Response should not hava a body.
-        Assertions.assertThrows(StubObjectException.class, () -> response.body().asString());
+        Assertions.assertTrue(response.body().isStub());
         // Assert that the file was created.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(notebook3())));
     }

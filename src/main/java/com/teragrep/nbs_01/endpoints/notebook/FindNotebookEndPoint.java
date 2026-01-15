@@ -45,6 +45,7 @@
  */
 package com.teragrep.nbs_01.endpoints.notebook;
 
+import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 import com.teragrep.nbs_01.protocols.http.HTTPEndPoint;
 import com.teragrep.nbs_01.protocols.http.body.ErrorBody;
 import com.teragrep.nbs_01.exceptions.ErrorEvent;
@@ -99,6 +100,9 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
                     headers
             );
         }
+        catch (final MalformedRequestException malformedRequestException) {
+            response = new BasicHTTPResponse(HttpStatus.BAD_REQUEST_400, new ExceptionBody(malformedRequestException));
+        }
         // If the file cannot be found from Storage, respond with a 404 not found.
         catch (final FileNotFoundException notFoundException) {
             response = new BasicHTTPResponse(HttpStatus.NOT_FOUND_404, new ExceptionBody(notFoundException));
@@ -109,9 +113,6 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     new ErrorBody(new ErrorEvent(serverErrorException))
             );
-        }
-        catch (final com.teragrep.nbs_01.exceptions.MalformedRequestException malformedRequestException) {
-            throw new RuntimeException(malformedRequestException);
         }
         return response;
     }

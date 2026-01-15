@@ -58,8 +58,8 @@ public class StubBody implements Body {
     }
 
     @Override
-    public String asString() throws StubObjectException {
-        throw new StubObjectException("Body is a stub!");
+    public String asString() {
+        throw new RuntimeException("Body is a stub!");
     }
 
     @Override

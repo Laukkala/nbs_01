@@ -45,7 +45,6 @@
  */
 package com.teragrep.nbs_01.protocols.http;
 
-import com.teragrep.nbs_01.exceptions.StubObjectException;
 import com.teragrep.nbs_01.protocols.http.body.Body;
 import com.teragrep.nbs_01.protocols.http.body.StubBody;
 import org.apache.http.Header;
@@ -99,11 +98,11 @@ public final class BasicHTTPResponse implements HTTPResponse {
     @Override
     public String message() {
         String message;
-        try {
-            message = body.asString();
-        }
-        catch (final StubObjectException exception) {
+        if (body.isStub()) {
             message = "";
+        }
+        else {
+            message = body.asString();
         }
         return message;
     }

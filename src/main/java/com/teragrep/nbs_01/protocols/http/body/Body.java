@@ -53,7 +53,7 @@ import com.teragrep.nbs_01.exceptions.StubObjectException;
  */
 public interface Body extends Stubable {
 
-    public abstract String asString() throws StubObjectException;
+    public abstract String asString();
 
     public abstract String title() throws StubObjectException;
 

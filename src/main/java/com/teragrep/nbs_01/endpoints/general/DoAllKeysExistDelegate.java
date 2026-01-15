@@ -72,12 +72,7 @@ public final class DoAllKeysExistDelegate implements Delegate {
             return false;
         }
         JsonObject parameters;
-        try {
-            parameters = Json.createReader(new StringReader(request.body().asString())).readObject();
-        }
-        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+        parameters = Json.createReader(new StringReader(request.body().asString())).readObject();
         for (final String key : keys) {
             if (!parameters.containsKey(key)) {
                 return false;

@@ -123,12 +123,7 @@ public final class HttpServlet extends jakarta.servlet.http.HttpServlet {
         // If the endpoint's response has a body, write it to ServletResponse's PrintWriter
         if (!endPointResponse.body().isStub()) {
             final PrintWriter writer = resp.getWriter();
-            try {
-                writer.write(endPointResponse.body().asString());
-            }
-            catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-                throw new RuntimeException(e);
-            }
+            writer.write(endPointResponse.body().asString());
             writer.flush();
             writer.close();
         }

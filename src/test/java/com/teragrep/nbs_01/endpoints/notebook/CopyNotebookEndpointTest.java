@@ -320,12 +320,7 @@ class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
         // The endpoint should return an JsonResponse with the correct status and specified cause.
         Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
-        try {
-            Assertions.assertEquals(expectedJson.toString(), response.body().asString());
-        }
-        catch (final com.teragrep.nbs_01.exceptions.StubObjectException e) {
-            throw new RuntimeException(e);
-        }
+        Assertions.assertEquals(expectedJson.toString(), response.body().asString());
 
         // Source file must not have changed
         Assertions
