@@ -98,7 +98,7 @@ public final class JsonParagraph implements SerializedParagraph {
 
     @Override
     public Script script() throws JsonException {
-        Script script;
+        final Script script;
         if (jsonObject.containsKey("script")) {
             final JsonValue.ValueType type = jsonObject.get("script").getValueType();
             if (type.equals(JsonValue.ValueType.OBJECT)) {

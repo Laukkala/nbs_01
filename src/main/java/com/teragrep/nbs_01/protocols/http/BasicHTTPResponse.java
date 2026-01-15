@@ -97,7 +97,7 @@ public final class BasicHTTPResponse implements HTTPResponse {
 
     @Override
     public String message() {
-        String message;
+        final String message;
         if (body.isStub()) {
             message = "";
         }
