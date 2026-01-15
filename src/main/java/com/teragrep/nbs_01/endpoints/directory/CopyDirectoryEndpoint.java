@@ -77,7 +77,7 @@ public final class CopyDirectoryEndpoint implements HTTPEndPoint {
         this.root = root;
     }
 
-    public HTTPResponse createResponse(final HTTPRequest request) { //TODO: fix multiple returns
+    public HTTPResponse createResponse(final HTTPRequest request) {
         HTTPResponse response;
         try {
             final Identifier sourceIdentifier = request.sourceIdentifier();
