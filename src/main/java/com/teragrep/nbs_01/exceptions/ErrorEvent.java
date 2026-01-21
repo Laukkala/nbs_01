@@ -64,7 +64,7 @@ public class ErrorEvent {
     }
 
     public ErrorEvent(final Throwable exception, final UUID eventId) {
-        LOGGER.error("Event_" + eventId, exception);
+        LOGGER.error("Event_{}", eventId, exception);
         this.exception = exception;
         this.eventId = eventId;
     }
