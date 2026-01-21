@@ -50,7 +50,7 @@ import com.teragrep.nbs_01.protocols.http.HTTPRequest;
 import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 
 // Endpoint that delegates the request to one of a collection of Endpoints based on the result of a Delegate
-public class DelegatingEndpoint implements HTTPEndPoint {
+public final class DelegatingEndpoint implements HTTPEndPoint {
 
     private final Delegate delegate;
     private final HTTPEndPoint trueEndPoint;

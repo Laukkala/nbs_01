@@ -54,7 +54,7 @@ import jakarta.json.JsonObject;
  * A Body that takes an ErrorEvent. Provides access to the ErrorEvent and Generates a preset message body that does not
  * expose the inner workings of the program to the end user.
  */
-public class ErrorBody implements Body {
+public final class ErrorBody implements Body {
 
     private final JsonObject message;
     private final ErrorEvent event;

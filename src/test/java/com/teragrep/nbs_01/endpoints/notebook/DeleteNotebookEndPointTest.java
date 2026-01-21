@@ -59,7 +59,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 
-public class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
+public final class DeleteNotebookEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in a new file being saved on disk.

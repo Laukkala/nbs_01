@@ -60,7 +60,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LocalFilesystemStorageTest extends AbstractNotebookServerTest {
+public final class LocalFilesystemStorageTest extends AbstractNotebookServerTest {
 
     @Test
     void deleteDirectory() {

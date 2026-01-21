@@ -64,7 +64,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
+public final class UpdateParagraphEndpointTest extends AbstractNotebookServerTest {
 
     private final String paragraphId = "20150213-230428_1231780373";
     private final String editedParagraphText = "test edit";

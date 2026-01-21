@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
-class PathIdentifierTest {
+public final class PathIdentifierTest {
 
     @Test
     void asLongStringTest() {

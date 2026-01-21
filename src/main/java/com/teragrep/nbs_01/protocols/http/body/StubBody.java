@@ -52,7 +52,7 @@ import com.teragrep.nbs_01.exceptions.StubObjectException;
  * all.
  */
 
-public class StubBody implements Body {
+public final class StubBody implements Body {
 
     public StubBody() {
     }

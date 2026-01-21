@@ -53,7 +53,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ExceptionBodyTest {
+public final class ExceptionBodyTest {
 
     // ExceptionBody should contain a message with the top reason in the stack, but not deeper
     @Test

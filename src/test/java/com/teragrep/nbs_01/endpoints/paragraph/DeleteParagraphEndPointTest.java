@@ -63,7 +63,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
+public final class DeleteParagraphEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a request to DeleteParagraphEndpoint results in a file with edited content being saved on disk.

@@ -58,7 +58,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-class DoAllKeysExistDelegateTest {
+public final class DoAllKeysExistDelegateTest {
 
     private final String testKey1 = "testKey1";
 

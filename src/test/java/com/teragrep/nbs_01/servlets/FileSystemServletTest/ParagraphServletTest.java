@@ -57,7 +57,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ParagraphServletTest extends AbstractNotebookServerTest {
+public final class ParagraphServletTest extends AbstractNotebookServerTest {
 
     private final String notebookName = "my_note4_2A94M5J4Z.zpln";
     private final String firstParagraphId = "20150213-231621_168813393";

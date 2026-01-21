@@ -59,7 +59,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicHTTPResponseTest {
+public final class BasicHTTPResponseTest {
 
     @Test
     void statusTest() {

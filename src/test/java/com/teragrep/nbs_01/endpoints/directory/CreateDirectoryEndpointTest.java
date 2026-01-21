@@ -63,7 +63,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
+public final class CreateDirectoryEndpointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a proper request to CreateDirectoryEndpoint results in a correct response and a file being saved to disk.

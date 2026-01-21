@@ -48,7 +48,7 @@ package com.teragrep.nbs_01.repository;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-class ParagraphTest {
+public final class ParagraphTest {
 
     @Test
     public void testContract() {

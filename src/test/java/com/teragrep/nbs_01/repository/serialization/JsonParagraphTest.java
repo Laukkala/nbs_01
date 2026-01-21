@@ -51,7 +51,7 @@ import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class JsonParagraphTest {
+public final class JsonParagraphTest {
 
     private final JsonObject testJsonParagraph1 = Json
             .createObjectBuilder()

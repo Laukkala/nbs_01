@@ -54,7 +54,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class DirectoryTest {
+public final class DirectoryTest {
 
     private final Path notebookSource = Paths.get("src/test/resources");
     private final Path notebookDirectory = Paths.get("target/notebooks");

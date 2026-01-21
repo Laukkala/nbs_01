@@ -53,7 +53,7 @@ import jakarta.json.JsonValue;
  * A Body that encapsulates a JsonStructure
  */
 
-public class JSONBody implements Body {
+public final class JSONBody implements Body {
 
     private final JsonStructure json;
 

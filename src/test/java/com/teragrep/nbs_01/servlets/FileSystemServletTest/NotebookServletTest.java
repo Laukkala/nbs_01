@@ -60,7 +60,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
-public class NotebookServletTest extends AbstractNotebookServerTest {
+public final class NotebookServletTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP PUT request to /notebook/{path/to/notebook} endpoint results in a new file being saved on disk.

@@ -50,7 +50,7 @@ import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class JsonScriptTest {
+public final class JsonScriptTest {
 
     private final JsonObject testScript1 = Json.createObjectBuilder().add("text", "testText1").build();
     private final JsonObject testScript2 = Json.createObjectBuilder().add("text", "testText2").build();

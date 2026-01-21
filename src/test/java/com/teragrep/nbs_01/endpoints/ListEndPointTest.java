@@ -60,7 +60,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-public class ListEndPointTest extends AbstractNotebookServerTest {
+public final class ListEndPointTest extends AbstractNotebookServerTest {
 
     private final List<String> allFileIds = Arrays
             .asList("2A94M5J1Z", "2A94M5J2Z", "2A94M5J3Z", "2A94M5J4Z", "junkfile");

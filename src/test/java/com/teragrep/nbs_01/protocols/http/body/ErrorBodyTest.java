@@ -55,7 +55,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
 
-public class ErrorBodyTest {
+public final class ErrorBodyTest {
 
     // An ErrorBody should generate a specific message on creation, containing an event Id.
     @Test

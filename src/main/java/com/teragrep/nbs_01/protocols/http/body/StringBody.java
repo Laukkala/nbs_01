@@ -51,7 +51,7 @@ import com.teragrep.nbs_01.exceptions.StubObjectException;
  * A Body that encapsulates a String
  */
 
-public class StringBody implements Body {
+public final class StringBody implements Body {
 
     private final String text;
 

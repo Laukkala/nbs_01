@@ -53,7 +53,7 @@ import java.util.UUID;
 /**
  * Generates an unique ID for a Throwable and logs it. Provides access to the event ID and the Throwable encapsulated.
  */
-public class ErrorEvent {
+public final class ErrorEvent {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorEvent.class);
     private final Throwable exception;

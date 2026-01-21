@@ -64,7 +64,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
+public final class CreateParagraphEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP request to CreateParagraphEndpoint results in a new file being saved on disk.

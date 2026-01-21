@@ -62,7 +62,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-class NotebookTest {
+public final class NotebookTest {
 
     private final Path notebookSource = Paths.get("src/test/resources");
     private final Path notebookDirectory = Paths.get("target/notebooks");

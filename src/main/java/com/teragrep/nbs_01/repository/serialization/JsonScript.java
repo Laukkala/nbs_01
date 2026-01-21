@@ -49,7 +49,7 @@ import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class JsonScript implements SerializedScript {
+public final class JsonScript implements SerializedScript {
 
     private final JsonObject jsonObject;
 

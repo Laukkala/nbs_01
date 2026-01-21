@@ -65,7 +65,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
+public final class CopyNotebookEndpointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a proper request to CopyNotebookEndpoint results in a correct response and a file being saved to disk.

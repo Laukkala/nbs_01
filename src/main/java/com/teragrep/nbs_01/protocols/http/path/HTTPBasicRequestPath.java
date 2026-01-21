@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.exceptions.StubObjectException;
 
 import java.nio.file.Path;
 
-public class HTTPBasicRequestPath implements HTTPRequestPath {
+public final class HTTPBasicRequestPath implements HTTPRequestPath {
 
     private final Path path;
 

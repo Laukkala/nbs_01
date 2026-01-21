@@ -63,7 +63,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
+public final class UpdateNotebookEndpointTest extends AbstractNotebookServerTest {
 
     @Test
     public void httpUpdateNotebookTest() {

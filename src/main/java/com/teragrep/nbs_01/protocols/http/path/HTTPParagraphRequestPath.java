@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 
 import java.nio.file.Path;
 
-public class HTTPParagraphRequestPath implements HTTPRequestPath {
+public final class HTTPParagraphRequestPath implements HTTPRequestPath {
 
     private final Path path;
 

@@ -63,7 +63,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
+public final class FindDirectoryEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP request to /directory/find endpoint results in a response with the expected file contents

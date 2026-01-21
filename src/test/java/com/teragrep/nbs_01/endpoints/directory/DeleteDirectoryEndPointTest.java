@@ -59,7 +59,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
+public final class DeleteDirectoryEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP request to /notebook/new endpoint results in new directory being saved on disk.

@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-class ErrorEventTest {
+public final class ErrorEventTest {
 
     @Test
     void idTest() {

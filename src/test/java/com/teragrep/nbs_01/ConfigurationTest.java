@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ConfigurationTest {
+public final class ConfigurationTest {
 
     private final int serverPort = 8080;
 

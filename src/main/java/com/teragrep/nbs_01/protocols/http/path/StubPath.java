@@ -49,7 +49,7 @@ import com.teragrep.nbs_01.exceptions.MalformedRequestException;
 
 import java.nio.file.Path;
 
-public class StubPath implements HTTPRequestPath {
+public final class StubPath implements HTTPRequestPath {
 
     public StubPath() {
 

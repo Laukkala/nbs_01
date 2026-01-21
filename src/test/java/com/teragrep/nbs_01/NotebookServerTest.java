@@ -50,7 +50,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class NotebookServerTest extends AbstractNotebookServerTest {
+public final class NotebookServerTest extends AbstractNotebookServerTest {
 
     public NotebookServerTest() {
     }

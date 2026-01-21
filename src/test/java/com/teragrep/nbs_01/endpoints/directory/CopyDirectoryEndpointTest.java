@@ -67,7 +67,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
+public final class CopyDirectoryEndpointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a proper request to CopyDirectoryEndpoint results in a correct response and a directory being saved to disk.

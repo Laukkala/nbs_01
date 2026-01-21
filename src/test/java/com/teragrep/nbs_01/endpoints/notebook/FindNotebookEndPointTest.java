@@ -63,7 +63,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FindNotebookEndPointTest extends AbstractNotebookServerTest {
+public final class FindNotebookEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP GET request to /notebook/{path/to/notebook} endpoint results in a response with the expected file contents

@@ -55,7 +55,7 @@ import jakarta.json.JsonObjectBuilder;
  * shown to the end user. Should be used in cases where user has made a mistake, such as providing incorrect data.
  */
 
-public class ExceptionBody implements Body {
+public final class ExceptionBody implements Body {
 
     private final JsonObject json;
     private final Throwable exception;

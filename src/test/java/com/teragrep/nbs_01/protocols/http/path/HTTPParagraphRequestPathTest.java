@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class HTTPParagraphRequestPathTest {
+public final class HTTPParagraphRequestPathTest {
 
     @Test
     void path() {

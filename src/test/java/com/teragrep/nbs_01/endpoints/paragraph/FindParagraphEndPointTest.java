@@ -63,7 +63,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FindParagraphEndPointTest extends AbstractNotebookServerTest {
+public final class FindParagraphEndPointTest extends AbstractNotebookServerTest {
 
     @Test
     // Assert that a HTTP request to /notebook/{path/to/notebook}/paragraph/{paragraphId} endpoint results in a response with the expected file contents

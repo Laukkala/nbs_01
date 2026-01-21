@@ -83,7 +83,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 //
-public class LocalFilesystemStorage implements Storage {
+public final class LocalFilesystemStorage implements Storage {
 
     private final Path root;
     private final Charset charset;

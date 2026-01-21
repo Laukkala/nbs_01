@@ -51,7 +51,7 @@ import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class JsonBodyTest {
+public final class JsonBodyTest {
 
     // JsonBody should be able to represent itself as both a JsonStructure (a JsonObject or a JsonArray) and a String
     @Test

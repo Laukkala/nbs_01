@@ -52,7 +52,7 @@ import java.util.Objects;
  * An Identifier that uses a Path to uniquely identify resources
  */
 
-public class PathIdentifier implements Identifier {
+public final class PathIdentifier implements Identifier {
 
     private final Path identifier;
 
