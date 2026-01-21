@@ -96,7 +96,7 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.name()));
             response = new BasicHTTPResponse(HttpStatus.NO_CONTENT_204, headers);
         }
         catch (final FileNotFoundException notFoundException) {

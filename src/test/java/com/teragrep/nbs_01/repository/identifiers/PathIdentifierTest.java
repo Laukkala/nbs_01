@@ -55,12 +55,12 @@ class PathIdentifierTest {
     @Test
     void asLongStringTest() {
         final PathIdentifier identifier = new PathIdentifier(Path.of("first", "second", "third"));
-        Assertions.assertEquals("first/second/third", identifier.asLongString());
+        Assertions.assertEquals("first/second/third", identifier.name());
     }
 
     @Test
     void asShortStringTest() {
         final PathIdentifier identifier = new PathIdentifier(Path.of("first", "second", "third"));
-        Assertions.assertEquals("third", identifier.asShortString());
+        Assertions.assertEquals("third", identifier.displayName());
     }
 }

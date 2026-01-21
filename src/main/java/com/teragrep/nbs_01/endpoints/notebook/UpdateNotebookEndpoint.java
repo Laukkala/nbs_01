@@ -93,7 +93,7 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
-            headers.add(new BasicHeader("Location", targetIdentifier.asLongString()));
+            headers.add(new BasicHeader("Location", targetIdentifier.name()));
             headers.add(new BasicHeader("Content-Type", "application/json"));
             response = new BasicHTTPResponse(HttpStatus.OK_200, new StringBody(modifiedNotebook.title()), headers);
         }

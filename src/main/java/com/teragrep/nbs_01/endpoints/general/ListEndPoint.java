@@ -82,7 +82,7 @@ public final class ListEndPoint implements HTTPEndPoint {
             final List<Identifier> currentFiles = root.listFiles(new PathIdentifier(""));
             final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             for (final Identifier file : currentFiles) {
-                arrayBuilder.add(file.asShortString());
+                arrayBuilder.add(file.displayName());
             }
             final JsonArray array = arrayBuilder.build();
             response = new BasicHTTPResponse(HttpStatus.OK_200, new JSONBody(array));

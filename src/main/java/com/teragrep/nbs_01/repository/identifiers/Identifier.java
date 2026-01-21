@@ -56,13 +56,13 @@ public interface Identifier {
      * 
      * @return
      */
-    public abstract String asLongString();
+    public abstract String name();
 
     /**
      * Returns a shortened version of the identifier as a String for use in UI. eg. File name
      * 
      * @return
      */
-    public abstract String asShortString();
+    public abstract String displayName();
 
 }

@@ -64,11 +64,11 @@ public class PathIdentifier implements Identifier {
         this.identifier = identifier;
     }
 
-    public String asLongString() {
+    public String name() {
         return identifier.toString();
     }
 
-    public String asShortString() {
+    public String displayName() {
         return identifier.getFileName().toString();
     }
 
