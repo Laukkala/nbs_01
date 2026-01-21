@@ -61,7 +61,7 @@ public final class Notebook implements FilesystemEntity {
 
     // Constructor for a stub notebook that can be loaded from file.
     public Notebook() {
-        this("",new LinkedHashMap<>());
+        this("", new LinkedHashMap<>());
     }
 
     public Notebook(final String title) {
@@ -82,16 +82,12 @@ public final class Notebook implements FilesystemEntity {
     }
 
     public Notebook copy() throws IOException {
-        return copy(title);
-    }
-
-    public Notebook copy(final String copyTitle) {
         final Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
         for (final Paragraph paragraph : paragraphs.values()) {
             final Paragraph copyParagraph = paragraph.copy();
             copyParagraphs.put(copyParagraph.id(), copyParagraph);
         }
-        final Notebook copyNotebook = new Notebook(copyTitle, copyParagraphs);
+        final Notebook copyNotebook = new Notebook(title, copyParagraphs);
         return copyNotebook;
     }
 
