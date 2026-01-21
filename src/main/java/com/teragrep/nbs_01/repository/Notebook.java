@@ -81,7 +81,7 @@ public final class Notebook implements FilesystemEntity {
         return paragraphs;
     }
 
-    public Notebook copy() throws IOException {
+    public Notebook copy() {
         final Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
         for (final Paragraph paragraph : paragraphs.values()) {
             final Paragraph copyParagraph = paragraph.copy();
