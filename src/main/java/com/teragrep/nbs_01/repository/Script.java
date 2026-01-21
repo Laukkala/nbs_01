@@ -53,7 +53,7 @@ public final class Script {
     private final String text;
 
     public Script() {
-        this.text = "";
+        this("");
     }
 
     public Script(final String text) {

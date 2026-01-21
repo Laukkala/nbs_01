@@ -61,13 +61,11 @@ public final class Notebook implements FilesystemEntity {
 
     // Constructor for a stub notebook that can be loaded from file.
     public Notebook() {
-        this.title = "";
-        this.paragraphs = new LinkedHashMap<>();
+        this("",new LinkedHashMap<>());
     }
 
     public Notebook(final String title) {
-        this.title = title;
-        this.paragraphs = new LinkedHashMap<>();
+        this(title, new LinkedHashMap<>());
     }
 
     public Notebook(final String title, final Map<String, Paragraph> paragraphs) {

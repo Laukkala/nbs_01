@@ -56,9 +56,7 @@ public final class Paragraph {
     private final Script script;
 
     public Paragraph() {
-        this.id = "";
-        this.title = "";
-        this.script = new Script();
+        this("","",new Script());
     }
 
     public Paragraph(final String id, final String title, final Script script) {
