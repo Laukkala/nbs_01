@@ -78,7 +78,7 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 // A thread that registers all endpoints users can connect to and starts the Jetty server.
-public final class NotebookServer implements Callable {
+public final class NotebookServer implements Callable<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotebookServer.class);
     private final Storage root;
@@ -89,7 +89,7 @@ public final class NotebookServer implements Callable {
         this.root = root;
     }
 
-    public Object call() throws Exception {
+    public Boolean call() throws Exception {
         // Start jetty server
         try {
             // Jetty setup
