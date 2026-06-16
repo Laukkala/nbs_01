@@ -84,7 +84,7 @@ public final class Notebook implements FilesystemEntity {
         final Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
         for (final Paragraph paragraph : paragraphs.values()) {
             final Paragraph copyParagraph = paragraph.copy();
-            copyParagraphs.put(copyParagraph.id(), copyParagraph);
+            copyParagraphs.put(copyParagraph.id().name(), copyParagraph);
         }
         final Notebook copyNotebook = new Notebook(title, copyParagraphs);
         return copyNotebook;

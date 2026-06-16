@@ -86,8 +86,8 @@ public final class JsonNotebookTest {
     void paragraphsTest() {
         final JsonNotebook testNotebook = new JsonNotebook(testJsonObject);
         Assertions.assertEquals(2, testNotebook.paragraphs().size());
-        Assertions.assertEquals("paragraph1id", testNotebook.paragraphs().get("paragraph1id").id());
-        Assertions.assertEquals("paragraph2id", testNotebook.paragraphs().get("paragraph2id").id());
+        Assertions.assertEquals("paragraph1id", testNotebook.paragraphs().get("paragraph1id").id().name());
+        Assertions.assertEquals("paragraph2id", testNotebook.paragraphs().get("paragraph2id").id().name());
         Assertions.assertEquals("paragraph1Title", testNotebook.paragraphs().get("paragraph1id").title());
         Assertions.assertEquals("paragraph2Title", testNotebook.paragraphs().get("paragraph2id").title());
         Assertions.assertEquals("testText1", testNotebook.paragraphs().get("paragraph1id").script().text());

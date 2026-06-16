@@ -43,55 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository;
-
-import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.identifiers.StringIdentifier;
+package com.teragrep.nbs_01.repository.identifiers;
 
 import java.util.Objects;
-import java.util.UUID;
 
-// Represents a Paragraph that can be added to a Notebook.
-public final class Paragraph {
+/**
+ * An Identifier that uses a Path to uniquely identify resources
+ */
 
-    private final Identifier id;
-    private final String title;
-    private final Script script;
+public final class StringIdentifier implements Identifier {
 
-    public Paragraph() {
-        this(new StringIdentifier(""), "", new Script());
+    private final String identifier;
+
+    public StringIdentifier(final String identifier) {
+        this.identifier = identifier;
     }
 
-    public Paragraph(Identifier id) {
-        this(id, "", new Script());
+    public String name() {
+        return identifier;
     }
 
-    public Paragraph(Identifier id, final String title, final Script script) {
-        this.id = id;
-        this.title = title;
-        this.script = script;
-    }
-
-    public String title() {
-        return title;
-    }
-
-    public Identifier id() {
-        return id;
-    }
-
-    public Script script() {
-        return script;
-    }
-
-    public Paragraph copy() {
-        final String copyId = UUID.randomUUID().toString();
-        return copy(copyId);
-    }
-
-    public Paragraph copy(final String copyId) {
-        final Paragraph copy = new Paragraph(new StringIdentifier(copyId), title, new Script(script().text()));
-        return copy;
+    public String displayName() {
+        return identifier;
     }
 
     @Override
@@ -102,13 +75,12 @@ public final class Paragraph {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Paragraph paragraph = (Paragraph) o;
-        return Objects.equals(id, paragraph.id) && Objects.equals(title, paragraph.title)
-                && Objects.equals(script, paragraph.script);
+        final StringIdentifier that = (StringIdentifier) o;
+        return Objects.equals(identifier, that.identifier);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, script);
+        return Objects.hash(identifier);
     }
 }

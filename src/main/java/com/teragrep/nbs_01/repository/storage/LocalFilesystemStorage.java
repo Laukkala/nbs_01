@@ -226,7 +226,7 @@ public final class LocalFilesystemStorage implements Storage {
 
         for (final Paragraph paragraph : notebook.paragraphs().values()) {
             final JsonObjectBuilder paragraphBuilder = Json.createObjectBuilder();
-            paragraphBuilder.add("id", paragraph.id());
+            paragraphBuilder.add("id", paragraph.id().name());
             paragraphBuilder.add("title", paragraph.title());
             final JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
             scriptBuilder.add("text", paragraph.script().text());
@@ -244,7 +244,7 @@ public final class LocalFilesystemStorage implements Storage {
     @Override
     public SerializedParagraph serializeParagraph(final Paragraph paragraph) {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("id", paragraph.id());
+        builder.add("id", paragraph.id().name());
         builder.add("title", paragraph.title() != null ? paragraph.title() : "");
         final JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
         scriptBuilder.add("text", paragraph.script().text());
