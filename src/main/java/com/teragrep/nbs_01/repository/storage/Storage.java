@@ -62,16 +62,16 @@ import java.util.List;
 
 public interface Storage {
 
-    public abstract String readDirectory(Identifier identifier) throws IOException, MalformedRequestException;
+    public abstract String directoryContents(Identifier identifier) throws IOException, MalformedRequestException;
 
-    public abstract List<Identifier> listFiles(Identifier identifier)
+    public abstract List<Identifier> listChildren(Identifier identifier)
             throws MalformedRequestException, FileNotFoundException, IOException;
 
-    public abstract void writeFile(Identifier identifier, String content) throws MalformedRequestException, IOException;
+    public abstract void writeNotebook(Identifier identifier, String content) throws MalformedRequestException, IOException;
 
     public abstract void writeDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException;
 
-    public abstract void deleteFile(Identifier identifier)
+    public abstract void deleteNotebook(Identifier identifier)
             throws NoSuchFileException, MalformedRequestException, IOException;
 
     public abstract void deleteDirectory(Identifier identifier)

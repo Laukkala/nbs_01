@@ -108,7 +108,7 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void deleteFile(final Identifier identifier)
+    public void deleteNotebook(final Identifier identifier)
             throws NoSuchFileException, MalformedRequestException, IOException {
         final Path path = root.resolve(identifier.name());
         if (!Files.exists(path)) {
@@ -123,7 +123,7 @@ public final class LocalFilesystemStorage implements Storage {
     @Override
     public void copyDirectory(final Identifier source, final Identifier destination)
             throws FileNotFoundException, FileAlreadyExistsException, IOException, MalformedRequestException {
-        final List<Identifier> children = listFiles(new PathIdentifier(""));
+        final List<Identifier> children = listChildren(new PathIdentifier(""));
         if (!children.contains(source)) {
             throw new FileNotFoundException("No such directory: " + source.name() + " !");
         }
@@ -141,7 +141,7 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public String readDirectory(final Identifier identifier) throws IOException, MalformedRequestException {
+    public String directoryContents(final Identifier identifier) throws IOException, MalformedRequestException {
         final Path path = root.resolve(identifier.name());
         if (!Files.exists(path)) {
             throw new FileNotFoundException("No such file: " + root.relativize(path));
@@ -243,7 +243,7 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void writeFile(final Identifier identifier, final String content)
+    public void writeNotebook(final Identifier identifier, final String content)
             throws MalformedRequestException, IOException {
         final Path path = root.resolve(identifier.name());
         if (Files.exists(path) && Files.isDirectory(path)) {
@@ -258,7 +258,7 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public List<Identifier> listFiles(final Identifier identifier)
+    public List<Identifier> listChildren(final Identifier identifier)
             throws FileNotFoundException, MalformedRequestException, IOException {
         final Path path = root.resolve(identifier.name());
         if (!Files.exists(path)) {
@@ -298,6 +298,7 @@ public final class LocalFilesystemStorage implements Storage {
         Files.walkFileTree(path, fileVisitor);
         return files;
     }
+
     private String readFile(final Identifier identifier) throws FileNotFoundException, IOException {
         final Path path = root.resolve(identifier.name());
         if (!Files.exists(path) || Files.isDirectory(path)) {

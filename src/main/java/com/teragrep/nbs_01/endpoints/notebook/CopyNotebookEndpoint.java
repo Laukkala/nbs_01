@@ -91,7 +91,7 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
             final Notebook copy = source.copy();
             // Serialize copy to storage
             final SerializedNotebook serializedDestination = root.serializeNotebook(copy);
-            root.writeFile(targetIdentifier, serializedDestination.serialize());
+            root.writeNotebook(targetIdentifier, serializedDestination.serialize());
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();

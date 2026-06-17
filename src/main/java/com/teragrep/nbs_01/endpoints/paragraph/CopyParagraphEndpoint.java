@@ -113,7 +113,7 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
             // Serialize edited destination notebook to storage
             final Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);
             final SerializedNotebook serializedDestinationNotebook = root.serializeNotebook(destinationNotebook);
-            root.writeFile(targetIdentifier, serializedDestinationNotebook.serialize());
+            root.writeNotebook(targetIdentifier, serializedDestinationNotebook.serialize());
 
             // Create response
             final String paragraphContent = root.serializeParagraph(copyParagraph).serialize();

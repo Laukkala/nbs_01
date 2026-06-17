@@ -79,7 +79,7 @@ public final class FindDirectoryEndPoint implements HTTPEndPoint {
         try {
             // Find a directory and get a list of its children
             final Identifier targetIdentifier = request.targetIdentifier();
-            final String directoryContent = root.readDirectory(targetIdentifier);
+            final String directoryContent = root.directoryContents(targetIdentifier);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
