@@ -76,10 +76,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 //
@@ -224,12 +221,12 @@ public final class LocalFilesystemStorage implements Storage {
         // end //
         final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 
-        for (final Paragraph paragraph : notebook.paragraphs().values()) {
+        for (final Map.Entry<String, Paragraph> entry : notebook.paragraphs().entrySet()) {
             final JsonObjectBuilder paragraphBuilder = Json.createObjectBuilder();
-            paragraphBuilder.add("id", paragraph.id().name());
-            paragraphBuilder.add("title", paragraph.title());
+            paragraphBuilder.add("id", entry.getKey());
+            paragraphBuilder.add("title", entry.getValue().title());
             final JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
-            scriptBuilder.add("text", paragraph.script().text());
+            scriptBuilder.add("text", entry.getValue().script().text());
             paragraphBuilder.add("script", scriptBuilder.build());
             arrayBuilder.add(paragraphBuilder.build());
         }
@@ -244,7 +241,6 @@ public final class LocalFilesystemStorage implements Storage {
     @Override
     public SerializedParagraph serializeParagraph(final Paragraph paragraph) {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("id", paragraph.id().name());
         builder.add("title", paragraph.title() != null ? paragraph.title() : "");
         final JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
         scriptBuilder.add("text", paragraph.script().text());

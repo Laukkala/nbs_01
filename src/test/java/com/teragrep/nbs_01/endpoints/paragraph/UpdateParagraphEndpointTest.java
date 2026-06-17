@@ -110,7 +110,6 @@ public final class UpdateParagraphEndpointTest extends AbstractNotebookServerTes
 
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("id", paragraphId)
                 .add("title", editedTitle)
                 .add("script", Json.createObjectBuilder().add("text", editedParagraphText))
                 .build();
@@ -148,7 +147,6 @@ public final class UpdateParagraphEndpointTest extends AbstractNotebookServerTes
 
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("id", paragraphId)
                 .add("title", "")
                 .add("script", Json.createObjectBuilder().add("text", editedParagraphText))
                 .build();
@@ -188,7 +186,6 @@ public final class UpdateParagraphEndpointTest extends AbstractNotebookServerTes
 
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("id", paragraphId)
                 .add("title", editedTitle)
                 .add(
                         "script",

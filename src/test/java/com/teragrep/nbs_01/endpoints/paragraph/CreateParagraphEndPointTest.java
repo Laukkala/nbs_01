@@ -83,7 +83,6 @@ public final class CreateParagraphEndPointTest extends AbstractNotebookServerTes
 
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("id", paragraphId)
                 .add("title", "")
                 .add("script", Json.createObjectBuilder().add("text", "").build())
                 .build();

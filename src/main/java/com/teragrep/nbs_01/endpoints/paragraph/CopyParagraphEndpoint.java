@@ -99,16 +99,16 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
 
             // Create a copy of the paragraph from the source notebook
             final Paragraph sourceParagraph = sourceParagraphs.get(sourceParagraphId);
-            final Paragraph copyParagraph = sourceParagraph.copy(targetParagraphId);
+            final Paragraph copyParagraph = sourceParagraph.copy();
 
             // Deserialize destination notebook from Storage, and add the copied paragraph
             final Notebook serializedDestination = root.deserializeNotebook(targetIdentifier);
             final Map<String, Paragraph> destinationParagraphs = serializedDestination.paragraphs();
             // Throw error if requested destination paragraph already exists in destination notebook
-            if (destinationParagraphs.containsKey(copyParagraph.id().name())) {
-                throw new MalformedRequestException("Paragraph " + copyParagraph.id().name() + " already exists!");
+            if (destinationParagraphs.containsKey(targetParagraphId)) {
+                throw new MalformedRequestException("Paragraph " + targetParagraphId + " already exists!");
             }
-            destinationParagraphs.put(copyParagraph.id().name(), copyParagraph);
+            destinationParagraphs.put(targetParagraphId, copyParagraph);
 
             // Serialize edited destination notebook to storage
             final Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);

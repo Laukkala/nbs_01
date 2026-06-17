@@ -45,29 +45,19 @@
  */
 package com.teragrep.nbs_01.repository;
 
-import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.identifiers.StringIdentifier;
-
 import java.util.Objects;
-import java.util.UUID;
 
 // Represents a Paragraph that can be added to a Notebook.
 public final class Paragraph {
 
-    private final Identifier id;
     private final String title;
     private final Script script;
 
     public Paragraph() {
-        this(new StringIdentifier(""), "", new Script());
+        this("", new Script());
     }
 
-    public Paragraph(Identifier id) {
-        this(id, "", new Script());
-    }
-
-    public Paragraph(Identifier id, final String title, final Script script) {
-        this.id = id;
+    public Paragraph(final String title, final Script script) {
         this.title = title;
         this.script = script;
     }
@@ -76,21 +66,12 @@ public final class Paragraph {
         return title;
     }
 
-    public Identifier id() {
-        return id;
-    }
-
     public Script script() {
         return script;
     }
 
     public Paragraph copy() {
-        final String copyId = UUID.randomUUID().toString();
-        return copy(copyId);
-    }
-
-    public Paragraph copy(final String copyId) {
-        final Paragraph copy = new Paragraph(new StringIdentifier(copyId), title, new Script(script().text()));
+        final Paragraph copy = new Paragraph(title, new Script(script().text()));
         return copy;
     }
 
@@ -103,12 +84,11 @@ public final class Paragraph {
             return false;
         }
         final Paragraph paragraph = (Paragraph) o;
-        return Objects.equals(id, paragraph.id) && Objects.equals(title, paragraph.title)
-                && Objects.equals(script, paragraph.script);
+        return Objects.equals(title, paragraph.title) && Objects.equals(script, paragraph.script);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, script);
+        return Objects.hash(title, script);
     }
 }

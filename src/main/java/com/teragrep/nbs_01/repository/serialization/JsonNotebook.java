@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.repository.serialization;
 
 import com.teragrep.nbs_01.repository.Paragraph;
-import com.teragrep.nbs_01.repository.identifiers.StringIdentifier;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
@@ -113,12 +112,8 @@ public final class JsonNotebook implements SerializedNotebook {
             }
             final JsonObject paragraphJson = value.asJsonObject();
             final JsonParagraph jsonParagraph = new JsonParagraph(paragraphJson);
-            final Paragraph paragraph = new Paragraph(
-                    new StringIdentifier(jsonParagraph.id()),
-                    jsonParagraph.title(),
-                    jsonParagraph.script()
-            );
-            loadedParagraphs.put(paragraph.id().name(), paragraph);
+            final Paragraph paragraph = new Paragraph(jsonParagraph.title(), jsonParagraph.script());
+            loadedParagraphs.put(paragraphJson.getString("id"), paragraph);
         }
         return loadedParagraphs;
     }

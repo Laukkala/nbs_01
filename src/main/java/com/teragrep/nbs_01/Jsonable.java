@@ -43,67 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository;
+package com.teragrep.nbs_01;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import jakarta.json.JsonValue;
 
-/**
- * Represents a single Notebook that can be added to a Directory. Is identified by a Path, and corresponds to a file
- * saved on the filesystem.
- */
-public final class Notebook implements FilesystemEntity {
+public interface Jsonable {
 
-    private final Map<String, Paragraph> paragraphs;
-    private final String title;
-
-    // Constructor for a stub notebook that can be loaded from file.
-    public Notebook() {
-        this("", new LinkedHashMap<>());
-    }
-
-    public Notebook(final String title) {
-        this(title, new LinkedHashMap<>());
-    }
-
-    public Notebook(final String title, final Map<String, Paragraph> paragraphs) {
-        this.title = title;
-        this.paragraphs = paragraphs;
-    }
-
-    public String title() {
-        return title;
-    }
-
-    public Map<String, Paragraph> paragraphs() {
-        return paragraphs;
-    }
-
-    public Notebook copy() {
-        final Map<String, Paragraph> copyParagraphs = new LinkedHashMap<>();
-        for (final Map.Entry<String, Paragraph> entry : paragraphs.entrySet()) {
-            final Paragraph copyParagraph = entry.getValue().copy();
-            copyParagraphs.put(entry.getKey(), copyParagraph);
-        }
-        final Notebook copyNotebook = new Notebook(title, copyParagraphs);
-        return copyNotebook;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final Notebook notebook = (Notebook) o;
-        return Objects.equals(paragraphs, notebook.paragraphs) && Objects.equals(title, notebook.title);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(paragraphs, title);
-    }
+    public abstract JsonValue toJson();
 }

@@ -87,8 +87,8 @@ public final class ParagraphServletTest extends AbstractNotebookServerTest {
     // Searching for a paragraph should result in a message with the contents of the specified paragraph within the specified Notebook
     @Test
     public void httpFindParagraphTest() {
-        final String expectedparagraphContent = "{\"id\":\"" + firstParagraphId + "\",\"title\":\""
-                + firstParagraphTitle + "\",\"script\":{\"text\":\"" + firstParagraphText + "\"}}";
+        final String expectedparagraphContent = "{\"title\":\"" + firstParagraphTitle + "\",\"script\":{\"text\":\""
+                + firstParagraphText + "\"}}";
 
         final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
@@ -164,7 +164,6 @@ public final class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the body of the response contains a message mentioning the creation of the paragraph
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("id", newParagraphId)
                 .add("title", "")
                 .add("script", Json.createObjectBuilder().add("text", "").build())
                 .build();
@@ -323,7 +322,6 @@ public final class ParagraphServletTest extends AbstractNotebookServerTest {
         // Assert that the body of the response contains a message mentioning the editing of the paragraph
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
-                .add("id", firstParagraphId)
                 .add("title", newParagraphTitle)
                 .add("script", Json.createObjectBuilder().add("text", newParagraphText).build())
                 .build();
