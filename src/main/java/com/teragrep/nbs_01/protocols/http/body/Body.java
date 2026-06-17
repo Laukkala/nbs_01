@@ -45,8 +45,8 @@
  */
 package com.teragrep.nbs_01.protocols.http.body;
 
-import com.teragrep.nbs_01.Stubable;
 import com.teragrep.nbs_01.exceptions.StubObjectException;
+import com.teragrep.stb_01.Stubable;
 
 /**
  * Represents the body of a HTML request or a response. Can represent itself as a String.
