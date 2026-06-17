@@ -45,10 +45,15 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public final class NotebookServerTest extends AbstractNotebookServerTest {
 
@@ -58,10 +63,22 @@ public final class NotebookServerTest extends AbstractNotebookServerTest {
     @Test
     // Assert that a simple HTTP request to an existing endpoint results in return code 200 OK
     public void httpConnectTest() {
-        final HTTPResponse response = Assertions
-                .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/ping"));
-        Assertions.assertEquals(HttpStatus.OK_200, response.status());
-        final String body = Assertions.assertDoesNotThrow(() -> response.body().asString());
+        final URL url = Assertions.assertDoesNotThrow(() -> new URL("http://" + serverAddress() + "/ping"));
+
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest
+                .newBuilder()
+                .uri(URI.create(url.toString()))
+                .header("Origin", "localhost")
+                .GET()
+                .build();
+
+        final HttpResponse<String> response = Assertions
+                .assertDoesNotThrow(() -> client.send(request, HttpResponse.BodyHandlers.ofString()));
+
+        final int status = response.statusCode();
+        Assertions.assertEquals(HttpStatus.OK_200, status);
+        final String body = Assertions.assertDoesNotThrow(() -> response.body());
         Assertions.assertEquals("{\"message\":\"pong\"}", body);
     }
 }

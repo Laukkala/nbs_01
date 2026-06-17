@@ -46,7 +46,6 @@
 package com.teragrep.nbs_01.servlets.FileSystemServletTest;
 
 import com.teragrep.nbs_01.AbstractNotebookServerTest;
-import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
@@ -54,6 +53,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,7 +69,7 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + directoryPath, requestBody
@@ -78,12 +78,10 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         // Assert that we receive the proper response.
 
         final JsonObject expectedJson = Json.createObjectBuilder().build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
 
-        Assertions.assertEquals(HttpStatus.CREATED_201, response.status());
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.statusCode());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
     }
@@ -97,20 +95,19 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the existing directory path already has a saved file.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + directoryPath, requestBody
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.statusCode());
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Path at " + directoryPath + " is already in use!")
                 .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -126,7 +123,7 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that the file we are creating doesn't already exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + directoryPath, requestBody
@@ -137,8 +134,10 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         expectedChildren.add(directory2().getFileName().toString());
         expectedChildren.add(notebook2().getFileName().toString());
         final JsonObject expectedJson = Json.createObjectBuilder().build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+
+        // Assert that we receive the proper response.
+        Assertions.assertEquals(HttpStatus.CREATED_201, response.statusCode());
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
         // Assert that the file was created.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         // Assert that the original file still exists.
@@ -158,14 +157,14 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that there is a file in the path where we plan to copy our directory to.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + directoryPath, requestBody
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.statusCode());
     }
 
     @Test
@@ -180,20 +179,19 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Assert that there is a file in the path where we plan to copy our directory to.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + directoryPath, requestBody
                         )
                 );
         // Assert that we receive the proper response.
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.statusCode());
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "Destination " + directoryPath + " is already in use!")
                 .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -210,11 +208,11 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebook2())));
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory2())));
 
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + directoryPath, "{}")
                 );
-        Assertions.assertEquals(204, response.status());
+        Assertions.assertEquals(204, response.statusCode());
         // Assert that a file was deleted.
         Assertions
                 .assertEquals(3, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).toList().size()));
@@ -236,13 +234,13 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         // Assert that the file to be deleted does not exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(nonexistentDirectoryPath)));
 
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest(
                                 "http://" + serverAddress() + "/directory/" + nonexistentDirectoryPath, "{}"
                         )
                 );
-        Assertions.assertEquals(404, response.status());
+        Assertions.assertEquals(404, response.statusCode());
         // Assert that no files were deleted.
         Assertions
                 .assertEquals(4, Assertions.assertDoesNotThrow(() -> Files.list(notebookDirectory()).toList().size()));
@@ -254,17 +252,16 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         final Path directoryPath = notebook4();
         // Assert that the path we are looking for exists, even though it's not a directory.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + directoryPath, "{}")
                 );
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.statusCode());
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", directoryPath + " is not a Directory!")
                 .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -273,7 +270,7 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         final Path directoryPath = directory1();
         // Assert that the file exists.
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directory1())));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
 
         final JsonArrayBuilder expectedChildren = Json.createArrayBuilder();
@@ -284,8 +281,7 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
                 .add("title", directoryPath.toString())
                 .add("children", expectedChildren)
                 .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -294,9 +290,9 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         final String directoryPath = "I_DONT_EXIST";
         // Assert that the file does not exist.
         Assertions.assertFalse(Files.exists(notebookDirectory().resolve(directoryPath)));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
-        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.status());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND_404, response.statusCode());
     }
 
     @Test
@@ -306,16 +302,15 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
         // Assert that the path we are looking for exists and that it's a directory
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(directoryPath)));
         Assertions.assertFalse(Files.isDirectory(notebookDirectory().resolve(directoryPath)));
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + directoryPath));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.status());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.statusCode());
         final JsonObject expectedJson = Json
                 .createObjectBuilder()
                 .add("message", "File at path " + directoryPath + " is not a directory!")
                 .build();
-        Assertions
-                .assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body().asString()));
+        Assertions.assertDoesNotThrow(() -> Assertions.assertEquals(expectedJson.toString(), response.body()));
     }
 
     @Test
@@ -328,12 +323,12 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretDirectory by NBS_01
         final Path relativePath = Paths.get("../secretDirectory");
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(() -> makeHttpGETRequest("http://" + serverAddress() + "/directory/" + relativePath));
         // Assert that we got the proper response.
         Assertions.assertDoesNotThrow(() -> Files.delete(secretDirectory));
         // Response code should indicate a user error
-        Assertions.assertTrue(400 < response.status() && response.status() < 500);
+        Assertions.assertTrue(400 < response.statusCode() && response.statusCode() < 500);
     }
 
     @Test
@@ -346,13 +341,13 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretDirectory by NBS_01
         final Path relativePath = Paths.get("../secretDirectory");
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpDELETERequest("http://" + serverAddress() + "/directory/" + relativePath, "")
                 );
         // Assert that we got the proper response.
         // Response code should indicate a user error
-        Assertions.assertTrue(400 < response.status() && response.status() < 500);
+        Assertions.assertTrue(400 < response.statusCode() && response.statusCode() < 500);
         Assertions.assertTrue(Files.exists(secretDirectory));
         Assertions.assertDoesNotThrow(() -> Files.delete(secretDirectory));
     }
@@ -366,13 +361,13 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretDirectory by NBS_01
         final Path relativePath = Paths.get("../secretDirectory");
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest("http://" + serverAddress() + "/directory/" + relativePath, "")
                 );
         // Assert that we got the proper response.
         // Response code should indicate a user error
-        Assertions.assertTrue(400 < response.status() && response.status() < 500);
+        Assertions.assertTrue(400 < response.statusCode() && response.statusCode() < 500);
         Assertions.assertFalse(Files.exists(secretDirectory));
     }
 
@@ -385,7 +380,7 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
 
         // Define a path that would get resolved to secretDirectory by NBS_01
         final Path relativePath = Paths.get("../secretDirectory");
-        final HTTPResponse response = Assertions
+        final HttpResponse<String> response = Assertions
                 .assertDoesNotThrow(
                         () -> makeHttpPUTRequest(
                                 "http://" + serverAddress() + "/directory/" + relativePath,
@@ -394,7 +389,7 @@ public final class DirectoryServletTest extends AbstractNotebookServerTest {
                 );
         // Assert that we got the proper response.
         // Response code should indicate a user error
-        Assertions.assertTrue(400 < response.status() && response.status() < 500);
+        Assertions.assertTrue(400 < response.statusCode() && response.statusCode() < 500);
         Assertions.assertFalse(Files.exists(secretDirectory));
     }
 }

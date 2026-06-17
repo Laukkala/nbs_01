@@ -45,20 +45,8 @@
  */
 package com.teragrep.nbs_01;
 
-import com.teragrep.nbs_01.exceptions.ErrorEvent;
-import com.teragrep.nbs_01.protocols.http.body.Body;
-import com.teragrep.nbs_01.protocols.http.body.ErrorBody;
-import com.teragrep.nbs_01.protocols.http.body.JSONBody;
-import com.teragrep.nbs_01.protocols.http.body.StringBody;
-import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
-import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import com.teragrep.nbs_01.repository.storage.Storage;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
-import jakarta.json.stream.JsonParsingException;
-import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -66,16 +54,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -221,191 +206,65 @@ public class AbstractNotebookServerTest {
         fileToDelete.delete();
     }
 
-    public HTTPResponse makeHttpPOSTRequest(final String urlString, final String requestBody) throws IOException {
-        final URL url = new URL(urlString);
-        final StringBuilder messages = new StringBuilder();
+    public HttpResponse<String> makeHttpPOSTRequest(final String urlString, final String requestBody)
+            throws IOException {
+        final URL url = Assertions.assertDoesNotThrow(() -> new URL(urlString));
 
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest
+                .newBuilder()
+                .uri(URI.create(url.toString()))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
 
-        final byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        connection.connect();
-        final OutputStream output = connection.getOutputStream();
-        output.write(bytes);
-        output.close();
-        final int status = connection.getResponseCode();
-        final InputStreamReader connectionInputStreamReader;
-        if (status == 200) {
-            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
-        }
-        else {
-            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
-        }
-        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            messages.append(line + "\n");
-        }
-        Body responseBody;
-        try {
-            final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-            responseBody = new JSONBody(message);
-        }
-        catch (final JsonParsingException jsonParsingException) {
-            // Response is not in JSON format. In that case, return a String response.
-            responseBody = new StringBody(messages.toString());
-        }
-        connection.disconnect();
-        return new BasicHTTPResponse(status, responseBody);
+        final HttpResponse<String> response = Assertions
+                .assertDoesNotThrow(() -> client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return response;
     }
 
-    public HTTPResponse makeHttpGETRequest(final String urlString) throws IOException {
-        final URL url = new URL(urlString);
-        final StringBuilder messages = new StringBuilder();
+    public HttpResponse<String> makeHttpGETRequest(final String urlString) throws IOException {
 
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
+        final URL url = Assertions.assertDoesNotThrow(() -> new URL(urlString));
 
-        final int status = connection.getResponseCode();
-        final InputStreamReader connectionInputStreamReader;
-        if (status == 200) {
-            connectionInputStreamReader = new InputStreamReader(connection.getInputStream());
-        }
-        else {
-            connectionInputStreamReader = new InputStreamReader(connection.getErrorStream());
-        }
-        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url.toString())).GET().build();
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            messages.append(line);
-        }
-        Body responseBody;
-        try {
-            final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-            responseBody = new JSONBody(message);
-        }
-        catch (final JsonParsingException jsonParsingException) {
-            // Response is not in JSON format. In that case, return a String response.
-            responseBody = new StringBody(messages.toString());
-        }
-        connection.disconnect();
-        return new BasicHTTPResponse(status, responseBody);
+        final HttpResponse<String> response = Assertions
+                .assertDoesNotThrow(() -> client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return response;
     }
 
-    public HTTPResponse makeHttpPUTRequest(final String urlString, final String requestBody) throws IOException {
-        final URL url = new URL(urlString);
-        final StringBuilder messages = new StringBuilder();
+    public HttpResponse<String> makeHttpPUTRequest(final String urlString, final String requestBody)
+            throws IOException {
 
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("PUT");
-        connection.setDoOutput(true);
+        final URL url = Assertions.assertDoesNotThrow(() -> new URL(urlString));
 
-        final byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        connection.connect();
-        final OutputStream output = connection.getOutputStream();
-        output.write(bytes);
-        output.close();
-        final int status = connection.getResponseCode();
-        final InputStream connectionInputStream;
-        if (status == 201) {
-            connectionInputStream = connection.getInputStream();
-        }
-        else {
-            connectionInputStream = connection.getErrorStream();
-        }
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest
+                .newBuilder()
+                .uri(URI.create(url.toString()))
+                .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
 
-        // Read the response received from either ErrorStream or InputStream, depending on HTTP Response code received.
-        if (connectionInputStream != null) {
-            final InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
-            final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                messages.append(line + "\n");
-            }
-        }
-
-        Body responseBody;
-        try {
-            final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-            responseBody = new JSONBody(message);
-        }
-        catch (final JsonParsingException jsonParsingException) {
-            // Response is not in JSON format. In that case, return a String response.
-            responseBody = new StringBody(messages.toString());
-        }
-        connection.disconnect();
-        return new BasicHTTPResponse(status, responseBody);
+        final HttpResponse<String> response = Assertions
+                .assertDoesNotThrow(() -> client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return response;
     }
 
-    public HTTPResponse makeHttpDELETERequest(final String urlString, final String requestBody) throws IOException {
-        final URL url = new URL(urlString);
-        final StringBuilder messages = new StringBuilder();
+    public HttpResponse<String> makeHttpDELETERequest(final String urlString, final String requestBody)
+            throws IOException {
 
-        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("DELETE");
-        final byte[] bytes = (requestBody).getBytes(StandardCharsets.UTF_8);
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        connection.connect();
-        final OutputStream output = connection.getOutputStream();
-        output.write(bytes);
-        output.close();
-        final int status;
-        try {
-            status = connection.getResponseCode();
-            if (status == 204) {
-                // Successful responses to DELETE requests should have no content.
-                final JsonObject message = JsonValue.EMPTY_JSON_OBJECT;
-                connection.disconnect();
-                return new BasicHTTPResponse(status, new JSONBody(message));
-            }
-            else {
-                final InputStream connectionInputStream;
-                if (status >= 400 && status < 500) {
-                    connectionInputStream = connection.getErrorStream();
-                }
-                else {
-                    try {
-                        connectionInputStream = connection.getInputStream();
-                    }
-                    catch (final IOException ioException) {
-                        throw new IOException("Error while reading input from connection", ioException);
-                    }
-                }
-                if (connectionInputStream != null) {
-                    final InputStreamReader connectionInputStreamReader = new InputStreamReader(connectionInputStream);
-                    final BufferedReader reader = new BufferedReader(connectionInputStreamReader);
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        messages.append(line + "\n");
-                    }
-                }
-                Body responseBody;
-                try {
-                    final JsonObject message = Json.createReader(new StringReader(messages.toString())).readObject();
-                    responseBody = new JSONBody(message);
-                }
-                catch (final JsonParsingException jsonParsingException) {
-                    // Response is not in JSON format. In that case, return a String response.
-                    responseBody = new StringBody(messages.toString());
-                }
-                return new BasicHTTPResponse(status, responseBody);
-            }
+        final URL url = Assertions.assertDoesNotThrow(() -> new URL(urlString));
 
-        }
-        catch (final IOException ioException) {
-            return new BasicHTTPResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR_500,
-                    new ErrorBody(new ErrorEvent(ioException))
-            );
-        }
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest
+                .newBuilder()
+                .uri(URI.create(url.toString()))
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        final HttpResponse<String> response = Assertions
+                .assertDoesNotThrow(() -> client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return response;
     }
 }
