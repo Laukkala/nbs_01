@@ -62,8 +62,6 @@ import java.util.List;
 
 public interface Storage {
 
-    public abstract Identifier root();
-
     public abstract String readFile(Identifier identifier) throws IOException;
 
     public abstract String readDirectory(Identifier identifier) throws IOException, MalformedRequestException;

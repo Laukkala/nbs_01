@@ -94,10 +94,6 @@ public final class LocalFilesystemStorage implements Storage {
         this.charset = charset;
     }
 
-    public Identifier root() {
-        return new PathIdentifier(root.toString());
-    }
-
     @Override
     public void deleteDirectory(final Identifier identifier)
             throws NoSuchFileException, MalformedRequestException, IOException {
