@@ -105,12 +105,13 @@ public final class NotebookTest {
     @Test
     void testParagraphs() {
         final LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory);
+
         final JsonObject json = Assertions
                 .assertDoesNotThrow(
                         () -> Json
                                 .createReader(
                                         new StringReader(
-                                                root.readFile(new PathIdentifier(notebookDirectory.relativize(notebook1).toString()))
+                                                Files.readString(notebook1)
                                         )
                                 )
                                 .readObject()
@@ -130,11 +131,10 @@ public final class NotebookTest {
                         () -> Json
                                 .createReader(
                                         new StringReader(
-                                                root.readFile(new PathIdentifier(notebookDirectory.relativize(notebook4).toString()))
+                                                Files.readString(notebook4))
                                         )
                                 )
-                                .readObject()
-                );
+                                .readObject();
         final JsonNotebook jsonNotebook = new JsonNotebook(json);
         final Notebook notebook = new Notebook(jsonNotebook.title(), jsonNotebook.paragraphs());
         Assertions.assertTrue(Files.exists(notebook4));

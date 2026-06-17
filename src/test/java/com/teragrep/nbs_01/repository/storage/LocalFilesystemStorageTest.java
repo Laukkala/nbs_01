@@ -121,17 +121,6 @@ public final class LocalFilesystemStorageTest extends AbstractNotebookServerTest
     }
 
     @Test
-    void read() {
-        final LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory());
-        final String notebook1Content = Assertions
-                .assertDoesNotThrow(() -> root.readFile(new PathIdentifier(notebook1())));
-        Assertions
-                .assertEquals(
-                        Assertions.assertDoesNotThrow(() -> Files.readString(notebookDirectory().resolve(notebook1()))), notebook1Content
-                );
-    }
-
-    @Test
     void write() {
         final LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory());
         final Path notebookPath = Paths.get("createdNotebook_newNotebookId");

@@ -141,15 +141,6 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public String readFile(final Identifier identifier) throws FileNotFoundException, IOException {
-        final Path path = root.resolve(identifier.name());
-        if (!Files.exists(path) || Files.isDirectory(path)) {
-            throw new FileNotFoundException("No such file: " + root.relativize(path));
-        }
-        return Files.readString(path);
-    }
-
-    @Override
     public String readDirectory(final Identifier identifier) throws IOException, MalformedRequestException {
         final Path path = root.resolve(identifier.name());
         if (!Files.exists(path)) {
@@ -306,6 +297,13 @@ public final class LocalFilesystemStorage implements Storage {
         };
         Files.walkFileTree(path, fileVisitor);
         return files;
+    }
+    private String readFile(final Identifier identifier) throws FileNotFoundException, IOException {
+        final Path path = root.resolve(identifier.name());
+        if (!Files.exists(path) || Files.isDirectory(path)) {
+            throw new FileNotFoundException("No such file: " + root.relativize(path));
+        }
+        return Files.readString(path);
     }
 
     private void delete(final Path path) throws NoSuchFileException, IOException {
