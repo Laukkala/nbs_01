@@ -58,7 +58,6 @@ import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
@@ -118,8 +117,7 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
             final Paragraph newParagraph = new Paragraph(title, newScript);
             paragraphs.put(paragraphId, newParagraph);
             final Notebook newNotebook = new Notebook(notebook.title(), paragraphs);
-            final SerializedNotebook serializedNotebook = root.serializeNotebook(newNotebook);
-            root.writeNotebook(targetIdentifier, serializedNotebook);
+            root.writeNotebook(targetIdentifier, newNotebook);
 
             // Create response
             final String paragraphContent = root.serializeParagraph(newParagraph).serialize();

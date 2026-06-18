@@ -57,7 +57,6 @@ import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -88,7 +87,6 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
             // We cannot simply return the file contents as is back to the UI using root.read(), since it's possible that there are legacy Zeppelin files, which have a different structure.
             // Therefore, we must first create an in-memory Notebook object first via root.deserialize(), which will format the notebook properly whether it was sourced from a legacy file or not.
             final Notebook notebook = root.deserializeNotebook(targetIdentifier);
-            final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
@@ -96,7 +94,7 @@ public final class FindNotebookEndPoint implements HTTPEndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             response = new BasicHTTPResponse(
                     HttpStatus.OK_200,
-                    new StringBody(serializedNotebook.serialize()),
+                    new StringBody(root.format().format(notebook).serialize()),//TODO: This does formatting a second time per request. if format() is slow, problematic
                     headers
             );
         }

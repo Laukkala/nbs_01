@@ -56,7 +56,6 @@ import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
@@ -88,8 +87,7 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
 
             // Create a new Notebook with the modified title and serialize it to Storage.
             final Notebook modifiedNotebook = new Notebook(title, serializedNotebook.paragraphs());
-            final SerializedNotebook serializedModifiedNotebook = root.serializeNotebook(modifiedNotebook);
-            root.writeNotebook(targetIdentifier, serializedModifiedNotebook);
+            root.writeNotebook(targetIdentifier, modifiedNotebook);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();

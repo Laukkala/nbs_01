@@ -43,18 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository.serialization;
+package com.teragrep.nbs_01.repository.serialization.formats;
 
+import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
+import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
 import jakarta.json.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
-public interface SerializedNotebook {
+public class JsonFormat implements Format {
 
-    public abstract String title() throws JsonException;
+    @Override
+    public JsonNotebook format(Notebook notebook) {
+        final JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("title", notebook.title());
+        //compatibility fields//
+        builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
+        // end //
+        final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 
-    public abstract Map<String, Paragraph> paragraphs() throws JsonException;
-
-    public abstract String serialize();
+        for (final Map.Entry<String, Paragraph> entry : notebook.paragraphs().entrySet()) {
+            final JsonObjectBuilder paragraphBuilder = Json.createObjectBuilder();
+            paragraphBuilder.add("id", entry.getKey());
+            paragraphBuilder.add("title", entry.getValue().title());
+            final JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
+            scriptBuilder.add("text", entry.getValue().script().text());
+            paragraphBuilder.add("script", scriptBuilder.build());
+            arrayBuilder.add(paragraphBuilder.build());
+        }
+        final JsonArray paragraphJsonArray = arrayBuilder.build();
+        builder.add("paragraphs", paragraphJsonArray);
+        final JsonObject json = builder.build();
+        JsonNotebook serializedNotebook = new JsonNotebook(json);
+        return serializedNotebook;
+    }
 }

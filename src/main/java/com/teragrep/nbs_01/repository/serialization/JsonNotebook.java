@@ -46,10 +46,7 @@
 package com.teragrep.nbs_01.repository.serialization;
 
 import com.teragrep.nbs_01.repository.Paragraph;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
+import jakarta.json.*;
 
 import java.util.HashMap;
 import java.util.Map;

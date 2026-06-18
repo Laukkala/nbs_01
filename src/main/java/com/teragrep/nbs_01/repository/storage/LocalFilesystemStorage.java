@@ -57,8 +57,8 @@ import com.teragrep.nbs_01.repository.serialization.JsonScript;
 import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedParagraph;
 import com.teragrep.nbs_01.repository.serialization.SerializedScript;
+import com.teragrep.nbs_01.repository.serialization.formats.JsonFormat;
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
@@ -84,6 +84,7 @@ public final class LocalFilesystemStorage implements Storage {
 
     private final Path root;
     private final Charset charset;
+    private final JsonFormat format;
 
     public LocalFilesystemStorage(final Path root) {
         this(root, Charset.defaultCharset());
@@ -92,6 +93,7 @@ public final class LocalFilesystemStorage implements Storage {
     public LocalFilesystemStorage(final Path root, final Charset charset) {
         this.root = root;
         this.charset = charset;
+        this.format = new JsonFormat();
     }
 
     @Override
@@ -200,32 +202,6 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public SerializedNotebook serializeNotebook(final Notebook notebook) {
-        final JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("title", notebook.title());
-        //compatibility fields//
-        builder.add("config", Json.createObjectBuilder(new HashMap<>()).build());
-        // end //
-        final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-
-        for (final Map.Entry<String, Paragraph> entry : notebook.paragraphs().entrySet()) {
-            final JsonObjectBuilder paragraphBuilder = Json.createObjectBuilder();
-            paragraphBuilder.add("id", entry.getKey());
-            paragraphBuilder.add("title", entry.getValue().title());
-            final JsonObjectBuilder scriptBuilder = Json.createObjectBuilder();
-            scriptBuilder.add("text", entry.getValue().script().text());
-            paragraphBuilder.add("script", scriptBuilder.build());
-            arrayBuilder.add(paragraphBuilder.build());
-        }
-        final JsonArray paragraphJsonArray = arrayBuilder.build();
-        builder.add("paragraphs", paragraphJsonArray);
-        final JsonObject json = builder.build();
-
-        final JsonNotebook jsonNotebook = new JsonNotebook(json);
-        return jsonNotebook;
-    }
-
-    @Override
     public SerializedParagraph serializeParagraph(final Paragraph paragraph) {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("title", paragraph.title() != null ? paragraph.title() : "");
@@ -243,13 +219,19 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void writeNotebook(final Identifier identifier, final SerializedNotebook content)
+    public JsonFormat format() {
+        return format;
+    }
+
+    @Override
+    public void writeNotebook(final Identifier identifier, final Notebook notebook)
             throws MalformedRequestException, IOException {
         final Path path = root.resolve(identifier.name());
         if (Files.exists(path) && Files.isDirectory(path)) {
             throw new MalformedRequestException("File at path: " + root.relativize(path) + " is a Directory!");
         }
-        Files.write(path, content.serialize().getBytes(charset));
+        JsonNotebook formatted = format.format(notebook);
+        Files.write(path, formatted.serialize().getBytes(charset));
     }
 
     @Override

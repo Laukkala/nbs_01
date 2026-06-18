@@ -57,7 +57,6 @@ import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
@@ -112,8 +111,7 @@ public final class CopyParagraphEndpoint implements HTTPEndPoint {
 
             // Serialize edited destination notebook to storage
             final Notebook destinationNotebook = new Notebook(serializedDestination.title(), destinationParagraphs);
-            final SerializedNotebook serializedDestinationNotebook = root.serializeNotebook(destinationNotebook);
-            root.writeNotebook(targetIdentifier, serializedDestinationNotebook);
+            root.writeNotebook(targetIdentifier, destinationNotebook);
 
             // Create response
             final String paragraphContent = root.serializeParagraph(copyParagraph).serialize();

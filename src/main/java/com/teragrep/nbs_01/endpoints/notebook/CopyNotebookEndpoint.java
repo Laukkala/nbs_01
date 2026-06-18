@@ -56,7 +56,6 @@ import com.teragrep.nbs_01.protocols.http.HTTPRequest;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
@@ -90,8 +89,7 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
             // Create a copy, which also generates unique IDs for copied paragraphs.
             final Notebook copy = source.copy();
             // Serialize copy to storage
-            final SerializedNotebook serializedDestination = root.serializeNotebook(copy);
-            root.writeNotebook(targetIdentifier, serializedDestination);
+            root.writeNotebook(targetIdentifier, copy);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
@@ -99,7 +97,7 @@ public final class CopyNotebookEndpoint implements HTTPEndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             response = new BasicHTTPResponse(
                     HttpStatus.CREATED_201,
-                    new StringBody(serializedDestination.serialize()),
+                    new StringBody(root.format().format(copy).serialize()),//TODO: This does formatting a second time per request. if format() is slow, problematic
                     headers
             );
         }

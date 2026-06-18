@@ -43,18 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.nbs_01.repository.serialization;
+package com.teragrep.nbs_01.repository.serialization.formats;
 
-import com.teragrep.nbs_01.repository.Paragraph;
-import jakarta.json.*;
+import com.teragrep.nbs_01.repository.Notebook;
+import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 
-import java.util.Map;
+public interface Format {
 
-public interface SerializedNotebook {
-
-    public abstract String title() throws JsonException;
-
-    public abstract Map<String, Paragraph> paragraphs() throws JsonException;
-
-    public abstract String serialize();
+    public abstract SerializedNotebook format(Notebook notebook);
 }

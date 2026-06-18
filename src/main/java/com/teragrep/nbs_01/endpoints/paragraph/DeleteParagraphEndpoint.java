@@ -56,7 +56,6 @@ import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.storage.Storage;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -91,8 +90,7 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
 
             // Remove the paragraph and serialize notebook to Storage
             notebook.paragraphs().remove(targetParagraphId);
-            final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
-            root.writeNotebook(targetIdentifier, serializedNotebook);
+            root.writeNotebook(targetIdentifier, notebook);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();

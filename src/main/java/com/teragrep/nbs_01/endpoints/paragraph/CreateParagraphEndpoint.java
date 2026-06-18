@@ -57,7 +57,6 @@ import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.Storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -94,8 +93,7 @@ public final class CreateParagraphEndpoint implements HTTPEndPoint {
             // Add a new empty paragraph to the notebook and serialize to Storage
             final Paragraph newParagraph = new Paragraph();
             notebook.paragraphs().put(targetParagraphId, newParagraph);
-            final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
-            root.writeNotebook(targetIdentifier, serializedNotebook);
+            root.writeNotebook(targetIdentifier, notebook);
 
             // Create response
             final String paragraphContent = root.serializeParagraph(newParagraph).serialize();

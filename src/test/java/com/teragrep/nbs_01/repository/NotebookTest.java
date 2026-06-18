@@ -47,7 +47,6 @@ package com.teragrep.nbs_01.repository;
 
 import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
 import com.teragrep.nbs_01.repository.serialization.JsonNotebook;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.storage.LocalFilesystemStorage;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -126,9 +125,7 @@ public final class NotebookTest {
         Assertions.assertTrue(Files.exists(notebook4));
         final Path destinationPath = Paths.get("newName_copyId");
         final Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
-        final SerializedNotebook serializedNotebook = Assertions.assertDoesNotThrow(() -> root.serializeNotebook(copy));
-        Assertions
-                .assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(destinationPath.toString()), serializedNotebook));
+        Assertions.assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(destinationPath.toString()), copy));
         Assertions.assertTrue(Files.exists(notebook4));
         Assertions.assertTrue(Files.exists(notebookDirectory.resolve(destinationPath)));
     }

@@ -50,9 +50,9 @@ import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.Paragraph;
 import com.teragrep.nbs_01.repository.Script;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import com.teragrep.nbs_01.repository.serialization.SerializedParagraph;
 import com.teragrep.nbs_01.repository.serialization.SerializedScript;
+import com.teragrep.nbs_01.repository.serialization.formats.Format;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public interface Storage {
     public abstract List<Identifier> listChildren(Identifier identifier)
             throws MalformedRequestException, FileNotFoundException, IOException;
 
-    public abstract void writeNotebook(Identifier identifier, SerializedNotebook content)
+    public abstract void writeNotebook(Identifier identifier, Notebook content)
             throws MalformedRequestException, IOException;
 
     public abstract void writeDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException;
@@ -83,11 +83,11 @@ public interface Storage {
 
     public abstract Notebook deserializeNotebook(Identifier identifier) throws IOException;
 
-    public abstract SerializedNotebook serializeNotebook(Notebook notebook);
-
     public abstract SerializedParagraph serializeParagraph(Paragraph paragraph);
 
     public abstract SerializedScript serializeScript(Script script);
+
+    public abstract Format format();
 
     public abstract boolean exists(Identifier identifierZ);
 }

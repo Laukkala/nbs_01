@@ -49,7 +49,6 @@ import com.teragrep.nbs_01.AbstractNotebookServerTest;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.identifiers.PathIdentifier;
-import com.teragrep.nbs_01.repository.serialization.SerializedNotebook;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -125,11 +124,9 @@ public final class LocalFilesystemStorageTest extends AbstractNotebookServerTest
         final LocalFilesystemStorage root = new LocalFilesystemStorage(notebookDirectory());
         final Path notebookPath = Paths.get("createdNotebook_newNotebookId");
         final Notebook notebook = new Notebook("title");
-        final SerializedNotebook serializedNotebook = Assertions
-                .assertDoesNotThrow(() -> root.serializeNotebook(notebook));
 
         Assertions.assertFalse(Files.exists(notebookPath));
-        Assertions.assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(notebookPath), serializedNotebook));
+        Assertions.assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(notebookPath), notebook));
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
     }
 
