@@ -56,6 +56,7 @@ import com.teragrep.nbs_01.protocols.http.HTTPResponse;
 import com.teragrep.nbs_01.repository.identifiers.Identifier;
 import com.teragrep.nbs_01.repository.Notebook;
 import com.teragrep.nbs_01.protocols.http.BasicHTTPResponse;
+import com.teragrep.nbs_01.repository.serialization.formats.JsonFormat;
 import com.teragrep.nbs_01.repository.storage.Storage;
 import jakarta.json.JsonException;
 import org.apache.http.Header;
@@ -99,7 +100,7 @@ public final class CreateNotebookEndpoint implements HTTPEndPoint {
             headers.add(new BasicHeader("Content-Type", "application/json"));
             response = new BasicHTTPResponse(
                     HttpStatus.CREATED_201,
-                    new StringBody(root.format().format(newFile).serialize()), //TODO: This does formatting a second time per request. if format() is slow, problematic
+                    new StringBody(new JsonFormat().format(newFile).serialize()),
                     headers
             );
         }
