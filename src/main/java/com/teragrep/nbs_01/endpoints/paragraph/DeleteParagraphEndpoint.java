@@ -92,7 +92,7 @@ public final class DeleteParagraphEndpoint implements HTTPEndPoint {
             // Remove the paragraph and serialize notebook to Storage
             notebook.paragraphs().remove(targetParagraphId);
             final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
-            root.writeNotebook(targetIdentifier, serializedNotebook.serialize());
+            root.writeNotebook(targetIdentifier, serializedNotebook);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();

@@ -89,7 +89,7 @@ public final class UpdateNotebookEndpoint implements HTTPEndPoint {
             // Create a new Notebook with the modified title and serialize it to Storage.
             final Notebook modifiedNotebook = new Notebook(title, serializedNotebook.paragraphs());
             final SerializedNotebook serializedModifiedNotebook = root.serializeNotebook(modifiedNotebook);
-            root.writeNotebook(targetIdentifier, serializedModifiedNotebook.serialize());
+            root.writeNotebook(targetIdentifier, serializedModifiedNotebook);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();

@@ -128,7 +128,7 @@ public final class NotebookTest {
         final Notebook copy = Assertions.assertDoesNotThrow(() -> notebook.copy());
         final SerializedNotebook serializedNotebook = Assertions.assertDoesNotThrow(() -> root.serializeNotebook(copy));
         Assertions
-                .assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(destinationPath.toString()), serializedNotebook.serialize()));
+                .assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(destinationPath.toString()), serializedNotebook));
         Assertions.assertTrue(Files.exists(notebook4));
         Assertions.assertTrue(Files.exists(notebookDirectory.resolve(destinationPath)));
     }

@@ -243,13 +243,13 @@ public final class LocalFilesystemStorage implements Storage {
     }
 
     @Override
-    public void writeNotebook(final Identifier identifier, final String content)
+    public void writeNotebook(final Identifier identifier, final SerializedNotebook content)
             throws MalformedRequestException, IOException {
         final Path path = root.resolve(identifier.name());
         if (Files.exists(path) && Files.isDirectory(path)) {
             throw new MalformedRequestException("File at path: " + root.relativize(path) + " is a Directory!");
         }
-        Files.write(path, content.getBytes(charset));
+        Files.write(path, content.serialize().getBytes(charset));
     }
 
     @Override

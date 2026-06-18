@@ -95,7 +95,7 @@ public final class CreateParagraphEndpoint implements HTTPEndPoint {
             final Paragraph newParagraph = new Paragraph();
             notebook.paragraphs().put(targetParagraphId, newParagraph);
             final SerializedNotebook serializedNotebook = root.serializeNotebook(notebook);
-            root.writeNotebook(targetIdentifier, serializedNotebook.serialize());
+            root.writeNotebook(targetIdentifier, serializedNotebook);
 
             // Create response
             final String paragraphContent = root.serializeParagraph(newParagraph).serialize();

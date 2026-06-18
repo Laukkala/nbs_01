@@ -129,8 +129,7 @@ public final class LocalFilesystemStorageTest extends AbstractNotebookServerTest
                 .assertDoesNotThrow(() -> root.serializeNotebook(notebook));
 
         Assertions.assertFalse(Files.exists(notebookPath));
-        Assertions
-                .assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(notebookPath), serializedNotebook.serialize()));
+        Assertions.assertDoesNotThrow(() -> root.writeNotebook(new PathIdentifier(notebookPath), serializedNotebook));
         Assertions.assertTrue(Files.exists(notebookDirectory().resolve(notebookPath)));
     }
 

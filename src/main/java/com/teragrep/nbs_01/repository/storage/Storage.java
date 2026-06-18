@@ -67,7 +67,8 @@ public interface Storage {
     public abstract List<Identifier> listChildren(Identifier identifier)
             throws MalformedRequestException, FileNotFoundException, IOException;
 
-    public abstract void writeNotebook(Identifier identifier, String content) throws MalformedRequestException, IOException;
+    public abstract void writeNotebook(Identifier identifier, SerializedNotebook content)
+            throws MalformedRequestException, IOException;
 
     public abstract void writeDirectory(Identifier identifier) throws FileAlreadyExistsException, IOException;
 

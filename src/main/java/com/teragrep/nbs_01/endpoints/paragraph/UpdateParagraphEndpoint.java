@@ -119,7 +119,7 @@ public final class UpdateParagraphEndpoint implements HTTPEndPoint {
             paragraphs.put(paragraphId, newParagraph);
             final Notebook newNotebook = new Notebook(notebook.title(), paragraphs);
             final SerializedNotebook serializedNotebook = root.serializeNotebook(newNotebook);
-            root.writeNotebook(targetIdentifier, serializedNotebook.serialize());
+            root.writeNotebook(targetIdentifier, serializedNotebook);
 
             // Create response
             final String paragraphContent = root.serializeParagraph(newParagraph).serialize();

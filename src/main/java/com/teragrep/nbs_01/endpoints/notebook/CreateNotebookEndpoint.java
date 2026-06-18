@@ -93,7 +93,7 @@ public final class CreateNotebookEndpoint implements HTTPEndPoint {
             // Create new notebook and serialize it to Storage
             final Notebook newFile = new Notebook(title);
             final SerializedNotebook notebook = root.serializeNotebook(newFile);
-            root.writeNotebook(targetIdentifier, notebook.serialize());
+            root.writeNotebook(targetIdentifier, notebook);
 
             // Create response
             final ArrayList<Header> headers = new ArrayList<>();
